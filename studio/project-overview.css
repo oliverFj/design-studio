@@ -1,0 +1,43 @@
+/* Shared demonstration composition; component anatomy remains in the library. */
+.project-overview { container-type: inline-size; container-name: project-overview; min-width: 0; background: var(--ds-color-background-canvas); color: var(--ds-color-text-primary); font-family: var(--ds-typography-font-body); font-size: var(--ds-typography-size-body); line-height: var(--ds-typography-lineHeight-body); }
+.project-overview .example-canvas { padding: 34px; min-height: 600px; }
+.project-overview .example-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 26px; }
+.project-overview .example-heading-copy { display: grid; gap: var(--ds-space-component-gap); min-width: 0; }
+.project-overview .example-heading .ds-heading, .project-overview .example-heading .ds-text { margin: 0; }
+.project-overview .example-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-component-gap); }
+.project-overview .example-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-bottom: 24px; }
+.project-overview [data-example-layout="stat"] { display: flex; justify-content: space-between; align-items: center; gap: var(--ds-space-component-gap); }
+.project-overview .example-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.project-overview .example-stack { display: grid; gap: 20px; min-width: 0; }
+.project-overview .example-section-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-space-component-gap); margin-bottom: 16px; }
+.project-overview .example-projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.project-overview [data-example-layout="project-heading"] { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-space-component-gap); }
+.project-overview [data-example-layout="project-copy"] { display: grid; gap: var(--ds-space-component-gap); }
+.project-overview .example-form { min-width: 0; }
+.project-overview .example-grid > *, .project-overview .example-projects > *, .project-overview .example-stats > * { min-width: 0; }
+.project-overview .example-form .ds-field, .project-overview .example-form .ds-input, .project-overview .example-form .ds-select { width: 100%; }
+.project-overview .example-grid .ds-heading, .project-overview .example-grid .ds-text, .project-overview .example-stats .ds-heading, .project-overview .example-stats .ds-text { margin: 0; }
+.project-overview .example-grid .ds-card, .project-overview .example-stats .ds-card { width: 100%; }
+.project-overview [data-example-stack] { display: grid; gap: var(--ds-space-component-gapLarge); }
+.project-overview [data-example-stack="heading"] { gap: var(--ds-space-component-gap); }
+.project-overview .example-modal { max-width: min(540px, calc(100vw - 32px)); width: 100%; padding: 0; border: 0; background: transparent; color: inherit; }
+.project-overview .example-modal::backdrop { background: #111c2bb3; backdrop-filter: blur(4px); }
+.project-overview .example-modal .ds-dialog { width: 100%; max-width: none; }
+@container project-overview (max-width: 1000px) {
+  .project-overview .example-canvas { padding: 26px; }
+  .project-overview .example-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; }
+  .project-overview .example-projects { grid-template-columns: 1fr; }
+}
+@container project-overview (max-width: 700px) {
+  .project-overview .example-grid { grid-template-columns: 1fr; }
+  .project-overview .example-heading { align-items: start; flex-direction: column; gap: 18px; }
+  .project-overview .example-stats { gap: 12px; }
+  .project-overview [data-example-layout="stat"] { align-items: start; flex-direction: column; }
+  .project-overview .example-projects { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container project-overview (max-width: 460px) {
+  .project-overview .example-canvas { padding: 22px 16px; }
+  .project-overview .example-stats { grid-template-columns: 1fr; gap: 10px; }
+  .project-overview [data-example-layout="stat"] { flex-direction: row; align-items: center; }
+  .project-overview .example-projects { grid-template-columns: 1fr; }
+}

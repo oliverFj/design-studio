@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 2,
+  "studioRoot": "REPLACE_WITH_ABSOLUTE_DESIGN_STUDIO_PATH",
+  "package": "design/design.json",
+  "css": "design/design.css",
+  "scope": ".ds-scope",
+  "starter": "studio-light",
+  "components": {},
+  "libraryVersion": "2.0.0",
+  "library": "design/runtime/components.mjs"
+}

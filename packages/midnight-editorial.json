@@ -1,0 +1,736 @@
+{
+  "schemaVersion": 2,
+  "id": "midnight-editorial",
+  "name": "Midnight Editorial",
+  "description": "Et raffineret mørkt tema med blækblå flader, varm kobberglød og redaktionelle serifoverskrifter. Rolige kontroller og tydelig læsbarhed holder indholdet i centrum.",
+  "tokens": {
+    "color.background.canvas": {
+      "$type": "color",
+      "$value": "#14161e",
+      "description": "Produktets grundbaggrund."
+    },
+    "color.background.surface": {
+      "$type": "color",
+      "$value": "#1e212c",
+      "description": "Baggrund for kort, dialoger og indtastningsfelter."
+    },
+    "color.background.subtle": {
+      "$type": "color",
+      "$value": "#292d39",
+      "description": "Svagt fremhævede områder og neutrale badges."
+    },
+    "color.text.primary": {
+      "$type": "color",
+      "$value": "#f3eee7",
+      "description": "Primær tekst og overskrifter."
+    },
+    "color.text.secondary": {
+      "$type": "color",
+      "$value": "#b9bdcc",
+      "description": "Supplerende tekst og vejledning."
+    },
+    "color.border.default": {
+      "$type": "color",
+      "$value": "#3c4253",
+      "description": "Standardkant på kontroller og overflader."
+    },
+    "color.action.primary": {
+      "$type": "color",
+      "$value": "#efc4a3",
+      "description": "Primære handlinger og valgte kontroller."
+    },
+    "color.action.primaryText": {
+      "$type": "color",
+      "$value": "#292019",
+      "description": "Tekst oven på den primære handlingsfarve."
+    },
+    "color.action.subtle": {
+      "$type": "color",
+      "$value": "#3c302a",
+      "description": "Svag baggrund for sekundære handlinger og accentbadges."
+    },
+    "color.action.subtleText": {
+      "$type": "color",
+      "$value": "#f2ceb3",
+      "description": "Tekst på den svage handlingsbaggrund."
+    },
+    "color.focus": {
+      "$type": "color",
+      "$value": "#efc4a3",
+      "description": "Synlig markering af tastaturfokus."
+    },
+    "color.status.danger": {
+      "$type": "color",
+      "$value": "#f1a5b0",
+      "description": "Fejlkant og destruktive handlinger."
+    },
+    "color.status.dangerSurface": {
+      "$type": "color",
+      "$value": "#3f2631",
+      "description": "Baggrund for fejlbeskeder."
+    },
+    "color.status.dangerText": {
+      "$type": "color",
+      "$value": "#f4bdc6",
+      "description": "Tekst på fejlbaggrunden og selvstændig fejltekst."
+    },
+    "color.status.dangerContrast": {
+      "$type": "color",
+      "$value": "#301a23",
+      "description": "Tekst på en destruktiv handlingsknap."
+    },
+    "color.disabled.surface": {
+      "$type": "color",
+      "$value": "#2a2e3a",
+      "description": "Baggrund for deaktiverede inputkontroller."
+    },
+    "color.disabled.text": {
+      "$type": "color",
+      "$value": "#9299ad",
+      "description": "Tekst i deaktiverede inputkontroller."
+    },
+    "typography.font.body": {
+      "$type": "fontFamily",
+      "$value": "'Segoe UI', system-ui, sans-serif",
+      "description": "Brødtekst og kontroller; ingen ekstern skrifttjeneste er nødvendig."
+    },
+    "typography.font.heading": {
+      "$type": "fontFamily",
+      "$value": "Georgia, 'Times New Roman', serif",
+      "description": "Overskrifter og titler."
+    },
+    "typography.size.body": {
+      "$type": "dimension",
+      "$value": "1rem",
+      "description": "Normal læsetekst."
+    },
+    "typography.size.heading": {
+      "$type": "dimension",
+      "$value": "2.25rem",
+      "description": "Primær overskrift i designeksemplerne."
+    },
+    "typography.size.label": {
+      "$type": "dimension",
+      "$value": "0.875rem",
+      "description": "Labels og betjeningskontroller."
+    },
+    "typography.size.small": {
+      "$type": "dimension",
+      "$value": "0.8125rem",
+      "description": "Hjælpetekst og kompakte badges."
+    },
+    "typography.size.title": {
+      "$type": "dimension",
+      "$value": "1.5rem",
+      "description": "Titler i kort og dialoger."
+    },
+    "typography.weight.body": {
+      "$type": "fontWeight",
+      "$value": 400,
+      "description": "Normal tekstvægt."
+    },
+    "typography.weight.heading": {
+      "$type": "fontWeight",
+      "$value": 400,
+      "description": "Overskrifternes tekstvægt."
+    },
+    "typography.weight.label": {
+      "$type": "fontWeight",
+      "$value": 600,
+      "description": "Labels og handlingsknappers tekstvægt."
+    },
+    "typography.lineHeight.body": {
+      "$type": "number",
+      "$value": 1.65,
+      "description": "Linjehøjde uden enhed for brødtekst."
+    },
+    "typography.lineHeight.heading": {
+      "$type": "number",
+      "$value": 1.15,
+      "description": "Linjehøjde uden enhed for overskrifter."
+    },
+    "typography.lineHeight.control": {
+      "$type": "number",
+      "$value": 1.35,
+      "description": "Linjehøjde uden enhed for knapper og badges."
+    },
+    "space.1": {
+      "$type": "dimension",
+      "$value": "0.25rem",
+      "description": "Små indvendige mellemrum."
+    },
+    "space.2": {
+      "$type": "dimension",
+      "$value": "0.5rem",
+      "description": "Tæt afstand mellem beslægtede elementer."
+    },
+    "space.3": {
+      "$type": "dimension",
+      "$value": "0.75rem",
+      "description": "Kompakt indvendig afstand."
+    },
+    "space.4": {
+      "$type": "dimension",
+      "$value": "1rem",
+      "description": "Standardafstand og vandret kontrolpadding."
+    },
+    "space.6": {
+      "$type": "dimension",
+      "$value": "1.5rem",
+      "description": "Indvendig afstand i større overflader."
+    },
+    "space.8": {
+      "$type": "dimension",
+      "$value": "2rem",
+      "description": "Afstand mellem visuelle grupper."
+    },
+    "size.control.height": {
+      "$type": "dimension",
+      "$value": "2.75rem",
+      "description": "Minimumshøjde for knapper, input og select."
+    },
+    "size.checkbox": {
+      "$type": "dimension",
+      "$value": "1.125rem",
+      "description": "Checkboxens visuelle størrelse."
+    },
+    "size.dialog.maxWidth": {
+      "$type": "dimension",
+      "$value": "36rem",
+      "description": "Dialogfladens maksimale bredde."
+    },
+    "border.width.default": {
+      "$type": "dimension",
+      "$value": "1px",
+      "description": "Standardbredde på kanter."
+    },
+    "border.width.focus": {
+      "$type": "dimension",
+      "$value": "3px",
+      "description": "Bredde på den synlige fokusmarkering."
+    },
+    "border.offset.focus": {
+      "$type": "dimension",
+      "$value": "3px",
+      "description": "Afstand fra kontrol til fokusmarkering."
+    },
+    "radius.control": {
+      "$type": "dimension",
+      "$value": "0.5rem",
+      "description": "Hjørner på knapper og input."
+    },
+    "radius.card": {
+      "$type": "dimension",
+      "$value": "0.875rem",
+      "description": "Hjørner på kort, beskeder og dialoger."
+    },
+    "radius.badge": {
+      "$type": "dimension",
+      "$value": "999px",
+      "description": "Afrunding på badges."
+    },
+    "opacity.hover": {
+      "$type": "number",
+      "$value": 0.92,
+      "description": "Knapopacitet ved hover."
+    },
+    "opacity.active": {
+      "$type": "number",
+      "$value": 0.84,
+      "description": "Knapopacitet under aktivering."
+    },
+    "opacity.disabled": {
+      "$type": "number",
+      "$value": 0.45,
+      "description": "Opacitet for deaktiverede knapper og checkboxes."
+    },
+    "shadow.card": {
+      "$type": "shadow",
+      "$value": "0 2px 4px rgba(0,0,0,0.08), 0 12px 28px rgba(0,0,0,0.16)",
+      "description": "Skygge på hævede overflader."
+    },
+    "duration.fast": {
+      "$type": "duration",
+      "$value": "170ms",
+      "description": "Varighed af små visuelle tilstandsskift."
+    },
+    "color.background.control": {
+      "$type": "color",
+      "$value": "#222632",
+      "description": "Temaets fælles visuelle værdi for color.background.control."
+    },
+    "color.background.detail": {
+      "$type": "color",
+      "$value": "{color.background.surface}",
+      "description": "Temaets fælles visuelle værdi for color.background.detail."
+    },
+    "color.text.muted": {
+      "$type": "color",
+      "$value": "{color.text.secondary}",
+      "description": "Temaets fælles visuelle værdi for color.text.muted."
+    },
+    "color.text.label": {
+      "$type": "color",
+      "$value": "{color.text.secondary}",
+      "description": "Temaets fælles visuelle værdi for color.text.label."
+    },
+    "color.border.strong": {
+      "$type": "color",
+      "$value": "{color.text.secondary}",
+      "description": "Temaets fælles visuelle værdi for color.border.strong."
+    },
+    "color.caption.surface": {
+      "$type": "color",
+      "$value": "{color.background.surface}",
+      "description": "Temaets fælles visuelle værdi for color.caption.surface."
+    },
+    "color.caption.text": {
+      "$type": "color",
+      "$value": "{color.text.primary}",
+      "description": "Temaets fælles visuelle værdi for color.caption.text."
+    },
+    "color.caption.labelSurface": {
+      "$type": "color",
+      "$value": "{color.action.primary}",
+      "description": "Temaets fælles visuelle værdi for color.caption.labelSurface."
+    },
+    "color.caption.labelText": {
+      "$type": "color",
+      "$value": "{color.action.primaryText}",
+      "description": "Temaets fælles visuelle værdi for color.caption.labelText."
+    },
+    "typography.size.control": {
+      "$type": "dimension",
+      "$value": "{typography.size.label}",
+      "description": "Temaets fælles visuelle værdi for typography.size.control."
+    },
+    "typography.size.panel": {
+      "$type": "dimension",
+      "$value": "{typography.size.title}",
+      "description": "Temaets fælles visuelle værdi for typography.size.panel."
+    },
+    "typography.size.tiny": {
+      "$type": "dimension",
+      "$value": "{typography.size.small}",
+      "description": "Temaets fælles visuelle værdi for typography.size.tiny."
+    },
+    "typography.size.shortcut": {
+      "$type": "dimension",
+      "$value": "0.75rem",
+      "description": "Temaets fælles visuelle værdi for typography.size.shortcut."
+    },
+    "typography.weight.strong": {
+      "$type": "fontWeight",
+      "$value": "{typography.weight.label}",
+      "description": "Temaets fælles visuelle værdi for typography.weight.strong."
+    },
+    "typography.tracking.title": {
+      "$type": "dimension",
+      "$value": "-0.025em",
+      "description": "Temaets fælles visuelle værdi for typography.tracking.title."
+    },
+    "typography.tracking.label": {
+      "$type": "dimension",
+      "$value": "0.1em",
+      "description": "Temaets fælles visuelle værdi for typography.tracking.label."
+    },
+    "typography.tracking.section": {
+      "$type": "dimension",
+      "$value": "0.1em",
+      "description": "Temaets fælles visuelle værdi for typography.tracking.section."
+    },
+    "typography.tracking.brand": {
+      "$type": "dimension",
+      "$value": "-0.02em",
+      "description": "Temaets fælles visuelle værdi for typography.tracking.brand."
+    },
+    "radius.input": {
+      "$type": "dimension",
+      "$value": "{radius.control}",
+      "description": "Temaets fælles visuelle værdi for radius.input."
+    },
+    "radius.segment": {
+      "$type": "dimension",
+      "$value": "0.375rem",
+      "description": "Temaets fælles visuelle værdi for radius.segment."
+    },
+    "radius.note": {
+      "$type": "dimension",
+      "$value": "{radius.control}",
+      "description": "Temaets fælles visuelle værdi for radius.note."
+    },
+    "radius.actionButton": {
+      "$type": "dimension",
+      "$value": "{radius.control}",
+      "description": "Temaets fælles visuelle værdi for radius.actionButton."
+    },
+    "radius.pill": {
+      "$type": "dimension",
+      "$value": "999px",
+      "description": "Temaets fælles visuelle værdi for radius.pill."
+    },
+    "size.switch.width": {
+      "$type": "dimension",
+      "$value": "2.75rem",
+      "description": "Temaets fælles visuelle værdi for size.switch.width."
+    },
+    "size.switch.height": {
+      "$type": "dimension",
+      "$value": "1.5rem",
+      "description": "Temaets fælles visuelle værdi for size.switch.height."
+    },
+    "size.switch.thumb": {
+      "$type": "dimension",
+      "$value": "1.125rem",
+      "description": "Temaets fælles visuelle værdi for size.switch.thumb."
+    },
+    "size.switch.inset": {
+      "$type": "dimension",
+      "$value": "0.1875rem",
+      "description": "Temaets fælles visuelle værdi for size.switch.inset."
+    },
+    "opacity.shortcut": {
+      "$type": "number",
+      "$value": 1,
+      "description": "Temaets fælles visuelle værdi for opacity.shortcut."
+    },
+    "space.component.padding": {
+      "$type": "dimension",
+      "$value": "1rem",
+      "description": "Temaets fælles visuelle værdi for space.component.padding."
+    },
+    "space.component.paddingLarge": {
+      "$type": "dimension",
+      "$value": "1.5rem",
+      "description": "Temaets fælles visuelle værdi for space.component.paddingLarge."
+    },
+    "space.component.paddingCompact": {
+      "$type": "dimension",
+      "$value": "0.5rem",
+      "description": "Temaets fælles visuelle værdi for space.component.paddingCompact."
+    },
+    "space.component.gap": {
+      "$type": "dimension",
+      "$value": "0.5rem",
+      "description": "Temaets fælles visuelle værdi for space.component.gap."
+    },
+    "space.component.gapLarge": {
+      "$type": "dimension",
+      "$value": "1rem",
+      "description": "Temaets fælles visuelle værdi for space.component.gapLarge."
+    },
+    "color.border.field": {
+      "$type": "color",
+      "$value": "#535b6f",
+      "description": "Temaets fælles visuelle værdi for color.border.field."
+    },
+    "color.background.inverse": {
+      "$type": "color",
+      "$value": "#ece5db",
+      "description": "Temaets fælles visuelle værdi for color.background.inverse."
+    },
+    "color.text.inverse": {
+      "$type": "color",
+      "$value": "#25232c",
+      "description": "Temaets fælles visuelle værdi for color.text.inverse."
+    },
+    "color.brand.accent": {
+      "$type": "color",
+      "$value": "{color.action.primary}",
+      "description": "Temaets fælles visuelle værdi for color.brand.accent."
+    },
+    "color.status.success": {
+      "$type": "color",
+      "$value": "#b1d6be",
+      "description": "Temaets fælles visuelle værdi for color.status.success."
+    },
+    "color.status.info": {
+      "$type": "color",
+      "$value": "#aac7f1",
+      "description": "Temaets fælles visuelle værdi for color.status.info."
+    },
+    "color.status.warning": {
+      "$type": "color",
+      "$value": "#e8d094",
+      "description": "Temaets fælles visuelle værdi for color.status.warning."
+    },
+    "typography.size.display": {
+      "$type": "dimension",
+      "$value": "4rem",
+      "description": "Temaets fælles visuelle værdi for typography.size.display."
+    },
+    "shadow.floating": {
+      "$type": "shadow",
+      "$value": "0 12px 32px rgba(0,0,0,0.2), 0 28px 72px rgba(0,0,0,0.25)",
+      "description": "Temaets fælles visuelle værdi for shadow.floating."
+    },
+    "shadow.selected": {
+      "$type": "shadow",
+      "$value": "0 1px 4px rgba(0,0,0,0.22)",
+      "description": "Temaets fælles visuelle værdi for shadow.selected."
+    },
+    "color.action.neutralHover": {
+      "$type": "color",
+      "$value": "#3a4053",
+      "description": "Flade for neutrale, sekundære og åbne handlinger, når pegeren er over kontrollen."
+    },
+    "color.action.neutralHoverText": {
+      "$type": "color",
+      "$value": "{color.text.primary}",
+      "description": "Læsbar tekst på neutralHover-fladen; bruges sammen med fladens token."
+    },
+    "color.action.neutralActive": {
+      "$type": "color",
+      "$value": "#474d63",
+      "description": "Flade for neutrale, sekundære og åbne handlinger, når kontrollen trykkes ned."
+    },
+    "color.action.neutralActiveText": {
+      "$type": "color",
+      "$value": "{color.text.primary}",
+      "description": "Læsbar tekst på neutralActive-fladen; bruges sammen med fladens token."
+    },
+    "color.action.primaryHover": {
+      "$type": "color",
+      "$value": "#ffd9ba",
+      "description": "Flade for primære og aktive handlinger, når pegeren er over kontrollen."
+    },
+    "color.action.primaryHoverText": {
+      "$type": "color",
+      "$value": "{color.action.primaryText}",
+      "description": "Læsbar tekst på primaryHover-fladen; bruges sammen med fladens token."
+    },
+    "color.action.primaryActive": {
+      "$type": "color",
+      "$value": "#ffe9d6",
+      "description": "Flade for primære og aktive handlinger, når kontrollen trykkes ned."
+    },
+    "color.action.primaryActiveText": {
+      "$type": "color",
+      "$value": "{color.action.primaryText}",
+      "description": "Læsbar tekst på primaryActive-fladen; bruges sammen med fladens token."
+    },
+    "color.action.selectedHover": {
+      "$type": "color",
+      "$value": "#46404a",
+      "description": "Flade for valgte segmenter med en rolig kontrolflade, når pegeren er over kontrollen."
+    },
+    "color.action.selectedHoverText": {
+      "$type": "color",
+      "$value": "{color.text.primary}",
+      "description": "Læsbar tekst på selectedHover-fladen; bruges sammen med fladens token."
+    },
+    "color.action.selectedActive": {
+      "$type": "color",
+      "$value": "#544955",
+      "description": "Flade for valgte segmenter med en rolig kontrolflade, når kontrollen trykkes ned."
+    },
+    "color.action.selectedActiveText": {
+      "$type": "color",
+      "$value": "{color.text.primary}",
+      "description": "Læsbar tekst på selectedActive-fladen; bruges sammen med fladens token."
+    },
+    "color.action.dangerHover": {
+      "$type": "color",
+      "$value": "#ffc4cd",
+      "description": "Flade for destruktive handlinger, når pegeren er over kontrollen."
+    },
+    "color.action.dangerHoverText": {
+      "$type": "color",
+      "$value": "{color.status.dangerContrast}",
+      "description": "Læsbar tekst på dangerHover-fladen; bruges sammen med fladens token."
+    },
+    "color.action.dangerActive": {
+      "$type": "color",
+      "$value": "#ffdae0",
+      "description": "Flade for destruktive handlinger, når kontrollen trykkes ned."
+    },
+    "color.action.dangerActiveText": {
+      "$type": "color",
+      "$value": "{color.status.dangerContrast}",
+      "description": "Læsbar tekst på dangerActive-fladen; bruges sammen med fladens token."
+    },
+    "color.action.accentHover": {
+      "$type": "color",
+      "$value": "{color.action.primaryHover}",
+      "description": "Flade for særlige brandhandlinger, når pegeren er over kontrollen."
+    },
+    "color.action.accentHoverText": {
+      "$type": "color",
+      "$value": "{color.action.primaryText}",
+      "description": "Læsbar tekst på accentHover-fladen; bruges sammen med fladens token."
+    },
+    "color.action.accentActive": {
+      "$type": "color",
+      "$value": "{color.action.primaryActive}",
+      "description": "Flade for særlige brandhandlinger, når kontrollen trykkes ned."
+    },
+    "color.action.accentActiveText": {
+      "$type": "color",
+      "$value": "{color.action.primaryText}",
+      "description": "Læsbar tekst på accentActive-fladen; bruges sammen med fladens token."
+    }
+  },
+  "history": [
+    {
+      "date": "2026-10-08",
+      "note": "Selvstændig mørk eksempelpakke med samme tokens, komponentdele, varianter og tilstande som Studio Light. Indeholder intet design fra Walking Fortress."
+    },
+    {
+      "date": "2026-10-09",
+      "note": "Migrated explicitly to theme format 2. Shared library now owns structure, padding, gaps, native markup and previews; visual appearance and brand are preserved."
+    },
+    {
+      "date": "2026-10-09",
+      "note": "Kanoniske roller; komponentdokumentation arves entydigt fra det fælles bibliotek."
+    },
+    {
+      "date": "2026-10-09",
+      "note": "Visuelt redesign: sammenhængende semantiske farver, læsbar typografi, fælles kontrolmål, bevidst afrunding og roligere skygger. Gentagne komponentopskrifter er erstattet af tokens og få brandvalg; logoer, skrifter og licenser er bevaret."
+    },
+    {
+      "date": "2026-10-09",
+      "note": "Hover og tryk bruger nu tydelige, solide semantiske flade- og tekstpar for neutrale, primære, valgte, destruktive og særlige handlinger. Palettens karakter og valgt hierarki er bevaret; tastaturfokus og klikflader følger fortsat biblioteket."
+    }
+  ],
+  "appearance": {},
+  "brand": {
+    "name": "Midnight Editorial",
+    "summary": "Et raffineret mørkt tema med blækblå flader, varm kobberglød og redaktionelle serifoverskrifter. Rolige kontroller og tydelig læsbarhed holder indholdet i centrum.",
+    "principles": [
+      {
+        "id": "clarity",
+        "title": "Klarhed",
+        "description": "Lad typografisk hierarki, ensartede kontroller og tydelig kontrast gøre indhold og handlinger lette at aflæse."
+      },
+      {
+        "id": "restraint",
+        "title": "Visuel ro",
+        "description": "Brug accentfarven sparsomt og lad neutrale flader skabe forskellen mellem grupper."
+      },
+      {
+        "id": "precision",
+        "title": "Præcision",
+        "description": "Brug bibliotekets komponenter med fælles mål og tilstande. Visuel karakter kommer fra temaets tokens."
+      }
+    ],
+    "sections": [
+      {
+        "id": "palette",
+        "title": "Farver og hierarki",
+        "description": "Blækblå flader skaber dybde; varm kobberglød markerer handlinger. Undgå rent sort og store stærke accentflader.",
+        "tokens": [
+          "color.background.canvas",
+          "color.background.surface",
+          "color.background.subtle",
+          "color.text.primary",
+          "color.text.secondary",
+          "color.action.primary"
+        ],
+        "components": [
+          "button",
+          "card",
+          "badge",
+          "segmented-control"
+        ],
+        "dos": [
+          "Giv primære handlinger den stærkeste lokale fremhævning.",
+          "Brug statusfarver til status og accentfarven til handlinger."
+        ],
+        "donts": [
+          "Farvelæg ikke alle kort og labels med accent."
+        ]
+      },
+      {
+        "id": "typography",
+        "title": "Typografi",
+        "description": "Georgia giver overskrifterne et redaktionelt udtryk; systemets sans-skrift giver kontroller og brødtekst præcision.",
+        "tokens": [
+          "typography.font.body",
+          "typography.font.heading",
+          "typography.size.body",
+          "typography.size.heading",
+          "typography.size.title"
+        ],
+        "components": [
+          "heading",
+          "text",
+          "field",
+          "caption"
+        ],
+        "dos": [
+          "Hold brødtekst og funktionelle labels i sans-skrift.",
+          "Brug tydelige, korte overskrifter."
+        ],
+        "donts": [
+          "Brug ikke overdreven versalsætning eller mange forskellige tekstvægte."
+        ]
+      },
+      {
+        "id": "surfaces",
+        "title": "Flader og dybde",
+        "description": "Fine kanter og bevidst afrunding samler systemet. Almindelige kort er rolige; skygger reserveres til hævede og løsrevne lag.",
+        "tokens": [
+          "radius.control",
+          "radius.card",
+          "shadow.card",
+          "shadow.floating",
+          "space.component.padding",
+          "space.component.paddingLarge"
+        ],
+        "components": [
+          "card",
+          "dialog",
+          "inspector",
+          "input",
+          "action-button"
+        ],
+        "dos": [
+          "Brug samme behandling til samme type flade.",
+          "Bevar bibliotekets native controls og synlige tastaturfokus."
+        ],
+        "donts": [
+          "Tilføj ikke skygge til hvert enkelt element.",
+          "Tilsidesæt ikke bibliotekets dele eller layout i temaet."
+        ]
+      },
+      {
+        "id": "interaction",
+        "title": "Synlige interaktioner",
+        "description": "Hover og tryk bruger særskilte solide farvepar. Neutrale handlinger, primære handlinger, valgte segmenter, destruktive handlinger og særlige accenter bevarer hver sit hierarki. Tastaturfokus er en selvstændig kontur.",
+        "tokens": [
+          "color.action.neutralHover",
+          "color.action.neutralHoverText",
+          "color.action.neutralActive",
+          "color.action.primaryHover",
+          "color.action.primaryHoverText",
+          "color.action.primaryActive",
+          "color.action.selectedHover",
+          "color.action.selectedHoverText",
+          "color.action.dangerHover",
+          "color.action.dangerHoverText",
+          "color.action.accentHover",
+          "color.focus"
+        ],
+        "components": [
+          "button",
+          "action-button",
+          "toolbar",
+          "segmented-option",
+          "tag"
+        ],
+        "dos": [
+          "Brug bibliotekets flade- og tekstpar samlet, så hover er tydelig og teksten forbliver læsbar.",
+          "Bevar forskellen mellem en valgt tilstand og en midlertidig hover eller et tryk.",
+          "Lad disabled og synligt tastaturfokus følge native semantik."
+        ],
+        "donts": [
+          "Vis ikke hover alene ved at gøre tekst og flade gennemsigtige.",
+          "Tilføj ikke en lokal hoverfarve til hver knap eller erstat fokus med hover."
+        ]
+      }
+    ],
+    "logos": [],
+    "assets": [],
+    "sources": []
+  }
+}

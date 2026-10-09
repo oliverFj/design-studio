@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Udforsk Design Studio: ét fælles komponentbibliotek med syv gennemarbejdede visuelle temaer.">
+  <title>Design Studio · Komponenter & temaer</title>
+  <link rel="stylesheet" href="./showcase.css">
+  <link rel="stylesheet" href="./preview/project-overview.css">
+  <style id="theme-css"></style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="wordmark" href="./index.html" aria-label="Design Studio demo"><span class="wordmark-symbol" aria-hidden="true"></span>Design Studio<span class="edition">DESIGNSYSTEM</span></a>
+    <a class="portfolio-link" href="/projekter/design-studio">Om projektet <span aria-hidden="true">↗</span></a>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="intro-title">
+      <div>
+        <p class="eyebrow">ÉT BIBLIOTEK. MANGE MULIGHEDER.</p>
+        <h1 id="intro-title">Et fælles fundament.<br><span>Syv forskellige udtryk.</span></h1>
+        <p class="intro-copy">Fra rolig produktflade til markant identitet. Skift tema, og oplev det samme interface med en helt anden karakter.</p>
+      </div>
+      <div class="theme-control">
+        <div class="control-heading"><h2>Vælg et udtryk</h2><span id="theme-count"></span></div>
+        <div id="themes" class="theme-list" aria-label="Temaer"></div>
+        <p id="theme-description" class="theme-description"></p>
+      </div>
+    </section>
+    <section class="studio-panel" aria-label="Interaktiv komponentvisning">
+      <div class="panel-toolbar">
+        <div class="views" aria-label="Visning">
+          <button type="button" data-view="example" aria-pressed="true">I brug</button>
+          <button type="button" data-view="catalog" aria-pressed="false">Komponentbibliotek <span id="component-count"></span></button>
+        </div>
+        <span class="live-label"><span aria-hidden="true"></span> Fælles struktur · frit udtryk</span>
+      </div>
+      <div id="example-view">
+        <div class="preview-caption"><span>PROJEKTOVERBLIK</span><span id="example-theme"></span></div>
+        <div id="example" class="project-overview-host"></div>
+      </div>
+      <div id="catalog-view" class="catalog-layout" hidden>
+        <aside class="catalog-sidebar">
+          <label for="component-search" class="eyebrow">UDFORSK BIBLIOTEKET</label>
+          <input id="component-search" type="search" placeholder="Søg efter en komponent…" autocomplete="off">
+          <nav id="component-list" aria-label="Komponenter"></nav>
+          <p id="no-results" hidden>Ingen komponenter matcher din søgning.</p>
+        </aside>
+        <div class="catalog-content">
+          <div class="catalog-heading">
+            <div><p class="eyebrow" id="component-id"></p><h2 id="component-name"></h2></div>
+            <label class="variant-control">Variant<select id="variant"></select></label>
+          </div>
+          <p id="component-description"></p>
+          <div id="component-preview" class="ds-scope component-canvas"></div>
+          <div class="component-notes"><p class="eyebrow">ANVENDELSE</p><p id="component-usage"></p><div id="component-parts" class="part-tags"></div></div>
+        </div>
+      </div>
+    </section>
+    <aside class="foundations" aria-labelledby="foundations-title">
+      <h2 id="foundations-title" class="eyebrow">Design med et grundlag</h2>
+      <p>Et fælles bibliotek med tydelige roller, native kontroller og læsbare tilstande. Principperne tager afsæt i
+        <a href="https://fluent2.microsoft.design/components/web/react/core/button/usage/" target="_blank" rel="noopener noreferrer">Fluent 2</a>
+        og <a href="https://www.carbondesignsystem.com/building-blocks/core/components/button/guidelines" target="_blank" rel="noopener noreferrer">Carbon</a>.
+        Temaerne giver farver, typografi og karakter.</p>
+    </aside>
+    <div class="demo-footer"><p>Design Studio · Et bibliotek, flere perspektiver</p><p>Design & udvikling · Oliver Fjordside</p></div>
+    <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
+  </main>
+  <noscript><p class="noscript">Slå JavaScript til for at skifte tema og udforske komponenterne.</p></noscript>
+  <script type="module" src="./showcase.mjs"></script>
+</body>
+</html>
