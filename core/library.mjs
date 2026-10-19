@@ -1,5 +1,5 @@
 /** Project-agnostic component anatomy and semantic defaults. Visual themes own appearance. */
-export const LIBRARY_VERSION='2.5.0';
+export const LIBRARY_VERSION='2.7.1';
 function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
 export const APPEARANCE_PROPERTIES=freeze([
   "color",
@@ -460,6 +460,11 @@ export const DEFAULT_TOKENS=freeze({
     "$type": "dimension",
     "$value": "{typography.size.small}",
     "description": "Central semantic default: inherits typography.size.small so components follow the selected theme. A theme may provide its own documented value."
+  },
+  "typography.size.toolLabel": {
+    "$type": "dimension",
+    "$value": "13px",
+    "description": "Compact tool labels beneath an icon; the shared tool variant keeps a 52 px minimum target."
   },
   "typography.size.control": {
     "$type": "dimension",
@@ -1067,6 +1072,21 @@ export const COMPONENT_LIBRARY=freeze({
       }
     },
     "variants": {
+      "desktop": {
+  "description": "Kompakt desktopbetjening med 32 px klikflader. Brug standardvarianten ved touch eller behov for større mål.",
+  "styles": {
+    "minHeight": "32px",
+    "minWidth": "32px",
+    "padding": "{space.component.paddingCompact} {space.component.padding}",
+    "backgroundColor": "{color.background.control}",
+    "color": "{color.text.primary}",
+    "borderColor": "{color.border.field}",
+    "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+    "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+    "--ds-interaction-active-surface": "{color.action.neutralActive}",
+    "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+  }
+},
       "primary": {
         "description": "Vigtigste lokale handling.",
         "styles": {
@@ -1430,6 +1450,14 @@ export const COMPONENT_LIBRARY=freeze({
       }
     },
     "variants": {
+      "desktop": {
+  "description": "Kompakt desktopbetjening med 32 px klikflader. Brug standardvarianten ved touch eller behov for større mål.",
+  "styles": {
+    "minHeight": "32px",
+    "height": "32px",
+    "padding": "{space.component.paddingCompact}"
+  }
+},
       "invalid": {
         "description": "Synlig valideringsfejl.",
         "styles": {
@@ -1634,6 +1662,14 @@ export const COMPONENT_LIBRARY=freeze({
       }
     },
     "variants": {
+      "desktop": {
+  "description": "Kompakt desktopbetjening med 32 px klikflader. Brug standardvarianten ved touch eller behov for større mål.",
+  "styles": {
+    "minHeight": "32px",
+    "height": "32px",
+    "padding": "{space.component.paddingCompact}"
+  }
+},
       "invalid": {
         "description": "Synlig valideringsfejl.",
         "styles": {
@@ -2917,6 +2953,13 @@ export const COMPONENT_LIBRARY=freeze({
       }
     },
     "variants": {
+      "desktop": {
+  "description": "Kompakt desktopbetjening med 32 px klikflader. Brug standardvarianten ved touch eller behov for større mål.",
+  "styles": {
+    "padding": "{space.component.paddingCompact}",
+    "gap": "{space.component.gap}"
+  }
+},
       "horizontal": {
         "description": "Vandret opbygning.",
         "styles": {
@@ -3076,6 +3119,7 @@ export const COMPONENT_LIBRARY=freeze({
       }
     },
     "variants": {
+      "tool": {"description":"Kompakt, neutral værktøjsknap med symbol over en 13 px label. Brug korte handlingsnavne i en værktøjslinje; pressed markerer det aktive værktøj.","styles":{"display":"inline-flex","flexDirection":"column","alignItems":"center","justifyContent":"center","minWidth":"56px","minHeight":"52px","width":"auto","gap":"{space.component.gap}","padding":"{space.1} {space.component.paddingCompact}","fontSize":"{typography.size.toolLabel}","lineHeight":1.3,"color":"{color.text.primary}","backgroundColor":"{color.background.control}","borderColor":"transparent","borderRadius":"{radius.control}"},"parts":{"icon":{"styles":{"width":"{size.icon.compact}","height":"{size.icon.compact}","fontSize":"{size.icon.compact}"}},"label":{"styles":{"fontSize":"{typography.size.toolLabel}","lineHeight":1.3}}}},
       "vertical": {
         "description": "Lodret opbygning.",
         "styles": {
@@ -3268,6 +3312,13 @@ export const COMPONENT_LIBRARY=freeze({
       }
     },
     "variants": {
+      "desktop": {
+  "description": "Kompakt desktopbetjening med 32 px klikflader. Brug standardvarianten ved touch eller behov for større mål.",
+  "styles": {
+    "minHeight": "32px",
+    "padding": "{space.component.paddingCompact} {space.component.padding}"
+  }
+},
       "compact": {
         "description": "Kompakt opbygning.",
         "styles": {
@@ -4117,6 +4168,90 @@ export const COMPONENT_LIBRARY=freeze({
       ]
     }
   },
+  "tree": {
+    "name": "Hierarkisk liste",
+    "description": "En indlejret liste med foldning, valg og navngivne handlinger for elementer, filer eller lag.",
+    "usage": "Brug mountTree til kontrollerede data og callbacks. Standard bruger 32 px rækker og tæt indrykning; roomy giver 44 px klikflader. Vis kun nødvendige metadata og få direkte rækkehandlinger. Andre operationer hører til i objektets menu eller inspektør. Piletaster flytter fokus og åbner eller lukker grene; Space vælger, Shift udvider valg, og Ctrl eller Meta skifter enkelte valg. Produktet ejer tilstand, kontekstmenu og flytning, og skal supplere træk med en klik- og tastaturbetjent Flyt-handling. Flere egentlige datakolonner kræver en særskilt treegrid.",
+    "composes": ["button", "badge"],
+    "parts": {
+      "root": {"selector": ".ds-tree", "styles": {"display":"flex","flexDirection":"column","gap":"0","minWidth":"0","padding":"{space.component.paddingCompact}","margin":"0","listStyleType":"none","fontFamily":"{typography.font.body}","fontSize":"{typography.size.body}","lineHeight":"{typography.lineHeight.body}","color":"{color.text.primary}","backgroundColor":"{color.background.surface}","boxSizing":"border-box"}},
+      "item": {"selector":".ds-tree__item","styles":{"display":"block","minWidth":"0","margin":"0","padding":"0","listStyleType":"none","borderRadius":"{radius.control}","--ds-interaction-hover-surface":"{color.action.neutralHover}","--ds-interaction-hover-text":"{color.action.neutralHoverText}","--ds-interaction-active-surface":"{color.action.neutralActive}","--ds-interaction-active-text":"{color.action.neutralActiveText}"}},
+      "row": {"selector":".ds-tree__row","styles":{"display":"flex","alignItems":"center","gap":"{space.component.gap}","minHeight":"32px","minWidth":"0","borderRadius":"{radius.control}","border":"{border.width.default} solid transparent","padding":"0 {space.component.paddingCompact}","boxSizing":"border-box","color":"inherit","backgroundColor":"transparent"}},
+      "group": {"selector":".ds-tree__group","styles":{"display":"flex","flexDirection":"column","gap":"0","minWidth":"0","padding":"0 0 0 {space.component.padding}","margin":"0","listStyleType":"none"}},
+      "toggle": {"selector":".ds-tree__toggle","styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","minWidth":"24px","minHeight":"32px","flexShrink":"0","padding":"0","border":"0","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"inherit","color":"inherit","backgroundColor":"transparent","cursor":"pointer","width":"24px"}},
+      "spacer": {"selector":".ds-tree__spacer","styles":{"display":"block","width":"24px","minWidth":"24px","flexShrink":"0"}},
+      "label": {"selector":".ds-tree__label","styles":{"display":"flex","alignItems":"center","gap":"{space.component.gap}","flex":"1 1 auto","minWidth":"0","minHeight":"32px","padding":"0","border":"0","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"inherit","color":"inherit","backgroundColor":"transparent","textAlign":"left","whiteSpace":"normal","wordBreak":"normal","overflowWrap":"anywhere","cursor":"pointer"}},
+      "icon": {"selector":".ds-tree__icon","styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","flexShrink":"0","fontSize":"{typography.size.control}"}},
+      "name": {"selector":".ds-tree__name","styles":{"minWidth":"0","overflowWrap":"anywhere","overflow":"hidden","textOverflow":"ellipsis","whiteSpace":"nowrap"}},
+      "meta": {"selector":".ds-tree__meta","styles":{"minWidth":"0","fontSize":"{typography.size.label}","color":"inherit","overflowWrap":"normal","whiteSpace":"nowrap","flexShrink":"0"}},
+      "badge": {"selector":".ds-tree__badge","styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","padding":"{space.component.paddingCompact}","borderRadius":"{radius.pill}","fontSize":"{typography.size.label}","color":"{color.text.secondary}","backgroundColor":"{color.background.subtle}"}},
+      "actions": {"selector":".ds-tree__actions","styles":{"display":"flex","alignItems":"center","flexWrap":"wrap","gap":"{space.component.gap}","flexShrink":"0"}},
+      "action": {"selector":".ds-tree__action","styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","minWidth":"28px","minHeight":"28px","padding":"0","border":"{border.width.default} solid transparent","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"inherit","color":"inherit","backgroundColor":"transparent","cursor":"pointer"}}
+    },
+    "variants": {
+      "desktop": {
+  "description": "Eksplicit alias til standardens kompakte 32 px betjening. Brug roomy ved touch eller behov for større mål.",
+  "styles": {
+    "gap": "0",
+    "padding": "{space.component.paddingCompact}"
+  },
+  "parts": {
+    "row": {
+      "styles": {
+        "minHeight": "32px",
+        "gap": "{space.component.gap}"
+      }
+    },
+    "group": {
+      "styles": {
+        "gap": "0",
+        "padding": "0 0 0 {space.component.padding}"
+      }
+    },
+    "toggle": {
+      "styles": {
+        "minWidth": "24px",
+        "width": "24px",
+        "minHeight": "32px",
+        "padding": "0"
+      }
+    },
+    "spacer": {
+      "styles": {
+        "width": "24px",
+        "minWidth": "24px"
+      }
+    },
+    "label": {
+      "styles": {
+        "minHeight": "32px",
+        "padding": "0"
+      }
+    },
+    "action": {
+      "styles": {
+        "minWidth": "28px",
+        "minHeight": "28px",
+        "padding": "0"
+      }
+    }
+  }
+},
+      "default":{"description":"Kompakt hierarki med 32 px rækker, tæt indrykning og tydelige navne.","styles":{}},
+      "roomy":{"description":"Større 44 px klikflader, mere luft og ombrudte navne til touch eller behov for større mål.","styles":{"gap":"{space.component.gap}"},"parts":{"row":{"styles":{"display":"flex","alignItems":"center","gap":"{space.component.gap}","minHeight":"max(44px, {size.control.height})","minWidth":"0","borderRadius":"{radius.control}","border":"{border.width.default} solid transparent","padding":"0 {space.component.paddingCompact}","boxSizing":"border-box","color":"inherit","backgroundColor":"transparent"}},"group":{"styles":{"display":"flex","flexDirection":"column","gap":"{space.component.gap}","minWidth":"0","padding":"{space.component.gap} 0 0 {space.component.paddingLarge}","margin":"0","listStyleType":"none"}},"toggle":{"styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","minWidth":"44px","minHeight":"max(44px, {size.control.height})","flexShrink":"0","padding":"{space.component.paddingCompact}","border":"0","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"inherit","color":"inherit","backgroundColor":"transparent","cursor":"pointer","width":"44px"}},"spacer":{"styles":{"display":"block","width":"44px","minWidth":"44px","flexShrink":"0"}},"label":{"styles":{"display":"flex","alignItems":"center","gap":"{space.component.gap}","flex":"1 1 auto","minWidth":"0","minHeight":"max(44px, {size.control.height})","padding":"{space.component.paddingCompact}","border":"0","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"inherit","color":"inherit","backgroundColor":"transparent","textAlign":"left","whiteSpace":"normal","wordBreak":"normal","overflowWrap":"anywhere","cursor":"pointer"}},"action":{"styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","minWidth":"44px","minHeight":"max(44px, {size.control.height})","padding":"{space.component.paddingCompact}","border":"{border.width.default} solid transparent","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"inherit","color":"inherit","backgroundColor":"transparent","cursor":"pointer"}},"name":{"styles":{"overflow":"visible","textOverflow":"clip","whiteSpace":"normal"}},"meta":{"styles":{"whiteSpace":"normal","overflowWrap":"anywhere","flexShrink":"1"}}}},
+      "compact":{"description":"Mindre indrykning mellem niveauer med samme tilgængelige klikflader.","styles":{"gap":"{space.component.gap}"},"parts":{"row":{"styles":{"gap":"{space.component.gap}"}},"group":{"styles":{"paddingInlineStart":"{space.component.padding}"}}}}
+    },
+    "states": {
+      "selected":{"description":"Den enkelte række er valgt uafhængigt af tastaturfokus.","styles":{"--ds-interaction-hover-surface":"{color.action.selectedHover}","--ds-interaction-hover-text":"{color.action.selectedHoverText}","--ds-interaction-active-surface":"{color.action.selectedActive}","--ds-interaction-active-text":"{color.action.selectedActiveText}"},"parts":{"row":{"styles":{"color":"{color.action.primaryText}","backgroundColor":"{color.action.primary}"}}}},
+      "focus":{"description":"Den fokuserede rækkes egen klikflade markeres, også ved fokus på en rækkehandling.","styles":{},"parts":{"row":{"styles":{"outline":"max(3px, {border.width.focus}) solid {color.focus}","outlineOffset":"max(2px, {border.offset.focus})"}}}},
+      "expanded":{"description":"Grenens børn er synlige. Produktet ejer den kontrollerede foldetilstand.","styles":{}},
+      "disabled":{"description":"Rækken kan ikke vælges eller trækkes. Foldning og native rækkehandlinger beholder deres egen tilgængelighed, så eksempelvis en låst post kan låses op.","styles":{},"parts":{"row":{"styles":{"color":"{color.text.muted}","backgroundColor":"{color.background.subtle}","cursor":"default"}}}},
+      "drop-target":{"description":"Rækken er et muligt mål for indsættelse før, efter eller inde i grenen.","styles":{},"parts":{"row":{"styles":{"outline":"max(3px, {border.width.focus}) dashed {color.focus}","outlineOffset":"max(2px, {border.offset.focus})"}}}},
+      "hover":{"description":"Den enkelte række under markøren.","styles":{},"parts":{"row":{"styles":{"color":"var(--ds-interaction-hover-text)","backgroundColor":"var(--ds-interaction-hover-surface)"}}}},
+      "active":{"description":"Den enkelte række under aktivering.","styles":{},"parts":{"row":{"styles":{"color":"var(--ds-interaction-active-text)","backgroundColor":"var(--ds-interaction-active-surface)"}}}}
+    },
+    "preview": {"tag":"ul","part":"root","attrs":{"role":"tree","aria-label":"Indhold","aria-multiselectable":"true"},"children":[{"tag":"li","part":"item","attrs":{"role":"treeitem","aria-label":"Samling","aria-expanded":"true","aria-level":"1","aria-posinset":"1","aria-setsize":"1","tabindex":"0"},"children":[{"tag":"div","part":"row","children":[{"tag":"button","part":"toggle","text":"▾","attrs":{"aria-label":"Luk Samling","aria-disabled":"false","tabindex":"-1"}},{"tag":"button","part":"label","attrs":{"tabindex":"-1"},"children":[{"tag":"span","part":"icon","text":"▣","attrs":{"aria-hidden":"true"}},{"tag":"span","part":"name","text":"Samling"}]},{"tag":"span","part":"meta","text":"2 elementer"},{"tag":"span","part":"actions","children":[{"tag":"button","part":"action","text":"◉","attrs":{"aria-label":"Skjul Samling","aria-disabled":"false","aria-pressed":"true","tabindex":"0"}}]}]},{"tag":"ul","part":"group","attrs":{"role":"group"},"children":[{"tag":"li","part":"item","attrs":{"role":"treeitem","aria-label":"Dokument","aria-selected":"true","aria-level":"2","aria-posinset":"1","aria-setsize":"2","tabindex":"-1"},"children":[{"tag":"div","part":"row","children":[{"tag":"span","part":"spacer","attrs":{"aria-hidden":"true"}},{"tag":"button","part":"label","attrs":{"tabindex":"-1"},"children":[{"tag":"span","part":"icon","text":"◇","attrs":{"aria-hidden":"true"}},{"tag":"span","part":"name","text":"Dokument"}]}]}]},{"tag":"li","part":"item","attrs":{"role":"treeitem","aria-label":"Arkiv","aria-disabled":"true","aria-level":"2","aria-posinset":"2","aria-setsize":"2","tabindex":"-1"},"children":[{"tag":"div","part":"row","children":[{"tag":"span","part":"spacer","attrs":{"aria-hidden":"true"}},{"tag":"button","part":"label","text":"Arkiv","attrs":{"disabled":true,"tabindex":"-1"}}]}]}]}]}]}
+  },
   "stack": {
     "name": "Stak",
     "description": "Lodret sammensætning af relateret indhold med ens afstand mellem direkte børn.",
@@ -4172,7 +4307,352 @@ export const COMPONENT_LIBRARY=freeze({
         }
       ]
     }
+  },
+  "menubar": {
+  "name": "Menulinje",
+  "description": "En vedvarende, kompakt indgang til programmets kommandomenuer.",
+  "usage": "Brug til globale kommandoer. Produktet styrer åbne/lukke-state, pile mellem topmenuer, Home/End, Enter/Ned til menuen, Escape med fokusretur og klik udenfor. Tab forlader hele menukæden. Topmenuer er ikke arbejdsområdefaner. Vis ingen genvej uden implementeret handling.",
+  "composes": [],
+  "parts": {
+    "root": {
+      "selector": ".ds-menubar",
+      "styles": {
+        "display": "flex",
+        "alignItems": "center",
+        "gap": "{space.component.gap}",
+        "padding": "{space.component.paddingCompact}",
+        "margin": "0",
+        "backgroundColor": "{color.background.surface}",
+        "color": "{color.text.primary}",
+        "fontFamily": "{typography.font.body}"
+      }
+    },
+    "item": {
+      "selector": ".ds-menubar__item",
+      "styles": {
+        "display": "inline-flex",
+        "alignItems": "center",
+        "gap": "{space.component.gap}",
+        "minHeight": "32px",
+        "minWidth": "32px",
+        "padding": "{space.component.paddingCompact} {space.component.padding}",
+        "boxSizing": "border-box",
+        "border": "{border.width.default} solid transparent",
+        "borderRadius": "{radius.control}",
+        "fontFamily": "{typography.font.body}",
+        "fontSize": "{typography.size.control}",
+        "lineHeight": "{typography.lineHeight.control}",
+        "fontWeight": "{typography.weight.body}",
+        "color": "{color.text.primary}",
+        "backgroundColor": "transparent",
+        "cursor": "pointer"
+      }
+    }
+  },
+  "variants": {
+    "default": {
+      "description": "Vandret programmenu.",
+      "styles": {}
+    }
+  },
+  "states": {
+    "focus": {
+      "description": "Synligt tastaturfokus.",
+      "styles": {
+        "outline": "{border.width.focus} solid {color.focus}",
+        "outlineOffset": "{border.offset.focus}"
+      }
+    },
+    "expanded": {
+      "description": "Den åbne topmenu bruger aria-expanded=true på udløseren.",
+      "parts": {
+        "item": {
+          "styles": {}
+        }
+      },
+      "styles": {}
+    },
+    "hover": {
+      "description": "Kun det enkelte menupunkt fremhæves ved hover.",
+      "styles": {},
+      "parts": {
+        "item": {
+          "styles": {
+            "backgroundColor": "{color.action.neutralHover}",
+            "color": "{color.action.neutralHoverText}"
+          }
+        }
+      }
+    },
+    "active": {
+      "description": "Det aktiverede menupunkt.",
+      "styles": {},
+      "parts": {
+        "item": {
+          "styles": {
+            "backgroundColor": "{color.action.neutralActive}",
+            "color": "{color.action.neutralActiveText}"
+          }
+        }
+      }
+    }
+  },
+  "preview": {
+    "tag": "div",
+    "part": "root",
+    "attrs": {
+      "role": "menubar",
+      "aria-label": "Programmenu"
+    },
+    "children": [
+      {
+        "tag": "button",
+        "part": "item",
+        "text": "Filer",
+        "attrs": {
+          "role": "menuitem",
+          "aria-haspopup": "menu",
+          "aria-expanded": "false",
+          "tabindex": "0"
+        }
+      },
+      {
+        "tag": "button",
+        "part": "item",
+        "text": "Rediger",
+        "attrs": {
+          "role": "menuitem",
+          "aria-haspopup": "menu",
+          "aria-expanded": "false",
+          "tabindex": "-1"
+        }
+      },
+      {
+        "tag": "button",
+        "part": "item",
+        "text": "Vis",
+        "attrs": {
+          "role": "menuitem",
+          "aria-haspopup": "menu",
+          "aria-expanded": "false",
+          "tabindex": "-1"
+        }
+      }
+    ]
   }
+},
+  "menu": {
+  "name": "Kommandomenu",
+  "description": "En afgrænset flade med kommandoer, valg og tydelige grupper.",
+  "usage": "Brug samme rolle i menulinje, kontekstmenu og overflow. Produktet placerer menuen inden for vinduet og ejer fokus, Ned/Op, Home/End, typeahead, Escape og aktivering. Radio- og checkboxpunkter viser deres tilstand. Maksimalt ét underniveau; vis undermenu med højrepil og åbn med Højre/Enter. Luk den inderste menu først. Farlige handlinger placeres sidst og adskilles. En menu må ikke indeholde almindelige formularfelter; brug en popover eller dialog. Disabled-punkter kan forklares og fokuseres med pile, men kan ikke udføres.",
+  "composes": [
+    "menu-item"
+  ],
+  "parts": {
+    "root": {
+      "selector": ".ds-menu",
+      "styles": {
+        "display": "flex",
+        "flexDirection": "column",
+        "gap": "{space.component.gap}",
+        "padding": "{space.component.paddingCompact}",
+        "minWidth": "220px",
+        "maxWidth": "360px",
+        "boxSizing": "border-box",
+        "border": "{border.width.default} solid {color.border.default}",
+        "borderRadius": "{radius.card}",
+        "backgroundColor": "{color.background.surface}",
+        "color": "{color.text.primary}",
+        "boxShadow": "{shadow.floating}",
+        "fontFamily": "{typography.font.body}"
+      }
+    },
+    "groupLabel": {
+      "selector": ".ds-menu__group-label",
+      "styles": {
+        "padding": "{space.component.paddingCompact}",
+        "fontSize": "{typography.size.small}",
+        "color": "{color.text.secondary}"
+      }
+    },
+    "separator": {
+      "selector": ".ds-menu__separator",
+      "styles": {
+        "height": "1px",
+        "margin": "{space.component.gap} 0",
+        "border": "0",
+        "backgroundColor": "{color.border.default}"
+      }
+    }
+  },
+  "variants": {
+    "default": {
+      "description": "Fælles menuoverflade.",
+      "styles": {}
+    }
+  },
+  "states": {},
+  "preview": {
+    "tag": "div",
+    "part": "root",
+    "attrs": {
+      "role": "menu",
+      "aria-label": "Handlinger"
+    },
+    "children": [
+      {
+        "component": "menu-item"
+      },
+      {
+        "tag": "hr",
+        "part": "separator",
+        "attrs": {
+          "role": "separator"
+        }
+      },
+      {
+        "component": "menu-item"
+      }
+    ]
+  }
+},
+  "menu-item": {
+  "name": "Menupunkt",
+  "description": "En navngivet kommando med valgfrit symbol, genvej eller valgmarkør.",
+  "usage": "Labelen beskriver en handling. Brug slots til label, symbol, genvej og valgmarkør. Produktet sætter role=menuitemcheckbox/menuitemradio med aria-checked ved valg, aria-haspopup og aria-expanded ved undermenu og aria-disabled ved utilgængelig handling. Slå aktivering fra ved aria-disabled; attributten gør det ikke alene. Genvejen er supplerende og må kun vises, når produktet implementerer den.",
+  "composes": [],
+  "parts": {
+    "root": {
+      "selector": ".ds-menu-item",
+      "styles": {
+        "display": "inline-flex",
+        "alignItems": "center",
+        "gap": "{space.component.gap}",
+        "minHeight": "32px",
+        "minWidth": "32px",
+        "padding": "{space.component.paddingCompact} {space.component.padding}",
+        "boxSizing": "border-box",
+        "border": "{border.width.default} solid transparent",
+        "borderRadius": "{radius.control}",
+        "fontFamily": "{typography.font.body}",
+        "fontSize": "{typography.size.control}",
+        "lineHeight": "{typography.lineHeight.control}",
+        "fontWeight": "{typography.weight.body}",
+        "color": "{color.text.primary}",
+        "backgroundColor": "transparent",
+        "cursor": "pointer",
+        "width": "100%",
+        "textAlign": "left"
+      }
+    },
+    "symbol": {
+      "selector": ".ds-menu-item__symbol",
+      "styles": {
+        "display": "inline-flex",
+        "width": "18px",
+        "flexShrink": "0"
+      }
+    },
+    "label": {
+      "selector": ".ds-menu-item__label",
+      "styles": {
+        "flex": "1 1 auto",
+        "minWidth": "0"
+      }
+    },
+    "shortcut": {
+      "selector": ".ds-menu-item__shortcut",
+      "styles": {
+        "fontSize": "{typography.size.small}",
+        "color": "{color.text.secondary}",
+        "whiteSpace": "nowrap"
+      }
+    },
+    "indicator": {
+      "selector": ".ds-menu-item__indicator",
+      "styles": {
+        "display": "inline-flex",
+        "width": "18px",
+        "flexShrink": "0"
+      }
+    }
+  },
+  "variants": {
+    "default": {
+      "description": "Almindelig kommando.",
+      "styles": {}
+    },
+    "danger": {
+      "description": "Destruktiv kommando adskilt fra øvrige handlinger.",
+      "styles": {
+        "color": "{color.status.dangerText}"
+      }
+    }
+  },
+  "states": {
+    "hover": {
+      "description": "Kontrollen under markøren.",
+      "styles": {
+        "backgroundColor": "{color.action.neutralHover}",
+        "color": "{color.action.neutralHoverText}"
+      }
+    },
+    "focus": {
+      "description": "Synligt tastaturfokus.",
+      "styles": {
+        "outline": "{border.width.focus} solid {color.focus}",
+        "outlineOffset": "{border.offset.focus}"
+      }
+    },
+    "active": {
+      "description": "Kontrollen aktiveres.",
+      "styles": {
+        "backgroundColor": "{color.action.neutralActive}",
+        "color": "{color.action.neutralActiveText}"
+      }
+    },
+    "disabled": {
+      "description": "Utilgængelig handling; produktet forklarer årsagen.",
+      "styles": {
+        "opacity": "{opacity.disabled}",
+        "cursor": "not-allowed"
+      }
+    }
+  },
+  "preview": {
+    "tag": "button",
+    "part": "root",
+    "attrs": {
+      "role": "menuitem",
+      "tabindex": "-1"
+    },
+    "children": [
+      {
+        "tag": "span",
+        "part": "symbol",
+        "attrs": {
+          "aria-hidden": "true"
+        }
+      },
+      {
+        "tag": "span",
+        "part": "label",
+        "text": "Åbn"
+      },
+      {
+        "tag": "span",
+        "part": "shortcut"
+      },
+      {
+        "tag": "span",
+        "part": "indicator",
+        "attrs": {
+          "aria-hidden": "true"
+        }
+      }
+    ]
+  }
+}
 });
 export const canonicalComponentId=id=>Object.hasOwn(COMPONENT_ALIASES,id)?COMPONENT_ALIASES[id]:id;
 export const canonicalVariantId=(id,key)=>VARIANT_ALIASES[canonicalComponentId(id)]?.[key]??key;

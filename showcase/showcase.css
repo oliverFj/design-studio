@@ -55,9 +55,9 @@ main { max-width: 1504px; margin: auto; padding: 0 44px; }
 .catalog-content > p { max-width: 700px; margin: 16px 0 26px; color: var(--shell-muted); font-size: 13px; }
 .variant-control { display: flex; flex-direction: column; gap: 5px; color: var(--shell-muted); font-size: 10px; }
 .variant-control select { max-width: 180px; min-width: 130px; min-height: 37px; padding: 8px 10px; border: 1px solid var(--shell-border); border-radius: 6px; color: var(--shell-ink); background: #fff; font-size: 12px; }
-.component-canvas { display: grid; justify-items: start; align-content: center; min-height: 220px; padding: 36px; border: 1px solid var(--shell-border); border-radius: 8px; background: var(--ds-color-background-canvas); color: var(--ds-color-text-primary); overflow-wrap: anywhere; }
+.component-canvas { display: grid; justify-items: center; align-content: center; min-height: 220px; padding: 36px; border: 1px solid var(--shell-border); border-radius: 8px; background: var(--ds-color-background-canvas); color: var(--ds-color-text-primary); overflow-wrap: anywhere; }
 .component-canvas > * { max-width: 100%; }
-.component-canvas .ds-card, .component-canvas .ds-dialog { width: 100%; }
+.component-canvas > :is(.ds-field,.ds-choice-field,.ds-card,.ds-alert,.ds-inspector,.ds-range-field,.ds-toolbar:not([data-variant="vertical"]),.ds-menubar,.ds-tree,.ds-segmented-control,.ds-dialog,.ds-dialog-host,.ds-caption,.ds-divider,.ds-metric-row) { width: 100%; }
 .component-canvas .ds-dialog-host { position: static; width: 100%; max-width: 100%; padding: 0; border: 0; margin: 0; background: transparent; color: inherit; }
 .component-notes { margin-top: 28px; }
 .component-notes .eyebrow { margin-bottom: 8px; font-size: 9px; }

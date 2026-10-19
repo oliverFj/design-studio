@@ -52,6 +52,7 @@ function cssPreview() {
   let style = document.querySelector('#package-styles');
   if (!style) { style = document.createElement('style'); style.id = 'package-styles'; document.head.append(style); }
   style.textContent = generateCSS(state.pack);
+  document.documentElement.classList.add('ds-scope');
   lastPreviewTheme = clone(state.pack);
   return checked;
 }
@@ -61,7 +62,7 @@ function refreshStatus() {
   if (!bar) return;
   const invalid = !checked.valid || state.recipeDraft !== null;
   bar.className = 'status-bar'+(!checked.valid ? ' error' : dirty() ? ' changed' : '');
-  const message = !checked.valid ? 'Ret de værdier, der bryder temaets designregler, før du gemmer.' : state.recipeDraft !== null ? 'Komponentopskriften skal anvendes før du gemmer.' : dirty() ? 'Ændringerne er endnu ikke gemt.' : 'Temaet er gemt. Ændringer vises straks i eksemplerne.';
+  const message = !checked.valid ? 'Ret de værdier, der bryder temaets designregler, før du gemmer.' : state.recipeDraft !== null ? 'Komponentopskriften skal anvendes før du gemmer.' : dirty() ? 'Ændringerne er endnu ikke gemt.' : 'Temaet er gemt. Ændringer vises straks i hele Design Studio.';
   bar.innerHTML = '<span>'+escape(message)+'</span><span>'+Object.keys(themeTokens()).length+' tokens · '+Object.keys(components()).length+' komponenter</span>';
   const save = document.querySelector('#save');
   if (save) save.disabled = !dirty() || invalid || state.busy;

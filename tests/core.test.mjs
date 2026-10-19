@@ -490,7 +490,7 @@ test('canonical catalog and previews use project-agnostic anatomy without legacy
  assert.doesNotMatch(source,/Castle|Fjordside|byggeværktøj|fortælling|borg|tårn|murkrone|rumpanel|terracotta|Nunito|Alegreya|setParam|limitsFor/i);
  for(const id of ['action-button','caption','choice-field','metric-row'])assert.ok(COMPONENT_LIBRARY[id]);
  for(const id of ['tool-button','simulation-caption','brandSelect','stat-row'])assert.equal(Object.hasOwn(COMPONENT_LIBRARY,id),false);
- assert.equal(Object.keys(COMPONENT_LIBRARY).length,30);
+ assert.equal(Object.keys(COMPONENT_LIBRARY).length,34);
  assert.equal(Object.keys(DEFAULT_TOKENS).some(id=>id.startsWith('color.scene.')),false);
  assert.deepEqual(COMPONENT_LIBRARY['action-button'].preview.children.map(node=>node.part),['icon','label','shortcut']);
 });
@@ -524,7 +524,9 @@ test('v2 focus rules remain mandatory and scoped while canonical controls retain
  const css=generateCSS(theme,{scope:'#product'});
  assert.match(css,/#product \.ds-button:focus-visible/);assert.match(css,/outline: max\(3px, var\(--ds-border-width-focus\)\) solid var\(--ds-color-focus\) !important;/);assert.match(css,/opacity: 1 !important;/);
  assert.match(css,/min-height: max\(44px, var\(--ds-size-control-height\)\)/);assert.doesNotMatch(css,/(?:^|,) button:focus-visible/m);
- assert.doesNotMatch(generateCSS(base()),/outline: max\(3px, var\(--ds-border-width-focus\)\)/);
+ // Only v2 adds the mandatory override. An explicitly materialized v1 recipe
+ // may itself contain a 3px focus outline, as the new tree does.
+ assert.doesNotMatch(generateCSS(base()),/outline: max\(3px, var\(--ds-border-width-focus\)\) solid var\(--ds-color-focus\) !important;/);
 });
 test('action buttons can use an approved image asset without permitting arbitrary image sources',()=>{
  const theme=themeFixture('fjordside'),logo=theme.brand.logos[0],asset=theme.brand.assets.find(asset=>asset.id===logo.asset);

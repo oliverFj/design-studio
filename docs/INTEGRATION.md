@@ -49,7 +49,50 @@ Formularfelter bruger label, hint, error og idPrefix. Biblioteket forbinder for/
 
 Frameworkadaptere må forbinde komponenter til React, Vue eller lignende, men skal bevare fælles dele, native semantik og bibliotekets grundlayout. Registrér adaptere i components-feltet med verificerede file og export. Skærmlayout og routing er produktspecifikke.
 
-Handlingsknappen action-button har slots icon, label og shortcut. iconAssetId kan vælge en godkendt logo- eller billedressource fra temaets brand.assets; billedet bevarer proportionerne. Brug den til en handling med symbol og tekst; forbind genvejen i produktet, hvis den vises. Billedtekst caption og nøgletal metric-row har ingen produktspecifik indholdslogik. Se DESIGN-FOUNDATIONS.md for valg mellem rollerne.
+Handlingsknappen action-button har slots icon, label og shortcut. Varianten tool placerer symbol over en kort label i en kompakt værktøjslinje; den bruger de samme pressed- og focustilstande. En tom shortcut skjules. iconAssetId kan vælge en godkendt logo- eller billedressource fra temaets brand.assets; billedet bevarer proportionerne. Brug den til en handling med symbol og tekst; forbind genvejen i produktet, hvis den vises. Billedtekst caption og nøgletal metric-row har ingen produktspecifik indholdslogik. Se DESIGN-FOUNDATIONS.md for valg mellem rollerne.
+
+## Hierarkisk indhold med tree
+
+Brug `tree` til navngivne objekter med børn og få handlinger pr. række. Den interaktive runtime importeres som `mountTree` fra `design/runtime/components.mjs`; katalogets deklarative preview er ikke en interaktiv produktintegration.
+
+~~~js
+import { mountTree } from './design/runtime/components.mjs';
+
+let expandedIds = ['collection'];
+const tree = mountTree(theme, host, {
+  label: 'Indhold',
+  items: [{ id: 'collection', label: 'Samling', children: [
+    { id: 'item-a', label: 'Element A', icon: '◇', meta: 'Kladde',
+      actions: [{ id: 'visibility', label: 'Synlig', icon: '◉', pressed: true }] },
+  ] }],
+  selectedIds: [],
+  expandedIds,
+  onSelect(ids) { tree.update({ selectedIds: ids }); },
+  onToggle(id, expanded) {
+    expandedIds = expanded ? [...new Set([...expandedIds, id])] : expandedIds.filter(value => value !== id);
+    tree.update({ expandedIds });
+  },
+  onAction(id, actionId, detail) { handleItemAction(id, actionId, detail); },
+}, { document });
+~~~
+
+`host` ligger under `ds-scope`. Produktet leverer `handleItemAction` og sin egen tilstand. Controlleren eksponerer `element`, `update(nextOptions)` og `destroy()`; opdatér ved ændringer og afmontér med `destroy`. Brug stabile, entydige item-ID'er, så DOM og fokus kan bevares.
+
+Et item har `id`, `label` og valgfrie `icon`, `meta`, `badge`, `children`, `actions`, `disabled`, `draggable` og `dropTarget`. En rækkehandling har `id`, en forståelig `label` samt valgfrie `icon`, `pressed` og `disabled`; symboler erstatter ikke handlingsnavne. `dropTarget` er en boolean eller `{ inside, before, after }`. Options omfatter også `multiSelect` (standard `true`) og `variant` (standard `default`). Standardtræet har 32 px rækker, 24 px foldningsfelt, tæt indrykning og afkortning af lange navne. Brug `roomy` til de større 44 px klikflader og ombrudte navne. `desktop` bevares som eksplicit kompakt variant.
+
+| Callback | Foreslået ændring og kontekst |
+| --- | --- |
+| `onSelect(ids, detail)` | Nyt valg; `detail` indeholder `id`, `item`, `event`, `toggle` og `range`. |
+| `onToggle(id, expanded, detail)` | Åben/luk; kontekst er `{ item, event }`. |
+| `onAction(id, actionId, detail)` | Aktivér rækkehandling; kontekst er `{ item, event }`. |
+| `onMove(sourceIds, targetId, detail)` | Flyt til `position: 'inside'`, `'before'` eller `'after'`; `event` følger med. |
+| `onContextMenu(id, detail)` | Produktets menu; kontekst er `{ item, event, selectedIds }`. |
+
+Callbacks foreslår handlinger; de ændrer ikke produktets data. Produktet validerer flytning og valg, opdaterer tilstanden og sender resultatet tilbage med `update`. Det ejer også kontekstmenu, fortryd og en klik-/tastaturbetjent flyttehandling, når drag-and-drop bruges. En tastaturgenvej alene erstatter ikke et klikbart alternativ til træk. Se [WCAG 2.2 om dragging movements](https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html).
+
+Pil op/ned og Home/End flytter kun rækkefokus; højre/venstre åbner, lukker eller navigerer mellem forælder og barn. Bogstaver søger efter rækkenavne med en buffer på 700 ms. Enter vælger rækken, mens Space skifter dens valgtilstand ved multivalg. Normalt klik erstatter valget, Ctrl/Meta-klik skifter en række, og Shift-klik eller Shift+pil op/ned foreslår et interval. `item.disabled` blokerer valg og træk, men ikke foldning eller særskilt aktiverede handlinger. Sådanne rækker kan fortsat få fokus; kun disabled-blade uden aktive handlinger springes over. `action.disabled` styrer den enkelte knap. Tab når den fokuserede rækkes native handlingsknapper; Enter/Space aktiverer knappen. ContextMenu eller Shift+F10 åbner produktets kontekstmenu. Fokus og vedvarende valg skal kunne skelnes. [Designgrundlaget](DESIGN-FOUNDATIONS.md#hierarkier-og-rækkehandlinger-i-bibliotek-26) beskriver kilder og afgrænsning.
+
+Træet ejer sin indrykning, rækkeanatomi og fokus. Brug eksisterende `scroll-area` til lange træer og produktets shell til placering og maksimal højde. Brede redigerbare kolonner hører til en særskilt treegrid-løsning.
 
 ## Tema og tokens
 

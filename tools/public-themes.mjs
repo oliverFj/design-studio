@@ -4,6 +4,7 @@ export const PUBLIC_THEME_IDS = Object.freeze([
   'midnight-editorial',
   'fjordside',
   'castle-studio',
+  'castle-studio-v2',
   'atelier',
   'signal',
   'nocturne',

@@ -25,6 +25,7 @@ const enumProperties = {
   display: ['none', 'block', 'inline', 'inline-block', 'flex', 'inline-flex', 'grid', 'inline-grid', 'contents'],
   boxSizing: ['border-box', 'content-box'], fontStyle: ['normal', 'italic', 'oblique'],
   textAlign: ['left', 'right', 'center', 'start', 'end', 'justify'],
+  textOverflow: ['clip', 'ellipsis'],
   textTransform: ['none', 'uppercase', 'lowercase', 'capitalize'],
   whiteSpace: ['normal', 'nowrap', 'pre', 'pre-wrap', 'pre-line', 'break-spaces'],
   wordBreak: ['normal', 'break-all', 'keep-all', 'break-word'], overflowWrap: ['normal', 'break-word', 'anywhere'],
@@ -176,7 +177,7 @@ function validateTreatment(treatment, path, parts, tokens, resolved, errors, req
     }
   }
 }
-const previewTags = new Set(['div', 'span', 'p', 'strong', 'label', 'button', 'input', 'select', 'option', 'h2', 'h3', 'hr', 'section', 'article', 'header', 'footer', 'dl', 'dt', 'dd']);
+const previewTags = new Set(['div', 'span', 'p', 'strong', 'label', 'button', 'input', 'select', 'option', 'h2', 'h3', 'hr', 'section', 'article', 'header', 'footer', 'dl', 'dt', 'dd', 'ul', 'li']);
 const previewInputTypes = new Set(['button', 'submit', 'reset', 'text', 'email', 'number', 'password', 'checkbox', 'radio', 'search', 'tel', 'url', 'range', 'color', 'date']);
 function validatePreview(tree, component, path, errors, catalog) {
   let count = 0;
@@ -204,7 +205,7 @@ function validatePreview(tree, component, path, errors, catalog) {
           if (typeof value !== 'boolean') errors.push(nodePath + '.attrs.' + attribute + ': must be boolean.');
         } else if (attribute === 'tabindex') {
           if (!['0','-1'].includes(value)) errors.push(nodePath + '.attrs.tabindex: must be 0 or -1.');
-        } else if (['type', 'value', 'placeholder', 'aria-label', 'aria-hidden', 'aria-pressed', 'role', 'min', 'max', 'step'].includes(attribute)) {
+        } else if (['type', 'value', 'placeholder', 'aria-label', 'aria-hidden', 'aria-pressed', 'aria-selected', 'aria-disabled', 'aria-expanded', 'aria-haspopup', 'aria-checked', 'aria-multiselectable', 'aria-level', 'aria-posinset', 'aria-setsize', 'role', 'min', 'max', 'step'].includes(attribute)) {
           if (typeof value !== 'string' || value.length > 1000) errors.push(nodePath + '.attrs.' + attribute + ': expected a string of at most 1000 characters.');
           else if (attribute === 'type' && !previewInputTypes.has(value)) errors.push(nodePath + '.attrs.type: unsupported input type.');
         } else errors.push(nodePath + '.attrs.' + attribute + ': unsupported preview attribute.');
@@ -556,6 +557,7 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
     rules.push('', `${selectors.map(selector=>scope+' '+selector).join(', ')} {`, ...Object.entries(styles).map(([property, value]) => `  ${cssProperty(property)}: ${cssValue(value)};`), '}');
   }
   if(sourceVersion===2){rules.push('', `${scope} [hidden] { display: none !important; }`);emit('dialog.ds-dialog:not([open])',{display:'none'});emit('dialog.ds-dialog-host:not([open])',{display:'none'});}
+  else if(pack.components.tree)rules.push('', `${scope} .ds-tree [hidden] { display: none !important; }`);
   if(sourceVersion===2)emit('.ds-dialog-host',{border:'0',padding:'0',backgroundColor:'transparent',color:'inherit',width:'calc(100% - 2rem)',maxWidth:'{size.dialog.maxWidth}'});
   for (const [componentId, component] of Object.entries(pack.components)) {
     const root = component.parts.root.selector;
@@ -568,7 +570,8 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
         const nested=anatomyPath(child,partId,childPath);if(nested)return nested;
       }
     }
-    const partSelector=(parent,partId)=>{if(partId==='root')return parent;const path=sourceVersion===2?anatomyPath(component.preview,partId):null;return parent+(path?' > '+path.join(' > '):' '+component.parts[partId].selector);};
+    const treeComponent=componentId==='tree';
+    const partSelector=(parent,partId)=>{if(partId==='root')return parent;if(treeComponent)return parent+' '+component.parts[partId].selector;const path=sourceVersion===2?anatomyPath(component.preview,partId):null;return parent+(path?' > '+path.join(' > '):' '+component.parts[partId].selector);};
     for (const [partId, part] of Object.entries(component.parts)) emit(partSelector(root,partId), part.styles);
     for (const [variantId, variant] of Object.entries(component.variants)) {
       const variantRoot = `${root}[data-variant="${variantId}"]`;
@@ -580,6 +583,20 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
     const interactivePart=partId=>{let found=false;const visit=node=>{if(node?.part===partId&&['button','input','select','textarea'].includes(node.tag))found=true;for(const child of node?.children??[])visit(child);};visit(component.preview);return found;};
     const disabledGuard=':not(:is(:disabled, [aria-disabled="true"], [data-state~="disabled"]))';
     for (const [stateId, state] of Object.entries(component.states).sort(([a],[b])=>Number(transientState(a))-Number(transientState(b)))) {
+      if(treeComponent){
+        // Recursive items have independent state. A selected ancestor must not
+        // select its descendants, and hovering a child must not paint its parent.
+        const item=root+' '+component.parts.item.selector,row=component.parts.row.selector;
+        if(transientState(stateId)){
+          emit(item+disabledGuard+' > '+row+stateSelector(stateId,component),{...state.styles,...state.parts?.row?.styles});
+          for(const partId of ['toggle','action'])emit(root+' '+component.parts[partId].selector+stateSelector(stateId,component)+disabledGuard,{backgroundColor:state.parts?.row?.styles?.backgroundColor,color:state.parts?.row?.styles?.color});
+        }else{
+          const native=stateId==='focus'?':is(:focus-visible, :has(> '+row+' :focus-visible))':stateSelector(stateId,component),target=item+':is('+native+', [data-state~="'+stateId+'"])';
+          emit(target,state.styles);
+          for(const [partId,part]of Object.entries(state.parts??{}))emit(target+(partId==='item'?'':partId==='row'?' > '+row:' > '+row+' '+component.parts[partId].selector),part.styles);
+        }
+        continue;
+      }
       const stateRoot = sourceVersion===2?`${root}:is(${stateId==='pressed'?'[aria-pressed="true"]':stateSelector(stateId, component)}, [data-state~="${stateId}"])${transientState(stateId)?disabledGuard:''}`:`${root}${stateSelector(stateId, component)}`;
       emit(stateRoot, state.styles);
       if(sourceVersion===2)for(const [alias,key]of Object.entries(STATE_ALIASES[componentId]??{}))if(key===stateId){const aliasRoot=`${root}:is(${stateSelector(alias,component)}, [data-state~="${alias}"])`;emit(aliasRoot,state.styles);for(const [partId,part]of Object.entries(state.parts??{}))emit(partSelector(aliasRoot,partId),part.styles);}

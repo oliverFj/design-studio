@@ -23,7 +23,7 @@ Komponentstruktur redigeres i det fælles bibliotek, ikke i hvert tema. Padding 
 
 Gem ændringer skriver til den åbnede JSON-fil. Importér tema opretter en kopi; eksisterende filer overskrives ikke. Projektets genererede CSS opdateres med sync efter redigering. Revisionstjek forhindrer, at en samtidig filændring overskrives.
 
-Bibliotek 2.5.0 har 30 fælles roller og syv offentlige temaer. `stack` styrer afstand mellem komponenter, `scroll-area` giver indlejret indhold én synlig ramme, og handlingsfamilierne bruger fælles hover-/tryk-tokens. Se [integrationsguiden](docs/INTEGRATION.md) for sammensætning og [temaformatet](docs/PACKAGE-FORMAT.md) for kontrakten. Biblioteksversionen er særskilt fra desktop-appens versionsnummer.
+Bibliotek 2.7.1 har 34 fælles roller og otte offentlige temaer. `menubar`, `menu` og `menu-item` giver fælles struktur og regler for program- og kontekstmenuer. Desktopvarianter giver kompakte 32 px kontroller. Træets standard bruger kompakte rækker; roomy bevarer de større klikflader. Castle Studio v2 er et separat tema; det oprindelige Castle Studio og Atelier bevares. `tree` viser hierarkisk indhold med valg, foldning og rækkehandlinger gennem den fælles `mountTree`-runtime. `stack` styrer afstand mellem komponenter, `scroll-area` giver indlejret indhold én synlig ramme, og handlingsfamilierne bruger fælles hover-/tryk-tokens. Se [integrationsguiden](docs/INTEGRATION.md) for API og sammensætning og [temaformatet](docs/PACKAGE-FORMAT.md) for kontrakten. Biblioteksversionen er særskilt fra desktop-appens versionsnummer. Komponentvisningen centrerer selvstændige eksempler; formularer, træer og sammensatte paneler bevarer deres anvendelige bredde og tekstretning.
 
 ## Brug i et produkt
 

@@ -8812,6 +8812,18 @@
                     "0",
                     "-1"
                   ]
+                },
+                "aria-haspopup": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "aria-checked": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "aria-expanded": {
+                  "type": "string",
+                  "maxLength": 1000
                 }
               },
               "additionalProperties": false
