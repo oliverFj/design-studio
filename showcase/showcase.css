@@ -32,7 +32,7 @@ main { max-width: 1504px; margin: auto; padding: 0 44px; }
 .theme-description { min-height: 34px; margin: 11px 0 0; color: var(--shell-muted); font-size: 11px; line-height: 1.6; }
 .studio-panel { overflow: hidden; border: 1px solid var(--shell-border); border-radius: 12px; background: var(--shell-surface); box-shadow: 0 10px 40px #23334a08; }
 .panel-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 0 24px; border-bottom: 1px solid var(--shell-border); }
-.views { display: flex; gap: 26px; }
+.views { display: flex; flex-wrap: wrap; column-gap: 26px; row-gap: 0; }
 .views button { min-height: 57px; padding: 16px 0; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--shell-muted); font-size: 12px; font-weight: 500; }
 .views button[aria-pressed="true"] { color: var(--shell-ink); border-bottom-color: var(--shell-accent); }
 .views button > span { margin-left: 6px; padding: 2px 5px; border: 1px solid var(--shell-border); border-radius: 4px; font-size: 9px; }

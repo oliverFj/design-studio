@@ -2,6 +2,7 @@ import { PACKAGE_SCHEMA_VERSION, TOKEN_TYPES, REQUIRED_TOKENS, COMPONENT_CONTRAC
 import {COMPONENT_LIBRARY, DEFAULT_TOKENS, APPEARANCE_PROPERTIES, POSITIVE_SPACING_TOKENS, LIBRARY_VERSION, COMPONENT_ALIASES, VARIANT_ALIASES, STATE_ALIASES, PART_ALIASES, TOKEN_ALIASES, LEGACY_SELECTORS, canonicalComponentId, canonicalVariantId, canonicalStateId, canonicalPartId} from './library.mjs';
 export {LIBRARY_VERSION, canonicalComponentId, canonicalVariantId, canonicalPartId, canonicalStateId} from './library.mjs';
 import {validateThemeQuality, contrastRatio} from './quality.mjs';
+import { generateLayoutCSS } from './layout.mjs';
 
 const own = (object, key) => Object.hasOwn(object, key);
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -556,7 +557,7 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
     const selectors=sourceVersion===2?expandLegacySelectors(selector):[selector];
     rules.push('', `${selectors.map(selector=>scope+' '+selector).join(', ')} {`, ...Object.entries(styles).map(([property, value]) => `  ${cssProperty(property)}: ${cssValue(value)};`), '}');
   }
-  if(sourceVersion===2){rules.push('', `${scope} [hidden] { display: none !important; }`);emit('dialog.ds-dialog:not([open])',{display:'none'});emit('dialog.ds-dialog-host:not([open])',{display:'none'});}
+  if(sourceVersion===2){rules.push('', generateLayoutCSS(scope), `${scope} [hidden] { display: none !important; }`);emit('dialog.ds-dialog:not([open])',{display:'none'});emit('dialog.ds-dialog-host:not([open])',{display:'none'});}
   else if(pack.components.tree)rules.push('', `${scope} .ds-tree [hidden] { display: none !important; }`);
   if(sourceVersion===2)emit('.ds-dialog-host',{border:'0',padding:'0',backgroundColor:'transparent',color:'inherit',width:'calc(100% - 2rem)',maxWidth:'{size.dialog.maxWidth}'});
   for (const [componentId, component] of Object.entries(pack.components)) {

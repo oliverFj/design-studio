@@ -1,5 +1,6 @@
 /** Project-agnostic component anatomy and semantic defaults. Visual themes own appearance. */
-export const LIBRARY_VERSION='2.7.1';
+export const LIBRARY_VERSION='2.8.0';
+export { LAYOUT_PROFILES } from './layout.mjs';
 function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
 export const APPEARANCE_PROPERTIES=freeze([
   "color",

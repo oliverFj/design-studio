@@ -1,0 +1,11 @@
+body {
+  margin: 0;
+  background: var(--ds-color-background-canvas);
+  color: var(--ds-color-text-primary);
+  font-family: var(--ds-typography-font-body, system-ui, sans-serif);
+}
+
+.app-shell {
+  box-sizing: border-box;
+  padding: var(--ds-space-component-paddingLarge);
+}

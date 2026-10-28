@@ -19,6 +19,20 @@ Biblioteket bruger Microsoft Fluent 2 og IBM Carbon som designfaglige referencer
 
 Typografi, skillelinjer, mærker, billedtekst og nøgletal er enkle lokale sammensætninger af disse grundprincipper. Billedtekst er indhold med en valgfri kort label; nøgletal er label og værdi. De forudsætter ingen bestemt branche, fortælling eller datamodel.
 
+## Indholdsbredde og fuld bredde
+
+Vælg bredde efter indholdets opgave, ikke efter den ledige skærmplads. En bred vært betyder ikke, at alle dens børn skal strækkes. Skeln mellem sidens ramme, arbejdsfladen, paneler og kontroller:
+
+- Fuld bredde er relevant for indhold, der faktisk udnytter pladsen: en tegne-/3D-flade, et kort, en tidslinje eller en tæt datavisning. Bevar afgrænsede værktøjer og egenskabspaneler omkring fladen.
+- Formularer og tekst får en læsbar maksimal bredde. I referenceeksemplerne begynder formularer ved højst 44rem, liste/detaljevisninger ved 72rem og komplette editor-eksempler ved 84rem. Brødtekst og vejledning begrænses typisk til 60–75ch. Tallene er udgangspunkter for eksemplerne, ikke krav til alle produkter.
+- Handlinger har som udgangspunkt indholdsbestemt bredde. Stræk dem kun, når deres rolle kræver det, eksempelvis en listepost eller en bevidst primær handling i et smalt panel. Korte valg bliver ikke til en arbejdsflade, blot fordi knapperne fylder en hel række.
+- En illustration af objekter kan bruge afgrænsede kort eller markører. Den skal ikke ligne en meget bred menu. Et rigtigt canvas kan vokse, mens kontrollerne bevarer deres hensigtsmæssige størrelse.
+- Begrænsningerne skal stadig tilpasse sig den tilgængelige plads. Brug maksimal bredde og indholdsbaserede/containerbaserede brudpunkter; skift til én kolonne, når paneler ikke længere kan fungere side om side. Bevar klikflader, hele ord og tastaturfokus.
+
+Breddeprofilerne er fælles layoutprimitiver i core/layout.mjs og eksporteres også fra core/library.mjs. De medfølger automatisk i format 2-CSS og kopieres med init/sync. Brug ds-layout med data-layout eller createLayout fra components.mjs. Profilerne prose, form, panel, split, workspace og fluid giver standardgrænser på henholdsvis 70ch, 44rem, 23rem, 72rem, 84rem og ingen grænse. En konkret ramme kan tilpasses med --ds-layout-max-width i produktets CSS. Indlejrede rammer nulstiller denne lokale tilpasning, så en bred arbejdsflade ikke gør dens paneler brede.
+
+Breddevalg og kolonner tilhører fortsat produktet. Komponentbiblioteket ejer komponenternes indvendige afstande, anatomi og tilstande; temaerne skal ikke indføre layoutregler. patterns/catalog.mjs vælger en fælles profil for hvert eksempel, mens patterns/styles.css alene styrer eksemplets sammensætning. Profilen er en god standard, ikke et krav til produktets arkitektur.
+
 ## Hvad biblioteket fastholder
 
 - Struktur, dele, mellemrum og indvendig afstand ligger i biblioteket. Temaet kan justere afstandstokens, men ikke fjerne dem.

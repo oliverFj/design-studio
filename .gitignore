@@ -4,9 +4,8 @@ node_modules/
 Thumbs.db
 
 # Byggeprodukter og lokal konfiguration
-/release/
 /artifacts/
-/*.lnk
+/index.html
 *.log
 .env
 .env.*

@@ -7,6 +7,7 @@
   <title>Design Studio · Komponenter & temaer</title>
   <link rel="stylesheet" href="./showcase.css">
   <link rel="stylesheet" href="./preview/project-overview.css">
+  <link rel="stylesheet" href="./patterns/styles.css">
   <style id="theme-css"></style>
 </head>
 <body>
@@ -32,6 +33,7 @@
         <div class="views" aria-label="Visning">
           <button type="button" data-view="example" aria-pressed="true">I brug</button>
           <button type="button" data-view="catalog" aria-pressed="false">Komponentbibliotek <span id="component-count"></span></button>
+          <button type="button" data-view="patterns" aria-pressed="false">Designmønstre</button>
         </div>
         <span class="live-label"><span aria-hidden="true"></span> Fælles struktur · frit udtryk</span>
       </div>
@@ -39,6 +41,7 @@
         <div class="preview-caption"><span>PROJEKTOVERBLIK</span><span id="example-theme"></span></div>
         <div id="example" class="project-overview-host"></div>
       </div>
+      <div id="patterns-view" class="patterns-panel" hidden><div id="patterns"></div></div>
       <div id="catalog-view" class="catalog-layout" hidden>
         <aside class="catalog-sidebar">
           <label for="component-search" class="eyebrow">UDFORSK BIBLIOTEKET</label>

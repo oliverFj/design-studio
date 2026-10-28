@@ -1,4 +1,5 @@
 import {getComponents, brandAssetDataURL} from './engine.mjs';
+export { createLayout } from './layout.mjs';
 import {COMPONENT_LIBRARY, canonicalComponentId, canonicalVariantId, canonicalStateId, canonicalPartId} from './library.mjs';
 
 const tags=new Set(['div','span','p','strong','label','button','input','select','option','h1','h2','h3','h4','h5','h6','hr','section','article','header','footer','dialog','textarea','ul','li','img','dl','dt','dd']);

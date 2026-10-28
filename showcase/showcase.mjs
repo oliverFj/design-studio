@@ -2,6 +2,7 @@ import { generateCSS, getComponents, resolveTokens } from './core/engine.mjs';
 import { createComponent } from './core/components.mjs';
 import { themes } from './themes.mjs';
 import { createProjectOverview, createProjectOverviewDraft } from './preview/project-overview.mjs';
+import { mountCompositionGallery, createGalleryState } from './patterns/gallery.mjs';
 
 const $ = selector => document.querySelector(selector);
 const themeDescriptions = {
@@ -16,6 +17,8 @@ let selectedComponent = 'card';
 let selectedVariant = 'default';
 let activeView = 'example';
 const draft = createProjectOverviewDraft();
+const patternState = createGalleryState();
+let patternGallery;
 const component = (id, options = {}) => createComponent(activeTheme, id, options, { document });
 const element = (tag, className, children = []) => {
   const result = document.createElement(tag);
@@ -49,6 +52,7 @@ function renderThemeButtons() {
 }
 
 function setTheme(theme, { announceChange = true } = {}) {
+  patternGallery?.destroy();
   $('#example').querySelector('dialog[open]')?.close();
   activeTheme = theme;
   catalog = getComponents(theme);
@@ -58,6 +62,8 @@ function setTheme(theme, { announceChange = true } = {}) {
   $('#component-count').textContent = Object.keys(catalog).length;
   renderThemeButtons();
   $('#example').replaceChildren(createProjectOverview(theme, { document, draft, announce, idPrefix: 'showcase-example' }));
+  patternGallery=mountCompositionGallery(theme,{document,state:patternState,announce,idPrefix:'showcase-patterns'});
+  $('#patterns').replaceChildren(patternGallery.element);
   renderCatalog();
   if (announceChange) announce('Temaet er skiftet til ' + theme.name + '.');
 }
@@ -119,5 +125,6 @@ document.querySelectorAll('[data-view]').forEach(button => button.addEventListen
   document.querySelectorAll('[data-view]').forEach(item => item.setAttribute('aria-pressed', String(item.dataset.view === activeView)));
   $('#example-view').hidden = activeView !== 'example';
   $('#catalog-view').hidden = activeView !== 'catalog';
+  $('#patterns-view').hidden = activeView !== 'patterns';
 }));
 setTheme(activeTheme, { announceChange: false });

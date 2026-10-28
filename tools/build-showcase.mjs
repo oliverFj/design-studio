@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { createTheme, getComponents, validatePackage } from '../core/engine.mjs';
 import { LIBRARY_VERSION } from '../core/library.mjs';
 import { PUBLIC_THEME_IDS } from './public-themes.mjs';
+import { COMPOSITIONS, PATTERN_FILES } from '../patterns/catalog.mjs';
 
 const studio = fileURLToPath(new URL('../', import.meta.url));
 const outputIndex = process.argv.indexOf('--out');
@@ -21,8 +22,13 @@ for (const id of PUBLIC_THEME_IDS) {
   themes.push(theme);
 }
 const browserImports = source => source.replace(/\.mjs(['"])/g, '.js$1');
+await mkdir(join(output, 'patterns'), { recursive: true });
+for (const name of PATTERN_FILES) {
+  const source = await readFile(join(studio, 'patterns', name), 'utf8');
+  await writeFile(join(output, 'patterns', name.replace('.mjs', '.js')), browserImports(source), 'utf8');
+}
 await mkdir(join(output, 'core'), { recursive: true });
-for (const name of ['contract.mjs', 'library.mjs', 'quality.mjs', 'engine.mjs', 'components.mjs']) {
+for (const name of ['contract.mjs', 'library.mjs', 'quality.mjs', 'engine.mjs', 'components.mjs', 'layout.mjs']) {
   const source = await readFile(join(studio, 'core', name), 'utf8');
   await writeFile(join(output, 'core', name.replace('.mjs', '.js')), browserImports(source), 'utf8');
   await rm(join(output, 'core', name), { force: true });
@@ -53,6 +59,7 @@ await writeFile(join(output, 'manifest.json'), JSON.stringify({
   libraryVersion: LIBRARY_VERSION,
   themes: themes.map(theme => ({ id: theme.id, name: theme.name })),
   components: Object.keys(getComponents(themes[0])),
+  compositions: Object.entries(COMPOSITIONS).map(([id, item]) => ({ id, name: item.name, version: item.version, components: item.components })),
 }, null, 2) + '\n');
 console.log('Design Studio-showcase bygget: ' + output);
 

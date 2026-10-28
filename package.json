@@ -3,23 +3,18 @@
   "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Portable visual design packages, agent instructions and a local editor.",
+  "description": "Shared component library, themes and a standalone offline browser editor.",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "start": "node tools/launch.mjs",
+    "build": "node tools/build-offline.mjs",
+    "start": "node tools/open-offline.mjs",
     "test": "node --test tests/*.test.mjs",
     "check": "node tools/check-themes.mjs",
-    "desktop": "electron .",
-    "desktop:build": "node tools/desktop-build.mjs",
-    "desktop:smoke": "node tools/desktop-smoke.mjs",
     "showcase:build": "node tools/build-showcase.mjs"
   },
-  "main": "desktop/main.mjs",
   "devDependencies": {
-    "electron": "44.7.0",
-    "electron-builder": "26.15.3"
+    "esbuild": "^0.28.2"
   }
 }
-

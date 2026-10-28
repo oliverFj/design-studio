@@ -3,21 +3,30 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { generateCSS, validateCompatibility, validatePackage, migratePackage, LIBRARY_VERSION } from '../core/engine.mjs';
+import { doctor, formatDoctor, PROJECT_RUNTIME, runtimeContent } from './doctor.mjs';
+import { STARTER_VERSION, STARTER_FILES, PACKAGE_FIELDS, contentHash, packageField, starterFiles, starterSnapshot } from './starter.mjs';
+import { PATTERN_FILES } from '../patterns/catalog.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const RUNTIME_FILES = ['contract.mjs', 'library.mjs', 'quality.mjs', 'engine.mjs', 'components.mjs'];
 const MARKER = '<!-- design-studio -->';
 const HELP = `Design Studio
   node tools/cli.mjs validate FILE
   node tools/cli.mjs css FILE [--out FILE] [--scope .ds-scope]
   node tools/cli.mjs assets FILE --out DIRECTORY
   node tools/cli.mjs compare BASE CANDIDATE
-  node tools/cli.mjs init PROJECT_DIR [--theme studio-light]
+  node tools/cli.mjs init PROJECT_DIR [--theme studio-light] [--design-only]
   node tools/cli.mjs sync PROJECT_DIR
+  node tools/cli.mjs doctor PROJECT_DIR
+  node tools/cli.mjs update PROJECT_DIR [--apply]
+  node tools/cli.mjs examples PROJECT_DIR
   node tools/cli.mjs migrate FILE --out NEW_FILE
 
-init tilføjer tema, fælles komponentruntime, CSS, brandressourcer, konfiguration og agentanvisning.
+init opretter et minimalt offlineprojekt med færdig index.html, kildefiler og npm run build samt tema, runtime, CSS, brandressourcer, konfiguration og agentanvisning.
+Brug --design-only til at tilknytte et eksisterende produkt uden at oprette applikationsfiler.
 sync opdaterer komponentruntime og genereret CSS. migrate skriver en ny temafil og bevarer originalen.
+doctor kontrollerer tema, runtime, adaptere og offlinebuild uden at ændre projektet.
+update viser valgfrie startprojektopdateringer. --apply opdaterer kun uændrede filer og manglende nye filer; lokale ændringer bevares.
+examples kopierer valgfrie sammensætningseksempler til design/patterns uden at overskrive eksisterende filer.
 Eksisterende designfiler overskrives ikke.`;
 
 async function readPackage(file) {
@@ -33,16 +42,17 @@ async function readPackage(file) {
   return pack;
 }
 
-function argumentsFor(args, allowedFlags) {
+function argumentsFor(args, allowedFlags, booleanFlags = []) {
   const positionals = [];
   const options = {};
   for (let index = 0; index < args.length; index++) {
     const argument = args[index];
     if (argument.startsWith('--')) {
       if (!allowedFlags.includes(argument)) throw new Error(`Ukendt argument: ${argument}`);
+      if (options[argument] !== undefined) throw new Error(`Angiv kun ${argument} én gang.`);
+      if (booleanFlags.includes(argument)) { options[argument] = true; continue; }
       const value = args[++index];
       if (!value || value.startsWith('--')) throw new Error(`Angiv en værdi efter ${argument}.`);
-      if (options[argument] !== undefined) throw new Error(`Angiv kun ${argument} én gang.`);
       options[argument] = value;
     } else positionals.push(argument);
   }
@@ -147,9 +157,9 @@ async function extractAssets(pack, directory) {
 }
 
 async function runtimeCopies(designDir) {
-  return Promise.all(RUNTIME_FILES.map(async name => ({
-    file: path.join(designDir, 'runtime', name),
-    content: await fs.readFile(path.join(ROOT, 'core', name), 'utf8'),
+  return Promise.all(PROJECT_RUNTIME.map(async ([source, relative]) => ({
+    file: path.join(designDir, relative),
+    content: runtimeContent(source, await fs.readFile(path.join(ROOT, source), 'utf8')),
   })));
 }
 function withinProject(project, relative) {
@@ -186,7 +196,119 @@ async function synchronize(projectArgument) {
   return [...plan.map(output => output.file), configFile];
 }
 
-async function initialize(projectArgument, theme) {
+async function updateStarter(projectArgument, apply) {
+  const project = await fs.realpath(projectArgument);
+  const configFile = path.join(project, 'design-studio.project.json');
+  await directoriesFor(path.dirname(configFile));
+  const configInfo = await fs.lstat(configFile);
+  if (!configInfo.isFile() || configInfo.isSymbolicLink()) throw new Error('Projektkonfigurationen skal være en almindelig fil.');
+  const configBefore = await fs.readFile(configFile, 'utf8');
+  const config = JSON.parse(configBefore);
+  const pack = await readPackage(withinProject(project, config.package));
+  const app = await starterFiles(ROOT, { id: pack.id, name: path.basename(project) });
+  if (!config.offline && !config.starterTemplate) throw new Error('Projektet har ingen registreret offline-startskabelon. Brug sync til fælles runtime og CSS; behold produktets egen app- og buildopsætning.');
+  const runtime = await runtimeCopies(path.join(project, 'design'));
+  const targets = [...app, ...runtime.map(copy => ({ relative: path.relative(project, copy.file).replaceAll('\\', '/'), content: copy.content })), { relative: config.css, content: generateCSS(pack, { scope: config.scope || '.ds-scope' }) }];
+  const names = new Set();
+  for (const target of targets) {
+    const file = withinProject(project, target.relative);
+    const key = file.toLowerCase();
+    if (names.has(key) || [configFile, withinProject(project, config.package)].some(protectedFile => protectedFile.toLowerCase() === key)) throw new Error('Startprojektets output må ikke overlappe tema, konfiguration eller andre filer.');
+    names.add(key);
+  }
+  const previous = config.starterTemplate;
+  if (previous?.version) {
+    const local = String(previous.version).split('.').map(Number), latest = STARTER_VERSION.split('.').map(Number);
+    const difference = local.findIndex((value, index) => value !== latest[index]);
+    if (!/^\d+\.\d+\.\d+$/.test(previous.version) || (difference >= 0 && local[difference] > latest[difference])) throw new Error('Projektets startprojektversion er nyere eller ukendt. Automatisk nedgradering understøttes ikke.');
+  }
+  const nextSnapshot = starterSnapshot(targets);
+  const rows = [], writes = [], proposals = [];
+  const readOutput = async relative => {
+    const file = withinProject(project, relative);
+    await directoriesFor(path.dirname(file));
+    const info = await exists(file);
+    if (info && (!info.isFile() || info.isSymbolicLink())) throw new Error('Output skal være en almindelig fil: ' + file);
+    return { file, before: info ? await fs.readFile(file, 'utf8') : null };
+  };
+  const classify = (current, baseline, target) => current === target ? 'current'
+    : baseline === target ? (current === null ? 'deleted' : 'custom')
+    : current === null ? (baseline === undefined ? 'add' : 'review')
+    : current === baseline ? 'update' : 'review';
+  const setField = (metadata, field, value) => {
+    const parts = field.split('.'); const key = parts.pop();
+    let node = metadata;
+    for (const part of parts) {
+      if (!node[part] || typeof node[part] !== 'object' || Array.isArray(node[part])) node[part] = {};
+      node = node[part];
+    }
+    node[key] = value;
+  };
+  for (const target of targets) {
+    const output = await readOutput(target.relative);
+    if (target.relative === 'package.json' && output.before !== null) {
+      const current = JSON.parse(output.before), next = structuredClone(current), suggested = structuredClone(current);
+      if (!current || Array.isArray(current) || typeof current !== 'object' || ['scripts', 'engines', 'devDependencies'].some(key => current[key] !== undefined && (!current[key] || typeof current[key] !== 'object' || Array.isArray(current[key])))) throw new Error('package.json skal have en objektstruktur for scripts, engines og devDependencies. Filen bevares.');
+      const desired = JSON.parse(target.content);
+      let changed = false, needsReview = false;
+      for (const field of PACKAGE_FIELDS) {
+        const local = packageField(current, field), base = previous?.package?.[field], incoming = packageField(desired, field);
+        const action = classify(local === undefined ? null : JSON.stringify(local), base === undefined ? undefined : JSON.stringify(base), JSON.stringify(incoming));
+        rows.push({ file: 'package.json → ' + field, action });
+        if (action === 'add' || action === 'update') { setField(next, field, incoming); changed = true; }
+        if (action === 'review') needsReview = true;
+        if (action === 'review' || action === 'add' || action === 'update') setField(suggested, field, incoming);
+      }
+      if (changed) writes.push({ ...output, content: JSON.stringify(next, null, 2) + '\n' });
+      if (needsReview) proposals.push({ relative: target.relative, content: JSON.stringify(suggested, null, 2) + '\n' });
+      continue;
+    }
+    const action = classify(output.before === null ? null : contentHash(output.before), previous?.files?.[target.relative], contentHash(target.content));
+    rows.push({ file: target.relative, action });
+    if (action === 'add' || action === 'update') writes.push({ ...output, content: target.content });
+    if (action === 'review') proposals.push(target);
+  }
+  const report = { from: previous?.version || 'ukendt', to: STARTER_VERSION, applied: apply, files: rows, proposals: [] };
+  if (!apply) return report;
+  for (const proposal of proposals) {
+    const relative = '.design-studio/updates/' + STARTER_VERSION + '/' + contentHash(proposal.content).slice(0, 12) + '/' + proposal.relative;
+    const output = await readOutput(relative);
+    if (output.before !== null && output.before !== proposal.content) throw new Error('Et eksisterende opdateringsforslag er redigeret og bevares: ' + output.file);
+    if (output.before === null) writes.push({ ...output, content: proposal.content });
+    report.proposals.push(relative);
+  }
+  // This is the new reference baseline; customized product code remains customized.
+  config.starterTemplate = nextSnapshot;
+  const sharedReady = runtime.every(copy => !rows.some(row => row.file === path.relative(project, copy.file).replaceAll('\\', '/') && ['review', 'deleted'].includes(row.action)));
+  if (sharedReady) config.libraryVersion = LIBRARY_VERSION;
+  const configAfter = JSON.stringify(config, null, 2) + '\n';
+  if (configAfter !== configBefore) writes.push({ file: configFile, before: configBefore, content: configAfter });
+  const created = [], directories = [], replaced = [];
+  try {
+    const missing = [...new Set((await Promise.all(writes.map(output => directoriesFor(path.dirname(output.file))))).flat())];
+    await createDirectories(missing, directories);
+    // Recheck every original before writing, and again immediately before replacement.
+    for (const output of writes) {
+      const current = await exists(output.file) ? await fs.readFile(output.file, 'utf8') : null;
+      if (current !== output.before) throw new Error('Projektfilen blev ændret under opdateringen: ' + output.file);
+    }
+    for (const output of writes) {
+      if (output.before === null) await writeNewFile(output.file, output.content, created);
+      else {
+        if (await fs.readFile(output.file, 'utf8') !== output.before) throw new Error('Projektfilen blev ændret under opdateringen: ' + output.file);
+        await atomicWrite(output.file, output.content); replaced.push(output);
+      }
+    }
+  } catch (error) {
+    for (const output of replaced.reverse()) {
+      if (await fs.readFile(output.file, 'utf8').catch(() => null) === output.content) await atomicWrite(output.file, output.before);
+    }
+    await rollbackCreated(created, directories); throw error;
+  }
+  return report;
+}
+
+async function initialize(projectArgument, theme, designOnly = false) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(theme)) throw new Error('--theme skal være id for en pakke i packages-mappen.');
   const starter = await readPackage(path.join(ROOT, 'packages', `${theme}.json`));
   const project = await fs.realpath(projectArgument);
@@ -201,8 +323,12 @@ async function initialize(projectArgument, theme) {
   const configFile = path.join(project, 'design-studio.project.json');
   const runtime = await runtimeCopies(designDir);
   const outputs = [packageFile, cssFile, configFile, ...runtime.map(copy => copy.file)];
-  for (const file of outputs) {
-    if (await exists(file)) throw new Error(`Filen findes allerede; intet er ændret: ${file}`);
+  const appFiles = designOnly ? [] : STARTER_FILES;
+  const appOutputs = appFiles.map(file => path.join(project, file));
+  const indexFile = path.join(project, 'index.html');
+  const allOutputs = [...outputs, ...appOutputs, ...(designOnly ? [] : [indexFile])];
+  for (const file of allOutputs) {
+    if (await exists(file)) throw new Error(`Filen findes allerede; intet er ændret: ${file}` + (appOutputs.includes(file) || file === indexFile ? '\nBrug --design-only for at tilknytte et eksisterende produkt uden offline-startprojektet.' : ''));
   }
   const agentsFile = path.join(project, 'AGENTS.md');
   const agentsInfo = await exists(agentsFile);
@@ -218,6 +344,8 @@ async function initialize(projectArgument, theme) {
   const result = validatePackage(pack);
   if (!result.valid) throw new Error(result.errors.join('\n'));
   const css = generateCSS(pack);
+  const appSources = designOnly ? [] : await starterFiles(ROOT, { id: pack.id, name: projectName });
+  const appContents = appSources.map(file => file.content);
   const assetPlan = await assetOutputs(pack, path.join(designDir, 'assets'));
   const designDirectories = await directoriesFor(designDir);
   const config = {
@@ -230,6 +358,12 @@ async function initialize(projectArgument, theme) {
     scope: '.ds-scope',
     starter: starter.id,
     components: {},
+    ...(!designOnly ? { offline: true } : {}),
+    ...(!designOnly ? { starterTemplate: starterSnapshot([
+      ...appSources,
+      ...runtime.map(copy => ({ relative: path.relative(project, copy.file).replaceAll('\\', '/'), content: copy.content })),
+      { relative: 'design/design.css', content: css },
+    ]) } : {}),
   };
   const agentInstruction = `${MARKER}
 ## Design Studio
@@ -238,7 +372,19 @@ Brug Design Studio-systemet i ${ROOT.replaceAll('\\', '/')}.
 Læs systemets AGENTS.md og README.md før visuelt arbejde.
 Projektets tema er design/design.json; design/design.css genereres fra temaet og det fælles bibliotek.
 Læs også docs/AGENT-WORKFLOW.md og docs/DESIGN-FOUNDATIONS.md i systemmappen.
+Standard for nye projekter: lever projektets egen index.html i roden, som åbnes direkte via file:// i browseren, ligesom FormLab.
+Den færdige app skal fungere offline uden server, terminal, startfil eller installeret runtime.
+Brug projektets npm run build til at pakke programkode, komponentruntime, CSS og nødvendige ressourcer til offlinebrug; undgå CDN-afhængigheder og lokale fetch-/modulindlæsninger, der kræver en server.
+Agenten installerer udviklingsafhængigheder og genbygger efter kode-, design-, tema- og ressourceændringer, også efter sync af ændrede designfiler. Brugeren skal blot genindlæse browseren.
+Brug browserens filvælger og downloads til projektfiler; downloads overskriver ikke automatisk originalfilen. Browserlagring kan supplere de gemte filer.
+Brug fælles filhåndtering fra design/runtime/files.mjs: createProjectFile forbinder produktets format-id, version og datavalidering med åbning/gemning. Afvis ugyldige eller ukendte filversioner uden at erstatte den aktuelle tilstand.
+Kør npm run doctor i offline-startprojektet, eller node tools/cli.mjs doctor PROJECT_DIR fra Design Studio. Doctor ændrer ikke filer og erstatter ikke relevant funktionskontrol. Kør sync ved forældet runtime/CSS og derefter npm run build ved forældet offlinefil.
+Startprojektet er et udgangspunkt, ikke en fast arkitektur. tools/cli.mjs update PROJECT_DIR viser valgfrie opdateringer; --apply bevarer lokalt ændrede filer og lægger forslag til manuel fletning ved siden af projektkoden. Opdateringer er ikke et krav for at bruge eller bygge produktet.
+Kontrollér proportionalt, at produktets færdige index.html fungerer via file://; en fungerende udviklingsserver er ikke tilstrækkelig.
+${designOnly ? 'Init er kørt med --design-only og har kun oprettet designtilknytningen.' : 'Init har oprettet src/app.mjs, src/styles.css, src/index.html, tools/build.mjs, package.json og en færdig index.html. Redigér src-filerne og genbyg; håndredigér ikke den genererede index.html. Kør npm install ved første udviklingsopsætning; den færdige index.html virker uden installation og uden Design Studios mappe.'}
+Bevar eksisterende projekters arkitektur, medmindre en omlægning er bestilt. Afvig kun fra offline-standarden ved udtrykkelige brugerkrav eller konkret nødvendig funktionalitet, og forklar behovet.
 Importér fælles komponenter fra design/runtime/components.mjs; brug renderComponent/createComponent, eller en tynd frameworkadapter.
+Brug de fælles breddeprofiler prose, form, panel, split, workspace og fluid: class="ds-layout" med data-layout under ds-scope, eller createLayout fra components.mjs. Tilpas en ramme lokalt med --ds-layout-max-width i produktets CSS; profilerne bestemmer ikke produktets kolonner eller funktioner.
 Grundlayout, semantik og komponentstruktur ejes af core/library.mjs i Design Studio, aldrig af temaet.
 design-studio.project.json registrerer projektets komponentimplementeringer i components.
 For hver implementeret komponent: tilføj komponent-id med {file, export}; file er projektets relative filsti, export er navnet på eksporten.
@@ -250,17 +396,25 @@ Nye genbrugelige komponenter tilføjes i systemets core/library.mjs med projekta
 Efter biblioteksændringer: kør sync for produktet, og opdatér showcasen. Produktets særlige sammensætninger kan forblive lokale.
 UX, indhold, handlinger og produktarkitektur bestemmes af dette projekt.
 Efter ændringer: validér temaet og kør tools/cli.mjs sync PROJECT_DIR, så runtime og CSS følges ad.
-Åbn Design Studio desktop-app, og vælg Filer > Åbn projekttema. Browseralternativ: node "${path.join(ROOT, 'tools/launch.mjs')}" --project "${packageFile}".
+Åbn "${path.join(ROOT, 'index.html')}" direkte i browseren, og vælg Åbn tema for at indlæse "${packageFile}".
+Gem tema henter en JSON-fil. Placér den som projektets design/design.json før sync; originalfilen overskrives ikke automatisk.
 `;
   const agentContent = agentsBefore?.includes(MARKER)
     ? agentsBefore
     : `${agentsBefore ? `${agentsBefore.trimEnd()}\n\n` : ''}${agentInstruction}`;
   const contents = [`${JSON.stringify(pack, null, 2)}\n`, css, `${JSON.stringify(config, null, 2)}\n`, ...runtime.map(copy => copy.content)];
+  const appDirectories = (await Promise.all(appOutputs.map(file => directoriesFor(path.dirname(file))))).flat();
   const created = [], createdDirectories = [];
   try {
-    await createDirectories([...new Set([...designDirectories, ...await directoriesFor(path.join(designDir, 'runtime')), ...assetPlan.directories])], createdDirectories);
+    const runtimeDirectories = (await Promise.all(runtime.map(copy => directoriesFor(path.dirname(copy.file))))).flat();
+    await createDirectories([...new Set([...designDirectories, ...runtimeDirectories, ...assetPlan.directories, ...appDirectories])], createdDirectories);
     for (let index = 0; index < outputs.length; index++) await writeNewFile(outputs[index], contents[index], created);
     for (const {file, content} of assetPlan.files) await writeNewFile(file, content, created);
+    for (let index = 0; index < appOutputs.length; index++) await writeNewFile(appOutputs[index], appContents[index], created);
+    if (!designOnly) {
+      const { buildHTML } = await import('../templates/offline/tools/build.mjs');
+      await writeNewFile(indexFile, await buildHTML(project), created);
+    }
     // Preserve existing project guidance, and refuse a concurrent replacement.
     const currentAgents = await exists(agentsFile) ? await fs.readFile(agentsFile, 'utf8') : null;
     if (currentAgents !== agentsBefore) throw new Error('AGENTS.md blev ændret under oprettelsen. Prøv igen.');
@@ -273,7 +427,7 @@ Efter ændringer: validér temaet og kør tools/cli.mjs sync PROJECT_DIR, så ru
     await rollbackCreated(created, createdDirectories);
     throw error;
   }
-  return [...outputs, ...assetPlan.files.map(({file}) => file), agentsFile];
+  return [...allOutputs, ...assetPlan.files.map(({file}) => file), agentsFile];
 }
 
 export async function runCLI(args, { cwd = process.cwd(), log = console.log } = {}) {
@@ -332,15 +486,48 @@ export async function runCLI(args, { cwd = process.cwd(), log = console.log } = 
     const created = [];
     await writeNewFile(output, JSON.stringify(theme, null, 2) + '\n', created);
     log('Tema gemt; originalen er bevaret: ' + output);
+  } else if (command === 'examples') {
+    const { positionals } = argumentsFor(remaining, []);
+    if (positionals.length !== 1) throw new Error('Brug: examples PROJECT_DIR');
+    const project = await fs.realpath(path.resolve(cwd, positionals[0]));
+    await fs.access(path.join(project, 'design/runtime/components.mjs'));
+    const destination = path.join(project, 'design/patterns');
+    const files = await Promise.all(PATTERN_FILES.map(async name => ({
+      file: path.join(destination, name),
+      content: (await fs.readFile(path.join(ROOT, 'patterns', name), 'utf8')).replaceAll("'../core/", "'../runtime/"),
+    })));
+    for (const { file } of files) if (await exists(file)) throw new Error('Filen findes allerede; intet er ændret: ' + file);
+    const created = [], directories = [];
+    try {
+      await createDirectories(await directoriesFor(destination), directories);
+      for (const { file, content } of files) await writeNewFile(file, content, created);
+    } catch (error) { await rollbackCreated(created, directories); throw error; }
+    log('Referenceeksempler kopieret. Produktet ejer nu tilpasningerne; sync overskriver dem ikke.\n' + files.map(file => '  ' + file.file).join('\n') + '\nIndlæs design/patterns/styles.css i produktets build, og importer de ønskede eksempler.');
+  } else if (command === 'update') {
+    const { positionals, options } = argumentsFor(remaining, ['--apply'], ['--apply']);
+    if (positionals.length !== 1) throw new Error('Brug: update PROJECT_DIR [--apply]');
+    const report = await updateStarter(path.resolve(cwd, positionals[0]), !!options['--apply']);
+    const labels = { current: 'AKTUEL', add: 'TILFØJ', update: 'OPDATÉR', custom: 'BEVAR LOKAL', deleted: 'BEVAR SLETTET', review: 'MANUEL GENNEMGANG' };
+    log('Startprojekt: ' + report.from + ' → ' + report.to + '\n' + report.files.map(file => labels[file.action] + ' · ' + file.file).join('\n'));
+    if (report.applied) log('Sikre ændringer er anvendt. Projektets egen kode er bevaret.\n' + report.proposals.map(file => 'Forslag: ' + file).join('\n') + '\nGenbyg med npm run build efter ændringer.');
+    else log('Ingen filer er ændret. Brug --apply for at anvende sikre ændringer og få forslag til manuel fletning.');
+    return report;
+  } else if (command === 'doctor') {
+    const { positionals } = argumentsFor(remaining, []);
+    if (positionals.length !== 1) throw new Error('Brug: doctor PROJECT_DIR');
+    const report = await doctor(path.resolve(cwd, positionals[0]), { studioRoot: ROOT });
+    log(formatDoctor(report));
+    if (!report.valid) throw new Error('Doctor fandt fejl i projektet. Se rapporten ovenfor.');
+    return report;
   } else if (command === 'sync') {
     const { positionals } = argumentsFor(remaining, []);
     if (positionals.length !== 1) throw new Error('Brug: sync PROJECT_DIR');
     const files = await synchronize(path.resolve(cwd, positionals[0]));
     log('Fælles bibliotek og CSS opdateret:\n' + files.map(file => '  ' + file).join('\n'));
   } else if (command === 'init') {
-    const { positionals, options } = argumentsFor(remaining, ['--theme']);
-    if (positionals.length !== 1) throw new Error('Brug: init PROJECT_DIR [--theme studio-light]');
-    const files = await initialize(path.resolve(cwd, positionals[0]), options['--theme'] || 'studio-light');
+    const { positionals, options } = argumentsFor(remaining, ['--theme', '--design-only'], ['--design-only']);
+    if (positionals.length !== 1) throw new Error('Brug: init PROJECT_DIR [--theme studio-light] [--design-only]');
+    const files = await initialize(path.resolve(cwd, positionals[0]), options['--theme'] || 'studio-light', options['--design-only'] || false);
     log(`Design Studio tilføjet:\n${files.map(file => `  ${file}`).join('\n')}`);
   } else throw new Error(`Ukendt kommando: ${command}\n${HELP}`);
 }

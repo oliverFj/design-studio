@@ -8,12 +8,22 @@ node tools/cli.mjs init "E:/produkt" --theme studio-light
 
 Init kræver en eksisterende projektmappe og opretter følgende uden at overskrive filer:
 
+- index.html: færdig offline-app, som åbnes direkte i browseren.
+- src/app.mjs, src/styles.css og src/index.html: appens redigerbare kilder og HTML-skabelon.
+- tools/build.mjs og package.json: et selvstændigt offlinebuild med esbuild og npm run build.
+- .gitignore: udelukker node_modules og den genererede index.html.
 - design/design.json: projektets tema i format 2.
 - design/design.css: temaets tokens og bibliotekets fælles komponent-CSS.
 - design/runtime/: engine, contract, library, quality og components som browserkompatible moduler.
+- design/runtime/files.mjs: fælles JSON-filvalg, downloads og versionerede projektfiler.
+- design/tools/: fælles doctor og kontrol af offlinebyggestempel; opdateres af sync.
 - design/assets/: godkendte brandoriginaler og licenser, hvis temaet indeholder dem.
 - design-studio.project.json: filstier, scope, biblioteksudgave og registrerede produktadaptere.
 - En anvisning i AGENTS.md; eksisterende produktregler bevares.
+
+Den første index.html bygges af init og kan åbnes straks uden installation. Agenten kører npm install i det nye projekt før senere builds, redigerer src-filerne og kører npm run build efter ændringer. Brugeren genindlæser blot browseren. Buildet anvender produktets egen kopierede runtime og kræver ikke Design Studios mappe.
+
+Brug `init PROJECT_DIR --design-only` i et eksisterende produkt, der allerede har app- eller buildfiler. Det opretter kun designfilerne, konfigurationen og agentanvisningen. Standard-init afviser eksisterende output før skrivning, så fx package.json eller index.html ikke overskrives.
 
 Efter ændringer i tema eller fælles bibliotek:
 
@@ -22,6 +32,136 @@ node tools/cli.mjs sync "E:/produkt"
 ~~~
 
 Sync opdaterer runtime og CSS fra systemets kilder. Kopieret runtime må ikke blive en parallel lokal biblioteksudgave.
+
+## Valgfrie opdateringer af startprojektet
+
+Startprojektet er en start, ikke et krav om en bestemt produktarkitektur. Nye init-projekter registrerer `starterTemplate` i design-studio.project.json med en særskilt skabelonversion og fingeraftryk af de leverede filer. Produktet kan ændre kode, mapper og buildopsætning; der er ingen obligatoriske opdateringer eller automatisk opdatering under build.
+
+Fra Design Studios mappe:
+
+~~~sh
+node tools/cli.mjs update "E:/produkt"
+node tools/cli.mjs update "E:/produkt" --apply
+~~~
+
+Den første kommando viser en plan uden at skrive filer. `--apply` opdaterer filer, som stadig matcher den tidligere leverede udgave, og tilføjer nye manglende filer. Lokale ændringer og kendte lokale sletninger bevares. I package.json behandles skabelonens enkelte felter særskilt, så fx egne scripts og afhængigheder ikke erstattes. Tema, produktdata, AGENTS.md og den byggede index.html overskrives ikke.
+
+Når både skabelonen og produktet har ændret samme fil eller felt, lægges et forslag under `.design-studio/updates/VERSION/INDHOLDSHASH/`. Gennemgå og flet det relevante indhold manuelt; produktets fil bevares. Opdateringen kører ikke produktets scripts. Genbyg med npm run build efter relevante ændringer, og brug doctor til kontrol.
+
+Den registrerede version efter `--apply` er den senest tilbudte skabelonreference, ikke en påstand om, at produktet er identisk med skabelonen, eller at manuelle forslag er flettet. Det gør det muligt at beholde egne løsninger og stadig få nye forslag ved senere opdateringer. Skabelonversionen vedligeholdes i tools/starter.mjs og hæves ved ændringer i startskabelonerne; biblioteksversionen er uafhængig.
+
+Ældre offline-initprojekter uden fingeraftryk behandles konservativt: identiske filer kan genkendes, men afvigende filer bevares og får forslag til gennemgang. Projekter uden registreret offlineopsætning omlægges ikke med update; brug sync til deres fælles runtime/CSS og tilpas produktets opsætning selv.
+
+## Projekttjek med doctor
+
+Nye offlineprojekter får `npm run doctor`. Fra Design Studios mappe kan samme tjek køres med `node tools/cli.mjs doctor PROJECT_DIR`. Tjekket ændrer ingen filer og returnerer en fejlkode, når der findes fejl.
+
+Doctor kontrollerer tema, genereret CSS, kopieret runtime, adapterfiler og deres faktiske exports samt offlinefilen. Buildet indlejrer et fingeraftryk af sine faktiske inputfiler, så doctor kan opdage en forældet index.html uden at kræve faste src-filnavne eller en bestemt produktmappestruktur. Kør sync ved forældet runtime eller CSS og derefter npm run build. Ved manglende Design Studio-mappe vises en advarsel om, at sammenligning med den centrale kilde ikke er mulig; produktets lokale tjek kan stadig køre.
+
+Netværkskald og serverafhængigheder undersøges statisk og kan give advarsler. Doctor er ikke en garanti for alle brugerforløb eller en erstatning for relevant kontrol via file://. Ældre projekter uden byggestempel får en advarsel om, at buildets aktualitet ikke kan fastslås. Sync opdaterer fælles filer, men indsætter ikke scripts i eksisterende package.json eller erstatter produktets buildopsætning.
+
+## Fælles projektfiler
+
+Brug `createProjectFile` fra `design/runtime/files.mjs`. Produktet ejer sit format-id, versionsnummer og datavalidering. Et minimalt eksempel:
+
+~~~js
+import { createProjectFile } from './design/runtime/files.mjs';
+
+const projectFile = createProjectFile({
+  format: 'my-project', version: 1,
+  validate: data => ({
+    valid: !!data && typeof data.name === 'string',
+    errors: ['Projektets navn skal være tekst.'],
+  }),
+});
+
+// Kald fra brugerens klik. Opdatér først produktets state efter vellykket læsning.
+const opened = await projectFile.open();
+if (opened) state = opened.data;
+projectFile.save('projekt.json', state);
+~~~
+
+Filformatet er `{ "format": "my-project", "version": 1, "data": { ... } }`. Forkert format, ukendt version og ugyldige data afvises; modulet migrerer ikke filer stiltiende. Annulleret filvalg giver null. Produktet håndterer fejlbesked, eventuelle ugemte ændringer og sin egen state. Standardgrænsen er 5 MiB; open/read accepterer maxBytes, hvis produktet har et konkret andet behov.
+
+`readJSONFile`, `openJSONFile`, `downloadJSON` og `downloadFile` kan også bruges uden projektkonvolut, eksempelvis til temaer og originalressourcer. Validering returnerer `{ valid, errors }`. Save/download starter browserens download og bekræfter ikke, at brugeren har gemt filen på disken; originalfilen overskrives ikke automatisk. Nye init-projekter har Åbn projekt og Gem projekt som et lille eksempel med tællerens tilstand.
+
+## Fælles breddeprofiler
+
+Format 2-temaers genererede CSS indeholder de fælles layoutprimitiver fra core/layout.mjs. Init og sync kopierer også modulet til design/runtime/layout.mjs. Nye startprojekter bruger form-profilen som udgangspunkt. Profilerne tilføjer ikke kolonner, padding, rammer eller fokusadfærd.
+
+| Profil | Standardgrænse | Brug |
+| --- | --- | --- |
+| prose | 70ch | Læsetekst og vejledning |
+| form | 44rem | Formularer og indstillinger |
+| panel | 23rem | Egenskaber og værktøjer |
+| split | 72rem | Liste og detaljevisning |
+| workspace | 84rem | Sammensatte editorer |
+| fluid | Ingen | Arbejdsflader, som reelt udnytter fuld bredde |
+
+~~~html
+<main class="ds-scope">
+  <section class="ds-layout my-form" data-layout="form">...</section>
+</main>
+~~~
+
+Alternativt: `const frame = createLayout('form')` fra design/runtime/components.mjs, og tilføj indhold med frame.append. LAYOUT_PROFILES fra design/runtime/layout.mjs beskriver profilerne til værktøjer og adaptere. Containerens native semantik bestemmes fortsat af produktet.
+
+Tilpas kun den konkrete ramme, eksempelvis `.my-form { --ds-layout-max-width: 50rem; }` i produktets stylesheet efter design.css. En indlejret ds-layout starter igen med sin egen profilgrænse. Produktet kan vælge fluid eller opbygge egne kolonner uden at ændre temaet eller biblioteket. Format 1 beholder sin eksisterende CSS og får ikke profilerne automatisk.
+
+## Valgfrie sammensætningseksempler
+
+Offline-editorens Designsystem → Designmønstre og web-showcasen viser samme fem eksempler: objekteditor med kontekstpanel, formular med validering, liste med detaljevisning, ressourcebibliotek samt fortryd/gentag. De bruger bibliotekets eksisterende roller og det valgte tema. Kilde, version, formål, komponenter og interaktioner findes i patterns/catalog.mjs; implementering og layout findes i patterns/compositions.mjs, de enkelte mønstermoduler og patterns/styles.css. PATTERN_FILES i kataloget er den fælles liste til referenceeksport og showcase.
+
+Katalogets layoutprofil vælger en af bibliotekets fælles breddeprofiler. Profilerne vælges efter indholdets rolle og kan tilpasses i produktet. Objektkort og handlinger strækkes ikke med en bredere arbejdsflade. Se [retningslinjerne for indholdsbredde](DESIGN-FOUNDATIONS.md#indholdsbredde-og-fuld-bredde).
+
+Objekteditoren er tilpasset fra FormLabs object-panel.js, ui.js og ui.css, gennemgået 27. oktober 2026. Den genbruger hierarkisk søgning med midlertidig åbning af matchende forældre, multivalg, gruppehandlinger for synlighed/låsning, kontekst, faner og bevarede foldesektioner. Gruppens lås beskytter også underobjekter; rækkehandlinger bevarer valget. Flytning er tilgængelig gennem Handlinger, så træk ikke er nødvendigt. Ved forskellige mål viser panelet en tom blandet værdi; tomt input bevarer de enkelte mål, mens en indtastet værdi gælder hele udvalget. Native faneroller har piletaster, Home/End og én tabstop-position.
+
+Den neutrale objektmodel og arbejdsflade er implementeret særskilt i Design Studio. FormLabs geometri, bygningskommandoer, materialer og projektdata følger ikke med. Det oprindelige projekt ændres ikke ved at tilpasse mønstret. Kildens navn, relevante filer og afgrænsning vises under Genbrug og sammensætning.
+
+Fra systemmappen kan referencekoden kopieres til et tilknyttet produkt:
+
+~~~sh
+node tools/cli.mjs examples "E:/produkt"
+~~~
+
+Kommandoen opretter design/patterns uden at overskrive eksisterende filer. Kopierne bruger produktets design/runtime. De er valgfrie og ejes efter kopiering af produktet; sync og update ændrer dem ikke. Indlæs design/patterns/styles.css i produktets build og brug hele eksemplet eller kun de relevante dele.
+
+~~~js
+import { mountComposition, createCompositionState } from './design/patterns/compositions.mjs';
+
+const state = createCompositionState('editor');
+const example = mountComposition(theme, 'editor', {
+  state, idPrefix: 'my-editor',
+  onChange: nextState => { /* Produktet bestemmer lagring og øvrige handlinger. */ },
+  announce: message => { liveRegion.textContent = message; },
+});
+host.append(example.element);
+// Ved afmontering: example.destroy();
+~~~
+
+Id'er er editor, form, list-detail, resource-library og history. Tilstanden kan beholdes ved afmontering og genbruges ved temaskift. Brug forskellige idPrefix-værdier ved flere instanser. Formularens gemning og handlingernes ændringer gælder kun den leverede state i hukommelsen. Eksemplerne har ikke en server, en 3D-motor eller produktets forretningslogik.
+
+Ressourcebibliotekets state indeholder items med id, title, description, type, tags og favorite samt søgning, filtre, visning og valgt id. `mountComposition(theme, 'resource-library', { state, onUse })` kalder onUse med en kopi af den valgte ressource, når brugeren vælger Brug ressourcen. Produktet bestemmer indlæsning og anvendelse. Søgning, typefilter og Kun favoritter kombineres; tomt bibliotek og ingen søgeresultater har forskellige tilstande. Favoritter og valg er separate handlinger.
+
+Fortryd/gentag kan bruges som samlet eksempel med id history eller som den selvstændige JSON-historik i design/patterns/history.mjs:
+
+~~~js
+import { createHistoryState, createHistory } from './design/patterns/history.mjs';
+const historyState = createHistoryState(documentData);
+const history = createHistory(historyState, { limit: 50 });
+history.commit('Omdøb objekt', changedDocument);
+history.undo();
+history.redo();
+// Først efter produktets egen vellykkede gemning:
+history.markSaved();
+// history.value er en kopi. history.dirty sammenligner indhold med gemmepunktet.
+~~~
+
+Produktet ejer historyState og kan bevare den ved afmontering. Brug JSON-serialiserbare dokumentdata; udvalg, fokus, filtre og ufærdige inputkladder holdes uden for historikken. Ét afsluttet feltvalg eller greb bør være ét commit, ikke ét trin pr. tast eller pointerbevægelse. Identiske ændringer giver intet trin; nye ændringer efter undo rydder redo-grenen. Historikken har som standard højst 50 tidligere snapshots.
+
+Eksemplets navnefelt commits ved change, mens uanvendte eller ugyldige kladder bevares og kan annulleres. Genveje er afgrænset til eksemplets rod og springer input, textarea, select og contenteditable over, så native tekstfortrydelse bevares. Ctrl/⌘+Z fortryder; Ctrl+Y eller Ctrl/⌘+Shift+Z gentager. Gem i eksemplet flytter kun et gemmepunkt i hukommelsen. Historikmodulet skriver ikke filer, installerer ikke globale genveje og bekræfter ikke en browserdownload som en vellykket disk-gemning.
+
+Det er referencekode, ikke et pluginsystem eller et krav til produktets struktur. Ved optagelse af løsninger fra eksisterende apps: bevar kilde/ophav og relevante licenser; skeln mellem det oprindelige produkt som inspiration og det tilpassede, genbrugelige designmønster. Fjern produktdata og skjulte afhængigheder, brug fælles komponentroller, og kontrollér relevante interaktioner og temaer. Domænespecifik logik kan forblive i produktet. Formularen og liste/detaljevisningen er selvstændige referenceeksempler; objekteditoren er inspireret af FormLab.
 
 ## Brug de faktiske komponenter
 
@@ -97,6 +237,8 @@ Træet ejer sin indrykning, rækkeanatomi og fokus. Brug eksisterende `scroll-ar
 ## Tema og tokens
 
 Temaet indeholder tokens, brandguide, historik og eventuelt appearance. Det indeholder ikke komponentdefinitioner. Brug bibliotekets positive semantiske spacingtokens til tæthed. appearance kan ændre godkendte visuelle egenskaber, men ikke padding, gap eller struktur.
+
+Redigér temaet ved at åbne Design Studios `index.html` i browseren og vælge **Åbn tema**. **Gem tema** henter den redigerede JSON-fil; placér den som produktets `design/design.json`, før `node tools/cli.mjs sync PROJECT_DIR` køres fra Design Studios mappe. Editorens download ændrer ikke automatisk produktets tema, CSS eller runtime.
 
 Produktets sidelayout kan bruge CSS-variabler som --ds-space-6 og --ds-color-background-canvas. Token-id'ers punktummer bliver bindestreger; store bogstaver bevares. Biblioteket ejer komponenternes interne layout.
 

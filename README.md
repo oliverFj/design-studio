@@ -1,16 +1,33 @@
 # Design Studio
 
-Et fælles, framework-uafhængigt komponentbibliotek med udskiftelige temaer, agentprocedure, lokal desktop-editor og interaktiv web-showcase.
+Et fælles, framework-uafhængigt komponentbibliotek med udskiftelige temaer, agentprocedure, offline-editor i browseren og interaktiv web-showcase.
 
 Biblioteket bestemmer struktur, semantik og grundlayout. Temaet bestemmer farver, typografi, afstandsværdier, kanter og skygger. Produktet bestemmer indhold, navigation og forretningslogik.
 
 ## Åbn Design Studio
 
-Dobbeltklik på **Design Studio.lnk** (genvejen i systemmappen) eller **Start Design Studio.cmd**. Den åbner den byggede Windows-app i sit eget vindue uden et terminalvindue eller manuel serverstart. Brug **Filer → Åbn projekttema** til at redigere et projekts design/design.json.
+Dobbeltklik på **[index.html](index.html)** i systemmappen. Design Studio åbner direkte i din normale browser og fungerer offline. Der kræves ingen server, Windows-app, terminal eller installeret Node.js for at bruge den færdige fil. Alle otte medfølgende temaer er indbygget.
 
-Den pakkede app har sin nødvendige runtime med. En selvstændig udgave opbevarer brugerens temaer i en skrivbar lokal arbejdsmappe; en udgave startet fra systemmappen kan arbejde med dens temaer. Lokale serverfunktioner starter og stopper sammen med appen.
+**Åbn tema** læser en JSON-fil, du vælger, eksempelvis et projekts `design/design.json`. **Gem tema** henter det aktuelle tema som en JSON-fil med tokens, brandguide, originalressourcer og historik. Browseren håndterer placeringen; den oprindeligt åbnede fil overskrives ikke automatisk. Gem den hentede fil på den ønskede placering, og erstat projektets tema bevidst, hvis ændringen skal bruges dér.
 
-Browseralternativet er **Start Design Studio Browser.cmd** eller npm start. Til udvikling af desktop bruges npm run desktop. Byg en ny Windows-distribution med npm run desktop:build; npm run desktop:smoke kontrollerer den pakkede app. CLI/browser kræver Node.js 20 eller nyere; desktopudvikling og pakning kræver Node.js 22.12 eller nyere; installer afhængigheder med npm install. Bibliotekets browser-runtime kræver ingen frameworkpakker. Den færdige portable app ligger i release/Design-Studio-0.2.0-portable.exe; genvejen åbner release/current/win-unpacked/Design Studio.exe.
+Åbnede temaer og ændringer findes i den aktuelle browsersession. Gem dem som filer før genindlæsning eller lukning; hentede temaer kan åbnes igen med **Åbn tema**. De indbyggede temaer er kopier fra seneste build, og redigering ændrer ikke filerne i `packages/`.
+
+`npm start` er en valgfri genvej for udviklere med Node.js; den åbner `index.html` i browseren.
+
+## Byg offlineudgaven
+
+Agenter og udviklere bygger filen fra projektmappen med Node.js 20 eller nyere:
+
+~~~sh
+npm ci
+npm run build
+~~~
+
+`npm ci` bruges ved første opsætning eller ændrede afhængigheder. `npm run build` samler editor, bibliotek, temaer og design i én selvstændig `index.html`. Filen er genereret og Git-ignoreret; den skal bygges i et nyt checkout. Den kan derefter kopieres og åbnes selvstændigt uden projektmappen eller byggeværktøjerne.
+
+Efter kode-, design- eller temaændringer køres `npm run build` igen. Brugeren skal derefter blot genindlæse browseren. Håndredigér ikke `index.html`. Rene dokumentationsændringer kræver ikke et nyt build. CLI-værktøjerne til produktintegration kræver Node.js 20 eller nyere.
+
+Se [produktion og levering](docs/PRODUCTION.md) for kontrol før levering, opdatering, tilbageførsel og eksport af web-showcasen.
 
 ## Ét bibliotek, flere temaer
 
@@ -19,11 +36,13 @@ Browseralternativet er **Start Design Studio Browser.cmd** eller npm start. Til 
 - **Brandguide:** Principper, anvendelsesregler, godkendte logoer, skrifter og originalressourcer.
 - **Temaet:** Navn, beskrivelse, historik, JSON-eksport og genereret CSS.
 
+Under **Designsystem → Designmønstre** findes interaktive eksempler på en objekteditor med kontekstpanel inspireret af FormLab, en formular, en liste med detaljevisning, et ressourcebibliotek samt fortryd/gentag med gemmepunkt. De samme eksempler indgår i web-showcasen og kan afprøves med alle temaer. `node tools/cli.mjs examples PROJECT_DIR` kopierer valgfri referencekode og den selvstændige historikhjælper til et tilknyttet projekt uden overskrivning. Se [genbrug af designmønstre](docs/INTEGRATION.md#valgfrie-sammensætningseksempler).
+
 Komponentstruktur redigeres i det fælles bibliotek, ikke i hvert tema. Padding og gap kommer fra biblioteket. De semantiske spacingtokens skal være positive; temaet kan hverken udelade grundlayoutet eller erstatte det med nul-padding.
 
-Gem ændringer skriver til den åbnede JSON-fil. Importér tema opretter en kopi; eksisterende filer overskrives ikke. Projektets genererede CSS opdateres med sync efter redigering. Revisionstjek forhindrer, at en samtidig filændring overskrives.
+Temaet valideres før åbning og gemning. Ugyldige kladder kan redigeres, men ikke gemmes som gyldige temaer. **Hent CSS** under **Temaet** henter temaets genererede CSS. Når en hentet temafil er lagt tilbage i et produkt, opdateres produktets CSS og runtime med `sync`.
 
-Bibliotek 2.7.1 har 34 fælles roller og otte offentlige temaer. `menubar`, `menu` og `menu-item` giver fælles struktur og regler for program- og kontekstmenuer. Desktopvarianter giver kompakte 32 px kontroller. Træets standard bruger kompakte rækker; roomy bevarer de større klikflader. Castle Studio v2 er et separat tema; det oprindelige Castle Studio og Atelier bevares. `tree` viser hierarkisk indhold med valg, foldning og rækkehandlinger gennem den fælles `mountTree`-runtime. `stack` styrer afstand mellem komponenter, `scroll-area` giver indlejret indhold én synlig ramme, og handlingsfamilierne bruger fælles hover-/tryk-tokens. Se [integrationsguiden](docs/INTEGRATION.md) for API og sammensætning og [temaformatet](docs/PACKAGE-FORMAT.md) for kontrakten. Biblioteksversionen er særskilt fra desktop-appens versionsnummer. Komponentvisningen centrerer selvstændige eksempler; formularer, træer og sammensatte paneler bevarer deres anvendelige bredde og tekstretning.
+Bibliotek 2.8.0 har 34 fælles roller og otte offentlige temaer. `menubar`, `menu` og `menu-item` giver fælles struktur og regler for program- og kontekstmenuer. Desktopvarianter giver kompakte 32 px kontroller. Træets standard bruger kompakte rækker; roomy bevarer de større klikflader. Castle Studio v2 er et separat tema; det oprindelige Castle Studio og Atelier bevares. `tree` viser hierarkisk indhold med valg, foldning og rækkehandlinger gennem den fælles `mountTree`-runtime. `stack` styrer afstand mellem komponenter, `scroll-area` giver indlejret indhold én synlig ramme, og handlingsfamilierne bruger fælles hover-/tryk-tokens. Se [integrationsguiden](docs/INTEGRATION.md) for API og sammensætning og [temaformatet](docs/PACKAGE-FORMAT.md) for kontrakten. Biblioteksversionen er særskilt fra editorens versionsnummer. Komponentvisningen centrerer selvstændige eksempler; formularer, træer og sammensatte paneler bevarer deres anvendelige bredde og tekstretning.
 
 ## Brug i et produkt
 
@@ -37,7 +56,15 @@ Opret tilknytningen fra systemmappen:
 node tools/cli.mjs init "E:/sti/til/produkt" --theme studio-light
 ~~~
 
-Projektmappen skal eksistere. Kommandoen opretter tema, CSS, fælles komponentruntime, eventuelle brandoriginaler, projektkonfiguration og en anvisning i produktets AGENTS.md. Eksisterende output overskrives ikke.
+Projektmappen skal eksistere. Kommandoen opretter et minimalt offlineprojekt med kildefiler i `src/`, `tools/build.mjs`, `package.json` med `npm run build` og en færdig `index.html`, som kan åbnes med det samme. Den opretter også tema, CSS, fælles komponentruntime, eventuelle brandoriginaler, projektkonfiguration og en anvisning i produktets AGENTS.md. Eksisterende output overskrives ikke; ved filkonflikter ændres intet.
+
+Nye projekter får også `npm run doctor` og fælles filhåndtering med Åbn projekt/Gem projekt. Doctor kontrollerer tema, CSS, runtime, komponentadaptere og om offlinefilen er opdateret. Det ændrer ingen filer. Filmodulet validerer JSON, formatversion og projektdata og håndterer annulleret filvalg. Se [integrationsguiden](docs/INTEGRATION.md#projekttjek-med-doctor).
+
+Startprojektet kan tilpasses frit. `node tools/cli.mjs update PROJECT_DIR` viser valgfrie versionsopdateringer; tilføj `--apply` for at anvende sikre ændringer. Egen kode bevares, og ændrede filer får separate forslag til manuel fletning. Buildet foretager ingen automatiske opdateringer. Se [opdateringsreglerne](docs/INTEGRATION.md#valgfrie-opdateringer-af-startprojektet).
+
+Nye produkter åbnes direkte fra deres egen `index.html`, ligesom FormLab. Agenten kører `npm install` i produktet ved første udviklingsopsætning, redigerer `src`-filerne og kører `npm run build` efter ændringer, så brugeren blot genindlæser browseren. Den færdige fil kræver ingen installation, og produktets build er uafhængigt af Design Studios mappe. Se [arbejdsmetoden for nye projekter](docs/AGENT-WORKFLOW.md#start-et-projekt).
+
+I et eksisterende produkt bruges `node tools/cli.mjs init PROJECT_DIR --design-only` for kun at oprette designtilknytningen og bevare produktets app- og buildopsætning.
 
 Importér komponentruntime fra design/runtime/components.mjs, eller forbind det gennem projektets frameworkadapter. Registrér faktiske adapterfiler og exports i design-studio.project.json. Læs docs/INTEGRATION.md.
 
@@ -57,7 +84,7 @@ Find først en eksisterende rolle. Tilføj om nødvendigt en variant eller en ny
 
 ## Web-showcase
 
-Showcasen bruger samme bibliotek, renderer og offentlige temaer. Den kræver ingen backend til tema- og komponentskift. Kør npm run sync:design-studio i E:/AI projekter/Hjemmeside før hjemmesidens normale build. Det eksporterer gennem tools/build-showcase.mjs til public/design-studio. Andre websites kan bruge tools/build-showcase.mjs --out DIRECTORY. Hjemmesidens projektside forklarer systemet og åbner demoen. Lokal projektredigering tilhører desktop-appen.
+Showcasen bruger samme bibliotek, renderer og offentlige temaer. Den kræver ingen backend til tema- og komponentskift. Kør npm run sync:design-studio i E:/AI projekter/Hjemmeside før hjemmesidens normale build. Det eksporterer gennem tools/build-showcase.mjs til public/design-studio. Andre websites kan bruge tools/build-showcase.mjs --out DIRECTORY. Hjemmesidens projektside forklarer systemet og åbner demoen. Temaer redigeres i offline-editoren via index.html; showcasen er en separat demo til websites.
 
 ## Indhold
 
@@ -67,9 +94,9 @@ Showcasen bruger samme bibliotek, renderer og offentlige temaer. Den kræver ing
 - core/engine.mjs og core/contract.mjs: validering, tokenopløsning, CSS og migration.
 - packages/: Studio Light, Midnight Editorial, Fjordside og Castle Studio samt Atelier, Signal og Nocturne, der viser bibliotekets spændvidde.
 - schema/: temaformat og læsbar kompatibilitet med format 1.
-- studio/ og server.mjs: lokal temaeditor og kontrolleret filadgang.
-- desktop/: Windows-app og pakningskonfiguration.
-- tools/: projektintegration, desktopdistribution og web-showcase.
+- studio/: fælles editorinterface og åbning/gemning af temaer.
+- tools/build-offline.mjs og index.html: byggeproces og genereret offline-editor.
+- tools/: projektintegration og eksport til web-showcase.
 - docs/: agentprocedure, integration, temaformat og brandguide.
 
 ## Kontrol og migration
@@ -77,6 +104,7 @@ Showcasen bruger samme bibliotek, renderer og offentlige temaer. Den kræver ing
 ~~~sh
 npm test
 npm run check
+node tools/cli.mjs doctor "E:/sti/til/produkt"
 node tools/cli.mjs validate packages/studio-light.json
 node tools/cli.mjs compare packages/studio-light.json packages/midnight-editorial.json
 node tools/cli.mjs migrate "E:/produkt/design/design.json" --out "E:/produkt/design/theme-v2.json"

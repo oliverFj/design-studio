@@ -1,19 +1,26 @@
-import { createBrandStudio } from '/brand.mjs';
+import { createBrandStudio } from './brand.mjs';
 
-import { validatePackage, resolveTokens, generateCSS, validateCompatibility, getComponents, materializePackage, migratePackage } from '/core/engine.mjs';
+import { validatePackage, resolveTokens, generateCSS, validateCompatibility, getComponents, materializePackage, migratePackage } from '../core/engine.mjs';
 
-import { renderComponent } from '/core/components.mjs';
-import { DEFAULT_TOKENS, COMPONENT_LIBRARY } from '/core/library.mjs';
-import { createProjectOverview, createProjectOverviewDraft } from '/project-overview.mjs';
+import { renderComponent } from '../core/components.mjs';
+import { DEFAULT_TOKENS, COMPONENT_LIBRARY } from '../core/library.mjs';
+import { createProjectOverview, createProjectOverviewDraft } from './project-overview.mjs';
+import bundledThemes from './bundled-themes.mjs';
+import { createThemeStorage } from './theme-storage.mjs';
+import { readJSONFile, downloadFile } from '../core/files.mjs';
+import { mountCompositionGallery, createGalleryState } from '../patterns/gallery.mjs';
 
 const root = document.querySelector('#app');
-const state = { packages: [], key: null, file: '', revision: null, pack: null, saved: '', view: 'components', mode: 'catalog', component: 'button', token: null, variants: {}, recipeDraft: null, error: '', busy: false };
+const state = { packages: [], key: null, file: '', pack: null, saved: '', view: 'components', mode: 'catalog', component: 'button', token: null, variants: {}, recipeDraft: null, error: '', busy: false };
 const exampleDraft = createProjectOverviewDraft();
+const galleryState = createGalleryState();
+let compositionGallery;
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone = value => structuredClone(value);
+const themeStorage = createThemeStorage(bundledThemes, { download });
 const brandStudio = createBrandStudio(state, {escape, field, edited, render, notice, allowNavigation, download});
 const icon = name => {
-  const paths = { brand:'<path d="M4 5h16v14H4zM8 9h8M8 13h5"/><path d="m17 15 2 2"/>', components:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>', tokens:'<path d="M12 3 21 8v8l-9 5-9-5V8zM3 8l9 5 9-5M12 13v8"/>', package:'<path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/>' };
+  const paths = { patterns:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M14 3v18M3 10h11M14 14h7"/>', brand:'<path d="M4 5h16v14H4zM8 9h8M8 13h5"/><path d="m17 15 2 2"/>', components:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>', tokens:'<path d="M12 3 21 8v8l-9 5-9-5V8zM3 8l9 5 9-5M12 13v8"/>', package:'<path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/>' };
   return '<svg viewBox="0 0 24 24" aria-hidden="true">'+paths[name]+'</svg>';
 };
 let readModel = null, lastValidModel = null, lastPreviewTheme = null;
@@ -30,12 +37,6 @@ const editableToken = () => state.pack.tokens[state.token] ||= clone(themeTokens
 const dirty = () => state.pack && (JSON.stringify(state.pack) !== state.saved || state.recipeDraft !== null);
 const validation = () => state.pack ? validatePackage(state.pack) : { valid: false, errors: [] };
 const groupName = id => ({color:'Farver',typography:'Typografi',space:'Afstande',radius:'Hjørner',shadow:'Skygger',duration:'Overgange',border:'Kanter',size:'Størrelser',opacity:'Gennemsigtighed'})[id] || id;
-async function request(url, options = {}) {
-  const response = await fetch(url, options);
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error([data.error || 'Handlingen kunne ikke gennemføres.', ...(data.errors || [])].join('\n'));
-  return data;
-}
 function notice(message, error = false) {
   document.querySelector('.notification')?.remove();
   const node = document.createElement('div');
@@ -62,10 +63,10 @@ function refreshStatus() {
   if (!bar) return;
   const invalid = !checked.valid || state.recipeDraft !== null;
   bar.className = 'status-bar'+(!checked.valid ? ' error' : dirty() ? ' changed' : '');
-  const message = !checked.valid ? 'Ret de værdier, der bryder temaets designregler, før du gemmer.' : state.recipeDraft !== null ? 'Komponentopskriften skal anvendes før du gemmer.' : dirty() ? 'Ændringerne er endnu ikke gemt.' : 'Temaet er gemt. Ændringer vises straks i hele Design Studio.';
+  const message = !checked.valid ? 'Ret de værdier, der bryder temaets designregler, før du gemmer.' : state.recipeDraft !== null ? 'Komponentopskriften skal anvendes før du gemmer.' : dirty() ? 'Ændringerne er endnu ikke gemt.' : 'Offline · Gem tema henter en JSON-fil. Browseren håndterer placeringen.';
   bar.innerHTML = '<span>'+escape(message)+'</span><span>'+Object.keys(themeTokens()).length+' tokens · '+Object.keys(components()).length+' komponenter</span>';
   const save = document.querySelector('#save');
-  if (save) save.disabled = !dirty() || invalid || state.busy;
+  if (save) save.disabled = invalid || state.busy;
   const discard = document.querySelector('#discard');
   if (discard) discard.hidden = !dirty();
   const errors = document.querySelector('#validation-errors');
@@ -94,6 +95,10 @@ function cardMarkup(prefix = 'card') {
 }
 function specimen(id) {
   return renderComponent(previewTheme(), id, { variant: variantFor(id), idPrefix: 'specimen-' + id, open: id === 'dialog' });
+}
+function patternsView() {
+  if(state.pack.schemaVersion!==2) return '<div class="canvas-toolbar"><h2>Designmønstre</h2></div><p class="help">Designmønstre bruger det fælles bibliotek i temaformat 2.</p>';
+  return '<div class="canvas-toolbar"><h2>Designmønstre</h2></div><p class="help">Genbrugelige løsninger fra komponenter til arbejdsflow. Prøv dem med dit tema, og åbn Genbrug og sammensætning for kode og ophav.</p><div id="compositions-host"></div>';
 }
 function componentsView() {
   const entries = Object.entries(components());
@@ -147,10 +152,13 @@ function packageInspector() {
 }
 function render() {
   if (!state.pack) return;
+  compositionGallery?.destroy(); compositionGallery=null;
   readModel = null;
-  const currentURL=new URL(location.href);currentURL.searchParams.set('package',state.key);currentURL.searchParams.set('view',state.view);currentURL.searchParams.set('mode',state.mode);history.replaceState(null,'',currentURL);
+  if(location.protocol !== 'file:') {
+    const currentURL=new URL(location.href);currentURL.searchParams.set('package',state.key);currentURL.searchParams.set('view',state.view);currentURL.searchParams.set('mode',state.mode);history.replaceState(null,'',currentURL);
+  }
   cssPreview();
-  root.innerHTML='<div class="shell"><aside class="sidebar"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Design Studio</div><div><div class="side-label">Designsystem</div><nav class="navigation" aria-label="Design Studio">'+[['brand','Brandguide'],['components','Komponenter'],['tokens','Tokens'],['package','Temaet']].map(([view,name])=>'<button type="button" class="nav-item '+(state.view===view?'active':'')+'" data-view="'+view+'" '+(state.view===view?'aria-current="page"':'')+'>'+icon(view)+name+'</button>').join('')+'</nav></div><div class="side-footer"><strong>Fælles struktur. Eget udtryk.</strong>Fælles bibliotek · temaer</div></aside><main class="workspace"><header class="topbar"><div class="breadcrumb">Design Studio <span>/</span><strong>Temaer</strong></div><div class="actions"><button type="button" class="studio-button quiet" id="discard" hidden>Fortryd ændringer</button><button type="button" class="studio-button" id="import">Importér tema</button><button type="button" class="studio-button" id="export">Eksportér</button><button type="button" class="studio-button primary" id="save">Gem ændringer</button><input type="file" id="import-file" accept=".json,application/json" hidden></div></header><div class="page-heading"><div><p class="eyebrow">Komponentbibliotek og temaer</p><h1>'+escape(state.pack.name)+'</h1><p class="page-description">'+escape(state.pack.description)+'</p></div><label class="package-picker" for="package-select">Aktivt tema<select id="package-select">'+state.packages.map(pack=>'<option value="'+escape(pack.key)+'" '+(pack.key===state.key?'selected':'')+'>'+escape(pack.name)+'</option>').join('')+'</select></label></div><div class="content"><section class="canvas" aria-label="Designindhold">'+(state.view==='brand'?brandStudio.content():state.view==='components'?componentsView():state.view==='tokens'?tokensView():packageView())+'</section><aside class="inspector" aria-label="Egenskaber">'+(state.view==='brand'?brandStudio.inspector():state.view==='components'?componentInspector():state.view==='tokens'?tokenInspector():packageInspector())+'</aside></div><footer id="status-bar" class="status-bar" role="status"></footer></main></div>';
+  root.innerHTML='<div class="shell"><aside class="sidebar"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Design Studio</div><div><div class="side-label">Designsystem</div><nav class="navigation" aria-label="Design Studio">'+[['brand','Brandguide'],['components','Komponenter'],['patterns','Designmønstre'],['tokens','Tokens'],['package','Temaet']].map(([view,name])=>'<button type="button" class="nav-item '+(state.view===view?'active':'')+'" data-view="'+view+'" '+(state.view===view?'aria-current="page"':'')+'>'+icon(view)+name+'</button>').join('')+'</nav></div><div class="side-footer"><strong>Fælles struktur. Eget udtryk.</strong>Fælles bibliotek · temaer</div></aside><main class="workspace"><header class="topbar"><div class="breadcrumb">Design Studio <span>/</span><strong>'+(state.view==='patterns'?'Designmønstre':'Temaer')+'</strong></div><div class="actions"><button type="button" class="studio-button quiet" id="discard" hidden>Fortryd ændringer</button><button type="button" class="studio-button" id="import">Åbn tema</button><button type="button" class="studio-button primary" id="save">Gem tema</button><input type="file" id="import-file" accept=".json,application/json" hidden></div></header><div class="page-heading"><div><p class="eyebrow">Komponentbibliotek og temaer</p><h1>'+escape(state.pack.name)+'</h1><p class="page-description">'+escape(state.pack.description)+'</p></div><label class="package-picker" for="package-select">Aktivt tema<select id="package-select">'+state.packages.map(pack=>'<option value="'+escape(pack.key)+'" '+(pack.key===state.key?'selected':'')+'>'+escape(pack.name)+'</option>').join('')+'</select></label></div><div class="content'+(state.view==='patterns'?' patterns-content':'')+'"><section class="canvas" aria-label="Designindhold">'+(state.view==='brand'?brandStudio.content():state.view==='components'?componentsView():state.view==='patterns'?patternsView():state.view==='tokens'?tokensView():packageView())+'</section><aside class="inspector" aria-label="Egenskaber">'+(state.view==='brand'?brandStudio.inspector():state.view==='components'?componentInspector():state.view==='patterns'?'':state.view==='tokens'?tokenInspector():packageInspector())+'</aside></div><footer id="status-bar" class="status-bar" role="status"></footer></main></div>';
   document.querySelectorAll('[data-swatch]').forEach(el=> {
     const id=el.dataset.swatch;
     if(themeTokens()[id].$type==='color') {try {el.style.backgroundColor=resolveTokens(state.pack)[id];}catch{}}
@@ -158,11 +166,16 @@ function render() {
   });
   const exampleHost = document.querySelector('#project-overview-host');
   if (exampleHost) exampleHost.replaceChildren(createProjectOverview(previewTheme(), { document, draft: exampleDraft, announce: message => { document.querySelector('#announcer').textContent = message; }, idPrefix: 'studio-example' }));
+  const compositionHost=document.querySelector('#compositions-host');
+  if(compositionHost) {
+    compositionGallery=mountCompositionGallery(previewTheme(),{document,state:galleryState,announce:message=>{document.querySelector('#announcer').textContent=message;},idPrefix:'studio-patterns'});
+    compositionHost.append(compositionGallery.element);
+  }
   bind();
   refreshStatus();
 }
 async function load(key, checkCompatibility=false) {
-  const data=await request('/api/packages/'+encodeURIComponent(key));
+  const data=await themeStorage.read(key);
   const checked=validatePackage(data.package);
   if(!checked.valid) throw new Error('Pakken er ugyldig:\n'+checked.errors.join('\n'));
   // Browsing shared-library themes does not replace a product token contract.
@@ -170,7 +183,7 @@ async function load(key, checkCompatibility=false) {
     const comparison=validateCompatibility(state.pack,data.package);
     if(!comparison.compatible) notice('Pakken kan inspiceres, men er ikke fuldt kompatibel med den forrige pakke. Se formatets sammenligningsværktøj.',true);
   }
-  state.pack=data.package;readModel=null;lastValidModel=null;lastPreviewTheme=null;state.key=key;state.file=data.file;state.revision=data.revision;state.saved=JSON.stringify(state.pack);state.recipeDraft=null;state.error='';state.variants={};
+  state.pack=data.package;readModel=null;lastValidModel=null;lastPreviewTheme=null;state.key=key;state.file=data.file;state.saved=JSON.stringify(state.pack);state.recipeDraft=null;state.error='';state.variants={};
   if(!components()[state.component]) state.component=Object.keys(components())[0];
   if(!themeTokens()[state.token]) state.token=Object.keys(themeTokens())[0];
   render();
@@ -193,8 +206,7 @@ function changeToken(value) {
   }catch{}
 }
 function download(name,body,type) {
-  const url=URL.createObjectURL(new Blob([body],{type}));
-  const link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  downloadFile(name,body,type);
 }
 function bind() {
   document.querySelector('#migrate-theme')?.addEventListener('click', () => {
@@ -215,30 +227,26 @@ function bind() {
     state.busy=true;refreshStatus();
     try{
       const candidate=clone(state.pack);
-      candidate.history ||= [];
-      candidate.history.push({date:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Copenhagen',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()),note:'Designpakken blev opdateret i Design Studio.'});
-      const data=await request('/api/packages/'+encodeURIComponent(state.key),{method:'PUT',headers:{'Content-Type':'application/json','If-Match':state.revision},body:JSON.stringify(candidate)});
-      state.pack=data.package;state.saved=JSON.stringify(state.pack);state.file=data.file;state.revision=data.revision;
+      if(dirty()) {
+        candidate.history ||= [];
+        candidate.history.push({date:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Copenhagen',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()),note:'Designpakken blev opdateret i Design Studio.'});
+      }
+      const data=await themeStorage.save(state.key,candidate);
+      state.pack=data.package;state.saved=JSON.stringify(state.pack);state.file=data.file;
       const summary=state.packages.find(p=>p.key===state.key);if(summary){summary.name=state.pack.name;summary.description=state.pack.description;}
-      render();notice('Designpakken er gemt.');
+      render();notice('Temaets JSON-fil er sendt til browserens downloads. Gem den dér, hvor du vil opbevare temaet.');
     }catch(error){notice(error.message,true);}finally{state.busy=false;refreshStatus();}
   });
   document.querySelector('#discard').addEventListener('click',()=>{if(confirm('Vil du kassere de ændringer, der ikke er gemt?')){state.pack=JSON.parse(state.saved);state.recipeDraft=null;render();}});
-  document.querySelector('#export').addEventListener('click',()=>{
-    if(!validation().valid||state.recipeDraft!==null){notice('Ret de ugyldige værdier og anvend opskriften før eksport.',true);return;}
-    download(state.pack.id+'.json',JSON.stringify(state.pack,null,2)+'\n','application/json');
-  });
   document.querySelector('#import').addEventListener('click',()=>document.querySelector('#import-file').click());
   document.querySelector('#import-file').addEventListener('change',async event=>{
     const file=event.target.files[0];if(!file)return;
     if(dirty()&&!confirm('Du har ændringer, der ikke er gemt. Vil du indlæse en pakke og kassere ændringerne?'))return;
     try{
-      if(file.size>1024*1024)throw new Error('Pakken må højst fylde 1 MB.');
-      const pack=JSON.parse((await file.text()).replace(/^\uFEFF/,''));
-      const checked=validatePackage(pack);if(!checked.valid)throw new Error(checked.errors.join('\n'));
-      const data=await request('/api/packages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pack)});
-      const list=await request('/api/packages');state.packages=list.packages;
-      await load(data.key);notice('Pakken er indlæst som en kopi i Design Studio.');
+      const pack=await readJSONFile(file,{maxBytes:1024*1024,validate:validatePackage});
+      const data=await themeStorage.open(pack,file.name);
+      const list=await themeStorage.list();state.packages=list.packages;
+      await load(data.key);notice('Temaet er åbnet. Gem tema henter den redigerede fil.');
     }catch(error){notice(error.message,true);}finally{event.target.value='';}
   });
   document.querySelector('#token-value')?.addEventListener('input',event=>changeToken(event.target.value));
@@ -250,17 +258,21 @@ function bind() {
   document.querySelector('#download-css')?.addEventListener('click',()=>{if(!validation().valid||state.recipeDraft!==null){notice('Ret fejlene før du henter CSS.',true);return;}download(state.pack.id+'.css',generateCSS(state.pack),'text/css');});
 }
 window.addEventListener('beforeunload',event=>{if(dirty()){event.preventDefault();event.returnValue='';}});
+async function startStudio() {
 try{
-  const data=await request('/api/packages');state.packages=data.packages;
+  const data=await themeStorage.list();state.packages=data.packages;
   const params=new URLSearchParams(location.search);
   const requested=params.get('package');
   if(['catalog','example'].includes(params.get('mode')))state.mode=params.get('mode');
-  if(['brand','components','tokens','package'].includes(params.get('view')))state.view=params.get('view');
-  const first=data.packages.find(p=>p.key===requested)?.key || data.activeProject || data.packages.find(p=>p.id==='studio-light')?.key || data.packages[0]?.key;
+  if(['brand','components','patterns','tokens','package'].includes(params.get('view')))state.view=params.get('view');
+  if(params.get('mode')==='patterns')state.view='patterns';
+  const first=data.packages.find(p=>p.key===requested)?.key || data.packages.find(p=>p.id==='studio-light')?.key || data.packages[0]?.key;
   if(!first)throw new Error('Der er ingen designpakker. Tilføj en pakke i mappen packages, og åbn Design Studio igen.');
   await load(first);
 }catch(error){
   root.innerHTML='<main class="loading"><h1>Design Studio kunne ikke åbnes</h1><p>'+escape(error.message)+'</p><button class="studio-button" id="retry">Prøv igen</button></main>';
   document.querySelector('#retry').addEventListener('click',()=>location.reload());
 }
+}
+startStudio();
 

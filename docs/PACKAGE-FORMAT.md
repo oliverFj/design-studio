@@ -1,6 +1,6 @@
 # Temaformat og komponentbibliotek
 
-Format 2 er ét tema i en JSON-fil. Komponentdefinitioner ligger i det fælles core/library.mjs. Den samme renderer og CSS-compiler bruges i produkter, desktop-editor og web-showcase.
+Format 2 er ét tema i en JSON-fil. Komponentdefinitioner ligger i det fælles core/library.mjs. Den samme renderer og CSS-compiler bruges i produkter, offline-editoren i browseren og web-showcase.
 
 ## Temafelter
 
@@ -69,6 +69,6 @@ renderComponent giver sikker HTML. createComponent giver native DOM. options omf
 
 Skemaet og runtime accepterer eksisterende format 1, hvor komponentopskrifter ligger i pakken. CSS forbliver uændret. migratePackage er eksplicit og giver et nyt format 2-tema: visuelle egenskaber og brand bevares, mens struktur/layout kommer fra biblioteket. Ukendte roller/dele/varianter skal registreres før migration; de bortfalder ikke stiltiende.
 
-CLI migrate FILE --out NEW_FILE bevarer originalen og nægter at overskrive eksisterende output. Desktop-editorens konvertering er først en kladde. Gennemgå produktet for dobbelt padding før et migreret tema aktiveres.
+CLI migrate FILE --out NEW_FILE bevarer originalen og nægter at overskrive eksisterende output. Offline-editorens konvertering er først en kladde; **Gem tema** henter resultatet som en ny JSON-fil, som ikke automatisk erstatter originalen. Gennemgå produktet for dobbelt padding før et migreret tema aktiveres.
 
 validateCompatibility kontrollerer det effektive token- og komponentkontrakt. Alle medfølgende temaer har samme katalog; projektspecifikke ekstra tokens kan fortsat kræve en tilsvarende rolle i kandidaten. Validering kontrollerer også definerede kontrastpar. Den garanterer ikke produktkode, teksttilpasning eller alle mulige farvekombinationer i et konkret sidelayout.
