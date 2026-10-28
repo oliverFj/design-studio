@@ -3,6 +3,7 @@ import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validatePackage } from '../core/engine.mjs';
+import { buildWorkspace } from './build-workspace.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const themes = [];
@@ -34,3 +35,4 @@ html = html.replace('<link rel="stylesheet" href="../patterns/styles.css">', () 
 html = html.replace('</body>', () => '<script>' + bundle.outputFiles[0].text.replace(/<\/script/gi, '<\\/script') + '</script></body>');
 await writeFile(path.join(root, 'index.html'), html);
 console.log('Offline Design Studio bygget: index.html · ' + themes.length + ' temaer · ' + Math.round(Buffer.byteLength(html) / 1024) + ' KB');
+await buildWorkspace(root);

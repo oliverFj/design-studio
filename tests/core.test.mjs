@@ -589,9 +589,11 @@ test('scroll areas retain owned nested anatomy, inset scrollbars and unclipped n
  assert.match(css,/#product \.ds-scroll-area > \.ds-scroll-area__viewport > \.ds-scroll-area__content \{/);
  const components=getComponents(theme);assert.equal(components['scroll-area'].parts.viewport.styles.scrollbarGutter,'auto');assert.equal(components['scroll-area'].variants.contained.styles.backgroundColor,'{color.background.surface}');assert.equal(components['scroll-area'].variants.contained.styles.border,'{border.width.default} solid {color.border.default}');
  assert.match(css,/#product \.ds-scroll-area\[data-variant="contained"\] \{[^}]*background-color: var\(--ds-color-background-surface\);/);
- assert.match(css,/scrollbar-gutter: auto;/);assert.doesNotMatch(css,/scrollbar-gutter: stable;/);
+ assert.match(css,/\.ds-scroll-area__viewport \{[^}]*scrollbar-gutter: auto;/);
+ assert.doesNotMatch(css,/\.ds-scroll-area[^{}]*\{[^}]*scrollbar-gutter: stable;/);
  assert.doesNotMatch(css,/#product \.ds-scroll-area\[data-variant="contained"\] \.ds-scroll-area__content \{/);
- assert.match(css,/\.ds-scroll-area__viewport \{[^}]*margin: var\(--ds-space-1\);[^}]*overflow: auto;[^}]*scrollbar-width: thin;[^}]*scrollbar-color: var\(--ds-color-border-field\) transparent;/);
+ assert.match(css,/\.ds-scroll-area__viewport \{[^}]*margin: var\(--ds-space-1\);[^}]*overflow: auto;/);
+ assert.equal(components['scroll-area'].parts.viewport.styles.scrollbarColor,undefined,'shared scrollbar policy covers component and application scrollers together');
  assert.match(css,/:has\(> \.ds-scroll-area__viewport:focus-visible\)[^}]*> \.ds-scroll-area__viewport \{[^}]*outline: var\(--ds-border-width-focus\) solid var\(--ds-color-focus\);[^}]*outline-offset: calc\(-1 \* var\(--ds-border-width-focus\)\);/);
  assert.match(css,/padding: max\(var\(--ds-space-component-paddingCompact\), calc\(max\(3px, var\(--ds-border-width-focus\)\) \+ max\(2px, var\(--ds-border-offset-focus\)\)\)\);/);
  for(const tabindex of ['1','-2','x']){const legacy=base();legacy.components.card.preview.attrs={tabindex};assert.match(errorsFor(legacy),/tabindex: must be 0 or -1/);}

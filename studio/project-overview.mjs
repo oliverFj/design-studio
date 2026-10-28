@@ -1,5 +1,5 @@
 import { getComponents } from '../core/engine.mjs';
-import { createComponent } from '../core/components.mjs';
+import { createComponentFactory } from '../core/components.mjs';
 
 const defaults = Object.freeze({ name: 'Digitale oplevelser', owner: 'Produktteamet', notifications: true });
 
@@ -18,7 +18,7 @@ export function createProjectOverview(theme, {
   const prefix = String(idPrefix).replace(/[^a-zA-Z0-9_-]/g, '-');
   const catalog = getComponents(theme);
   const node = (component, options = {}) => ({ component, options });
-  const component = (id, options = {}) => createComponent(theme, id, options, { document });
+  const component = createComponentFactory(theme, { document });
   const element = (tag, className, children = []) => {
     const result = document.createElement(tag);
     if (className) result.className = className;

@@ -4,6 +4,11 @@
   "name": "Fjordside",
   "description": "En varm, præcis redaktionel identitet med papir, tryksværte, Platypi og sparsom terracotta. Skarpe flader og en fælles målrytme giver det håndværksmæssige udtryk ro.",
   "tokens": {
+    "typography.size.captionText": {
+      "$type": "dimension",
+      "$value": "15px",
+      "description": "Normal billedtekst med et underordnet typografisk niveau."
+    },
     "color.background.canvas": {
       "$type": "color",
       "$value": "{color.palette.chalk}",
@@ -121,7 +126,7 @@
     },
     "typography.size.title": {
       "$type": "dimension",
-      "$value": "24px",
+      "$value": "20px",
       "description": "Underrubrik og titel i sammensatte komponenter."
     },
     "typography.weight.body": {
@@ -361,7 +366,7 @@
     },
     "color.border.field": {
       "$type": "color",
-      "$value": "#aaa797",
+      "$value": "#908e7f",
       "description": "Kanter på indtastningsfelter."
     },
     "color.border.strong": {
@@ -666,27 +671,27 @@
     },
     "space.component.padding": {
       "$type": "dimension",
-      "$value": "1rem",
+      "$value": "0.75rem",
       "description": "Temaets fælles visuelle værdi for space.component.padding."
     },
     "space.component.paddingLarge": {
       "$type": "dimension",
-      "$value": "1.5rem",
+      "$value": "1rem",
       "description": "Temaets fælles visuelle værdi for space.component.paddingLarge."
     },
     "space.component.paddingCompact": {
       "$type": "dimension",
-      "$value": "0.5rem",
+      "$value": "0.375rem",
       "description": "Temaets fælles visuelle værdi for space.component.paddingCompact."
     },
     "space.component.gap": {
       "$type": "dimension",
-      "$value": "0.5rem",
+      "$value": "0.375rem",
       "description": "Temaets fælles visuelle værdi for space.component.gap."
     },
     "space.component.gapLarge": {
       "$type": "dimension",
-      "$value": "1rem",
+      "$value": "0.75rem",
       "description": "Temaets fælles visuelle værdi for space.component.gapLarge."
     },
     "color.status.success": {
@@ -843,6 +848,10 @@
     {
       "date": "2026-10-09",
       "note": "Hover og tryk bruger nu tydelige, solide semantiske flade- og tekstpar for neutrale, primære, valgte, destruktive og særlige handlinger. Palettens karakter og valgt hierarki er bevaret; tastaturfokus og klikflader følger fortsat biblioteket."
+    },
+    {
+      "date": "2026-10-28",
+      "note": "Tæthed og typografisk hierarki er strammet op med mindre semantiske insets og gaps samt mere kompakte paneltitler og billedtekster. Interaktive feltkanter er styrket uafhængigt af dekorative skillelinjer. Brand, læsetekst og normale klikmål er bevaret."
     }
   ],
   "brand": {
@@ -1054,18 +1063,18 @@
       {
         "id": "surfaces",
         "title": "Flader, kanter og mål",
-        "description": "Almindelige kontroller og cards er firkantede og flade med 1px kant. Standardkontrollen er 44px høj, store handlinger 48px og tætte desktopværktøjslinjer 36px. Card-padding er 16px i tætte rækker, 24px i produktkort og 32px i redaktionelle cards. Kun løsrevne lag får den særlige floating-skygge. Radioens native cirkel er en bevidst geometrisk undtagelse.",
+        "description": "Almindelige kontroller og cards er firkantede og flade med 1px kant. Standardkontrollen er mindst 44px høj; desktopvarianter bruger 32px. Almindelige kort har 16px indvendig afstand. Tættere værktøjsflader bruger bibliotekets kompakte varianter og semantiske spacingtokens efter indholdets rolle. Kun løsrevne lag får den særlige floating-skygge. Radioens native cirkel er en bevidst geometrisk undtagelse.",
         "tokens": [
           "radius.control",
           "radius.card",
           "radius.radio",
           "border.width.default",
           "size.control.height",
-          "size.control.compact",
-          "size.control.large",
-          "space.4",
-          "space.5",
-          "space.6",
+          "space.component.padding",
+          "space.component.paddingLarge",
+          "space.component.paddingCompact",
+          "space.component.gap",
+          "space.component.gapLarge",
           "shadow.card",
           "shadow.floating",
           "color.border.field"

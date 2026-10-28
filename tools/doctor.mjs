@@ -5,7 +5,7 @@ import { validatePackage, generateCSS, LIBRARY_VERSION } from '../core/engine.mj
 import { projectPath, inputFingerprint, offlineIssues } from './offline-checks.mjs';
 
 export const PROJECT_RUNTIME = [
-  ...['contract.mjs', 'library.mjs', 'quality.mjs', 'engine.mjs', 'components.mjs', 'files.mjs', 'layout.mjs'].map(name => ['core/' + name, 'runtime/' + name]),
+  ...['contract.mjs', 'library.mjs', 'quality.mjs', 'geometry.mjs', 'token-usage.mjs', 'engine.mjs', 'components.mjs', 'files.mjs', 'layout.mjs', 'panels.mjs'].map(name => ['core/' + name, 'runtime/' + name]),
   ['tools/doctor.mjs', 'tools/doctor.mjs'],
   ['tools/offline-checks.mjs', 'tools/offline-checks.mjs'],
 ];

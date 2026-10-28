@@ -72,6 +72,14 @@ export function themeContrastReport(resolved) {
     return {foreground,background,minimum,ratio,passed:ratio !== null && ratio >= minimum};
   });
 }
+/** Advisory field-boundary contrast, separate from decorative dividers and save validation. */
+export function controlBoundaryReport(resolved) {
+  return ['color.background.control','color.background.surface'].map(background=>{
+    const foreground='color.border.field',ratio=contrastRatio(resolved[foreground],resolved[background]),minimum=3;
+    return {foreground,background,ratio,minimum,passed:ratio!==null&&ratio>=minimum,advisory:true,
+      context:'Pejlemærke for en synlig feltkant. Kravet afhænger af, om kanten er nødvendig for at identificere feltet.'};
+  });
+}
 function pixels(value) {
   const match = /^(\d*\.?\d+)(px|rem|em)$/.exec(String(value));
   return match ? Number(match[1])*(match[2] === 'px' ? 1 : 16) : null;

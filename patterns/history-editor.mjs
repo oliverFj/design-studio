@@ -1,4 +1,4 @@
-import { createComponent, createLayout } from '../core/components.mjs';
+import { createComponentFactory, createLayout } from '../core/components.mjs';
 import { createHistoryState, createHistory } from './history.mjs';
 
 export function createHistoryEditorState() {
@@ -7,14 +7,14 @@ export function createHistoryEditorState() {
 
 export function mountHistoryEditor(theme, { document = globalThis.document, state = createHistoryEditorState(), announce = () => {}, onChange = () => {}, idPrefix = 'history-editor' } = {}) {
   const prefix = String(idPrefix).replace(/[^a-zA-Z0-9_-]/g, '-');
-  const c = (id, options = {}) => createComponent(theme, id, options, { document });
+  const c = createComponentFactory(theme, { document });
   const stack = (...nodes) => { const node = c('stack'); node.replaceChildren(...nodes); return node; };
-  const button = (text, action, variant = 'secondary') => c('button', { text, variant, attrs: { 'data-action': action } });
+  const button = (text, action, variant = 'desktop') => c('button', { text, variant, attrs: { 'data-action': action } });
   const root = createLayout('form', { document }); root.className += ' ds-composition ds-scope'; root.setAttribute('role', 'region'); root.setAttribute('aria-label', 'Fortryd og gentag');
   const history = createHistory(state.history);
   const toolbar = document.createElement('div'); toolbar.className = 'composition-actions';
   const undo = button('Fortryd', 'undo'), redo = button('Gentag', 'redo'), save = button('Gem i eksemplet', 'save-history'); toolbar.append(undo, redo, save);
-  const name = c('field', { idPrefix: prefix + '-title', label: 'Samlingens navn', value: state.draftTitle, hint: 'Navneændringen bliver ét trin, når du forlader feltet.', error: '' });
+  const name = c('field', { idPrefix: prefix + '-title', label: 'Samlingens navn', value: state.draftTitle, controlVariant: 'desktop', hint: 'Navneændringen bliver ét trin, når du forlader feltet.', error: '' });
   const input = name.querySelector('input'), error = name.querySelector('.ds-field__error');
   const actions = document.createElement('div'); actions.className = 'composition-actions';
   const add = button('Tilføj element', 'add-item', 'primary'), remove = button('Fjern sidste element', 'remove-item'), cancel = button('Fortryd kladde', 'cancel-draft', 'ghost'); actions.append(add, remove, cancel);
@@ -25,18 +25,24 @@ export function mountHistoryEditor(theme, { document = globalThis.document, stat
   const draftChanged = () => state.draftTitle !== history.value.title;
   const notify = text => { status.textContent = text; announce(text); onChange(state); };
   function render() {
+    const focused = document.activeElement;
     const value = history.value;
     undo.disabled = !history.canUndo || draftChanged(); redo.disabled = !history.canRedo || draftChanged(); save.disabled = draftChanged();
     undo.setAttribute('title', history.undoLabel ? 'Fortryd: ' + history.undoLabel : 'Intet at fortryde'); redo.setAttribute('title', history.redoLabel ? 'Gentag: ' + history.redoLabel : 'Intet at gentage');
     add.disabled = draftChanged(); remove.disabled = !value.items.length || draftChanged(); cancel.hidden = !draftChanged();
     const card = c('card', { slots: {
       header: { component: 'heading', options: { text: value.title, variant: 'panel' } },
-      body: { component: 'stack', options: { slots: { root: { tag: 'div', children: value.items.length ? value.items.map(text => ({ component: 'text', options: { text } })) : [{ component: 'instruction-note', options: { text: 'Samlingen er tom. Tilføj et element eller fortryd fjernelsen.' } }] } } } },
+      body: { component: 'stack', options: { variant: 'compact', slots: { root: { tag: 'div', children: value.items.length ? value.items.map(text => ({ component: 'text', options: { text } })) : [{ component: 'instruction-note', options: { text: 'Samlingen er tom. Tilføj et element eller fortryd fjernelsen.' } }] } } } },
       footer: { component: 'badge', options: { text: draftChanged() ? 'Kladde ikke anvendt' : history.dirty ? 'Ugemte ændringer' : 'Ved gemmepunktet' } },
     } });
     preview.replaceChildren(card);
     if (draftChanged()) status.textContent = invalidDraft() ? 'Giv samlingen et navn, eller fortryd kladden.' : 'Forlad feltet for at anvende navnet som ét fortrydtrin.';
     else status.textContent = (history.dirty ? 'Dokumentet har ugemte ændringer.' : 'Dokumentet svarer til gemmepunktet.') + ' Gemmepunktet gælder kun denne session; ingen fil er skrevet.';
+    // Keep focus usable when a command disables or hides its own control.
+    if (focused === cancel && cancel.hidden) input.focus();
+    else if (focused === undo && undo.disabled) (redo.disabled ? input : redo).focus();
+    else if (focused === redo && redo.disabled) (undo.disabled ? input : undo).focus();
+    else if (focused === remove && remove.disabled) add.focus();
   }
   function commit(label, next) { if (history.commit(label, next)) { render(); notify(label + '. ' + (history.dirty ? 'Ugemte ændringer.' : 'Ved gemmepunktet.')); } }
   input.addEventListener('input', event => { state.draftTitle = event.target.value; render(); });

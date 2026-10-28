@@ -28,7 +28,7 @@ for (const name of PATTERN_FILES) {
   await writeFile(join(output, 'patterns', name.replace('.mjs', '.js')), browserImports(source), 'utf8');
 }
 await mkdir(join(output, 'core'), { recursive: true });
-for (const name of ['contract.mjs', 'library.mjs', 'quality.mjs', 'engine.mjs', 'components.mjs', 'layout.mjs']) {
+for (const name of ['contract.mjs', 'library.mjs', 'quality.mjs', 'geometry.mjs', 'token-usage.mjs', 'engine.mjs', 'components.mjs', 'layout.mjs', 'panels.mjs']) {
   const source = await readFile(join(studio, 'core', name), 'utf8');
   await writeFile(join(output, 'core', name.replace('.mjs', '.js')), browserImports(source), 'utf8');
   await rm(join(output, 'core', name), { force: true });

@@ -2,6 +2,13 @@
 export const LIBRARY_VERSION='2.8.0';
 export { LAYOUT_PROFILES } from './layout.mjs';
 function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
+// Keep one-line desktop controls at 32px without clipping larger type or wrapped labels.
+const DESKTOP_CONTROL_STYLES=freeze({
+  minHeight: '32px',
+  padding: 'max(0px, calc((32px - 1em * {typography.lineHeight.control}) / 2 - {border.width.default})) {space.component.padding}',
+  lineHeight: '{typography.lineHeight.control}',
+});
+const DESKTOP_INPUT_HEIGHT='max(32px, calc(1em * {typography.lineHeight.control} + 2 * {border.width.default}))';
 export const APPEARANCE_PROPERTIES=freeze([
   "color",
   "backgroundColor",
@@ -779,7 +786,7 @@ export const DEFAULT_TOKENS=freeze({
   },
   "typography.size.captionText": {
     "$type": "dimension",
-    "$value": "1.25rem",
+    "$value": "0.875rem",
     "description": "Central default: Læselig billedtekst under en illustration eller indholdsvisning."
   },
   "typography.lineHeight.captionText": {
@@ -1076,9 +1083,8 @@ export const COMPONENT_LIBRARY=freeze({
       "desktop": {
   "description": "Kompakt desktopbetjening med 32 px klikflader. Brug standardvarianten ved touch eller behov for større mål.",
   "styles": {
-    "minHeight": "32px",
+    ...DESKTOP_CONTROL_STYLES,
     "minWidth": "32px",
-    "padding": "{space.component.paddingCompact} {space.component.padding}",
     "backgroundColor": "{color.background.control}",
     "color": "{color.text.primary}",
     "borderColor": "{color.border.field}",
@@ -1454,9 +1460,8 @@ export const COMPONENT_LIBRARY=freeze({
       "desktop": {
   "description": "Kompakt desktopbetjening med 32 px klikflader. Brug standardvarianten ved touch eller behov for større mål.",
   "styles": {
-    "minHeight": "32px",
-    "height": "32px",
-    "padding": "{space.component.paddingCompact}"
+    ...DESKTOP_CONTROL_STYLES,
+    "height": DESKTOP_INPUT_HEIGHT
   }
 },
       "invalid": {
@@ -1541,7 +1546,7 @@ export const COMPONENT_LIBRARY=freeze({
         "styles": {
           "margin": "0",
           "fontSize": "{typography.size.small}",
-          "lineHeight": "{typography.lineHeight.body}",
+          "lineHeight": "{typography.lineHeight.label}",
           "color": "{color.text.secondary}"
         }
       },
@@ -1551,7 +1556,7 @@ export const COMPONENT_LIBRARY=freeze({
           "display": "none",
           "margin": "0",
           "fontSize": "{typography.size.small}",
-          "lineHeight": "{typography.lineHeight.body}",
+          "lineHeight": "{typography.lineHeight.label}",
           "color": "{color.status.dangerText}"
         }
       }
@@ -1666,9 +1671,8 @@ export const COMPONENT_LIBRARY=freeze({
       "desktop": {
   "description": "Kompakt desktopbetjening med 32 px klikflader. Brug standardvarianten ved touch eller behov for større mål.",
   "styles": {
-    "minHeight": "32px",
-    "height": "32px",
-    "padding": "{space.component.paddingCompact}"
+    ...DESKTOP_CONTROL_STYLES,
+    "height": DESKTOP_INPUT_HEIGHT
   }
 },
       "invalid": {
@@ -2067,7 +2071,7 @@ export const COMPONENT_LIBRARY=freeze({
   "divider": {
     "name": "Skillelinje",
     "description": "En opdeling mellem beslægtede områder.",
-    "usage": "Brug hr til semantisk opdeling. Rent dekorative eller lodrette linjer må ikke ændre læserækkefølgen.",
+    "usage": "Brug hr til semantisk opdeling. En stak ejer afstanden omkring standardlinjen; standalone giver ydre afstand uden en stak. Rent dekorative eller lodrette linjer må ikke ændre læserækkefølgen.",
     "composes": [],
     "parts": {
       "root": {
@@ -2075,13 +2079,17 @@ export const COMPONENT_LIBRARY=freeze({
         "styles": {
           "width": "100%",
           "height": "0",
-          "margin": "{space.4} 0",
+          "margin": "0",
           "border": "0",
           "borderTop": "{border.width.default} solid {color.border.default}"
         }
       }
     },
     "variants": {
+      "standalone": {
+        "description": "Selvstændig skillelinje med afstand omkring; brug standard i en stak.",
+        "styles": { "margin": "{space.component.gapLarge} 0" }
+      },
       "vertical": {
         "description": "Lodret opbygning.",
         "styles": {
@@ -2620,7 +2628,7 @@ export const COMPONENT_LIBRARY=freeze({
         "selector": ".ds-switch__thumb",
         "styles": {
           "position": "absolute",
-          "top": "{size.switch.inset}",
+          "top": "calc((100% - {size.switch.thumb}) / 2)",
           "left": "{size.switch.inset}",
           "width": "{size.switch.thumb}",
           "height": "{size.switch.thumb}",
@@ -2792,7 +2800,7 @@ export const COMPONENT_LIBRARY=freeze({
           "margin": "0",
           "fontSize": "{typography.size.small}",
           "color": "{color.text.secondary}",
-          "lineHeight": "{typography.lineHeight.body}"
+          "lineHeight": "{typography.lineHeight.label}"
         }
       },
       "error": {
@@ -2802,7 +2810,7 @@ export const COMPONENT_LIBRARY=freeze({
           "margin": "0",
           "fontSize": "{typography.size.small}",
           "color": "{color.status.dangerText}",
-          "lineHeight": "{typography.lineHeight.body}"
+          "lineHeight": "{typography.lineHeight.label}"
         }
       }
     },
@@ -2959,6 +2967,9 @@ export const COMPONENT_LIBRARY=freeze({
   "styles": {
     "padding": "{space.component.paddingCompact}",
     "gap": "{space.component.gap}"
+  },
+  "parts": {
+    "action": { "styles": { ...DESKTOP_CONTROL_STYLES } }
   }
 },
       "horizontal": {
@@ -3316,8 +3327,7 @@ export const COMPONENT_LIBRARY=freeze({
       "desktop": {
   "description": "Kompakt desktopbetjening med 32 px klikflader. Brug standardvarianten ved touch eller behov for større mål.",
   "styles": {
-    "minHeight": "32px",
-    "padding": "{space.component.paddingCompact} {space.component.padding}"
+    ...DESKTOP_CONTROL_STYLES
   }
 },
       "compact": {
@@ -3820,7 +3830,7 @@ export const COMPONENT_LIBRARY=freeze({
           "color": "{color.text.secondary}",
           "fontSize": "{typography.size.control}",
           "margin": "0",
-          "lineHeight": "{typography.lineHeight.body}"
+          "lineHeight": "{typography.lineHeight.label}"
         }
       },
       "section": {
@@ -3931,7 +3941,15 @@ export const COMPONENT_LIBRARY=freeze({
       "label": {
         "selector": ".ds-caption__label",
         "styles": {
-          "display": "inline-block",
+          "display": "inline-flex",
+          "alignItems": "center",
+          "justifyContent": "center",
+          "boxSizing": "border-box",
+          "maxWidth": "100%",
+          "minWidth": "0",
+          "flexShrink": "0",
+          "fontFamily": "{typography.font.body}",
+          "fontStyle": "normal",
           "fontSize": "{typography.size.small}",
           "fontWeight": "{typography.weight.strong}",
           "letterSpacing": "{typography.tracking.captionLabel}",
@@ -3939,16 +3957,19 @@ export const COMPONENT_LIBRARY=freeze({
           "color": "{color.caption.labelText}",
           "backgroundColor": "{color.caption.labelSurface}",
           "borderRadius": "{radius.pill}",
-          "padding": "calc({space.component.paddingCompact} / 2) {space.component.paddingCompact}",
-          "lineHeight": "{typography.lineHeight.control}"
+          "padding": "max(calc({space.component.paddingCompact} / 2), 0.25em) max({space.component.paddingCompact}, 0.5em)",
+          "lineHeight": "normal",
+          "whiteSpace": "normal",
+          "overflowWrap": "anywhere",
+          "textAlign": "center"
         }
       },
       "text": {
         "selector": ".ds-caption__text",
         "styles": {
-          "fontFamily": "{typography.font.expressive}",
+          "fontFamily": "{typography.font.body}",
           "fontStyle": "normal",
-          "fontWeight": "{typography.weight.expressive}",
+          "fontWeight": "{typography.weight.body}",
           "fontSize": "{typography.size.captionText}",
           "lineHeight": "{typography.lineHeight.captionText}",
           "color": "{color.caption.text}",
@@ -4061,8 +4082,6 @@ export const COMPONENT_LIBRARY=freeze({
           "margin": "{space.1}",
           "overflow": "auto",
           "overscrollBehavior": "contain",
-          "scrollbarWidth": "thin",
-          "scrollbarColor": "{color.border.field} transparent",
           "scrollbarGutter": "auto",
           "borderRadius": "max(0px, calc({radius.card} - {space.1}))"
         }
@@ -4179,15 +4198,15 @@ export const COMPONENT_LIBRARY=freeze({
       "item": {"selector":".ds-tree__item","styles":{"display":"block","minWidth":"0","margin":"0","padding":"0","listStyleType":"none","borderRadius":"{radius.control}","--ds-interaction-hover-surface":"{color.action.neutralHover}","--ds-interaction-hover-text":"{color.action.neutralHoverText}","--ds-interaction-active-surface":"{color.action.neutralActive}","--ds-interaction-active-text":"{color.action.neutralActiveText}"}},
       "row": {"selector":".ds-tree__row","styles":{"display":"flex","alignItems":"center","gap":"{space.component.gap}","minHeight":"32px","minWidth":"0","borderRadius":"{radius.control}","border":"{border.width.default} solid transparent","padding":"0 {space.component.paddingCompact}","boxSizing":"border-box","color":"inherit","backgroundColor":"transparent"}},
       "group": {"selector":".ds-tree__group","styles":{"display":"flex","flexDirection":"column","gap":"0","minWidth":"0","padding":"0 0 0 {space.component.padding}","margin":"0","listStyleType":"none"}},
-      "toggle": {"selector":".ds-tree__toggle","styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","minWidth":"24px","minHeight":"32px","flexShrink":"0","padding":"0","border":"0","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"inherit","color":"inherit","backgroundColor":"transparent","cursor":"pointer","width":"24px"}},
+      "toggle": {"selector":".ds-tree__toggle","styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","minWidth":"24px","minHeight":"calc(32px - 2 * {border.width.default})","boxSizing":"border-box","flexShrink":"0","padding":"0","border":"0","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"inherit","color":"inherit","backgroundColor":"transparent","cursor":"pointer","width":"24px"}},
       "spacer": {"selector":".ds-tree__spacer","styles":{"display":"block","width":"24px","minWidth":"24px","flexShrink":"0"}},
-      "label": {"selector":".ds-tree__label","styles":{"display":"flex","alignItems":"center","gap":"{space.component.gap}","flex":"1 1 auto","minWidth":"0","minHeight":"32px","padding":"0","border":"0","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"inherit","color":"inherit","backgroundColor":"transparent","textAlign":"left","whiteSpace":"normal","wordBreak":"normal","overflowWrap":"anywhere","cursor":"pointer"}},
+      "label": {"selector":".ds-tree__label","styles":{"display":"flex","alignItems":"center","gap":"{space.component.gap}","flex":"1 1 auto","minWidth":"0","minHeight":"calc(32px - 2 * {border.width.default})","boxSizing":"border-box","padding":"0","border":"0","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"inherit","color":"inherit","backgroundColor":"transparent","textAlign":"left","whiteSpace":"normal","wordBreak":"normal","overflowWrap":"anywhere","cursor":"pointer"}},
       "icon": {"selector":".ds-tree__icon","styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","flexShrink":"0","fontSize":"{typography.size.control}"}},
       "name": {"selector":".ds-tree__name","styles":{"minWidth":"0","overflowWrap":"anywhere","overflow":"hidden","textOverflow":"ellipsis","whiteSpace":"nowrap"}},
       "meta": {"selector":".ds-tree__meta","styles":{"minWidth":"0","fontSize":"{typography.size.label}","color":"inherit","overflowWrap":"normal","whiteSpace":"nowrap","flexShrink":"0"}},
-      "badge": {"selector":".ds-tree__badge","styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","padding":"{space.component.paddingCompact}","borderRadius":"{radius.pill}","fontSize":"{typography.size.label}","color":"{color.text.secondary}","backgroundColor":"{color.background.subtle}"}},
+      "badge": {"selector":".ds-tree__badge","styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","padding":"calc({space.component.paddingCompact} / 2) {space.component.paddingCompact}","borderRadius":"{radius.pill}","fontSize":"{typography.size.label}","lineHeight":"{typography.lineHeight.control}","color":"{color.text.secondary}","backgroundColor":"{color.background.subtle}"}},
       "actions": {"selector":".ds-tree__actions","styles":{"display":"flex","alignItems":"center","flexWrap":"wrap","gap":"{space.component.gap}","flexShrink":"0"}},
-      "action": {"selector":".ds-tree__action","styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","minWidth":"28px","minHeight":"28px","padding":"0","border":"{border.width.default} solid transparent","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"inherit","color":"inherit","backgroundColor":"transparent","cursor":"pointer"}}
+      "action": {"selector":".ds-tree__action","styles":{"display":"inline-flex","alignItems":"center","justifyContent":"center","minWidth":"28px","minHeight":"28px","boxSizing":"border-box","padding":"0","border":"{border.width.default} solid transparent","borderRadius":"{radius.control}","fontFamily":"inherit","fontSize":"inherit","fontWeight":"inherit","lineHeight":"{typography.lineHeight.control}","color":"inherit","backgroundColor":"transparent","cursor":"pointer"}}
     },
     "variants": {
       "desktop": {
@@ -4213,7 +4232,7 @@ export const COMPONENT_LIBRARY=freeze({
       "styles": {
         "minWidth": "24px",
         "width": "24px",
-        "minHeight": "32px",
+        "minHeight": "calc(32px - 2 * {border.width.default})",
         "padding": "0"
       }
     },
@@ -4225,7 +4244,7 @@ export const COMPONENT_LIBRARY=freeze({
     },
     "label": {
       "styles": {
-        "minHeight": "32px",
+        "minHeight": "calc(32px - 2 * {border.width.default})",
         "padding": "0"
       }
     },
@@ -4331,18 +4350,16 @@ export const COMPONENT_LIBRARY=freeze({
     "item": {
       "selector": ".ds-menubar__item",
       "styles": {
+        ...DESKTOP_CONTROL_STYLES,
         "display": "inline-flex",
         "alignItems": "center",
         "gap": "{space.component.gap}",
-        "minHeight": "32px",
         "minWidth": "32px",
-        "padding": "{space.component.paddingCompact} {space.component.padding}",
         "boxSizing": "border-box",
         "border": "{border.width.default} solid transparent",
         "borderRadius": "{radius.control}",
         "fontFamily": "{typography.font.body}",
         "fontSize": "{typography.size.control}",
-        "lineHeight": "{typography.lineHeight.control}",
         "fontWeight": "{typography.weight.body}",
         "color": "{color.text.primary}",
         "backgroundColor": "transparent",
@@ -4455,7 +4472,7 @@ export const COMPONENT_LIBRARY=freeze({
       "styles": {
         "display": "flex",
         "flexDirection": "column",
-        "gap": "{space.component.gap}",
+        "gap": "{space.1}",
         "padding": "{space.component.paddingCompact}",
         "minWidth": "220px",
         "maxWidth": "360px",
@@ -4526,18 +4543,16 @@ export const COMPONENT_LIBRARY=freeze({
     "root": {
       "selector": ".ds-menu-item",
       "styles": {
+        ...DESKTOP_CONTROL_STYLES,
         "display": "inline-flex",
         "alignItems": "center",
         "gap": "{space.component.gap}",
-        "minHeight": "32px",
         "minWidth": "32px",
-        "padding": "{space.component.paddingCompact} {space.component.padding}",
         "boxSizing": "border-box",
         "border": "{border.width.default} solid transparent",
         "borderRadius": "{radius.control}",
         "fontFamily": "{typography.font.body}",
         "fontSize": "{typography.size.control}",
-        "lineHeight": "{typography.lineHeight.control}",
         "fontWeight": "{typography.weight.body}",
         "color": "{color.text.primary}",
         "backgroundColor": "transparent",

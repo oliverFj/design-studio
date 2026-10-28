@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseColor,contrastRatio,themeContrastReport,componentContrastReport} from '../core/quality.mjs';
+import {parseColor,contrastRatio,themeContrastReport,componentContrastReport,controlBoundaryReport} from '../core/quality.mjs';
 import {validatePackage,materializePackage,resolveTokens} from '../core/engine.mjs';
 import fs from 'node:fs';
 const theme = () => JSON.parse(fs.readFileSync(new URL('../packages/studio-light.json',import.meta.url),'utf8'));
@@ -25,6 +25,17 @@ test('theme validation rejects invisible text, low focus contrast and undersized
 test('semantic report never silently passes unmeasurable role colors',()=>{
  const report=themeContrastReport({'color.text.primary':'currentColor','color.background.surface':'#fff'});
  assert.equal(report[0].passed,false);assert.equal(report[0].ratio,null);
+});
+
+test('field boundary advice exposes weak or unmeasurable edges without claiming save validation or decorative contrast',()=>{
+ const pack=theme(),resolved=resolveTokens(pack);
+ assert.ok(controlBoundaryReport(resolved).every(check=>check.passed&&check.advisory));
+ const weak={...resolved,'color.border.field':resolved['color.background.control']};
+ const report=controlBoundaryReport(weak);assert.equal(report[0].passed,false);assert.equal(report[0].ratio,1);
+ assert.ok(report.every(check=>check.foreground==='color.border.field'&&check.minimum===3));
+ assert.ok(controlBoundaryReport({...resolved,'color.border.field':'currentColor'}).every(check=>check.ratio===null&&!check.passed));
+ pack.tokens['color.border.field'].$value=resolved['color.background.control'];
+ assert.equal(validatePackage(pack).valid,true,'advice remains separate from the existing save contract');
 });
 
 test('appearance cannot introduce an unreadable explicit foreground/surface pair',()=>{

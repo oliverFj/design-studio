@@ -31,8 +31,8 @@
     },
     "typography.size.captionText": {
       "$type": "dimension",
-      "$value": "28px",
-      "description": "Skriftstørrelse til fremhævede billedtekster."
+      "$value": "14px",
+      "description": "Skriftstørrelse til almindelige, supplerende billedtekster."
     },
     "typography.weight.expressive": {
       "$type": "fontWeight",
@@ -42,7 +42,7 @@
     "typography.lineHeight.captionText": {
       "$type": "number",
       "$value": 1.25,
-      "description": "Linjehøjde til fremhævede billedtekster."
+      "description": "Linjehøjde til almindelige, supplerende billedtekster."
     },
     "typography.tracking.captionLabel": {
       "$type": "dimension",
@@ -741,7 +741,7 @@
     },
     "color.border.field": {
       "$type": "color",
-      "$value": "#a6b5aa",
+      "$value": "#7f9188",
       "description": "Temaets fælles visuelle værdi for color.border.field."
     },
     "color.background.inverse": {
@@ -970,6 +970,10 @@
     {
       "date": "2026-10-19",
       "note": "Integreret som separat tema efter brugerens godkendelse. FormLabs valgte layout kombinerer højre objektpanel med en værktøjslinje nederst; layoutet tilhører produktet og ændrer ikke det eksisterende Atelier-tema."
+    },
+    {
+      "date": "2026-10-28",
+      "note": "Den eksisterende kompakte afstandsrytme er bevaret. Normal billedtekst er reduceret til 14 px, og interaktive feltkanter er styrket uafhængigt af dekorative skillelinjer. Brand, læsetekst og normale klikmål er bevaret."
     }
   ],
   "brand": {

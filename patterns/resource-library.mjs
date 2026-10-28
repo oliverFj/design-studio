@@ -1,4 +1,4 @@
-import { createComponent, createLayout } from '../core/components.mjs';
+import { createComponentFactory, createLayout } from '../core/components.mjs';
 
 export function createResourceLibraryState() {
   return { query: '', type: 'all', favoritesOnly: false, view: 'grid', selected: 'starter', lastUsed: null, items: [
@@ -12,13 +12,14 @@ export function createResourceLibraryState() {
 }
 
 export function mountResourceLibrary(theme, { document = globalThis.document, state = createResourceLibraryState(), announce = () => {}, onChange = () => {}, onUse = () => {}, idPrefix = 'resource-library' } = {}) {
-  const c = (id, options = {}) => createComponent(theme, id, options, { document });
+  const c = createComponentFactory(theme, { document });
   const stack = (...nodes) => { const node = c('stack'); node.replaceChildren(...nodes); return node; };
-  const field = (key, label, value, options = {}) => c('field', { idPrefix: idPrefix + '-' + key, label, value, hint: '', ...options });
+  const compact = (...nodes) => { const node = c('stack', { variant: 'compact' }); node.replaceChildren(...nodes); return node; };
+  const field = (key, label, value, options = {}) => c('field', { idPrefix: idPrefix + '-' + key, label, value, hint: '', controlVariant: 'desktop', ...options });
   const button = (text, action, variant = 'secondary') => c('button', { text, variant, attrs: { 'data-action': action } });
   const card = (title, nodes) => {
     const node = c('card', { slots: { header: { component: 'heading', options: { text: title, variant: 'panel' } }, body: '', footer: '' } });
-    node.querySelector('.ds-card__body').replaceChildren(stack(...nodes)); node.querySelector('.ds-card__footer').remove(); return node;
+    node.querySelector('.ds-card__body').replaceChildren(compact(...nodes)); node.querySelector('.ds-card__footer').remove(); return node;
   };
   const root = createLayout('workspace', { document }); root.className += ' ds-composition ds-scope'; root.setAttribute('role', 'region'); root.setAttribute('aria-label', 'Ressourcebibliotek');
   const filters = document.createElement('div'); filters.className = 'composition-resource-filters';
@@ -31,11 +32,13 @@ export function mountResourceLibrary(theme, { document = globalThis.document, st
   const views = c('segmented-control', { variant: 'wrap' }); views.replaceChildren(); views.setAttribute('aria-label', 'Visning af ressourcer');
   const viewButtons = new Map();
   for (const [id, label] of [['grid', 'Kort'], ['list', 'Liste']]) {
-    const node = c('segmented-option', { text: label, attrs: { 'data-action': 'view-' + id } });
+    const node = c('segmented-option', { text: label, variant: 'desktop', attrs: { 'data-action': 'view-' + id } });
     node.addEventListener('click', () => { state.view = id; render(); node.focus(); notify('Visningen er skiftet til ' + label.toLocaleLowerCase('da') + '.'); });
     viewButtons.set(id, node); views.append(node);
   }
-  const reset = button('Nulstil filtre', 'reset-filters', 'ghost'); controls.append(views, reset);
+  const reset = button('Nulstil filtre', 'reset-filters', 'desktop');
+  const count = c('text', { text: '', variant: 'small', attrs: { 'data-resource-count': '', role: 'status', 'aria-live': 'polite' } });
+  controls.append(views, reset, count);
   const results = document.createElement('div'), detail = document.createElement('aside'); detail.setAttribute('aria-label', 'Ressourcens detaljer'); detail.className = 'ds-layout'; detail.setAttribute('data-layout', 'panel');
   const layout = document.createElement('div'); layout.className = 'composition-resource-layout'; layout.append(results, detail);
   const status = c('text', { text: '', variant: 'small', attrs: { role: 'status', 'aria-live': 'polite' } });
@@ -64,15 +67,18 @@ export function mountResourceLibrary(theme, { document = globalThis.document, st
       });
       const open = state.view === 'list'
         ? c('button', { variant: 'list-item', slots: { heading: item.title, description: item.type + ' · ' + item.description }, attrs: { 'aria-current': item.id === state.selected ? 'true' : 'false' } })
-        : button(item.id === state.selected ? 'Valgt' : 'Se detaljer', 'resource-details', item.id === state.selected ? 'primary' : 'secondary');
+        : button('Se detaljer', 'resource-details');
       open.setAttribute('data-resource', item.id);
       openButtons.set(item.id, open);
       if(state.view === 'grid') open.setAttribute('aria-pressed', String(item.id === state.selected));
       open.addEventListener('click', () => { state.selected = item.id; render(); openButtons.get(item.id).focus(); notify(item.title + ' er valgt.'); });
       if (state.view === 'list') { const row = document.createElement('div'); row.className = 'composition-resource-row'; row.append(open, favorite); return row; }
       const tags = document.createElement('div'); tags.className = 'composition-actions'; tags.append(...item.tags.map(text => c('badge', { text })));
+      if (item.id === state.selected) tags.append(c('badge', { text: '✓ Valgt', variant: 'data' }));
       const actions = document.createElement('div'); actions.className = 'composition-actions'; actions.append(open, favorite);
-      return card(item.title, [c('text', { text: item.type, variant: 'small' }), c('text', { text: item.description }), tags, actions]);
+      const resource = card(item.title, [c('text', { text: item.type, variant: 'small' }), c('text', { text: item.description }), tags, actions]);
+      resource.className += ' composition-resource-card'; resource.setAttribute('data-selected', String(item.id === state.selected));
+      return resource;
     });
     if (!nodes.length) {
       const empty = state.items.length ? 'Ingen ressourcer matcher filtrene.' : 'Biblioteket er tomt.';
@@ -88,7 +94,9 @@ export function mountResourceLibrary(theme, { document = globalThis.document, st
       use.addEventListener('click', () => { state.lastUsed = selected.id; onUse(structuredClone(selected)); notify(selected.title + ' er valgt til brug i eksemplet.'); });
       detail.replaceChildren(card(selected.title, [c('badge', { text: selected.type }), c('text', { text: selected.description }), c('text', { text: 'Emner: ' + selected.tags.join(', '), variant: 'small' }), use]));
     }
-    status.textContent = filtered.length + ' af ' + state.items.length + ' ressourcer.';
+    const summary = filtered.length + ' af ' + state.items.length + ' ressourcer.';
+    if (count.textContent !== summary) count.textContent = summary;
+    status.textContent = '';
   }
   const onSearch = event => { state.query = event.target.value; render(); onChange(state); };
   const onType = event => { state.type = event.target.value; render(); onChange(state); };

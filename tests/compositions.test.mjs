@@ -26,6 +26,17 @@ test('all compositions mount with shared components and unique field IDs in ever
         const target = label.getAttribute('for');
         if (target) assert.ok(mounted.element.querySelector('#' + target));
       }
+      const controls = [...mounted.element.querySelectorAll('input'), ...mounted.element.querySelectorAll('select')]
+        .filter(node => node.getAttribute('type') !== 'checkbox');
+      for (const control of controls) assert.equal(control.getAttribute('data-variant'), id === 'form' ? null : 'desktop', id + ': density follows the task');
+      if (id === 'editor') {
+        const workspace = mounted.element.querySelector('.composition-workbench');
+        assert.ok(workspace);
+        assert.equal(workspace.className.includes('ds-card'), false, 'the workspace does not add a second card inset');
+        assert.ok(workspace.querySelector('#' + workspace.getAttribute('aria-labelledby')), 'the open workspace keeps its visible heading');
+        for (const tab of mounted.element.querySelectorAll('[data-tab]')) assert.equal(tab.getAttribute('data-variant'), 'desktop');
+      }
+      if (id === 'list-detail') assert.equal(mounted.element.querySelector('[data-item]').parentNode.getAttribute('data-variant'), 'compact', 'list entries have one compact row rhythm');
       mounted.destroy();
     }
   }
@@ -121,6 +132,10 @@ test('form rejects invalid input, saves to session state, and restores saved val
   assert.equal(document.activeElement, name());
   name().value = 'Et nyt navn'; fire(name(), 'input'); fire(element.querySelector('form'), 'submit');
   assert.equal(state.saved.name, 'Et nyt navn');
+  const feedback = element.querySelector('.ds-alert'), body = element.querySelector('.ds-card__body');
+  assert.equal(body.children.length, 1, 'one stack owns all form content and feedback spacing');
+  assert.equal(feedback.parentNode, body.children[0]);
+  assert.equal(feedback.parentNode.className, 'ds-stack');
   name().value = 'Kladde'; fire(name(), 'input'); fire(element.querySelector('[data-action="reset-form"]'), 'click');
   assert.equal(state.draft.name, 'Et nyt navn');
 });
@@ -148,6 +163,19 @@ test('gallery retains independent example state across selection and theme remou
   gallery.destroy();
 });
 
+test('gallery keeps a short compact introduction and preserves usage and attribution in reuse details', () => {
+  const gallery = mountCompositionGallery(theme('fjordside'), { document: dom() });
+  const content = gallery.element.querySelector('.composition-heading').nextSibling, intro = content.children[0];
+  assert.equal(intro.getAttribute('data-variant'), 'compact');
+  assert.equal(intro.children.length, 2, 'only title and short description sit above the demonstration');
+  const notes = gallery.element.querySelector('pre').textContent;
+  assert.match(notes, /Anvendelse:/);
+  assert.match(notes, /Breddeprofil:/);
+  assert.match(notes, /Ophav: FormLab/);
+  assert.match(notes, /object-panel.js/);
+  gallery.destroy();
+});
+
 test('resource library combines filters, preserves view and favorites, and recovers from empty results', () => {
   const { element, state } = fixture('resource-library');
   const type = element.querySelector('#composition-resource-library-type-control'); type.value = 'Skabelon'; fire(type, 'change');
@@ -168,6 +196,33 @@ test('resource use is a product callback receiving a copy; a truly empty library
   assert.equal(used.id, 'starter'); assert.equal(state.lastUsed, 'starter'); assert.equal(state.items[0].title, 'Startskabelon'); mounted.destroy();
   state.items = []; const empty = mountComposition(theme('studio-light'), 'resource-library', { document, state });
   assert.match(empty.element.textContent, /Biblioteket er tomt/); assert.equal(empty.element.querySelector('[data-action="clear-empty"]'), null); empty.destroy();
+});
+
+test('resource selection stays on the card and leaves one primary use action with a persistent filter count', () => {
+  const { element, document, state, destroy } = fixture('resource-library');
+  const count = element.querySelector('[data-resource-count]');
+  const layout = element.querySelector('.composition-resource-layout');
+  assert.equal(count.textContent, '6 af 6 ressourcer.');
+  assert.equal(count.parentNode.nextSibling, layout, 'the count is adjacent to the filters and above the results');
+  const primaryActions = () => element.querySelectorAll('button').filter(node => node.getAttribute('data-variant') === 'primary');
+  assert.deepEqual(primaryActions(), [element.querySelector('[data-action="use-resource"]')]);
+  const selectedCard = () => element.querySelectorAll('.composition-resource-card').find(node => node.getAttribute('data-selected') === 'true');
+  assert.match(selectedCard().textContent, /Startskabelon.*✓ Valgt/);
+  fire(element.querySelector('[data-resource="compact"]'), 'click');
+  assert.equal(state.selected, 'compact');
+  assert.match(selectedCard().textContent, /Kompakt opsætning.*✓ Valgt/);
+  assert.equal(element.querySelectorAll('.composition-resource-card').filter(node => node.getAttribute('data-selected') === 'true').length, 1);
+  assert.equal(document.activeElement, element.querySelector('[data-resource="compact"]'));
+  assert.equal(document.activeElement.getAttribute('aria-pressed'), 'true');
+  assert.equal(document.activeElement.getAttribute('data-variant'), 'secondary');
+  assert.equal(document.activeElement.textContent, 'Se detaljer');
+  assert.equal(count.textContent, '6 af 6 ressourcer.', 'interaction feedback does not replace the result count');
+  assert.deepEqual(primaryActions(), [element.querySelector('[data-action="use-resource"]')]);
+  const search = element.querySelector('#composition-resource-library-search-control'); search.value = 'ingen match'; fire(search, 'input');
+  assert.equal(count.textContent, '0 af 6 ressourcer.');
+  assert.equal(selectedCard(), undefined);
+  assert.equal(primaryActions().length, 0);
+  destroy();
 });
 
 test('history example groups field changes, protects native text undo, and supports scoped keyboard shortcuts', () => {

@@ -2,7 +2,7 @@
 .composition-heading + div > .ds-stack { max-inline-size: 70ch; }
 .composition-heading { margin-block-end: var(--ds-space-component-gapLarge); align-items: end; }
 .ds-composition-gallery pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--ds-typography-size-small); }
-.patterns-panel { padding: clamp(1rem, 3vw, 2.5rem); }
+.patterns-panel { padding: clamp(.75rem, 2vw, 1.5rem); }
 .patterns-content { grid-template-columns: minmax(0, 1fr); }
 .patterns-content > .inspector { display: none; }
 .composition-demo { margin-block: var(--ds-space-component-gapLarge); }
@@ -11,8 +11,8 @@
 .composition-object-dock { display: grid; gap: var(--ds-space-component-gapLarge); }
 .composition-tree-scroll { max-height: 13rem; }
 .composition-inspector-scroll { max-height: 26rem; }
-.composition-tab-panel { margin-block-start: var(--ds-space-component-gapLarge); }
 .composition-tab-panel[hidden] { display: none; }
+.composition-workbench { display: flex; flex-direction: column; gap: var(--ds-space-component-gapLarge); min-width: 0; }
 .composition-workspace { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 17rem)); gap: var(--ds-space-component-gapLarge); align-content: start; align-items: start; }
 .composition-object-preview { max-inline-size: 17rem; }
 .composition-object-preview .ds-card__body > .ds-stack { align-items: start; }
@@ -24,9 +24,9 @@
 .composition-resource-layout > * { min-width: 0; }
 .composition-resource-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 20rem)); gap: var(--ds-space-component-gapLarge); align-items: start; }
 .composition-resource-grid .ds-card__body > .ds-stack { align-items: start; }
+.composition-resource-card[data-selected="true"] { border-color: var(--ds-color-focus); }
 .composition-resource-list { display: grid; gap: var(--ds-space-component-gap); }
 .composition-resource-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--ds-space-component-gap); align-items: center; }
-.composition-properties form { margin-block-start: var(--ds-space-component-gapLarge); }
 @container (max-width: 700px) {
   .composition-object-editor, .composition-list-detail, .composition-resource-layout, .composition-resource-filters { grid-template-columns: minmax(0, 1fr); }
   .composition-resource-row { grid-template-columns: minmax(0, 1fr); }

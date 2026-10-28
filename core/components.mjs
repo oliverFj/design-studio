@@ -1,5 +1,6 @@
 import {getComponents, brandAssetDataURL} from './engine.mjs';
-export { createLayout } from './layout.mjs';
+export { createLayout, generateAppShellCSS } from './layout.mjs';
+export { mountPanelControls } from './panels.mjs';
 import {COMPONENT_LIBRARY, canonicalComponentId, canonicalVariantId, canonicalStateId, canonicalPartId} from './library.mjs';
 
 const tags=new Set(['div','span','p','strong','label','button','input','select','option','h1','h2','h3','h4','h5','h6','hr','section','article','header','footer','dialog','textarea','ul','li','img','dl','dt','dd']);
@@ -25,6 +26,7 @@ function model(pack,id,options,components,depth=0){
  if(depth>12)throw new Error('Component composition exceeds maximum depth 12.');
  if(pack.schemaVersion===2)id=canonicalComponentId(id);
  const component=components[id];if(!component)throw new Error('Unknown shared component: '+id);
+ if(options.controlVariant!==undefined&&(!['field','choice-field'].includes(id)||options.controlVariant!=='desktop'))throw new Error('Unsupported control variant: '+options.controlVariant);
  let iconAsset;
  if(id==='action-button'&&options.iconAssetId!==undefined){iconAsset=pack.brand?.assets?.find(asset=>asset.id===options.iconAssetId);if(!iconAsset||!iconAsset.mimeType.startsWith('image/'))throw new Error('Unknown approved icon image asset: '+options.iconAssetId);}
  const identifier=prefix(options), slots=Object.fromEntries(Object.entries(options.slots??{}).map(([key,value])=>[pack.schemaVersion===2?canonicalPartId(id,key):key,value]));
@@ -57,8 +59,7 @@ function model(pack,id,options,components,depth=0){
   if(!slotApplied&&part&&Object.hasOwn(slots,part)){
    const slot=slots[part];
    if(typeof slot==='string'){node.text=slot;delete node.children;}
-   else if(Array.isArray(slot)){node.children=slot;delete node.text;if(node.tag==='p')node.tag='div';}
-   else if(slot?.component){node.children=[slot];delete node.text;if(node.tag==='p')node.tag='div';}
+   else if(Array.isArray(slot)||slot?.component){node.children=Array.isArray(slot)?slot:[slot];delete node.text;if(node.tag==='p'||/^h[1-6]$/.test(node.tag))node.tag='div';}
    else if(slot&&typeof slot==='object'){node={...slot,part};}
    else throw new Error('Expected text or declarative nodes in component slot '+part);
   }
@@ -91,6 +92,10 @@ function model(pack,id,options,components,depth=0){
    if(part==='label'){attrs.for=identifier+'-control';if(options.label!==undefined)node.text=String(options.label);}
    if(part==='control'){
     attrs.id=identifier+'-control';
+    if(options.controlVariant){
+     if(!['input','select'].includes(node.tag))throw new Error('Desktop field controls require a native input or select.');
+     attrs['data-variant']=options.controlVariant;
+    }
     const described=[];if(component.parts.hint&&hasHint)described.push(identifier+'-hint');if(hasError)described.push(identifier+'-error');
     if(described.length)attrs['aria-describedby']=described.join(' ');
     if(hasError)attrs['aria-invalid']='true';
@@ -121,6 +126,7 @@ function serialize(node){
 }
 /** Safe HTML from the same shared declarative implementation used by createComponent.
  * options: variant, state, idPrefix, text, slots, attrs and native control values.
+ * field/choice-field accept controlVariant: 'desktop' independently of validation state.
  * slots accept escaped text, declarative nodes, arrays or {component, options}.
  * Dialog returns a native dialog host: call showModal()/close() in the product.
  */
@@ -128,7 +134,15 @@ export function renderComponent(pack,id,options={}) {return serialize(model(pack
 /** Build native DOM without innerHTML. Attach product event handlers to the returned node. */
 export function createComponent(pack,id,options={}, {document=globalThis.document}={}) {
  if(!document?.createElement)throw new Error('createComponent requires a DOM document.');
- const tree=model(pack,id,options,getComponents(pack));
+ return createNative(model(pack,id,options,getComponents(pack)),document);
+}
+/** Build a product screen from one validated theme snapshot. Recreate after theme edits. */
+export function createComponentFactory(pack,{document=globalThis.document}={}) {
+ if(!document?.createElement)throw new Error('createComponentFactory requires a DOM document.');
+ const snapshot=structuredClone(pack),components=getComponents(snapshot);
+ return (id,options={})=>createNative(model(snapshot,id,options,components),document);
+}
+function createNative(tree,document) {
  function create(node){
   const element=document.createElement(node.tag);
   for(const [name,value]of Object.entries(node.attrs??{}))element.setAttribute(name,value===true?'':value);

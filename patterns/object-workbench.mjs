@@ -1,4 +1,4 @@
-import { createComponent, createLayout, mountTree } from '../core/components.mjs';
+import { createComponentFactory, createLayout, mountTree } from '../core/components.mjs';
 
 // Adapted from FormLab's object-panel.js and inspector in ui.js (2026-10-27).
 // The model is deliberately generic; geometry and application commands stay in the product.
@@ -19,11 +19,12 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
   state.selectedIds ||= state.selected ? [state.selected] : [];
   state.query ||= ''; state.tab ||= 'properties'; state.folds ||= {}; state.drafts ||= {};
   for (const item of state.objects) { item.kind ||= state.objects.some(child => child.parent === item.id) ? 'group' : 'object'; item.locked ??= false; }
-  const c = (id, options = {}) => createComponent(theme, id, options, { document });
+  const c = createComponentFactory(theme, { document });
   const el = (tag, className = '') => { const node = document.createElement(tag); node.className = className; return node; };
   const stack = (...children) => { const node = c('stack'); node.replaceChildren(...children); return node; };
-  const field = (key, label, value, options = {}) => c('field', { label, value, hint: '', idPrefix: prefix + '-' + key, ...options });
-  const button = (text, action, options = {}) => c('button', { text, attrs: { 'data-action': action }, ...options });
+  const compact = (...children) => { const node = c('stack', { variant: 'compact' }); node.replaceChildren(...children); return node; };
+  const field = (key, label, value, options = {}) => c('field', { label, value, hint: '', controlVariant: 'desktop', idPrefix: prefix + '-' + key, ...options });
+  const button = (text, action, options = {}) => c('button', { text, variant: 'desktop', attrs: { 'data-action': action }, ...options });
   const card = (title, ...children) => {
     const node = c('card', { slots: { header: { component: 'heading', options: { text: title, variant: 'panel' } }, body: '', footer: '' } });
     node.querySelector('.ds-card__body').replaceChildren(...children); node.querySelector('.ds-card__footer').remove(); return node;
@@ -42,7 +43,9 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
   const search = field('object-search', 'Find objekt', state.query, { type: 'search', hint: 'Søgning bevarer matchende objekters placering i hierarkiet.' });
   const inspectorHost = el('div', 'composition-properties');
   dock.append(card('Objekter', stack(summary, search, scroll(treeHost, 'Objekter', 'composition-tree-scroll'))), inspectorHost);
-  layout.append(card('Arbejdsområde', preview), dock);
+  const workspace = el('section', 'composition-workbench'); workspace.setAttribute('aria-labelledby', prefix + '-workspace-title');
+  workspace.append(c('heading', { text: 'Arbejdsområde', variant: 'panel', attrs: { id: prefix + '-workspace-title' } }), preview);
+  layout.append(workspace, dock);
   const status = c('text', { text: 'Ctrl/⌘-klik eller Shift i træet vælger flere. Gruppehandlinger ændrer ikke valget.', variant: 'small', attrs: { role: 'status', 'aria-live': 'polite' } });
   root.append(layout, status);
   let tree;
@@ -94,7 +97,7 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
       node.addEventListener('click', event => {
         const ids = event.ctrlKey || event.metaKey ? state.selectedIds.includes(item.id) ? state.selectedIds.filter(id => id !== item.id) : [...state.selectedIds, item.id] : [item.id]; choose(ids, true);
       });
-      const tile = card(item.label, stack(c('text', { text: item.kind === 'group' ? 'Gruppe' : 'Objekt', variant: 'small' }), c('text', { text: 'Bredde: ' + item.width, variant: 'secondary' }), node));
+      const tile = card(item.label, compact(c('text', { text: item.kind === 'group' ? 'Gruppe' : 'Objekt', variant: 'small' }), c('text', { text: 'Bredde: ' + item.width, variant: 'secondary' }), node));
       tile.className += ' composition-object-preview';
       return tile;
     });
@@ -125,7 +128,7 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
     const apply = button('Anvend', 'apply-properties', { disabled: locked, attrs: { type: 'submit', 'data-action': 'apply-properties' } });
     name?.querySelector('input').addEventListener('input', event => { draft.name = event.target.value; });
     width.querySelector('input').addEventListener('input', event => { draft.width = event.target.value; });
-    form.append(stack(...(name ? [name] : []), disclosure('dimensions', 'Mål', width), apply));
+    form.append(compact(...(name ? [name] : []), disclosure('dimensions', 'Mål', width), apply));
     form.addEventListener('submit', event => {
       event.preventDefault(); if (locked) return;
       const invalid = {}, hasWidth = Boolean(draft.width.trim());
@@ -138,7 +141,7 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
     });
     const propertyContent = stack(...(locked ? [c('instruction-note', { text: 'Udvalget indeholder låste objekter. Lås gruppen op i træet for at redigere.' })] : []), form);
     const parents = [...new Set(selection.map(item => item.parent ? itemById(item.parent).label : 'Uden gruppe'))];
-    const relations = stack(c('heading', { text: 'Gruppemedlemskab', variant: 'panel' }), c('text', { text: parents.join(' · ') }), c('text', { text: 'Træet viser ejerskab. Flytning sker gennem Handlinger og har et klikbart alternativ til træk.', variant: 'small' }));
+    const relations = compact(c('heading', { text: 'Gruppemedlemskab', variant: 'panel' }), c('text', { text: parents.join(' · ') }), c('text', { text: 'Træet viser ejerskab. Flytning sker gennem Handlinger og har et klikbart alternativ til træk.', variant: 'small' }));
     const moveAllowed = !locked && selection.every(item => item.kind !== 'group');
     const parentIds = [...new Set(selection.map(item => item.parent || ''))];
     const target = field('move-target', 'Flyt til gruppe', parentIds.length === 1 ? parentIds[0] : '__mixed__', {
@@ -157,7 +160,7 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
       for (const item of selection) { if (groupId) item.parent = groupId; else delete item.parent; }
       reveal(state.selectedIds); refreshTree(); renderPreview(); renderInspector(); inspectorHost.querySelector('[data-tab="actions"]').focus(); notify('Udvalget er flyttet.');
     });
-    const actions = stack(c('text', { text: 'Handlinger gælder udvalget. Gruppevalg og låste objekter kan ikke flyttes her.', variant: 'small' }), target, move);
+    const actions = compact(c('text', { text: 'Handlinger gælder udvalget. Gruppevalg og låste objekter kan ikke flyttes her.', variant: 'small' }), target, move);
     const tabs = c('segmented-control', { variant: 'wrap' }); tabs.replaceChildren(); tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', 'Objektoplysninger');
     const sections = [['properties', 'Egenskaber', propertyContent], ['relations', 'Relationer', relations], ['actions', 'Handlinger', actions]];
     const panels = [], tabNodes = [];
@@ -167,7 +170,7 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
       if (focus) tabNodes[sections.findIndex(([value]) => value === id)].focus();
     }
     for (const [id, label, content] of sections) {
-      const tab = c('segmented-option', { text: label, attrs: { role: 'tab', id: prefix + '-tab-' + id, 'aria-controls': prefix + '-panel-' + id, 'data-tab': id } });
+      const tab = c('segmented-option', { text: label, variant: 'desktop', attrs: { role: 'tab', id: prefix + '-tab-' + id, 'aria-controls': prefix + '-panel-' + id, 'data-tab': id } });
       tab.removeAttribute('aria-pressed');
       const panel = el('div', 'composition-tab-panel'); panel.setAttribute('role', 'tabpanel'); panel.setAttribute('id', prefix + '-panel-' + id); panel.setAttribute('aria-labelledby', prefix + '-tab-' + id);
       panel.append(scroll(content, label, 'composition-inspector-scroll'));

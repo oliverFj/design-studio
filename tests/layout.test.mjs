@@ -19,7 +19,8 @@ test('shared profiles create optional native wrappers without imposing columns o
   }
   assert.throws(() => createLayout('unknown', { document }), /Ukendt breddeprofil/);
   const css = generateLayoutCSS();
-  assert.doesNotMatch(css, /padding|grid-template|display:/);
+  const profileRules = [...css.matchAll(/[^{}]*\.ds-layout[^{}]*\{([^{}]*)\}/g)].map(match => match[1]).join('\n');
+  assert.doesNotMatch(profileRules, /padding|grid-template|display:/);
   assert.match(css, /--ds-layout-max-width: initial/); // Nested layouts reset inherited local overrides.
   assert.match(css, /max-inline-size: var\(--ds-layout-max-width, 44rem\)/);
   assert.throws(() => generateLayoutCSS('.scope } body {'), /CSS scope/);

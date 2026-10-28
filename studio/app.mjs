@@ -2,8 +2,13 @@ import { createBrandStudio } from './brand.mjs';
 
 import { validatePackage, resolveTokens, generateCSS, validateCompatibility, getComponents, materializePackage, migratePackage } from '../core/engine.mjs';
 
-import { renderComponent } from '../core/components.mjs';
-import { DEFAULT_TOKENS, COMPONENT_LIBRARY } from '../core/library.mjs';
+import { renderComponent, mountPanelControls } from '../core/components.mjs';
+import { DEFAULT_TOKENS, COMPONENT_LIBRARY, TOKEN_ALIASES } from '../core/library.mjs';
+import { tokenUsageReport } from '../core/token-usage.mjs';
+import { usageLabel, usageDetails } from './token-usage.mjs';
+import { createQualityStudio } from './quality.mjs';
+import { createViewMemory } from './view-state.mjs';
+import { generateAppShellCSS, generateScrollbarCSS } from '../core/layout.mjs';
 import { createProjectOverview, createProjectOverviewDraft } from './project-overview.mjs';
 import bundledThemes from './bundled-themes.mjs';
 import { createThemeStorage } from './theme-storage.mjs';
@@ -11,6 +16,13 @@ import { readJSONFile, downloadFile } from '../core/files.mjs';
 import { mountCompositionGallery, createGalleryState } from '../patterns/gallery.mjs';
 
 const root = document.querySelector('#app');
+const shellStyle = document.createElement('style');
+shellStyle.textContent = generateAppShellCSS('#app') + '\n' + generateScrollbarCSS('#app');
+document.head.append(shellStyle);
+const viewMemory = createViewMemory({ document });
+let renderedView = null;
+const inspectorPanel = { open: true, width: 310 };
+let inspectorControls;
 const state = { packages: [], key: null, file: '', pack: null, saved: '', view: 'components', mode: 'catalog', component: 'button', token: null, variants: {}, recipeDraft: null, error: '', busy: false };
 const exampleDraft = createProjectOverviewDraft();
 const galleryState = createGalleryState();
@@ -19,9 +31,10 @@ const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp
 const clone = value => structuredClone(value);
 const themeStorage = createThemeStorage(bundledThemes, { download });
 const brandStudio = createBrandStudio(state, {escape, field, edited, render, notice, allowNavigation, download});
+const qualityStudio = createQualityStudio(state, {escape, validation:()=>validation(), render, notice});
 const icon = name => {
-  const paths = { patterns:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M14 3v18M3 10h11M14 14h7"/>', brand:'<path d="M4 5h16v14H4zM8 9h8M8 13h5"/><path d="m17 15 2 2"/>', components:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>', tokens:'<path d="M12 3 21 8v8l-9 5-9-5V8zM3 8l9 5 9-5M12 13v8"/>', package:'<path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/>' };
-  return '<svg viewBox="0 0 24 24" aria-hidden="true">'+paths[name]+'</svg>';
+  const paths = { quality:'<path d="M5 4h14v16H5zM8 9l2 2 5-5M8 15h8"/>', patterns:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M14 3v18M3 10h11M14 14h7"/>', brand:'<path d="M4 5h16v14H4zM8 9h8M8 13h5"/><path d="m17 15 2 2"/>', components:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>', tokens:'<path d="M12 3 21 8v8l-9 5-9-5V8zM3 8l9 5 9-5M12 13v8"/>', package:'<path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/>' };
+  return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(paths[name] || paths.components)+'</svg>';
 };
 let readModel = null, lastValidModel = null, lastPreviewTheme = null;
 const previewTheme = () => lastPreviewTheme || state.pack;
@@ -33,6 +46,12 @@ const model = () => {
 };
 const components = () => model().components;
 const themeTokens = () => model().tokens;
+let usageModel=null,usageCache=null;
+function tokenUsage(){
+  const current=model();
+  if(usageModel!==current){usageModel=current;usageCache=tokenUsageReport(current,{compatibilityTokens:[...Object.keys(TOKEN_ALIASES),'size.switch.checkedOffset']});}
+  return usageCache;
+}
 const editableToken = () => state.pack.tokens[state.token] ||= clone(themeTokens()[state.token]);
 const dirty = () => state.pack && (JSON.stringify(state.pack) !== state.saved || state.recipeDraft !== null);
 const validation = () => state.pack ? validatePackage(state.pack) : { valid: false, errors: [] };
@@ -121,28 +140,25 @@ function componentInspector() {
     '<details class="code-details"><summary>Se komponentdefinition</summary><p class="help">Struktur og grundlayout kommer fra det fælles bibliotek. Tilpas temaets værdier under Tokens.</p><pre>'+escape(JSON.stringify(component,null,2))+'</pre></details><div id="validation-errors" class="error-box" hidden></div>';
 }
 function tokensView() {
-  let resolved={}; try {resolved=resolveTokens(state.pack);} catch {}
+  const usage=tokenUsage();
   const groups=new Map();
   for (const [id,token] of Object.entries(themeTokens())) {
     const group=id.split('.')[0];
     if (!groups.has(group)) groups.set(group,[]);
     groups.get(group).push([id,token]);
   }
-  return '<div class="canvas-toolbar"><h2>Tokens <span class="count">'+Object.keys(themeTokens()).length+'</span></h2></div><div class="token-list">'+[...groups].map(([group,tokens]) => '<section class="token-group"><h3>'+escape(groupName(group))+'</h3>'+tokens.map(([id,token]) => '<button type="button" class="token-item '+(id===state.token?'selected':'')+'" data-token="'+escape(id)+'" aria-pressed="'+(id===state.token)+'"><span class="swatch" data-swatch="'+escape(id)+'"></span><span class="token-name">'+escape(id)+'</span><span class="token-value" data-value="'+escape(id)+'">'+escape(token.$value)+'</span></button>').join('')+'</section>').join('')+'</div>';
+  return '<div class="canvas-toolbar"><h2>Tokens <span class="count">'+Object.keys(themeTokens()).length+'</span></h2></div><p class="help">I brug omfatter også værdier, der påvirker komponenter gennem andre tokens. Referencer kan stadig bruges i produktets egen kode.</p><div class="token-list">'+[...groups].map(([group,tokens]) => '<section class="token-group"><h3>'+escape(groupName(group))+'</h3>'+tokens.map(([id,token]) => '<button type="button" class="token-item '+(id===state.token?'selected':'')+'" data-token="'+escape(id)+'" aria-pressed="'+(id===state.token)+'"><span class="swatch" data-swatch="'+escape(id)+'"></span><span class="token-name">'+escape(id)+'<small class="token-usage-status" data-usage="'+escape(id)+'">'+escape(usageLabel(usage[id]))+'</small></span><span class="token-value" data-value="'+escape(id)+'">'+escape(token.$value)+'</span></button>').join('')+'</section>').join('')+'</div>';
 }
 function tokenInspector() {
   const id=state.token, token=themeTokens()[id];
   if (!token) return '<p class="help">Vælg et token.</p>';
   let value=token.$value;try{value=resolveTokens(state.pack)[id];}catch{}
-  const users=Object.entries(components()).filter(([,component])=>JSON.stringify(component).includes('{'+id+'}'));
-  const aliases=Object.entries(themeTokens()).filter(([,t])=>t.$value==='{'+id+'}');
   const hex=token.$type==='color' && /^#[0-9a-f]{6}$/i.test(String(token.$value));
   return '<div class="inspector-heading">Token</div><h2>'+escape(groupName(id.split('.')[0]))+'</h2><p class="inspector-id">'+escape(id)+'</p><div class="property-row"><span>Type</span><span>'+escape(token.$type)+'</span></div><div class="inspector-section">'+field('token-value','Værdi',token.$value)+
     (hex?'<div class="color-editor"><input type="color" id="token-color" value="'+escape(token.$value)+'" aria-label="Vælg farve"><span class="help">Vælg en farve</span></div>':'')+
     '<p class="help">Henvis til et andet token med <code>{token.navn}</code>.</p>'+field('token-description','Beskrivelse',token.description,{textarea:true})+'</div>'+
     '<div class="inspector-section"><h3>Aktuel værdi</h3><div class="token-example" id="token-example">'+escape(value)+'</div></div>'+
-    '<div class="inspector-section"><h3>Bruges af</h3>'+(users.length?users.map(([id,component])=>'<button type="button" class="token-ref" data-component="'+escape(id)+'">'+escape(component.name)+'</button>').join(''):'<p class="help">Ingen direkte komponenthenvisninger.</p>')+
-    aliases.map(([alias])=>'<button type="button" class="token-ref" data-token="'+escape(alias)+'">'+escape(alias)+'</button>').join('')+'</div><div id="validation-errors" class="error-box" hidden></div>';
+    '<div class="inspector-section" id="token-usage-content">'+usageDetails(tokenUsage()[id],components(),escape)+'</div><div id="validation-errors" class="error-box" hidden></div>';
 }
 function packageView() {
   return '<div class="canvas-toolbar"><h2>Temaets oplysninger</h2></div><section class="meta-panel">'+field('package-name','Navn',state.pack.name)+field('package-description','Beskrivelse',state.pack.description,{textarea:true})+''+(state.pack.schemaVersion === 1 ? '<div class="error-box">Dette er en tidligere designpakke. Konvertér den til et tema for at bruge det fælles bibliotek.<button type="button" class="studio-button" id="migrate-theme">Konvertér til tema</button><p>Konverteringen vises først som en kladde. Eksportér en kopi, eller gem ændringen efter gennemgang.</p></div>' : '')+'<p class="file-info">'+escape(state.file)+'</p><details class="code-details"><summary>Se hele designpakken</summary><pre>'+escape(JSON.stringify(state.pack,null,2))+'</pre></details></section><section class="meta-panel" style="margin-top:18px"><h3>Ændringshistorik</h3>'+(state.pack.history || []).slice().reverse().map(entry=>'<div class="history-entry"><time>'+escape(entry.date)+'</time>'+escape(entry.note)+'</div>').join('')+'</section>';
@@ -152,13 +168,15 @@ function packageInspector() {
 }
 function render() {
   if (!state.pack) return;
+  if (renderedView !== null) viewMemory.capture(root, renderedView);
+  inspectorControls?.destroy(); inspectorControls = null;
   compositionGallery?.destroy(); compositionGallery=null;
   readModel = null;
   if(location.protocol !== 'file:') {
     const currentURL=new URL(location.href);currentURL.searchParams.set('package',state.key);currentURL.searchParams.set('view',state.view);currentURL.searchParams.set('mode',state.mode);history.replaceState(null,'',currentURL);
   }
   cssPreview();
-  root.innerHTML='<div class="shell"><aside class="sidebar"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Design Studio</div><div><div class="side-label">Designsystem</div><nav class="navigation" aria-label="Design Studio">'+[['brand','Brandguide'],['components','Komponenter'],['patterns','Designmønstre'],['tokens','Tokens'],['package','Temaet']].map(([view,name])=>'<button type="button" class="nav-item '+(state.view===view?'active':'')+'" data-view="'+view+'" '+(state.view===view?'aria-current="page"':'')+'>'+icon(view)+name+'</button>').join('')+'</nav></div><div class="side-footer"><strong>Fælles struktur. Eget udtryk.</strong>Fælles bibliotek · temaer</div></aside><main class="workspace"><header class="topbar"><div class="breadcrumb">Design Studio <span>/</span><strong>'+(state.view==='patterns'?'Designmønstre':'Temaer')+'</strong></div><div class="actions"><button type="button" class="studio-button quiet" id="discard" hidden>Fortryd ændringer</button><button type="button" class="studio-button" id="import">Åbn tema</button><button type="button" class="studio-button primary" id="save">Gem tema</button><input type="file" id="import-file" accept=".json,application/json" hidden></div></header><div class="page-heading"><div><p class="eyebrow">Komponentbibliotek og temaer</p><h1>'+escape(state.pack.name)+'</h1><p class="page-description">'+escape(state.pack.description)+'</p></div><label class="package-picker" for="package-select">Aktivt tema<select id="package-select">'+state.packages.map(pack=>'<option value="'+escape(pack.key)+'" '+(pack.key===state.key?'selected':'')+'>'+escape(pack.name)+'</option>').join('')+'</select></label></div><div class="content'+(state.view==='patterns'?' patterns-content':'')+'"><section class="canvas" aria-label="Designindhold">'+(state.view==='brand'?brandStudio.content():state.view==='components'?componentsView():state.view==='patterns'?patternsView():state.view==='tokens'?tokensView():packageView())+'</section><aside class="inspector" aria-label="Egenskaber">'+(state.view==='brand'?brandStudio.inspector():state.view==='components'?componentInspector():state.view==='patterns'?'':state.view==='tokens'?tokenInspector():packageInspector())+'</aside></div><footer id="status-bar" class="status-bar" role="status"></footer></main></div>';
+  root.innerHTML='<a class="studio-skip" href="#studio-content">Gå til indhold</a><div class="shell ds-app-shell"><aside data-scrollbar-surface="inverse" class="sidebar ds-app-navigation" tabindex="0" aria-label="Designsystemets navigation"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Design Studio</div><div><div class="side-label">Designsystem</div><nav class="navigation" aria-label="Design Studio">'+[['brand','Brandguide'],['components','Komponenter'],['patterns','Designmønstre'],['tokens','Tokens'],['quality','Kvalitet'],['package','Temaet']].map(([view,name])=>'<button type="button" class="nav-item '+(state.view===view?'active':'')+'" data-view="'+view+'" '+(state.view===view?'aria-current="page"':'')+'>'+icon(view)+name+'</button>').join('')+'</nav></div><div class="side-footer"><strong>Fælles struktur. Eget udtryk.</strong>Fælles bibliotek · temaer</div></aside><div class="workspace ds-app-workspace"><header class="topbar ds-app-header"><div class="breadcrumb">Design Studio <span>/</span><strong>'+(state.view==='patterns'?'Designmønstre':state.view==='quality'?'Kvalitet':'Temaer')+'</strong></div><div class="actions"><button type="button" class="studio-button quiet" id="toggle-inspector" aria-controls="studio-inspector"'+(state.view==='patterns'?' hidden':'')+'>'+(inspectorPanel.open?'Skjul egenskaber':'Vis egenskaber')+'</button><button type="button" class="studio-button quiet" id="discard" hidden>Fortryd ændringer</button><button type="button" class="studio-button" id="import">Åbn tema</button><button type="button" class="studio-button primary" id="save">Gem tema</button><input type="file" id="import-file" accept=".json,application/json" hidden></div></header><main id="studio-main" class="ds-app-content studio-main" tabindex="-1" aria-label="Design Studio – indhold"><div class="page-heading"><div><p class="eyebrow">Komponentbibliotek og temaer</p><h1>'+escape(state.pack.name)+'</h1><p class="page-description">'+escape(state.pack.description)+'</p></div><label class="package-picker" for="package-select">Aktivt tema<select id="package-select">'+state.packages.map(pack=>'<option value="'+escape(pack.key)+'" '+(pack.key===state.key?'selected':'')+'>'+escape(pack.name)+'</option>').join('')+'</select></label></div><div class="content ds-panel-layout'+(state.view==='patterns'?' patterns-content':'')+'" data-panel-open="'+(state.view!=='patterns'&&inspectorPanel.open)+'"><section id="studio-content" class="canvas ds-panel-content" tabindex="0" aria-label="Designindhold">'+(state.view==='brand'?brandStudio.content():state.view==='components'?componentsView():state.view==='patterns'?patternsView():state.view==='tokens'?tokensView():state.view==='quality'?qualityStudio.content():packageView())+'</section><button type="button" id="inspector-resize" class="inspector-resize ds-panel-resize" aria-label="Tilpas egenskabspanelets bredde"></button><aside id="studio-inspector" class="inspector ds-panel-side" tabindex="0" aria-label="Egenskaber">'+(state.view==='brand'?brandStudio.inspector():state.view==='components'?componentInspector():state.view==='patterns'?'':state.view==='tokens'?tokenInspector():state.view==='quality'?qualityStudio.inspector():packageInspector())+'</aside></div></main><footer id="status-bar" class="status-bar ds-app-footer" role="status"></footer></div></div>';
   document.querySelectorAll('[data-swatch]').forEach(el=> {
     const id=el.dataset.swatch;
     if(themeTokens()[id].$type==='color') {try {el.style.backgroundColor=resolveTokens(state.pack)[id];}catch{}}
@@ -173,6 +191,19 @@ function render() {
   }
   bind();
   refreshStatus();
+  if (state.view !== 'patterns') {
+    inspectorControls = mountPanelControls({
+      container: root.querySelector('.ds-panel-layout'), panel: root.querySelector('#studio-inspector'),
+      handle: root.querySelector('#inspector-resize'), toggle: root.querySelector('#toggle-inspector'),
+      width: inspectorPanel.width, open: inspectorPanel.open, document,
+      onChange: value => {
+        Object.assign(inspectorPanel, value);
+        root.querySelector('#toggle-inspector').textContent = value.open ? 'Skjul egenskaber' : 'Vis egenskaber';
+      },
+    });
+  }
+  renderedView = state.view + ':' + state.mode;
+  viewMemory.restore(root, renderedView);
 }
 async function load(key, checkCompatibility=false) {
   const data=await themeStorage.read(key);
@@ -192,7 +223,15 @@ function allowNavigation() {
   if(state.recipeDraft!==null) { notice('Anvend komponentopskriften, eller fortryd ændringerne, før du skifter visning.',true);return false; }
   return true;
 }
-function edited() { readModel = null; cssPreview();refreshStatus(); }
+function edited() {
+  readModel = null; qualityStudio.invalidate(); cssPreview();refreshStatus();
+  if(state.view==='tokens'){
+    const usage=tokenUsage();
+    document.querySelectorAll('[data-usage]').forEach(node=>{node.textContent=usageLabel(usage[node.dataset.usage]);});
+    const details=document.querySelector('#token-usage-content');
+    if(details){details.innerHTML=usageDetails(usage[state.token],components(),escape);bindInspectionLinks(details);}
+  }
+}
 function changeToken(value) {
   const token=editableToken();
   token.$value=['fontWeight','number'].includes(token.$type) && value.trim()!=='' && Number.isFinite(Number(value)) ? Number(value) : value;
@@ -208,16 +247,20 @@ function changeToken(value) {
 function download(name,body,type) {
   downloadFile(name,body,type);
 }
+function bindInspectionLinks(scope=document){
+  scope.querySelectorAll('[data-component]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.component=el.dataset.component;state.view='components';render();}}));
+  scope.querySelectorAll('[data-token]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.token=el.dataset.token;state.view='tokens';render();}}));
+}
 function bind() {
   document.querySelector('#migrate-theme')?.addEventListener('click', () => {
     try { state.pack = migratePackage(state.pack); state.variants = {}; render(); notice('Temaet er konverteret som en kladde. Gennemgå det, og gem eller eksportér.'); }
     catch (error) { notice(error.message, true); }
   });
   brandStudio.bind();
+  qualityStudio.bind();
   document.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.view=el.dataset.view;render();}}));
   document.querySelectorAll('[data-mode]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.mode=el.dataset.mode;render();}}));
-  document.querySelectorAll('[data-component]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.component=el.dataset.component;state.view='components';render();}}));
-  document.querySelectorAll('[data-token]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.token=el.dataset.token;state.view='tokens';render();}}));
+  bindInspectionLinks();
   document.querySelector('#package-select').addEventListener('change',async event=>{
     if(dirty() && !confirm('Du har ændringer, der ikke er gemt. Vil du skifte pakke og kassere ændringerne?')){event.target.value=state.key;return;}
     try{await load(event.target.value,true);}catch(error){event.target.value=state.key;notice(error.message,true);}
@@ -264,7 +307,7 @@ try{
   const params=new URLSearchParams(location.search);
   const requested=params.get('package');
   if(['catalog','example'].includes(params.get('mode')))state.mode=params.get('mode');
-  if(['brand','components','patterns','tokens','package'].includes(params.get('view')))state.view=params.get('view');
+  if(['brand','components','patterns','tokens','quality','package'].includes(params.get('view')))state.view=params.get('view');
   if(params.get('mode')==='patterns')state.view='patterns';
   const first=data.packages.find(p=>p.key===requested)?.key || data.packages.find(p=>p.id==='studio-light')?.key || data.packages[0]?.key;
   if(!first)throw new Error('Der er ingen designpakker. Tilføj en pakke i mappen packages, og åbn Design Studio igen.');

@@ -6,6 +6,7 @@ Thumbs.db
 # Byggeprodukter og lokal konfiguration
 /artifacts/
 /index.html
+/examples/workspace/index.html
 *.log
 .env
 .env.*

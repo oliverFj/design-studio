@@ -1,4 +1,4 @@
-import { createComponent, createLayout } from '../core/components.mjs';
+import { createComponentFactory, createLayout } from '../core/components.mjs';
 import { COMPOSITIONS } from './catalog.mjs';
 import { createObjectWorkbenchState, mountObjectWorkbench } from './object-workbench.mjs';
 import { createResourceLibraryState, mountResourceLibrary } from './resource-library.mjs';
@@ -31,7 +31,7 @@ export function mountComposition(theme, id, {
   if (id === 'history') return mountHistoryEditor(theme, { document, state, announce, onChange, idPrefix });
   const prefix = String(idPrefix).replace(/[^a-zA-Z0-9_-]/g, '-');
   const cleanups = [];
-  const component = (name, options = {}) => createComponent(theme, name, options, { document });
+  const component = createComponentFactory(theme, { document });
   const element = (tag, className = '') => { const node = document.createElement(tag); node.className = className; return node; };
   const root = createLayout(COMPOSITIONS[id].layout, { document });
   root.className += ' ds-composition ds-scope';
@@ -39,6 +39,7 @@ export function mountComposition(theme, id, {
   root.setAttribute('role', 'region');
   const listen = (node, event, handler) => { node.addEventListener(event, handler); cleanups.push(() => node.removeEventListener(event, handler)); };
   const stack = (...children) => { const node = component('stack'); node.replaceChildren(...children); return node; };
+  const compact = (...children) => { const node = component('stack', { variant: 'compact' }); node.replaceChildren(...children); return node; };
   const card = (title, children) => {
     const node = component('card', { slots: { header: { component: 'heading', options: { text: title, variant: 'panel' } }, body: '', footer: '' } });
     node.querySelector('.ds-card__body').replaceChildren(...children);
@@ -60,9 +61,9 @@ export function mountComposition(theme, id, {
       const save = button('Gem indstillinger', 'save-form', { attrs: { type: 'submit', 'data-action': 'save-form' } });
       const reset = button('Fortryd ændringer', 'reset-form', { variant: 'secondary' });
       const actions = element('div', 'composition-actions'); actions.append(save, reset);
-      const content = [stack(name, email, checkbox, actions)];
+      const content = [name, email, checkbox, actions];
       if (saved) content.push(component('alert', { slots: { title: 'Gemt i eksemplet', body: 'Indstillingerne bevares, mens du skifter tema. Ingen fil er skrevet.' } }));
-      form.append(card('Indstillinger', content));
+      form.append(card('Indstillinger', [stack(...content)]));
       name.querySelector('input').addEventListener('input', event => { state.draft.name = event.target.value; });
       email.querySelector('input').addEventListener('input', event => { state.draft.email = event.target.value; });
       checkbox.querySelector('input').addEventListener('change', event => { state.draft.notifications = event.target.checked; });
@@ -81,7 +82,7 @@ export function mountComposition(theme, id, {
   }
 
   if (id === 'list-detail') {
-    const search = field('search', 'Søg i samlingen', state.query, { type: 'search', hint: 'Søg efter navn eller beskrivelse.' });
+    const search = field('search', 'Søg i samlingen', state.query, { type: 'search', controlVariant: 'desktop', hint: 'Søg efter navn eller beskrivelse.' });
     const list = element('div'), detail = element('div');
     const layout = element('div', 'composition-list-detail');
     layout.append(card('Samling', [stack(search, list)]), detail); root.append(layout, status);
@@ -94,13 +95,13 @@ export function mountComposition(theme, id, {
         entry.addEventListener('click', () => { state.selected = item.id; render(); list.querySelector('[data-item="' + item.id + '"]').focus(); notify(item.title + ' er valgt.'); });
         return entry;
       });
-      list.replaceChildren(entries.length ? stack(...entries) : component('instruction-note', { text: 'Ingen poster matcher søgningen. Prøv et andet søgeord.' }));
+      list.replaceChildren(entries.length ? compact(...entries) : component('instruction-note', { text: 'Ingen poster matcher søgningen. Prøv et andet søgeord.' }));
       const selected = state.items.find(item => item.id === state.selected);
       if (!selected) { detail.replaceChildren(component('instruction-note', { text: 'Vælg en post, når der er søgeresultater.' })); return; }
       const review = button(selected.reviewed ? 'Markér som ikke gennemgået' : 'Markér som gennemgået', 'review');
       review.setAttribute('aria-pressed', String(selected.reviewed));
       review.addEventListener('click', () => { selected.reviewed = !selected.reviewed; render(true); notify('Postens status er opdateret i eksemplet.'); });
-      detail.replaceChildren(card(selected.title, [stack(component('badge', { text: selected.category }), component('text', { text: selected.description }), component('text', { text: selected.reviewed ? 'Denne post er gennemgået.' : 'Denne post afventer gennemgang.', variant: 'secondary' }), review)]));
+      detail.replaceChildren(card(selected.title, [compact(component('badge', { text: selected.category }), component('text', { text: selected.description }), component('text', { text: selected.reviewed ? 'Denne post er gennemgået.' : 'Denne post afventer gennemgang.', variant: 'secondary' }), review)]));
       if (focusAction) detail.querySelector('[data-action="review"]').focus();
     }
     listen(search.querySelector('input'), 'input', event => { state.query = event.target.value; render(); notify('Søgningen er opdateret.'); });

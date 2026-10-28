@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
-import {getComponents,materializePackage,validatePackage,generateCSS} from '../core/engine.mjs';
+import {getComponents,materializePackage,validatePackage,generateCSS,resolveTokens} from '../core/engine.mjs';
 import {renderComponent,createComponent,mountTree} from '../core/components.mjs';
+import {componentGeometryReport} from '../core/geometry.mjs';
 
 const pack=id=>JSON.parse(readFileSync(new URL(`../packages/${id}.json`,import.meta.url),'utf8').replace(/^\uFEFF/,''));
 
@@ -109,4 +110,17 @@ test('compact tree is the shared default and roomy retains the larger targets',(
   assert.match(renderComponent(theme,'tree',{variant:'roomy'}),/data-variant="roomy"/);
  }
  const {tree}=fixture();assert.equal(tree.element.getAttribute('data-variant'),'default');tree.update({variant:'roomy'});assert.equal(tree.element.getAttribute('data-variant'),'roomy');
+});
+
+test('compact row geometry fits labels, badges and native actions inside 32px in every theme',()=>{
+ for(const name of readdirSync(new URL('../packages/',import.meta.url)).filter(name=>name.endsWith('.json'))){
+  const theme=pack(name.slice(0,-5)),model=materializePackage(theme),component=model.components.tree;
+  const report=componentGeometryReport(model,resolveTokens(theme));
+  for(const variant of ['default','desktop']){
+   const check=report.find(item=>item.id==='tree.'+variant),row={...component.parts.row.styles,...component.variants[variant].parts?.row?.styles};
+   assert.equal(check.status,'pass',`${theme.id}/${variant}: ${check.details}`);
+   assert.equal(check.measured,32,`${theme.id}/${variant}: badge, actions and borders fit the compact row`);
+   assert.equal(row.height,undefined,'larger content may grow rather than clip');
+  }
+ }
 });
