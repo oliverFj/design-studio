@@ -14,7 +14,7 @@ export function mountWorkspace(theme, { document = globalThis.document, state = 
   const heading = (text, level = 2, variant = 'panel', attrs = {}) => c('heading', { variant, slots: { root: { tag: 'h' + level, text } }, attrs });
   const text = (copy, variant = 'secondary') => c('text', { text: copy, variant });
   const stack = (nodes, variant = 'compact') => { const node = c('stack', { variant }); node.replaceChildren(...nodes); return node; };
-  const button = (copy, action, variant = 'desktop') => c('button', { text: copy, variant, attrs: { 'data-action': action } });
+  const button = (copy, action, variant = 'tertiary') => c('button', { text: copy, variant, size:'small', attrs: { 'data-action': action } });
   const card = (title, content, { level = 2, className = '' } = {}) => {
     const node = c('card', { slots: { header: { tag: 'h' + level, text: title }, body: { tag: 'div' }, footer: '' } });
     node.className += className ? ' ' + className : '';

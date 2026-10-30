@@ -9,29 +9,29 @@ Læs README.md, docs/AGENT-WORKFLOW.md og docs/DESIGN-FOUNDATIONS.md før UI-arb
 - Projektet skal have npm run build, når output genereres. Agenten installerer nødvendige udviklingsafhængigheder og genbygger efter kode-, design-, tema- og ressourceændringer. Brugeren skal blot genindlæse browseren; byggeværktøjer er ikke et krav ved brug af den færdige fil.
 - Brug browserens filvælger til åbning og downloads til gemning. Gør det tydeligt, at downloads ikke automatisk overskriver originalfilen. Browserlagring kan supplere, men erstatter ikke brugerens gemte projektfiler.
 - Genbrug createProjectFile fra design/runtime/files.mjs med produktets format-id, version og datavalidering. Bevar state ved ugyldige filer eller annulleret åbning. Nye init-projekter får modulet og et åbn/gem-eksempel med fra starten.
-- Brug npm run doctor i nye startprojekter eller tools/cli.mjs doctor PROJECT_DIR fra systemmappen til at finde konkrete fejl og forældede filer. Tjekket ændrer ikke filer og erstatter ikke relevant funktionskontrol.
-- Startprojektets struktur er et udgangspunkt, ikke en fast arkitektur. tools/cli.mjs update PROJECT_DIR viser valgfrie skabelonopdateringer; --apply bevarer lokal kode og forbereder forslag til manuel fletning. Ingen opdatering er nødvendig for at bruge eller bygge produktet. Hæv STARTER_VERSION i tools/starter.mjs ved ændringer i startskabelonerne.
+- Brug npm run doctor i nye startprojekter eller tools/cli.mjs doctor PROJECT\_DIR fra systemmappen til at finde konkrete fejl og forældede filer. Tjekket ændrer ikke filer og erstatter ikke relevant funktionskontrol.
+- Startprojektets struktur er et udgangspunkt, ikke en fast arkitektur. tools/cli.mjs update PROJECT\_DIR viser valgfrie skabelonopdateringer; --apply bevarer lokal kode og forbereder forslag til manuel fletning. Ingen opdatering er nødvendig for at bruge eller bygge produktet. Hæv STARTER\_VERSION i tools/starter.mjs ved ændringer i startskabelonerne.
 - Kontrollér, at leverancen kan åbnes via file://; en fungerende udviklingsserver er ikke tilstrækkelig. Brug proportional kontrol og bevar eksisterende projekters arkitektur, medmindre en omlægning er bestilt.
 - Afvig kun, når brugerens udtrykkelige krav eller konkret nødvendig funktionalitet kræver en anden driftsmodel. Forklar da behovet; indfør ikke en server eller Windows-app alene som standardvalg.
 
 ## Ét bibliotek, flere temaer
 
 - core/library.mjs er den fælles kilde til komponenternes roller, dele, layout, varianter, tilstande og previews. core/components.mjs leverer den fælles markup og native DOM-implementering.
-- packages/*.json og projektets design/design.json er temaer i format 2. De ejer tokens, afgrænsede appearance-overrides, brandguide og historik. Temaer indeholder ikke komponentdefinitioner.
+- packages/\*.json og projektets design/design.json er temaer i format 2. De ejer tokens, afgrænsede appearance-overrides, brandguide og historik. Temaer indeholder ikke komponentdefinitioner.
 - Temaer må ikke tilsidesætte struktur, display, padding, gap, positionering eller fokusmekanik. Indvendige afstande tilpasses gennem bibliotekets positive semantiske spacingtokens.
 - Nye komponenter skal bruge eksisterende semantiske tokens eller dokumenterede centrale defaults. De skal kunne vises med alle medfølgende temaer uden nye opskrifter i hvert tema.
-- Ved hele skærme: undersøg også patterns/catalog.mjs og de valgfrie referenceeksempler. tools/cli.mjs examples PROJECT_DIR kopierer dem uden overskrivning. De er inspiration og tilpasningsbar produktkode, ikke en obligatorisk arkitektur eller nye komponentroller. Bevar ophav og licenser, når en løsning hentes fra et eksisterende produkt.
+- Ved hele skærme: undersøg også patterns/catalog.mjs og de valgfrie referenceeksempler. tools/cli.mjs examples PROJECT\_DIR kopierer dem uden overskrivning. De er inspiration og tilpasningsbar produktkode, ikke en obligatorisk arkitektur eller nye komponentroller. Bevar ophav og licenser, når en løsning hentes fra et eksisterende produkt.
 - Vælg bredde efter indholdets rolle. Genbrug profilerne fra core/layout.mjs gennem ds-layout/data-layout eller createLayout fra components.mjs. Fælles CSS og init/sync leverer dem; --ds-layout-max-width giver lokale tilpasninger uden at brede indlejrede paneler ud. Brug kun fuld bredde til indhold, der reelt udnytter den. Produktet ejer stadig kolonner og placering; se docs/DESIGN-FOUNDATIONS.md.
 
 ## Når et produkt anvender systemet
 
-1. Find design-studio.project.json og projektets tema. Mangler tilknytningen i et nyt projekt, kør tools/cli.mjs init PROJECT_DIR --theme THEME_ID; det opretter også en minimal offline-app med src-filer, npm run build og færdig index.html. Brug --design-only til eksisterende produkter med egen app-/buildopsætning. Bevar produktets eksisterende brand og instrukser.
-2. Undersøg det fælles katalog, temaets tokens/brandguide og registrerede produktadaptere. Vælg et tema efter opgaven; ingen bestemt æstetik er et systemkrav.
+1. Find design-studio.project.json og projektets tema. Mangler tilknytningen i et nyt projekt, kør tools/cli.mjs init PROJECT\_DIR --theme THEME\_ID; det opretter også en minimal offline-app med src-filer, npm run build og færdig index.html. Brug --design-only til eksisterende produkter med egen app-/buildopsætning. Bevar produktets eksisterende brand og instrukser.
+2. Undersøg det fælles katalog, temaets tokens/brandguide og registrerede produktadaptere. Brug det som inspiration eller vælg et tema efter opgaven; ingen bestemt æstetik er et systemkrav, men det skal passe til produktet.
 3. Brug runtime fra design/runtime/components.mjs eller en tynd frameworkadapter over de fælles dele. Indlæs genereret design/design.css under ds-scope. Opfind ikke en parallel lokal version af en eksisterende komponentrolle.
 4. Registrér frameworkadaptere i konfigurationens components: { "button": { "file": "src/components/Button.tsx", "export": "Button" } }. Verificér stier og exports.
 5. Genbrug først. Udvid den fælles komponent med en variant, når rollen allerede findes. Tilføj en ny fælles komponent, når en genbrugelig rolle mangler. Produktspecifikke skærme og sammensætninger kan forblive i produktet.
 6. Brug projektagnostiske navne, beskrivelser, variantnavne og eksempler. Bibliotekets principper følger Fluent 2 og Carbon; kilder og begrundelser findes i DESIGN-FOUNDATIONS.md. Nye fælles komponenter skal have navn, formål, anvendelse, parts, variants, states, composes og et deklarativt preview. Tilføj nødvendige tokens/defaults centralt. Temaerne bestemmer værdierne; biblioteket bestemmer hvordan de bruges.
-7. Kør tools/cli.mjs sync PROJECT_DIR efter tema- eller biblioteksændringer. Det kopierer runtime og regenererer CSS. Kontrollér de påvirkede komponenter visuelt og produktets relevante funktioner.
+7. Kør tools/cli.mjs sync PROJECT\_DIR efter tema- eller biblioteksændringer. Det kopierer runtime og regenererer CSS. Kontrollér de påvirkede komponenter visuelt og produktets relevante funktioner.
 8. Ved ændringer i biblioteket: kontrollér alle medfølgende temaer og opdatér website-showcase fra hjemmesidens mappe med npm run sync:design-studio og dens normale build. tools/build-showcase.mjs --out DIRECTORY eksporterer samme demo til andre websites. Notér ændringer i temaets history, når temaet ændres.
 
 ## Semantik og brand
@@ -42,9 +42,18 @@ Genbrug godkendte logo-originaler fra brand.assets efter brand.logos-reglerne; b
 
 ## Eksisterende format 1
 
-Format 1 kan fortsat læses og generere sin eksisterende CSS. Brug migrate FILE --out NEW_FILE for eksplicit konvertering, og bevar originalen. Gennemgå produktets gamle padding/layout før tilkobling til format 2, så indvendig afstand ikke tilføjes to gange. Nye projekter bruger format 2.
+Format 1 kan fortsat læses og generere sin eksisterende CSS. Brug migrate FILE --out NEW\_FILE for eksplicit konvertering, og bevar originalen. Gennemgå produktets gamle padding/layout før tilkobling til format 2, så indvendig afstand ikke tilføjes to gange. Nye projekter bruger format 2.
 
 ## Arbejde på selve Design Studio
+
+### Browserkontrol under udvikling
+
+- Browserkontrol er tilladt og forventes ved nye skærme, nye temaer og væsentlige ændringer i layout, materialer eller bevægelse. Små, rutinemæssige ændringer kontrolleres fortsat proportionelt.
+- Brug lokal HTTP-forhåndsvisning som standard til agentens visuelle browserkontrol. Byg først `index.html`, servér den fra `http://127.0.0.1:PORT`, og åbn adressen med browserværktøjet. Denne fremgangsmåde er afprøvet med selve Design Studio og kræver ikke særskilt bekræftelse ved almindelig lokal kontrol.
+- Forhåndsvisningen skal kun lytte på loopback og kun udstille det nødvendige testindhold. Genbrug en fungerende forhåndsvisning, og genindlæs efter nye builds. Den færdige leverance er fortsat en selvstændig `index.html`, som brugeren åbner uden server eller installation.
+- Den indbyggede browsers URL-politik understøtter HTTP/HTTPS og kan afvise `file://`. Det er ikke grund til at springe den lokale HTTP-kontrol over eller konkludere, at projektet mangler browseradgang. Respektér konkrete sikkerhedsafvisninger; ændr ikke browserens sikkerhedspolitik.
+- Ved væsentlige visuelle ændringer: inspicér den renderede side og relevante interaktioner før levering. Et gennemført build, kodeprøver eller et klikbart fillink erstatter ikke visuel kontrol. Hvis kontrollen fejler, undersøg den konkrete fejl og rapportér præcist, hvad der er og ikke er kontrolleret.
+- HTTP-kontrol beviser ikke `file://`-funktion. Angiv særskilt, om direkte filåbning faktisk er kontrolleret, og hvilke kontroller der eventuelt mangler.
 
 Bevar framework-uafhængigheden i bibliotek og temaer. Standardleverancen er en selvstændig offline-webapp: åbn index.html direkte i browseren uden server eller Windows-app. Temaer åbnes med filvælgeren og gemmes som JSON-downloads. Hjemmesidens showcase bruger samme browserkompatible kerne med offentlige temaer.
 

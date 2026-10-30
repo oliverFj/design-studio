@@ -214,7 +214,7 @@ test('resource selection stays on the card and leaves one primary use action wit
   assert.equal(element.querySelectorAll('.composition-resource-card').filter(node => node.getAttribute('data-selected') === 'true').length, 1);
   assert.equal(document.activeElement, element.querySelector('[data-resource="compact"]'));
   assert.equal(document.activeElement.getAttribute('aria-pressed'), 'true');
-  assert.equal(document.activeElement.getAttribute('data-variant'), 'secondary');
+  assert.equal(document.activeElement.getAttribute('data-variant'), 'tertiary');
   assert.equal(document.activeElement.textContent, 'Se detaljer');
   assert.equal(count.textContent, '6 af 6 ressourcer.', 'interaction feedback does not replace the result count');
   assert.deepEqual(primaryActions(), [element.querySelector('[data-action="use-resource"]')]);

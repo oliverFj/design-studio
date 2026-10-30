@@ -30,6 +30,8 @@ Format 2 validerer semantiske kontrastpar, målbare eksplicitte farvepar i varia
 
 Det fælles katalog bruger kanoniske, projektagnostiske navne. Tidligere format 2-id'er som tool-button, simulation-caption, brandSelect og stat-row er eksplicitte aliases for action-button, caption, choice-field og metric-row. Tidligere domænevarianter oversættes til funktionelle navne; nye temaer og kode bruger kanoniske id'er. Format 1 beholder sine hidtidige navne og regler.
 
+Bibliotek 3.0 adskiller de fire offentlige knapvarianter primary, secondary, tertiary og ghost fra historiske kompatibilitetsopskrifter. Eksisterende appearance-overrides for gamle knapvarianter accepteres fortsat. size og intent er renderingsvalg og bliver ikke nye komponentdefinitioner i temaet. Secondary har centrale defaults for secondaryHover/Active og tilhørende tekstfarver; temaet kan tilpasse værdierne med de almindelige farve- og kontrastregler.
+
 ## Appearance
 
 ~~~json

@@ -2,6 +2,7 @@ node_modules/
 *.tmp
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Byggeprodukter og lokal konfiguration
 /artifacts/

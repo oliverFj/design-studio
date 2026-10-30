@@ -16,7 +16,7 @@ export function mountResourceLibrary(theme, { document = globalThis.document, st
   const stack = (...nodes) => { const node = c('stack'); node.replaceChildren(...nodes); return node; };
   const compact = (...nodes) => { const node = c('stack', { variant: 'compact' }); node.replaceChildren(...nodes); return node; };
   const field = (key, label, value, options = {}) => c('field', { idPrefix: idPrefix + '-' + key, label, value, hint: '', controlVariant: 'desktop', ...options });
-  const button = (text, action, variant = 'secondary') => c('button', { text, variant, attrs: { 'data-action': action } });
+  const button = (text, action, variant = 'tertiary') => c('button', { text, ...(variant==='desktop'?{variant:'ghost',size:'small'}:{variant}), attrs: { 'data-action': action } });
   const card = (title, nodes) => {
     const node = c('card', { slots: { header: { component: 'heading', options: { text: title, variant: 'panel' } }, body: '', footer: '' } });
     node.querySelector('.ds-card__body').replaceChildren(compact(...nodes)); node.querySelector('.ds-card__footer').remove(); return node;

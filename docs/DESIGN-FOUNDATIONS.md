@@ -35,6 +35,8 @@ Breddevalg og kolonner tilhører fortsat produktet. Komponentbiblioteket ejer ko
 
 ## Hvad biblioteket fastholder
 
+Webnavigation bruger native links i navngivne `nav`-områder og lister, jf. [WAI Menus](https://www.w3.org/WAI/tutorials/menus/). `aria-current` markerer aktuelt mål; websitenavigation bruger ikke programmets menu-/menubar-roller. Headerens mobile eksempel bruger native `details`/`summary`. Billedrollen bruger `figure`, `img` og valgfri `figcaption`; alternativ tekst vælges efter billedets formål, jf. [WAI Images](https://www.w3.org/WAI/tutorials/images/). Header, hero, footer og billedgalleri er valgfrie sammensætninger i mønsterkataloget. Galleriets forstørrelse genbruger den fælles dialog i en native modal med retur til udløseren.
+
 - Struktur, dele, mellemrum og indvendig afstand ligger i biblioteket. Temaet kan justere afstandstokens, men ikke fjerne dem.
 - Native knapper og formularcontrols bevares. Labels, hjælp og fejl forbindes med unikke id'er. Et symbol er dekorativt, når knappens tekst allerede forklarer handlingen.
 - En handlingsknap består af symbol, label og en valgfri genvej. Den kan bruges til at oprette, søge, åbne, redigere eller udføre andre handlinger. Genvejen vises kun, hvis produktet faktisk implementerer den.
@@ -103,3 +105,18 @@ Kontrollen måler de angivne grundroller og eksplicitte farvepar. Den er ikke en
 Menulinje (`menubar`), kommandomenu (`menu`) og menupunkt (`menu-item`) følger [WAI-ARIA APG Menu and Menubar](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/). Biblioteket leverer native knapper, roller, dele og visuelle tilstande; produktet ejer fokus, åbning, placering og kommandoer. Brug pile mellem topmenuer og menupunkter, Home/End og typeahead. Enter/Ned åbner menuen, Escape lukker det inderste niveau og returnerer fokus, og Tab forlader menukæden. Checkbox/radio bruger aria-checked; undermenuer bruger aria-haspopup og aria-expanded. Deaktiverede punkter forklares og kan fokuseres med pile, men må ikke aktiveres. Formularfelter hører til i en popover eller dialog. Vis kun implementerede genveje.
 
 Desktopvarianterne til button, input, select, toolbar og segmented-option er eksplicitte valg til tætte desktopværktøjer. De genbruger temaets semantiske tokens, 32 px kontrolhøjde og den fælles fokusmarkering. Disse standardvarianter bevarer deres eksisterende større mål. Tree bruger som standard det kompakte hierarki med 32 px rækker og tæt indrykning; roomy bevarer de større 44 px klikflader og tekstombrydning, mens desktop er et kompatibelt eksplicit valg af den kompakte præsentation. Handlingsknappens tool-variant har symbol over en kort 13 px label og mindst 52 px samlet klikflade. Brug større mål ved touch eller behov for større klikflader. Menuernes katalog beskriver anvendelse, grupper, destruktive handlinger og højst ét undermenuniveau. Produktspecifikke værktøjslinjer og inspektørlayout bliver i produktet.
+
+
+## Knapfamilie og websiteindhold · 3.0
+
+Knapper følger et hierarki inspireret af Carbon: primary er hovedhandlingen, secondary er en solid neutral ledsager, tertiary er en indrammet handling, og ghost er supplerende. Fremhævelse, størrelse, destruktiv betydning og ikonbrug er særskilte valg. Et sideikon begrunder plads mellem label og ikon; uden sideikon centreres teksten med symmetrisk padding. Knaplignende navigation bruger native links med samme fremtoning, mens tekstlinks beholder linkrollens understregning. Dette er Design Studios eget API; det kopierer ikke Carbons komponentkode.
+
+Secondary bruger inverse grundfarver og egne hover-/active-flade- og tekstpar under color.action.secondaryHover/Active. Destruktiv betydning er et intent på primary, tertiary eller ghost. Historiske variantnavne kan stadig læses og renderes, men er adskilt fra det offentlige katalog. Se integrationsguiden for API og migration i ny kode.
+
+Link, navigation og image er selvstændige biblioteksroller; header, hero, footer og galleri er sammensætninger af dem og eksisterende roller. Native navigation og menusemantik holdes adskilt. Eksempelillustrationer bruger temaets semantiske flader, primærfarve og brandaccent. Produktets egne billeder og alternative tekster er produktindhold.
+
+## Udfoldning og bevægelse
+
+Den fælles standard i core/motion.mjs bruger 240 ms, hurtig start og rolig afslutning uden ekstra forsinkelse. Åbning og tilbagevenden har samme timing. Samtidige ændringer afløser ikke hinanden med ventetid; reduceret bevægelse viser slutlayoutet straks.
+
+Studios komponentkatalog holder rækkens korttoppe synlige og lader den aktive top hænge sammen med et fælles variantpanel. Eksemplerne i rækken skjules under udfoldning og vender animeret tilbage ved lukning. Kortbredderne fastholdes, så panelets spænd over rækken ikke aktiverer tomme gridkolonner. Panelets øverste hjørner er skarpe i alle temaer; de nederste bruger temaets afrunding. Dette er editorens visningsmønster og tilføjer ikke layoutkrav til produktets kortkomponent.

@@ -24,7 +24,7 @@ const bundle = await build({
   }],
 });
 let html = await readFile(path.join(root, 'studio/index.html'), 'utf8');
-for (const file of ['styles.css', 'project-overview.css']) {
+for (const file of ['styles.css', 'project-overview.css', 'component-catalog.css']) {
   const css = await readFile(path.join(root, 'studio', file), 'utf8');
   html = html.replace('<link rel="stylesheet" href="./' + file + '">', () => '<style>' + css.replace(/<\/style/gi, '<\\/style') + '</style>');
 }

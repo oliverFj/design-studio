@@ -14,7 +14,7 @@ export function mountCompositionGallery(theme, {
   const picker = component('field', { idPrefix: idPrefix + '-picker', label: 'Vælg et designmønster', value: state.selected, hint: '', controlVariant: 'desktop',
     slots: { control: { tag: 'select', children: Object.entries(COMPOSITIONS).map(([id, item]) => ({ tag: 'option', attrs: { value: id }, text: item.name })) } },
   });
-  const reset = component('button', { text: 'Nulstil eksempel', variant: 'desktop' });
+  const reset = component('button', { text: 'Nulstil eksempel', variant: 'ghost', size:'small' });
   const content = document.createElement('div');
   heading.append(picker, reset); root.append(heading, content);
   let mounted;

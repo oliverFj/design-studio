@@ -853,6 +853,26 @@
       "$type": "dimension",
       "$value": "13px",
       "description": "Tekst i kompakte handlinger; normal klikflade følger bibliotekets minimum."
+    },
+    "color.action.secondaryHover": {
+      "$type": "color",
+      "$value": "#335452",
+      "description": "Neutral secondary hover surface."
+    },
+    "color.action.secondaryHoverText": {
+      "$type": "color",
+      "$value": "{color.text.inverse}",
+      "description": "Text on the neutral secondary hover surface."
+    },
+    "color.action.secondaryActive": {
+      "$type": "color",
+      "$value": "#4a6663",
+      "description": "Neutral secondary active surface."
+    },
+    "color.action.secondaryActiveText": {
+      "$type": "color",
+      "$value": "{color.text.inverse}",
+      "description": "Text on the neutral secondary active surface."
     }
   },
   "history": [
@@ -883,6 +903,10 @@
     {
       "date": "2026-10-28",
       "note": "Tæthed og typografisk hierarki er strammet op med mindre semantiske insets og gaps samt mere kompakte paneltitler og billedtekster. Interaktive feltkanter er styrket uafhængigt af dekorative skillelinjer. Brand, læsetekst og normale klikmål er bevaret."
+    },
+    {
+      "date": "2026-10-29",
+      "note": "Knapfamilie 3.0: fire fremhævelser med solid neutral secondary; selvstændige størrelser og danger. Historiske varianter bevares til kompatibilitet."
     }
   ],
   "brand": {

@@ -1,4 +1,5 @@
 /** Theme foundation checks. No browser, I/O or third-party dependency. */
+import {BUTTON_DANGER_VARIANTS} from './library.mjs';
 const clamp = value => Math.max(0, Math.min(1, value));
 const linear = value => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4;
 const encoded = value => value <= .0031308 ? 12.92 * value : 1.055 * Math.max(0, value) ** (1 / 2.4) - .055;
@@ -55,7 +56,7 @@ export const THEME_CONTRAST_PAIRS = Object.freeze([
   ['color.action.primaryText','color.action.primary'], ['color.action.subtleText','color.action.subtle'],
   ['color.status.dangerText','color.status.dangerSurface'], ['color.status.danger','color.background.control'],
   ['color.caption.text','color.caption.surface'], ['color.caption.labelText','color.caption.labelSurface'],
-  ...['neutral','primary','selected','danger','accent'].flatMap(family=>['Hover','Active'].map(state=>['color.action.'+family+state+'Text','color.action.'+family+state])),
+  ...['neutral','primary','secondary','selected','danger','accent'].flatMap(family=>['Hover','Active'].map(state=>['color.action.'+family+state+'Text','color.action.'+family+state])),
   ['color.focus','color.background.canvas',3], ['color.focus','color.background.surface',3], ['color.focus','color.background.control',3],
 ].map(pair => Object.freeze(pair)));
 /** Test semantic foundations, not every possible product layout or appearance override. */
@@ -95,6 +96,7 @@ export function componentContrastReport(model,resolved) {
     const visit=node=>{if(node.part&&(node.text||['button','select','textarea','output'].includes(node.tag)||node.tag==='input'&&!['checkbox','radio','range','color'].includes(node.attrs?.type)))textParts.add(node.part);for(const child of node.children??[])visit(child);};
     if(component.preview)visit(component.preview);
     const variants=[['base',{}],...Object.entries(component.variants??{})];
+    if(id==='button')for(const [variant,styles]of Object.entries(BUTTON_DANGER_VARIANTS))variants.push([variant+' / danger',{styles:{...component.variants?.[variant]?.styles,...styles}}]);
     const states=[['idle',{}],...Object.entries(component.states??{}).filter(([state])=>state!=='disabled')];
     for(const persistent of ['pressed','current'])if(component.states?.[persistent])for(const transient of ['hover','active'])if(component.states[transient]){
       const base=component.states[persistent], interaction=component.states[transient],parts={};

@@ -25,8 +25,8 @@ function render({ preserveScroll = true } = {}) {
   const actions = document.createElement('div'); actions.className = 'example-actions';
   const themeField = c('field', { idPrefix: 'example-theme', label: 'Tema', value: themeKey, hint: '', controlVariant: 'desktop', slots: { control: { tag: 'select', children: themes.map(item => ({ tag: 'option', attrs: { value: item.key }, text: item.package.name })) } } }); themeField.className += ' example-theme';
   themeField.querySelector('select').addEventListener('change', event => { themeKey = event.target.value; render(); controls.querySelector('select').focus(); });
-  const open = c('button', { text: 'Åbn arbejdsrum', variant: 'desktop' });
-  const save = c('button', { text: 'Hent arbejdsrum', variant: 'desktop' });
+  const open = c('button', { text: 'Åbn arbejdsrum', variant: 'tertiary', size:'small' });
+  const save = c('button', { text: 'Hent arbejdsrum', variant: 'tertiary', size:'small' });
   const message = c('text', { text: 'Prøv et tema, vælg et projekt, eller arbejd videre med eksemplet.', variant: 'small', attrs: { id: 'example-message', role: 'status', 'aria-live': 'polite' } }); message.className += ' example-message';
   actions.append(themeField, open, save); controls.replaceChildren(title, actions, message);
   mounted?.destroy(); mounted = mountWorkspace(theme, { state, onChange: () => { dirty = true; } }); root.replaceChildren(mounted.element);

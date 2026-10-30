@@ -350,11 +350,11 @@ test('font assets generate standalone font faces without external paths', () => 
   assert.match(errorsFor(wrongType),/only font assets/);
 });
 import {renderComponent, createComponent} from '../core/components.mjs';
-import {COMPONENT_LIBRARY, DEFAULT_TOKENS, APPEARANCE_PROPERTIES, POSITIVE_SPACING_TOKENS} from '../core/library.mjs';
+import {COMPONENT_LIBRARY, DEFAULT_TOKENS, APPEARANCE_PROPERTIES, POSITIVE_SPACING_TOKENS, BUTTON_COMPATIBILITY_VARIANTS} from '../core/library.mjs';
 
 test('all v2 themes share every component, part, variant, state and declarative preview',()=>{
  const signature=components=>Object.fromEntries(Object.entries(components).map(([id,c])=>[id,{parts:Object.keys(c.parts),variants:Object.keys(c.variants),states:Object.keys(c.states),composes:c.composes,preview:c.preview}]));
- const expected=signature(COMPONENT_LIBRARY);
+ const expected=signature({...COMPONENT_LIBRARY,button:{...COMPONENT_LIBRARY.button,variants:{...COMPONENT_LIBRARY.button.variants,...BUTTON_COMPATIBILITY_VARIANTS}}});
  for(const id of PUBLIC_THEME_IDS){
   const theme=themeFixture(id);
   assert.equal(theme.schemaVersion,2);assert.equal(Object.hasOwn(theme,'components'),false);
@@ -490,7 +490,7 @@ test('canonical catalog and previews use project-agnostic anatomy without legacy
  assert.doesNotMatch(source,/Castle|Fjordside|byggeværktøj|fortælling|borg|tårn|murkrone|rumpanel|terracotta|Nunito|Alegreya|setParam|limitsFor/i);
  for(const id of ['action-button','caption','choice-field','metric-row'])assert.ok(COMPONENT_LIBRARY[id]);
  for(const id of ['tool-button','simulation-caption','brandSelect','stat-row'])assert.equal(Object.hasOwn(COMPONENT_LIBRARY,id),false);
- assert.equal(Object.keys(COMPONENT_LIBRARY).length,34);
+ assert.equal(Object.keys(COMPONENT_LIBRARY).length,37);
  assert.equal(Object.keys(DEFAULT_TOKENS).some(id=>id.startsWith('color.scene.')),false);
  assert.deepEqual(COMPONENT_LIBRARY['action-button'].preview.children.map(node=>node.part),['icon','label','shortcut']);
 });
@@ -578,7 +578,8 @@ test('vertical action buttons stretch in toolbars and framed controls share the 
  assert.match(css,/#product \.ds-toolbar\[data-variant="vertical"\] \{[^}]*align-items: stretch;[^}]*flex-wrap: nowrap;/);
  for(const id of ['input','select','action-button'])assert.ok(components[id].parts.root.styles.border.includes('{color.border.field}'));
  for(const id of ['field','choice-field'])assert.ok(components[id].parts.control.styles.border.includes('{color.border.field}'));
- assert.equal(components.button.variants.secondary.styles.borderColor,'{color.border.field}');
+ assert.equal(components.button.variants.secondary.styles.borderColor,'transparent');
+ assert.equal(components.button.variants.tertiary.styles.borderColor,'{color.action.primary}');
  const minimal={schemaVersion:2,id:'field-fallback',name:'Field fallback',description:'Shared default.',tokens:{},history:[]};assert.equal(resolveTokens(minimal)['color.border.field'],resolveTokens(minimal)['color.border.default']);
 });
 
@@ -615,7 +616,7 @@ test('semantic hover and active fills preserve primary, accent, danger and selec
  const theme=themeFixture('castle-studio'),components=getComponents(theme),css=generateCSS(theme,{scope:'#product'});
  const binding='--ds-interaction-hover-surface';
  assert.equal(components.button.parts.root.styles[binding],'{color.action.primaryHover}');
- for(const [variant,family]of [['secondary','neutral'],['ghost','neutral'],['danger','danger'],['danger-subtle','danger'],['accent','accent']])assert.equal(components.button.variants[variant].styles[binding],'{color.action.'+family+'Hover}');
+ for(const [variant,family]of [['secondary','secondary'],['tertiary','primary'],['ghost','neutral'],['danger','danger'],['danger-subtle','danger'],['accent','accent']])assert.equal(components.button.variants[variant].styles[binding],'{color.action.'+family+'Hover}');
  assert.equal(components['action-button'].states.pressed.styles[binding],'{color.action.primaryHover}');assert.equal(components['segmented-option'].states.pressed.styles[binding],'{color.action.selectedHover}');
  for(const id of ['button','action-button','segmented-option'])for(const state of ['hover','active']){
   assert.equal(components[id].states[state].styles.backgroundColor,'var(--ds-interaction-'+state+'-surface)');assert.equal(components[id].states[state].styles.color,'var(--ds-interaction-'+state+'-text)');assert.equal(Object.hasOwn(components[id].states[state].styles,'opacity'),false);

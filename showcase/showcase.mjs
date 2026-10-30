@@ -3,6 +3,7 @@ import { createComponent } from './core/components.mjs';
 import { themes } from './themes.mjs';
 import { createProjectOverview, createProjectOverviewDraft } from './preview/project-overview.mjs';
 import { mountCompositionGallery, createGalleryState } from './patterns/gallery.mjs';
+import {buttonVariantIds} from './core/library.mjs';
 
 const $ = selector => document.querySelector(selector);
 const themeDescriptions = {
@@ -81,7 +82,7 @@ function renderCatalogList() {
     button.setAttribute('aria-pressed', String(selectedComponent === id));
     button.addEventListener('click', () => {
       selectedComponent = id;
-      selectedVariant = Object.keys(item.variants)[0] ?? '';
+      selectedVariant = (id==='button'?buttonVariantIds(item):Object.keys(item.variants).filter(v=>id!=='link'||v!=='action'))[0] ?? '';
       renderCatalog();
     });
     return button;
@@ -92,7 +93,7 @@ function renderCatalogList() {
 function renderCatalog() {
   if (!catalog[selectedComponent]) selectedComponent = Object.keys(catalog)[0];
   const item = catalog[selectedComponent];
-  const variants = Object.keys(item.variants);
+  const variants = selectedComponent==='button'?buttonVariantIds(item):Object.keys(item.variants).filter(v=>selectedComponent!=='link'||v!=='action');
   if (!variants.includes(selectedVariant)) selectedVariant = variants[0] ?? '';
   $('#component-id').textContent = selectedComponent.toUpperCase();
   $('#component-name').textContent = item.name;

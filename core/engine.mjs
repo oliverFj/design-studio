@@ -3,6 +3,7 @@ import {COMPONENT_LIBRARY, DEFAULT_TOKENS, APPEARANCE_PROPERTIES, POSITIVE_SPACI
 export {LIBRARY_VERSION, canonicalComponentId, canonicalVariantId, canonicalPartId, canonicalStateId} from './library.mjs';
 import {validateThemeQuality, contrastRatio} from './quality.mjs';
 import { generateLayoutCSS, generateScrollbarCSS } from './layout.mjs';
+import { BUTTON_COMPATIBILITY_VARIANTS, BUTTON_SIZES, BUTTON_DANGER_VARIANTS } from './library.mjs';
 
 const own = (object, key) => Object.hasOwn(object, key);
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -178,7 +179,7 @@ function validateTreatment(treatment, path, parts, tokens, resolved, errors, req
     }
   }
 }
-const previewTags = new Set(['div', 'span', 'p', 'strong', 'label', 'button', 'input', 'select', 'option', 'h2', 'h3', 'hr', 'section', 'article', 'header', 'footer', 'dl', 'dt', 'dd', 'ul', 'li']);
+const previewTags = new Set(['a', 'nav', 'figure', 'figcaption', 'img', 'div', 'span', 'p', 'strong', 'label', 'button', 'input', 'select', 'option', 'h2', 'h3', 'hr', 'section', 'article', 'header', 'footer', 'dl', 'dt', 'dd', 'ul', 'li']);
 const previewInputTypes = new Set(['button', 'submit', 'reset', 'text', 'email', 'number', 'password', 'checkbox', 'radio', 'search', 'tel', 'url', 'range', 'color', 'date']);
 function validatePreview(tree, component, path, errors, catalog) {
   let count = 0;
@@ -206,13 +207,13 @@ function validatePreview(tree, component, path, errors, catalog) {
           if (typeof value !== 'boolean') errors.push(nodePath + '.attrs.' + attribute + ': must be boolean.');
         } else if (attribute === 'tabindex') {
           if (!['0','-1'].includes(value)) errors.push(nodePath + '.attrs.tabindex: must be 0 or -1.');
-        } else if (['type', 'value', 'placeholder', 'aria-label', 'aria-hidden', 'aria-pressed', 'aria-selected', 'aria-disabled', 'aria-expanded', 'aria-haspopup', 'aria-checked', 'aria-multiselectable', 'aria-level', 'aria-posinset', 'aria-setsize', 'role', 'min', 'max', 'step'].includes(attribute)) {
+        } else if (['href', 'src', 'alt', 'type', 'value', 'placeholder', 'aria-label', 'aria-hidden', 'aria-pressed', 'aria-selected', 'aria-disabled', 'aria-expanded', 'aria-haspopup', 'aria-checked', 'aria-multiselectable', 'aria-level', 'aria-posinset', 'aria-setsize', 'role', 'min', 'max', 'step'].includes(attribute)) {
           if (typeof value !== 'string' || value.length > 1000) errors.push(nodePath + '.attrs.' + attribute + ': expected a string of at most 1000 characters.');
           else if (attribute === 'type' && !previewInputTypes.has(value)) errors.push(nodePath + '.attrs.type: unsupported input type.');
         } else errors.push(nodePath + '.attrs.' + attribute + ': unsupported preview attribute.');
       }
     }
-    if (['input', 'hr'].includes(node.tag) && (own(node, 'children') || own(node, 'text'))) errors.push(nodePath + ': void preview tag cannot have text or children.');
+    if (['input', 'hr', 'img'].includes(node.tag) && (own(node, 'children') || own(node, 'text'))) errors.push(nodePath + ': void preview tag cannot have text or children.');
     if (own(node, 'children')) {
       if (!Array.isArray(node.children)) errors.push(nodePath + '.children: must be an array.');
       else node.children.forEach((child, index) => visit(child, nodePath + '.children.' + index, depth + 1));
@@ -585,6 +586,19 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
       if(sourceVersion===2)for(const [alias,key]of Object.entries(VARIANT_ALIASES[componentId]??{}))if(key===variantId){emit(`${root}[data-variant="${alias}"]`,variant.styles);for(const [partId,part]of Object.entries(variant.parts??{}))emit(partSelector(`${root}[data-variant="${alias}"]`,partId),part.styles);}
       for (const [partId, part] of Object.entries(variant.parts ?? {})) emit(partSelector(variantRoot,partId), part.styles);
     }
+    if(sourceVersion===2&&['button','action-button'].includes(componentId)){
+      for(const [size,styles]of Object.entries(BUTTON_SIZES))emit(root+'[data-size="'+size+'"]',styles);
+      const variantAttribute=componentId==='button'?'data-variant':'data-emphasis';
+      if(componentId==='action-button')for(const [variant,treatment]of Object.entries(pack.components.button.variants))if(!Object.hasOwn(BUTTON_COMPATIBILITY_VARIANTS,variant))emit(root+'['+variantAttribute+'="'+variant+'"]',treatment.styles);
+      for(const [variant,styles]of Object.entries(BUTTON_DANGER_VARIANTS))emit(root+'[data-intent="danger"]:where(['+variantAttribute+'="'+variant+'"])',styles);
+      if(componentId==='button'){
+        emit(root+'[data-has-icon="true"]',{justifyContent:'space-between',textAlign:'left'});
+        emit(root+'[data-has-icon="true"] > .ds-button__icon',{display:'inline-flex',alignItems:'center',justifyContent:'center'});
+        emit(root+'[data-icon-only="true"]',{width:'44px',minWidth:'44px',padding:'0',justifyContent:'center'});
+        for(const [size,styles]of Object.entries(BUTTON_SIZES))emit(root+'[data-icon-only="true"][data-size="'+size+'"]',{width:styles.minHeight,minWidth:styles.minWidth});
+        emit(root+'[aria-busy="true"] > .ds-button__progress',{display:'inline-block'});
+      }
+    }
     const transientState=id=>['hover','active'].includes(id);
     const interactivePart=partId=>{let found=false;const visit=node=>{if(node?.part===partId&&['button','input','select','textarea'].includes(node.tag))found=true;for(const child of node?.children??[])visit(child);};visit(component.preview);return found;};
     const disabledGuard=':not(:is(:disabled, [aria-disabled="true"], [data-state~="disabled"]))';
@@ -612,6 +626,14 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
         // Native disabled controls also work when only the control has disabled.
         if (stateId === 'disabled' && partId === 'control' && nestedControl(component)) emit(partSelector(root,partId)+':disabled', part.styles);
       }
+    }
+    if(sourceVersion===2&&componentId==='button'){
+      for(const [variant,treatment]of Object.entries(component.variants)){
+        const styles={...component.parts.root.styles,...treatment.styles};
+        emit(root+'[data-variant="'+variant+'"][aria-busy="true"]',{backgroundColor:styles.backgroundColor,color:styles.color,borderColor:styles.borderColor,opacity:'1',cursor:'progress'});
+      }
+      for(const [variant,styles]of Object.entries(BUTTON_DANGER_VARIANTS))emit(root+'[data-variant="'+variant+'"][data-intent="danger"][aria-busy="true"]',{backgroundColor:styles.backgroundColor,color:styles.color,borderColor:styles.borderColor});
+      rules.push(`${scope} .ds-button[aria-busy="true"] > .ds-button__progress { animation: ds-button-spin .8s linear infinite; }`, '@keyframes ds-button-spin { to { transform: rotate(360deg); } }', `@media (prefers-reduced-motion: reduce) { ${scope} .ds-button > .ds-button__progress { animation: none !important; } }`);
     }
   }
   if(sourceVersion===2){
@@ -664,7 +686,9 @@ function applyAppearance(components, appearance) {
 function effectivePackage(pack) {
   if (pack.schemaVersion===1) return pack;
   const {appearance,...theme}=normalizeThemeUnchecked(pack);
-  return {...theme,schemaVersion:1,tokens:{...structuredClone(DEFAULT_TOKENS),...structuredClone(theme.tokens)},components:applyAppearance(structuredClone(COMPONENT_LIBRARY),appearance)};
+  const library=structuredClone(COMPONENT_LIBRARY);
+  Object.assign(library.button.variants,structuredClone(BUTTON_COMPATIBILITY_VARIANTS));
+  return {...theme,schemaVersion:1,tokens:{...structuredClone(DEFAULT_TOKENS),...structuredClone(theme.tokens)},components:applyAppearance(library,appearance)};
 }
 function validateAppearance(appearance, errors) {
   if (!record(appearance)) {errors.push('appearance: must be an object.');return;}
@@ -681,7 +705,7 @@ function validateAppearance(appearance, errors) {
     }
   }
   for(const [id,override]of Object.entries(appearance)){
-    const path='appearance.'+id,component=COMPONENT_LIBRARY[id];
+    const path='appearance.'+id,original=COMPONENT_LIBRARY[id],component=id==='button'?{...original,variants:{...original.variants,...BUTTON_COMPATIBILITY_VARIANTS}}:original;
     if(!component){errors.push(path+': shared component does not exist; add new roles to core/library.mjs.');continue;}
     if(!record(override)){errors.push(path+': must be an object.');continue;}
     allowedKeys(override,['parts','variants','states'],path,errors);
@@ -740,7 +764,7 @@ function appearanceFromLegacy(pack) {
     }
     for(const section of ['variants','states'])for(const [sourceKey,treatment]of Object.entries(component[section])){
       const key=section==='variants'?canonicalVariantId(id,sourceKey):canonicalStateId(id,sourceKey);
-      if(!own(COMPONENT_LIBRARY[id][section],key))throw new Error('Cannot migrate component treatment '+id+'.'+section+'.'+key+': register it in the shared library first.');
+      if(!own(COMPONENT_LIBRARY[id][section],key)&&!(id==='button'&&section==='variants'&&own(BUTTON_COMPATIBILITY_VARIANTS,key)))throw new Error('Cannot migrate component treatment '+id+'.'+section+'.'+key+': register it in the shared library first.');
       const entry={...(treatment.description?{description:treatment.description}:{}),styles:filter(treatment.styles)};
       if(treatment.parts)entry.parts=Object.fromEntries(Object.entries(treatment.parts).map(([partId,part])=>[canonicalPartId(id,partId),{styles:filter(part.styles)}]));
       override[section][key]=entry;
@@ -819,7 +843,7 @@ function expandLegacySelectors(selector){
 function interactiveSelectors(components){
  const selectors=new Set();
  for(const component of Object.values(components)){
-  function visit(node){if(!node)return;if(['button','input','select','textarea'].includes(node.tag)&&node.part&&component.parts[node.part])selectors.add(component.parts[node.part].selector);for(const child of node.children??[])visit(child);}
+  function visit(node){if(!node)return;if(['a','button','input','select','textarea'].includes(node.tag)&&node.part&&component.parts[node.part])selectors.add(component.parts[node.part].selector);for(const child of node.children??[])visit(child);}
   visit(component.preview);
  }
  return [...selectors];

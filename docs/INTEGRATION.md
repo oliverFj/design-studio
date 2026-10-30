@@ -110,7 +110,7 @@ Tilpas kun den konkrete ramme, eksempelvis `.my-form { --ds-layout-max-width: 50
 
 ## Valgfrie sammensætningseksempler
 
-Offline-editorens Designsystem → Designmønstre og web-showcasen viser samme fem eksempler: objekteditor med kontekstpanel, formular med validering, liste med detaljevisning, ressourcebibliotek samt fortryd/gentag. De bruger bibliotekets eksisterende roller og det valgte tema. Kilde, version, formål, komponenter og interaktioner findes i patterns/catalog.mjs; implementering og layout findes i patterns/compositions.mjs, de enkelte mønstermoduler og patterns/styles.css. PATTERN_FILES i kataloget er den fælles liste til referenceeksport og showcase.
+Offline-editorens Designsystem → Designmønstre og web-showcasen viser samme ni eksempler: objekteditor med kontekstpanel, formular med validering, liste med detaljevisning, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. De bruger bibliotekets eksisterende roller og det valgte tema. Kilde, version, formål, komponenter og interaktioner findes i patterns/catalog.mjs; implementering og layout findes i patterns/compositions.mjs, de enkelte mønstermoduler og patterns/styles.css. PATTERN_FILES i kataloget er den fælles liste til referenceeksport og showcase.
 
 Katalogets layoutprofil vælger en af bibliotekets fælles breddeprofiler. Profilerne vælges efter indholdets rolle og kan tilpasses i produktet. Objektkort og handlinger strækkes ikke med en bredere arbejdsflade. Se [retningslinjerne for indholdsbredde](DESIGN-FOUNDATIONS.md#indholdsbredde-og-fuld-bredde).
 
@@ -190,6 +190,65 @@ Formularfelter bruger label, hint, error og idPrefix. Biblioteket forbinder for/
 Frameworkadaptere må forbinde komponenter til React, Vue eller lignende, men skal bevare fælles dele, native semantik og bibliotekets grundlayout. Registrér adaptere i components-feltet med verificerede file og export. Skærmlayout og routing er produktspecifikke.
 
 Handlingsknappen action-button har slots icon, label og shortcut. Varianten tool placerer symbol over en kort label i en kompakt værktøjslinje; den bruger de samme pressed- og focustilstande. En tom shortcut skjules. iconAssetId kan vælge en godkendt logo- eller billedressource fra temaets brand.assets; billedet bevarer proportionerne. Brug den til en handling med symbol og tekst; forbind genvejen i produktet, hvis den vises. Billedtekst caption og nøgletal metric-row har ingen produktspecifik indholdslogik. Se DESIGN-FOUNDATIONS.md for valg mellem rollerne.
+
+## Knapfamilien
+
+Nye integrationer vælger `variant` uafhængigt af `size` og `intent`:
+
+| Variant | Anvendelse |
+| --- | --- |
+| primary | Opgavens vigtigste næste handling. |
+| secondary | Solid neutral ledsager til primary, eksempelvis Tilbage eller Annuller. |
+| tertiary | Indrammet handling, som også kan stå alene. |
+| ghost | Supplerende handling med mindst visuel vægt. |
+
+`size` er `small` (32 px), `medium` (44 px, standard) eller `large` (48 px). `intent: 'danger'` kan kombineres med primary, tertiary og ghost; secondary bruges til neutrale ledsagehandlinger. Uden sideikon er teksten centreret med symmetrisk padding og indholdsbestemt bredde. `icon` giver et sideikon; `iconOnly: true` kræver både ikon og et tilgængeligt navn gennem `label` eller `aria-label`.
+
+~~~js
+const action = createComponent(theme, 'button', {
+  text: 'Gem ændringer', variant: 'primary', size: 'medium',
+});
+const destination = createComponent(theme, 'button', {
+  text: 'Udforsk samlingen', href: '#samling',
+  variant: 'primary', size: 'large', icon: '→',
+});
+const remove = createComponent(theme, 'button', {
+  text: 'Slet', variant: 'tertiary', intent: 'danger',
+});
+~~~
+
+Med `href` bliver elementet et native `a`; uden er det en native `button`. Knaplignende links får knappens tilstande uden tekstunderstregning ved hover. Løbende tekstnavigation bruger `link`, og websitenavigation bruger `navigation` med navngivet `nav` og `aria-current` på det aktuelle link. Programmets menuer bruger fortsat `menubar`, `menu` og `menu-item`.
+
+`loading: true` viser aktivitet og deaktiverer handlingen. Et deaktiveret eller arbejdende navigationslink får ikke et aktivt `href`. Produktet ejer arbejde, state og genaktivering. Historiske knapvarianter som desktop, rounded og danger understøttes fortsat af runtime, men vises ikke som den nye knapfamilie i Studio. Brug `buttonVariantIds(component)` fra library.mjs ved et katalog over de fire offentlige varianter; `getComponents(theme)` indeholder også kompatibilitetsopskrifter.
+
+## Billeder og websiteeksempler
+
+`image` bruger `figure`, `img` og valgfri billedtekst. Angiv altid `alt`, når du leverer `src`; tom tekst er tilladt for dekoration. `caption: ''` skjuler billedteksten. Grundudgaven bevarer motivets format; `landscape` og `square` beskærer med `object-fit: cover`.
+
+~~~js
+const image = createComponent(theme, 'image', {
+  src: './assets/samling.jpg', alt: 'En samling af noter på et bord.',
+  caption: 'Noter fra arbejdsdagen.', variant: 'landscape',
+});
+~~~
+
+Uden en egen kilde bruger previewet en offline-illustration fra temaets palette. `createImageExamples(theme)` fra components.mjs leverer de samme indbyggede motiver til hero og billedgalleri. Genopret dem ved temaskift; brugerens egne billedkilder omfarves ikke. Galleriet åbner det valgte motiv i en native dialog og returnerer fokus til udløseren. Headerens mobile navigation bruger native details/summary. Websiteeksemplerne ligger i patterns/web.mjs; der er ingen karussel eller automatisk billedbevægelse.
+
+## Fælles standardanimation
+
+`animateStandard` og `STANDARD_MOTION` eksporteres fra `design/runtime/components.mjs`; implementeringen i motion.mjs kopieres af init og sync. Udfoldning og tilbagevenden bruger 240 ms og `cubic-bezier(.2,.7,.2,1)` uden ekstra forsinkelse. Animationen styrer visuel overgang; produktet ejer slutlayout, åbning/lukning og fokus.
+
+~~~js
+import { animateStandard } from './design/runtime/components.mjs';
+
+function reveal(panel) {
+  panel.hidden = false;
+  const effect = animateStandard(panel, [{ opacity: 0 }, { opacity: 1 }]);
+  return () => effect?.cancel(); // Kald når visningen erstattes.
+}
+~~~
+
+Funktionen returnerer en native Animation eller null ved reduceret bevægelse eller manglende browserstøtte. Sæt derfor den anvendelige sluttilstand før kaldet. Produktet annullerer eventuelle effekter, når en visning afmonteres. Fanen Animation og effekter demonstrerer den faktiske standard; i komponentkataloget vender kortene tilbage samtidig med, at variantpanelet lukker.
 
 ## Hierarkisk indhold med tree
 

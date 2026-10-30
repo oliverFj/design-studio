@@ -9,7 +9,7 @@ export function mountHistoryEditor(theme, { document = globalThis.document, stat
   const prefix = String(idPrefix).replace(/[^a-zA-Z0-9_-]/g, '-');
   const c = createComponentFactory(theme, { document });
   const stack = (...nodes) => { const node = c('stack'); node.replaceChildren(...nodes); return node; };
-  const button = (text, action, variant = 'desktop') => c('button', { text, variant, attrs: { 'data-action': action } });
+  const button = (text, action, variant = 'tertiary') => c('button', { text, variant, size:'small', attrs: { 'data-action': action } });
   const root = createLayout('form', { document }); root.className += ' ds-composition ds-scope'; root.setAttribute('role', 'region'); root.setAttribute('aria-label', 'Fortryd og gentag');
   const history = createHistory(state.history);
   const toolbar = document.createElement('div'); toolbar.className = 'composition-actions';

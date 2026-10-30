@@ -8703,6 +8703,13 @@
           "properties": {
             "tag": {
               "enum": [
+                "a",
+                "nav",
+                "figure",
+                "figcaption",
+                "img",
+                "ul",
+                "li",
                 "div",
                 "span",
                 "p",
@@ -8746,6 +8753,9 @@
             "attrs": {
               "type": "object",
               "properties": {
+                "href": { "type": "string", "maxLength": 1000 },
+                "src": { "type": "string", "maxLength": 1000 },
+                "alt": { "type": "string", "maxLength": 1000 },
                 "disabled": {
                   "type": "boolean"
                 },
@@ -8838,6 +8848,7 @@
                   "tag": {
                     "enum": [
                       "input",
+                      "img",
                       "hr"
                     ]
                   }

@@ -1,4 +1,32 @@
 export const COMPOSITIONS = Object.freeze({
+  'site-header': Object.freeze({
+    name: 'Header og navigation', version: '1.0.0', layout: 'split',
+    description: 'Websiteheader med afsender, aktuelle links og en foldbar mobilnavigation.',
+    usage: 'Til websites. Erstat tekstafsenderen med produktets godkendte logo ved behov. Produktet ejer destinationer; eksemplet navigerer mellem lokale sektioner.',
+    components: ['link', 'navigation', 'heading', 'text', 'stack'],
+    interactions: ['Native links og markering af aktuelt mål', 'Mobilmenu med native details og Escape', 'Tastaturfokus følger den valgte sektion'], qualityScenarios: Object.freeze(['initial']),
+  }),
+  hero: Object.freeze({
+    name: 'Hero med billede', version: '1.0.0', layout: 'split',
+    description: 'En introduktion med overskrift, beskrivelse, navigationshandlinger og et billede.',
+    usage: 'Til sidens indledning. Tilpas overskriftsniveau til sidens hierarki og erstat indhold og destinationer. Teksten ligger på en sikker flade ved siden af billedet.',
+    components: ['button', 'image', 'heading', 'text', 'stack'],
+    interactions: ['Links fører til sektioner', 'To kolonner bliver til én i smalle rammer'], qualityScenarios: Object.freeze(['initial']),
+  }),
+  'site-footer': Object.freeze({
+    name: 'Footer med links', version: '1.0.0', layout: 'split',
+    description: 'Sidefod med afsender, navngivet navigation og kontaktvej.',
+    usage: 'Til websites. Produktet leverer afsender, kontaktoplysninger, rettigheder og eventuelle juridiske links.',
+    components: ['link', 'navigation', 'heading', 'text', 'stack', 'divider'],
+    interactions: ['Native sektionslinks', 'Kolonner tilpasses indhold og tilgængelig bredde'], qualityScenarios: Object.freeze(['initial']),
+  }),
+  'image-gallery': Object.freeze({
+    name: 'Billedgalleri', version: '1.0.0', layout: 'split',
+    description: 'Et responsivt billedgitter med billedtekster og forstørrelse i en dialog.',
+    usage: 'Til billedsamlinger. Erstat de indbyggede illustrationer med produktets billeder, alternative tekster og rettigheder. Galleriet har ingen automatisk bevægelse.',
+    components: ['image', 'button', 'dialog', 'heading', 'text', 'stack'],
+    interactions: ['Åbn hele billedet i en native modal dialog', 'Luk med knap eller Escape og vend tilbage til udløseren'], qualityScenarios: Object.freeze(['initial']),
+  }),
   editor: Object.freeze({
     name: 'Objekteditor med kontekstpanel', version: '1.1.1', layout: 'workspace',
     description: 'Et søgbart objekttræ og et kontekstpanel med Egenskaber, Relationer og Handlinger, inspireret af FormLab.',
@@ -42,4 +70,4 @@ export const COMPOSITIONS = Object.freeze({
   }),
 });
 
-export const PATTERN_FILES = Object.freeze(['catalog.mjs', 'compositions.mjs', 'object-workbench.mjs', 'resource-library.mjs', 'history.mjs', 'history-editor.mjs', 'gallery.mjs', 'quality.mjs', 'styles.css']);
+export const PATTERN_FILES = Object.freeze(['catalog.mjs', 'compositions.mjs', 'web.mjs', 'object-workbench.mjs', 'resource-library.mjs', 'history.mjs', 'history-editor.mjs', 'gallery.mjs', 'quality.mjs', 'styles.css']);

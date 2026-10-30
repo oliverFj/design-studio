@@ -3,8 +3,10 @@ import { COMPOSITIONS } from './catalog.mjs';
 import { createObjectWorkbenchState, mountObjectWorkbench } from './object-workbench.mjs';
 import { createResourceLibraryState, mountResourceLibrary } from './resource-library.mjs';
 import { createHistoryEditorState, mountHistoryEditor } from './history-editor.mjs';
+import { WEB_PATTERNS, createWebState, mountWebPattern } from './web.mjs';
 
 export function createCompositionState(id) {
+  if (WEB_PATTERNS.includes(id)) return createWebState(id);
   if (id === 'editor') return createObjectWorkbenchState();
   if (id === 'resource-library') return createResourceLibraryState();
   if (id === 'history') return createHistoryEditorState();
@@ -26,6 +28,7 @@ export function mountComposition(theme, id, {
   announce = () => {}, onChange = () => {}, onUse = () => {}, idPrefix = 'composition-' + id,
 } = {}) {
   if (!COMPOSITIONS[id]) throw new Error('Ukendt sammensætning: ' + id);
+  if (WEB_PATTERNS.includes(id)) return mountWebPattern(theme, id, { document, state, onChange, idPrefix });
   if (id === 'editor') return mountObjectWorkbench(theme, { document, state, announce, onChange, idPrefix });
   if (id === 'resource-library') return mountResourceLibrary(theme, { document, state, announce, onChange, onUse, idPrefix });
   if (id === 'history') return mountHistoryEditor(theme, { document, state, announce, onChange, idPrefix });

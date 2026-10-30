@@ -14,6 +14,8 @@ import bundledThemes from './bundled-themes.mjs';
 import { createThemeStorage } from './theme-storage.mjs';
 import { readJSONFile, downloadFile } from '../core/files.mjs';
 import { mountCompositionGallery, createGalleryState } from '../patterns/gallery.mjs';
+import {renderMotionView} from './motion.mjs';
+import {createCatalogState,renderComponentCatalog,bindComponentCatalog,catalogVariants} from './component-catalog.mjs';
 
 const root = document.querySelector('#app');
 const shellStyle = document.createElement('style');
@@ -26,6 +28,9 @@ let inspectorControls;
 const state = { packages: [], key: null, file: '', pack: null, saved: '', view: 'components', mode: 'catalog', component: 'button', token: null, variants: {}, recipeDraft: null, error: '', busy: false };
 const exampleDraft = createProjectOverviewDraft();
 const galleryState = createGalleryState();
+const catalogState=createCatalogState();
+const motionState=createCatalogState();
+let catalogControls;
 let compositionGallery;
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone = value => structuredClone(value);
@@ -33,7 +38,7 @@ const themeStorage = createThemeStorage(bundledThemes, { download });
 const brandStudio = createBrandStudio(state, {escape, field, edited, render, notice, allowNavigation, download});
 const qualityStudio = createQualityStudio(state, {escape, validation:()=>validation(), render, notice});
 const icon = name => {
-  const paths = { quality:'<path d="M5 4h14v16H5zM8 9l2 2 5-5M8 15h8"/>', patterns:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M14 3v18M3 10h11M14 14h7"/>', brand:'<path d="M4 5h16v14H4zM8 9h8M8 13h5"/><path d="m17 15 2 2"/>', components:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>', tokens:'<path d="M12 3 21 8v8l-9 5-9-5V8zM3 8l9 5 9-5M12 13v8"/>', package:'<path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/>' };
+  const paths = { motion:'<path d="M4 16h3l3-8 4 10 3-10h3"/><path d="M4 4h16M4 22h16"/>', quality:'<path d="M5 4h14v16H5zM8 9l2 2 5-5M8 15h8"/>', patterns:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M14 3v18M3 10h11M14 14h7"/>', brand:'<path d="M4 5h16v14H4zM8 9h8M8 13h5"/><path d="m17 15 2 2"/>', components:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>', tokens:'<path d="M12 3 21 8v8l-9 5-9-5V8zM3 8l9 5 9-5M12 13v8"/>', package:'<path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/>' };
   return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(paths[name] || paths.components)+'</svg>';
 };
 let readModel = null, lastValidModel = null, lastPreviewTheme = null;
@@ -124,16 +129,17 @@ function componentsView() {
   const toolbar = '<div class="canvas-toolbar"><h2>Komponenter <span class="count">'+entries.length+'</span></h2><div class="segmented" aria-label="Visning"><button type="button" data-mode="catalog" class="'+(state.mode==='catalog'?'active':'')+'" aria-pressed="'+(state.mode==='catalog')+'">Bibliotek</button><button type="button" data-mode="example" class="'+(state.mode==='example'?'active':'')+'" aria-pressed="'+(state.mode==='example')+'">Samlet eksempel</button></div></div>';
   if (state.mode === 'example' && state.pack.schemaVersion === 2) return toolbar+'<div id="project-overview-host"></div><p class="help">Samme samlede eksempel som i web-showcasen. Prøv temaer, indstillinger og et nyt projekt her.</p>';
   if (state.mode === 'example') return toolbar+'<div class="example-stage ds-scope"><div class="example-width"><div class="example-header"><div><p class="preview-copy preview-muted">Din samling</p><h2 class="ds-heading">Næste gode idé</h2></div><span class="ds-badge" data-variant="default">Kladde</span></div>'+cardMarkup('example')+'<div class="ds-card" data-variant="default"><header class="ds-card__header"><h3 class="preview-title">Gør den til din</h3></header><div class="ds-card__body"><div class="example-fields">'+dsField('Titel','Min nye samling','example-title')+dsField('Beskrivelse','Noter og inspiration','example-description')+'</div></div><footer class="ds-card__footer">'+button('Gem samling')+button('Annuller','secondary')+'</footer></div></div></div><p class="help">Samme komponenter og indhold, uanset hvilket tema du vælger.</p>';
-  return toolbar+'<div class="component-grid">'+entries.map(([id,component]) => '<article class="specimen '+(state.component===id?'selected':'')+'"><button type="button" class="specimen-label" data-component="'+escape(id)+'" aria-pressed="'+(state.component===id)+'"><span>'+escape(component.name)+'</span><span>'+escape(id)+'</span></button><div class="specimen-preview ds-scope">'+specimen(id)+'</div></article>').join('')+'</div>';
+  return toolbar+renderComponentCatalog(previewTheme(),{components:components(),state:catalogState,selected:state.component,variantFor});
 }
 function componentInspector() {
-  const id = state.component, component = components()[id];
+  const id = state.component, source = components()[id];
+  const component=source&&state.pack.schemaVersion===2?{...source,variants:Object.fromEntries(catalogVariants(state.pack,id,source).map(key=>[key,source.variants[key]]))}:source;
   if (!component) return '<p class="help">Vælg en komponent.</p>';
-  const variants = Object.keys(component.variants || {});
+  const variants = catalogVariants(state.pack,id,component);
   const refs = [...new Set(JSON.stringify(component).match(/\{([a-zA-Z0-9_.-]+)\}/g) || [])].map(ref => ref.slice(1,-1));
   return '<div class="inspector-heading">Fælles komponentbibliotek</div><h2>'+escape(component.name)+'</h2><p class="inspector-id">'+escape(id)+'</p><p>'+escape(component.description)+'</p>'+
     '<div class="inspector-section"><h3>Anvendelse</h3><p>'+escape(component.usage)+'</p></div>'+
-    (variants.length ? '<div class="inspector-section variant-picker"><label class="studio-field" for="variant-select">Variant<select id="variant-select" class="studio-input"><option value="" '+(!variantFor(id)?'selected':'')+'>Grundudgave</option>'+variants.map(v=>'<option value="'+escape(v)+'" '+(variantFor(id)===v?'selected':'')+'>'+escape(v)+'</option>').join('')+'</select></label></div>' : '')+
+    (variants.length&&catalogState.expanded!==id ? '<div class="inspector-section variant-picker"><label class="studio-field" for="variant-select">Variant<select id="variant-select" class="studio-input"><option value="" '+(!variantFor(id)?'selected':'')+'>Grundudgave</option>'+variants.map(v=>'<option value="'+escape(v)+'" '+(variantFor(id)===v?'selected':'')+'>'+escape(v)+'</option>').join('')+'</select></label></div>' : '')+
     '<div class="inspector-section"><h3>Dele</h3>'+Object.entries(component.parts).map(([name,part])=>'<div class="property-row"><span>'+escape(name)+'</span><span>'+escape(part.selector)+'</span></div>').join('')+'</div>'+
     (component.composes?.length ? '<div class="inspector-section"><h3>Sammensat af</h3>'+component.composes.map(c=>'<button class="token-ref" type="button" data-component="'+escape(c)+'">'+escape(components()[c]?.name || c)+'</button>').join('')+'</div>' : '')+
     '<div class="inspector-section"><h3>Temaværdier i brug</h3>'+refs.map(ref=>'<button class="token-ref" type="button" data-token="'+escape(ref)+'">'+escape(ref)+'</button>').join('')+'</div>'+
@@ -167,6 +173,7 @@ function packageInspector() {
   return '<div class="inspector-heading">Tema</div><h2>Ét bibliotek. Flere temaer.</h2><p>Biblioteket ejer struktur og grundlayout. Temaet giver komponenterne deres visuelle udtryk.</p><div class="inspector-section"><h3>Designgrundlag</h3><p>Projektagnostiske roller med principper fra Fluent 2 og Carbon. Fælles afstande og tastaturfokus fastholdes; målbare kontrastpar kontrolleres, før temaet kan gemmes.</p></div><div class="inspector-section"><h3>Indhold</h3><div class="property-row"><span>Formatversion</span><span>'+state.pack.schemaVersion+'</span></div><div class="property-row"><span>Identitet</span><span>'+escape(state.pack.id)+'</span></div><div class="property-row"><span>Tokens</span><span>'+Object.keys(themeTokens()).length+'</span></div><div class="property-row"><span>Komponenter</span><span>'+Object.keys(components()).length+'</span></div></div><div class="inspector-section"><h3>Eksport</h3><p>Eksportér pakken som JSON, eller hent dens CSS til et produkt.</p><button type="button" class="studio-button" id="download-css">Hent CSS</button></div><div id="validation-errors" class="error-box" hidden></div>';
 }
 function render() {
+  catalogControls?.destroy();
   if (!state.pack) return;
   if (renderedView !== null) viewMemory.capture(root, renderedView);
   inspectorControls?.destroy(); inspectorControls = null;
@@ -176,7 +183,8 @@ function render() {
     const currentURL=new URL(location.href);currentURL.searchParams.set('package',state.key);currentURL.searchParams.set('view',state.view);currentURL.searchParams.set('mode',state.mode);history.replaceState(null,'',currentURL);
   }
   cssPreview();
-  root.innerHTML='<a class="studio-skip" href="#studio-content">Gå til indhold</a><div class="shell ds-app-shell"><aside data-scrollbar-surface="inverse" class="sidebar ds-app-navigation" tabindex="0" aria-label="Designsystemets navigation"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Design Studio</div><div><div class="side-label">Designsystem</div><nav class="navigation" aria-label="Design Studio">'+[['brand','Brandguide'],['components','Komponenter'],['patterns','Designmønstre'],['tokens','Tokens'],['quality','Kvalitet'],['package','Temaet']].map(([view,name])=>'<button type="button" class="nav-item '+(state.view===view?'active':'')+'" data-view="'+view+'" '+(state.view===view?'aria-current="page"':'')+'>'+icon(view)+name+'</button>').join('')+'</nav></div><div class="side-footer"><strong>Fælles struktur. Eget udtryk.</strong>Fælles bibliotek · temaer</div></aside><div class="workspace ds-app-workspace"><header class="topbar ds-app-header"><div class="breadcrumb">Design Studio <span>/</span><strong>'+(state.view==='patterns'?'Designmønstre':state.view==='quality'?'Kvalitet':'Temaer')+'</strong></div><div class="actions"><button type="button" class="studio-button quiet" id="toggle-inspector" aria-controls="studio-inspector"'+(state.view==='patterns'?' hidden':'')+'>'+(inspectorPanel.open?'Skjul egenskaber':'Vis egenskaber')+'</button><button type="button" class="studio-button quiet" id="discard" hidden>Fortryd ændringer</button><button type="button" class="studio-button" id="import">Åbn tema</button><button type="button" class="studio-button primary" id="save">Gem tema</button><input type="file" id="import-file" accept=".json,application/json" hidden></div></header><main id="studio-main" class="ds-app-content studio-main" tabindex="-1" aria-label="Design Studio – indhold"><div class="page-heading"><div><p class="eyebrow">Komponentbibliotek og temaer</p><h1>'+escape(state.pack.name)+'</h1><p class="page-description">'+escape(state.pack.description)+'</p></div><label class="package-picker" for="package-select">Aktivt tema<select id="package-select">'+state.packages.map(pack=>'<option value="'+escape(pack.key)+'" '+(pack.key===state.key?'selected':'')+'>'+escape(pack.name)+'</option>').join('')+'</select></label></div><div class="content ds-panel-layout'+(state.view==='patterns'?' patterns-content':'')+'" data-panel-open="'+(state.view!=='patterns'&&inspectorPanel.open)+'"><section id="studio-content" class="canvas ds-panel-content" tabindex="0" aria-label="Designindhold">'+(state.view==='brand'?brandStudio.content():state.view==='components'?componentsView():state.view==='patterns'?patternsView():state.view==='tokens'?tokensView():state.view==='quality'?qualityStudio.content():packageView())+'</section><button type="button" id="inspector-resize" class="inspector-resize ds-panel-resize" aria-label="Tilpas egenskabspanelets bredde"></button><aside id="studio-inspector" class="inspector ds-panel-side" tabindex="0" aria-label="Egenskaber">'+(state.view==='brand'?brandStudio.inspector():state.view==='components'?componentInspector():state.view==='patterns'?'':state.view==='tokens'?tokenInspector():state.view==='quality'?qualityStudio.inspector():packageInspector())+'</aside></div></main><footer id="status-bar" class="status-bar ds-app-footer" role="status"></footer></div></div>';
+  const wideView=['patterns','motion'].includes(state.view);
+  root.innerHTML='<a class="studio-skip" href="#studio-content">Gå til indhold</a><div class="shell ds-app-shell"><aside data-scrollbar-surface="inverse" class="sidebar ds-app-navigation" tabindex="0" aria-label="Designsystemets navigation"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Design Studio</div><div><div class="side-label">Designsystem</div><nav class="navigation" aria-label="Design Studio">'+[['brand','Brandguide'],['components','Komponenter'],['patterns','Designmønstre'],['motion','Animation og effekter'],['tokens','Tokens'],['quality','Kvalitet'],['package','Temaet']].map(([view,name])=>'<button type="button" class="nav-item '+(state.view===view?'active':'')+'" data-view="'+view+'" '+(state.view===view?'aria-current="page"':'')+'>'+icon(view)+name+'</button>').join('')+'</nav></div><div class="side-footer"><strong>Fælles struktur. Eget udtryk.</strong>Fælles bibliotek · temaer</div></aside><div class="workspace ds-app-workspace"><header class="topbar ds-app-header"><div class="breadcrumb">Design Studio <span>/</span><strong>'+(state.view==='motion'?'Animation og effekter':state.view==='patterns'?'Designmønstre':state.view==='quality'?'Kvalitet':'Temaer')+'</strong></div><div class="actions"><button type="button" class="studio-button quiet" id="toggle-inspector" aria-controls="studio-inspector"'+(wideView?' hidden':'')+'>'+(inspectorPanel.open?'Skjul egenskaber':'Vis egenskaber')+'</button><button type="button" class="studio-button quiet" id="discard" hidden>Fortryd ændringer</button><button type="button" class="studio-button" id="import">Åbn tema</button><button type="button" class="studio-button primary" id="save">Gem tema</button><input type="file" id="import-file" accept=".json,application/json" hidden></div></header><main id="studio-main" class="ds-app-content studio-main" tabindex="-1" aria-label="Design Studio – indhold"><div class="page-heading"><div><p class="eyebrow">Komponentbibliotek og temaer</p><h1>'+escape(state.pack.name)+'</h1><p class="page-description">'+escape(state.pack.description)+'</p></div><label class="package-picker" for="package-select">Aktivt tema<select id="package-select">'+state.packages.map(pack=>'<option value="'+escape(pack.key)+'" '+(pack.key===state.key?'selected':'')+'>'+escape(pack.name)+'</option>').join('')+'</select></label></div><div class="content ds-panel-layout'+(wideView?' patterns-content':'')+'" data-panel-open="'+(!wideView&&inspectorPanel.open)+'"><section id="studio-content" class="canvas ds-panel-content" tabindex="0" aria-label="Designindhold">'+(state.view==='brand'?brandStudio.content():state.view==='components'?componentsView():state.view==='patterns'?patternsView():state.view==='motion'?renderMotionView(previewTheme(),motionState):state.view==='tokens'?tokensView():state.view==='quality'?qualityStudio.content():packageView())+'</section><button type="button" id="inspector-resize" class="inspector-resize ds-panel-resize" aria-label="Tilpas egenskabspanelets bredde"></button><aside id="studio-inspector" class="inspector ds-panel-side" tabindex="0" aria-label="Egenskaber">'+(state.view==='brand'?brandStudio.inspector():state.view==='components'?componentInspector():wideView?'':state.view==='tokens'?tokenInspector():state.view==='quality'?qualityStudio.inspector():packageInspector())+'</aside></div></main><footer id="status-bar" class="status-bar ds-app-footer" role="status"></footer></div></div>';
   document.querySelectorAll('[data-swatch]').forEach(el=> {
     const id=el.dataset.swatch;
     if(themeTokens()[id].$type==='color') {try {el.style.backgroundColor=resolveTokens(state.pack)[id];}catch{}}
@@ -191,7 +199,7 @@ function render() {
   }
   bind();
   refreshStatus();
-  if (state.view !== 'patterns') {
+  if (!wideView) {
     inspectorControls = mountPanelControls({
       container: root.querySelector('.ds-panel-layout'), panel: root.querySelector('#studio-inspector'),
       handle: root.querySelector('#inspector-resize'), toggle: root.querySelector('#toggle-inspector'),
@@ -252,6 +260,7 @@ function bindInspectionLinks(scope=document){
   scope.querySelectorAll('[data-token]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.token=el.dataset.token;state.view='tokens';render();}}));
 }
 function bind() {
+  catalogControls=bindComponentCatalog(root,{state:state.view==='motion'?motionState:catalogState,allowNavigation,onChange(id){if(state.view!=='motion')state.component=id;render();}});
   document.querySelector('#migrate-theme')?.addEventListener('click', () => {
     try { state.pack = migratePackage(state.pack); state.variants = {}; render(); notice('Temaet er konverteret som en kladde. Gennemgå det, og gem eller eksportér.'); }
     catch (error) { notice(error.message, true); }
@@ -307,7 +316,7 @@ try{
   const params=new URLSearchParams(location.search);
   const requested=params.get('package');
   if(['catalog','example'].includes(params.get('mode')))state.mode=params.get('mode');
-  if(['brand','components','patterns','tokens','quality','package'].includes(params.get('view')))state.view=params.get('view');
+  if(['brand','components','patterns','motion','tokens','quality','package'].includes(params.get('view')))state.view=params.get('view');
   if(params.get('mode')==='patterns')state.view='patterns';
   const first=data.packages.find(p=>p.key===requested)?.key || data.packages.find(p=>p.id==='studio-light')?.key || data.packages[0]?.key;
   if(!first)throw new Error('Der er ingen designpakker. Tilføj en pakke i mappen packages, og åbn Design Studio igen.');

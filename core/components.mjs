@@ -1,20 +1,42 @@
-import {getComponents, brandAssetDataURL} from './engine.mjs';
+import {getComponents, brandAssetDataURL, resolveTokens} from './engine.mjs';
 export { createLayout, generateAppShellCSS } from './layout.mjs';
 export { mountPanelControls } from './panels.mjs';
+export { animateStandard, STANDARD_MOTION } from './motion.mjs';
 import {COMPONENT_LIBRARY, canonicalComponentId, canonicalVariantId, canonicalStateId, canonicalPartId} from './library.mjs';
+import { BUTTON_SIZES } from './library.mjs';
 
-const tags=new Set(['div','span','p','strong','label','button','input','select','option','h1','h2','h3','h4','h5','h6','hr','section','article','header','footer','dialog','textarea','ul','li','img','dl','dt','dd']);
+const tags=new Set(['a','nav','figure','figcaption','div','span','p','strong','label','button','input','select','option','h1','h2','h3','h4','h5','h6','hr','section','article','header','footer','dialog','textarea','ul','li','img','dl','dt','dd']);
 const inputTypes=new Set(['button','submit','reset','text','email','number','password','checkbox','radio','search','tel','url','range','color','date']);
 const booleans=new Set(['disabled','checked','selected','multiple','required','readOnly','readonly','hidden','open']);
 const voidTags=new Set(['input','hr','img']);
-const safeAttribute=name=>booleans.has(name)||['id','for','name','type','value','placeholder','min','max','step','rows','cols','autocomplete','role','title','tabindex','draggable'].includes(name)||/^aria-[a-z-]+$/.test(name)||/^data-[a-z-]+$/.test(name);
+const safeAttribute=name=>booleans.has(name)||['href','src','alt','id','for','name','type','value','placeholder','min','max','step','rows','cols','autocomplete','role','title','tabindex','draggable'].includes(name)||/^aria-[a-z-]+$/.test(name)||/^data-[a-z-]+$/.test(name);
+// URLs are checked before either HTML serialization or native DOM construction.
+function safeURL(value, image=false){
+ const url=String(value).trim();
+ if(/[\u0000-\u0020\u007f\\]/.test(url.replace(/ /g,'')))throw new Error('Unsupported component URL.');
+ const scheme=url.match(/^([a-z][a-z0-9+.-]*):/i)?.[1]?.toLowerCase();
+ if(scheme&&!((image?['http','https','blob']:['http','https','mailto','tel']).includes(scheme)||(image&&/^data:image\/(png|jpeg|gif|webp|svg\+xml)[;,]/i.test(url))))throw new Error('Unsupported component URL.');
+ return url;
+}
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/** Offline sample illustrations using the selected theme's resolved palette. */
+export function createImageExamples(pack){
+ const tokens=resolveTokens(pack),color=id=>escape(tokens[id]);
+ const primary=color('color.action.primary'),accent=color('color.brand.accent');
+ return [
+  ['Cirkel','En cirkel på en ensfarvet flade.',color('color.background.subtle'),`<circle cx="300" cy="200" r="110" fill="${primary}"/>`],
+  ['Bue','En bue over en cirkel.',color('color.background.subtle'),`<circle cx="300" cy="210" r="105" fill="${accent}"/><path fill="${primary}" d="M130 300V190a170 170 0 0 1 340 0v110h-55V190a115 115 0 0 0-230 0v110z"/>`],
+  ['Balance','En cirkel balancerer over to forskudte flader.',color('color.background.surface'),`<circle cx="300" cy="120" r="65" fill="${accent}"/><path fill="${primary}" d="M100 220h280v60H100zM250 290h250v55H250z"/>`],
+  ['Rytme','Fire lodrette former med forskellig højde.',color('color.action.subtle'),`<path fill="${primary}" d="M100 320V170h65v150zM320 320V130h65v190z"/><path fill="${accent}" d="M210 320V80h65v240zM430 320V210h65v110z"/>`],
+ ].map(([title,alt,background,shapes])=>({title,alt,src:'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect width="600" height="400" fill="${background}"/>${shapes}</svg>`)}));
+}
 let sequence=0;
 function attributes(attrs={}){
  const result={};
  for(const [key,value]of Object.entries(attrs)){
   if(!safeAttribute(key))throw new Error('Unsupported component attribute: '+key);
   if(key==='type'&&!inputTypes.has(value))throw new Error('Unsupported native input type: '+value);
+  if(key==='href'||key==='src'){result[key]=safeURL(value,key==='src');continue;}
   if(key==='draggable'){if(![true,false,'true','false'].includes(value))throw new Error('Boolean draggable attribute required.');result[key]=String(value);}
   else if(booleans.has(key)){if(typeof value!=='boolean')throw new Error('Boolean component attribute required: '+key);if(value)result[key==='readOnly'?'readonly':key]=true;}
   else {if(!['string','number'].includes(typeof value))throw new Error('Text component attribute required: '+key);result[key]=String(value);}
@@ -40,6 +62,17 @@ function model(pack,id,options,components,depth=0){
  let variant=options.variant??component.preview?.variant??['default','primary','neutral','horizontal'].find(key=>Object.hasOwn(component.variants,key));
  if(pack.schemaVersion===2&&variant)variant=canonicalVariantId(id,variant);
  if(variant&&!Object.hasOwn(component.variants,variant))throw new Error('Unknown component variant: '+id+'.'+variant);
+ const buttonLike=['button','action-button'].includes(id);
+ if(buttonLike&&options.size!==undefined&&!Object.hasOwn(BUTTON_SIZES,options.size))throw new Error('Unknown button size: '+options.size);
+ if(buttonLike&&options.intent!==undefined&&!['normal','danger'].includes(options.intent))throw new Error('Unknown button intent: '+options.intent);
+ if(id==='action-button'&&options.emphasis!==undefined&&!['primary','secondary','tertiary','ghost'].includes(options.emphasis))throw new Error('Unknown button emphasis: '+options.emphasis);
+ if(buttonLike&&options.intent==='danger'&&(options.emphasis??variant)==='secondary')throw new Error('Danger requires primary, tertiary or ghost emphasis.');
+ const stateList=Array.isArray(options.state)?options.state:[options.state];
+ const loading=id==='button'&&(options.loading||stateList.includes('loading'));
+ const unavailable=Boolean(options.disabled||stateList.includes('disabled')||loading);
+ if(id==='button'&&options.icon!==undefined)slots.icon=String(options.icon);
+ if(id==='button'&&options.iconOnly&&!String(options.label??options.attrs?.['aria-label']??options.text??'').trim())throw new Error('Icon-only button requires an accessible name.');
+ if(id==='button'&&options.iconOnly&&options.icon===undefined&&!slots.icon)throw new Error('Icon-only button requires an icon.');
  if(options.error&&['field','choice-field'].includes(id))variant='invalid';
  const hasError=['field','choice-field'].includes(id)&&(Boolean(options.error)||variant==='invalid');
  const hasHint=options.hint!=='';
@@ -64,10 +97,37 @@ function model(pack,id,options,components,depth=0){
    else throw new Error('Expected text or declarative nodes in component slot '+part);
   }
   if(!tags.has(node.tag))throw new Error('Unsupported component tag: '+node.tag);
-  if(root&&options.text!==undefined&&id!=='action-button'){node.text=String(options.text);delete node.children;}
-  const attrs=attributes({...node.attrs,...(root?options.attrs:{})});
+  if(root&&options.text!==undefined&&id!=='action-button'&&!(id==='button'&&(options.icon!==undefined||slots.icon!==undefined||options.iconOnly||loading))){node.text=String(options.text);delete node.children;}
+  const suppliedAttrs={...node.attrs,...(root?options.attrs:{})};
+  if(id==='action-button'&&Object.hasOwn(suppliedAttrs,'src'))throw new Error('Unsupported component attribute: src');
+  const attrs=attributes(suppliedAttrs);
   if(part)attrs.class=component.parts[part].selector.slice(1);
   if(root&&variant)attrs['data-variant']=variant;
+  if(root&&buttonLike){
+   if(options.size)attrs['data-size']=options.size;
+   if(options.intent&&options.intent!=='normal')attrs['data-intent']=options.intent;
+   if(id==='action-button'&&options.emphasis)attrs['data-emphasis']=options.emphasis;
+  }
+  if(id==='button'){
+   if(root){
+    const href=options.href??attrs.href;
+    if(href!==undefined){node.tag='a';delete attrs.type;if(unavailable){delete attrs.href;attrs.role='link';attrs['aria-disabled']='true';attrs.tabindex='-1';}else attrs.href=safeURL(href);}
+    if(options.icon!==undefined||slots.icon!==undefined){attrs['data-has-icon']='true';}
+    if(options.iconOnly){attrs['data-icon-only']='true';attrs['aria-label']=String(options.label??options.attrs?.['aria-label']??options.text);}
+    if(loading){attrs['aria-busy']='true';attrs['data-loading']='true';}
+   }
+   if(part==='heading'&&(options.text!==undefined||options.label!==undefined))node.text=String(options.text??options.label);
+   if(part==='heading'&&options.iconOnly)attrs.hidden=true;
+   if(part==='icon'&&((options.icon===undefined&&slots.icon===undefined)||loading))attrs.hidden=true;
+   if(part==='progress'&&!loading)attrs.hidden=true;
+  }
+  if(root&&id==='link'&&options.href!==undefined)attrs.href=safeURL(options.href);
+  if(id==='image'&&part==='media'){
+   attrs.src=safeURL(options.src??attrs.src??createImageExamples(pack)[0].src,true);
+   if(options.alt!==undefined)attrs.alt=String(options.alt);
+   if(options.src!==undefined&&options.alt===undefined)throw new Error('Image source requires an explicit alt text (empty for decoration).');
+  }
+  if(id==='image'&&part==='caption'&&options.caption!==undefined){node.text=String(options.caption);if(options.caption==='')attrs.hidden=true;}
   if(!root&&node.variant)attrs['data-variant']=node.variant;
   if(root&&options.state){const states=(Array.isArray(options.state)?options.state:[options.state]).map(state=>pack.schemaVersion===2?canonicalStateId(id,state):state);for(const state of states)if(!Object.hasOwn(component.states,state))throw new Error('Unknown component state: '+state);if(id!=='tree'){attrs['data-state']=states.join(' ');if(states.includes('selected'))attrs['aria-selected']='true';if(states.includes('pressed'))attrs['aria-pressed']='true';if(states.includes('expanded'))attrs['aria-expanded']='true';if(states.includes('loading'))attrs['aria-busy']='true';}}
   const nativeControl=['input','select','textarea'].includes(node.tag);
@@ -78,6 +138,7 @@ function model(pack,id,options,components,depth=0){
   if(node.tag==='button'){
    attrs.type??='button';
    if(options.disabled!==undefined){if(options.disabled)attrs.disabled=true;else delete attrs.disabled;}
+   if(root&&loading)attrs.disabled=true;
   }
   if(id!=='tree'&&(nativeControl||node.tag==='button')&&(Array.isArray(options.state)?options.state:[options.state]).includes('disabled'))attrs.disabled=true;
   if(root&&options.disabled)attrs['aria-disabled']='true';
@@ -126,11 +187,16 @@ function serialize(node){
 }
 /** Safe HTML from the same shared declarative implementation used by createComponent.
  * options: variant, state, idPrefix, text, slots, attrs and native control values.
+ * button: size (small/medium/large), intent (normal/danger), href, icon, iconOnly,
+ * label and loading. action-button accepts size, intent and emphasis independently
+ * of its orientation variant. Four new button levels coexist with legacy recipes.
  * field/choice-field accept controlVariant: 'desktop' independently of validation state.
  * slots accept escaped text, declarative nodes, arrays or {component, options}.
  * Dialog returns a native dialog host: call showModal()/close() in the product.
  */
 export function renderComponent(pack,id,options={}) {return serialize(model(pack,id,options,getComponents(pack)));}
+/** Render many specimens from one validated theme snapshot. */
+export function createComponentRenderer(pack){const snapshot=structuredClone(pack),components=getComponents(snapshot);return(id,options={})=>serialize(model(snapshot,id,options,components));}
 /** Build native DOM without innerHTML. Attach product event handlers to the returned node. */
 export function createComponent(pack,id,options={}, {document=globalThis.document}={}) {
  if(!document?.createElement)throw new Error('createComponent requires a DOM document.');

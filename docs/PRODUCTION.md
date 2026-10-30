@@ -35,7 +35,7 @@ Efter tema- eller biblioteksændringer køres `node tools/cli.mjs sync PROJECT_D
 
 ## Designmønstre og fælles layout
 
-Editor og showcase indeholder fem afprøvbare referenceeksempler: objekteditor, formular, liste med detaljer, ressourcebibliotek og fortryd/gentag. `node tools/cli.mjs examples PROJECT_DIR` kopierer referencekoden uden overskrivning. Produktet ejer derefter tilpasning, data og lagring. Eksemplernes handlinger og gemmepunkter gælder kun hukommelsen; ressourcebiblioteket indlæser ikke i sig selv produktfiler.
+Editor og showcase indeholder ni afprøvbare referenceeksempler: objekteditor, formular, liste med detaljer, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. `node tools/cli.mjs examples PROJECT_DIR` kopierer referencekoden uden overskrivning. Produktet ejer derefter tilpasning, data og lagring. Eksemplernes handlinger og gemmepunkter gælder kun hukommelsen; ressourcebiblioteket indlæser ikke i sig selv produktfiler.
 
 Breddeprofilerne `prose`, `form`, `panel`, `split`, `workspace` og `fluid` følger med fælles CSS og runtime. De giver indholdsbestemte standarder og kan tilpasses lokalt; produktet ejer kolonner og placering. Se [designgrundlaget](DESIGN-FOUNDATIONS.md) og [API og designmønstre](INTEGRATION.md).
 

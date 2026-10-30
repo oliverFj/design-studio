@@ -1,4 +1,20 @@
 .ds-composition-gallery, .ds-composition { container-type: inline-size; color: var(--ds-color-text-primary); }
+.composition-site-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-component-gapLarge); border-bottom: var(--ds-border-width-default) solid var(--ds-color-border-default); padding-block-end: var(--ds-space-component-gapLarge); }
+.composition-mobile-navigation { display: none; }
+.composition-mobile-navigation summary { cursor: pointer; padding: var(--ds-space-component-padding); font: inherit; }
+.composition-mobile-navigation summary:focus-visible { outline: var(--ds-border-width-focus) solid var(--ds-color-focus); outline-offset: var(--ds-border-offset-focus); }
+.composition-mobile-navigation > nav { padding-block-start: var(--ds-space-component-gap); }
+.composition-hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; gap: var(--ds-space-component-gapLarge); }
+.composition-hero > *, .composition-site-footer > * { min-width: 0; }
+.composition-site-footer { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--ds-space-component-gapLarge); }
+.composition-image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: var(--ds-space-component-gapLarge); }
+.composition-web-destinations { border-top: var(--ds-border-width-default) solid var(--ds-color-border-default); padding-block-start: var(--ds-space-component-gapLarge); }
+@container (max-width: 600px) {
+  .composition-site-header { align-items: start; }
+  .composition-desktop-navigation { display: none; }
+  .composition-mobile-navigation { display: block; }
+  .composition-hero { grid-template-columns: minmax(0, 1fr); }
+}
 .composition-heading + div > .ds-stack { max-inline-size: 70ch; }
 .composition-heading { margin-block-end: var(--ds-space-component-gapLarge); align-items: end; }
 .ds-composition-gallery pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--ds-typography-size-small); }

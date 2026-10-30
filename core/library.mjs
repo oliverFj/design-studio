@@ -1,5 +1,5 @@
 /** Project-agnostic component anatomy and semantic defaults. Visual themes own appearance. */
-export const LIBRARY_VERSION='2.8.0';
+export const LIBRARY_VERSION='3.0.0';
 export { LAYOUT_PROFILES } from './layout.mjs';
 function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
 // Keep one-line desktop controls at 32px without clipping larger type or wrapped labels.
@@ -184,6 +184,10 @@ export const LEGACY_SELECTORS=freeze({
   ]
 });
 export const DEFAULT_TOKENS=freeze({
+  "color.action.secondaryHover": {"$type":"color","$value":"#3d4253","description":"Central neutral secondary hover surface; themes may override the complete surface/text pair."},
+  "color.action.secondaryHoverText": {"$type":"color","$value":"#ffffff","description":"Readable text on the neutral secondary hover surface."},
+  "color.action.secondaryActive": {"$type":"color","$value":"#171b29","description":"Central neutral secondary active surface; themes may override the complete surface/text pair."},
+  "color.action.secondaryActiveText": {"$type":"color","$value":"#ffffff","description":"Readable text on the neutral secondary active surface."},
   "color.background.canvas": {
     "$type": "color",
     "$value": "#f5f6f8",
@@ -950,7 +954,323 @@ export const DEFAULT_TOKENS=freeze({
     "description": "Central default: Accent interaction follows primary unless the theme defines its own accent family."
   }
 });
+// Historical recipes remain available to generated CSS and existing integrations.
+export const BUTTON_COMPATIBILITY_VARIANTS=freeze({
+  "desktop": {
+    "description": "Kompakt desktopbetjening med 32 px klikflader. Brug standardvarianten ved touch eller behov for større mål.",
+    "styles": {
+      "minHeight": "32px",
+      "padding": "max(0px, calc((32px - 1em * {typography.lineHeight.control}) / 2 - {border.width.default})) {space.component.padding}",
+      "lineHeight": "{typography.lineHeight.control}",
+      "minWidth": "32px",
+      "backgroundColor": "{color.background.control}",
+      "color": "{color.text.primary}",
+      "borderColor": "{color.border.field}",
+      "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+      "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+      "--ds-interaction-active-surface": "{color.action.neutralActive}",
+      "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+    }
+  },
+  "danger": {
+    "description": "Destruktiv handling eller fejlstatus.",
+    "styles": {
+      "backgroundColor": "{color.status.danger}",
+      "color": "{color.status.dangerContrast}",
+      "padding": "{space.component.paddingCompact} {space.component.padding}",
+      "--ds-interaction-hover-surface": "{color.action.dangerHover}",
+      "--ds-interaction-hover-text": "{color.action.dangerHoverText}",
+      "--ds-interaction-active-surface": "{color.action.dangerActive}",
+      "--ds-interaction-active-text": "{color.action.dangerActiveText}"
+    }
+  },
+  "accent": {
+    "description": "Særskilt fremhævning.",
+    "styles": {
+      "backgroundColor": "{color.brand.accent}",
+      "color": "{color.background.canvas}",
+      "borderColor": "{color.brand.accent}",
+      "padding": "{space.component.paddingCompact} {space.component.padding}",
+      "--ds-interaction-hover-surface": "{color.action.accentHover}",
+      "--ds-interaction-hover-text": "{color.action.accentHoverText}",
+      "--ds-interaction-active-surface": "{color.action.accentActive}",
+      "--ds-interaction-active-text": "{color.action.accentActiveText}"
+    }
+  },
+  "toolbar": {
+    "description": "Kompakt handling i en gruppe.",
+    "styles": {
+      "border": "0",
+      "backgroundColor": "transparent",
+      "padding": "{space.component.paddingCompact}",
+      "color": "{color.text.primary}",
+      "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+      "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+      "--ds-interaction-active-surface": "{color.action.neutralActive}",
+      "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+    }
+  },
+  "icon": {
+    "description": "Handling med ikon.",
+    "styles": {
+      "border": "0",
+      "backgroundColor": "transparent",
+      "padding": "{space.component.paddingCompact}",
+      "display": "flex",
+      "alignItems": "center",
+      "color": "{color.text.primary}",
+      "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+      "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+      "--ds-interaction-active-surface": "{color.action.neutralActive}",
+      "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+    }
+  },
+  "menu": {
+    "description": "Handling i en menuliste.",
+    "styles": {
+      "display": "block",
+      "width": "100%",
+      "textAlign": "left",
+      "border": "0",
+      "backgroundColor": "transparent",
+      "padding": "{space.component.paddingCompact}",
+      "color": "{color.text.primary}",
+      "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+      "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+      "--ds-interaction-active-surface": "{color.action.neutralActive}",
+      "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+    },
+    "parts": {
+      "description": {
+        "styles": {
+          "display": "block"
+        }
+      }
+    }
+  },
+  "dismiss": {
+    "description": "Lukke- eller afvisningshandling.",
+    "styles": {
+      "border": "0",
+      "backgroundColor": "transparent",
+      "padding": "{space.component.paddingCompact}",
+      "fontSize": "{typography.size.close}",
+      "lineHeight": 1,
+      "color": "{color.text.secondary}",
+      "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+      "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+      "--ds-interaction-active-surface": "{color.action.neutralActive}",
+      "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+    }
+  },
+  "list-item": {
+    "description": "Handling knyttet til en listepost.",
+    "styles": {
+      "display": "block",
+      "width": "100%",
+      "textAlign": "left",
+      "border": "0",
+      "borderBottom": "{border.width.default} solid {color.border.default}",
+      "backgroundColor": "transparent",
+      "padding": "{space.component.paddingCompact}",
+      "color": "{color.text.primary}",
+      "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+      "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+      "--ds-interaction-active-surface": "{color.action.neutralActive}",
+      "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+    },
+    "parts": {
+      "description": {
+        "styles": {
+          "display": "block"
+        }
+      }
+    }
+  },
+  "link": {
+    "description": "Typografisk fremhævet handling.",
+    "styles": {
+      "border": "0",
+      "backgroundColor": "transparent",
+      "padding": "{space.component.paddingCompact}",
+      "fontWeight": "{typography.weight.strong}",
+      "color": "{color.action.subtleText}",
+      "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+      "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+      "--ds-interaction-active-surface": "{color.action.neutralActive}",
+      "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+    }
+  },
+  "danger-subtle": {
+    "description": "Destruktiv handling med lav fremhævning.",
+    "styles": {
+      "border": "0",
+      "backgroundColor": "transparent",
+      "color": "{color.status.danger}",
+      "fontWeight": "{typography.weight.strong}",
+      "padding": "{space.component.paddingCompact}",
+      "--ds-interaction-hover-surface": "{color.action.dangerHover}",
+      "--ds-interaction-hover-text": "{color.action.dangerHoverText}",
+      "--ds-interaction-active-surface": "{color.action.dangerActive}",
+      "--ds-interaction-active-text": "{color.action.dangerActiveText}"
+    }
+  },
+  "rounded": {
+    "description": "Afrundet handling.",
+    "styles": {
+      "border": "{border.width.default} solid {color.border.field}",
+      "backgroundColor": "{color.caption.surface}",
+      "borderRadius": "{radius.pill}",
+      "padding": "{space.component.paddingCompact} {space.component.padding}",
+      "color": "{color.text.primary}",
+      "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+      "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+      "--ds-interaction-active-surface": "{color.action.neutralActive}",
+      "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+    }
+  },
+  "dismiss-small": {
+    "description": "Lille lukkehandling.",
+    "styles": {
+      "border": "0",
+      "backgroundColor": "transparent",
+      "padding": "{space.component.paddingCompact}",
+      "fontSize": "{typography.size.clock}",
+      "lineHeight": 1,
+      "color": "{color.text.secondary}",
+      "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+      "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+      "--ds-interaction-active-surface": "{color.action.neutralActive}",
+      "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+    }
+  },
+  "compact": {
+    "description": "Kompakt opbygning.",
+    "styles": {
+      "fontSize": "{typography.size.small}",
+      "padding": "{space.component.paddingCompact} {space.component.padding}",
+      "border": "{border.width.default} solid {color.border.field}",
+      "backgroundColor": "{color.background.control}",
+      "color": "{color.text.primary}",
+      "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+      "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+      "--ds-interaction-active-surface": "{color.action.neutralActive}",
+      "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+    }
+  },
+  "dismiss-compact": {
+    "description": "Lukkehandling i en tæt opbygning.",
+    "styles": {
+      "border": "0",
+      "backgroundColor": "transparent",
+      "fontSize": "{typography.size.panel}",
+      "padding": "{space.component.paddingCompact}",
+      "lineHeight": 1,
+      "color": "{color.text.secondary}",
+      "--ds-interaction-hover-surface": "{color.action.neutralHover}",
+      "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
+      "--ds-interaction-active-surface": "{color.action.neutralActive}",
+      "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+    }
+  }
+});
+export const BUTTON_SIZES=freeze({
+  "small": {
+    "minHeight": "32px",
+    "minWidth": "32px",
+    "fontSize": "{typography.size.control}",
+    "padding": "max(0px, calc((32px - 1em * {typography.lineHeight.control}) / 2 - {border.width.default})) {space.component.padding}"
+  },
+  "medium": {
+    "minHeight": "44px",
+    "minWidth": "44px",
+    "fontSize": "{typography.size.label}",
+    "padding": "max(0px, calc((44px - 1em * {typography.lineHeight.control}) / 2 - {border.width.default})) {space.component.padding}"
+  },
+  "large": {
+    "minHeight": "48px",
+    "minWidth": "48px",
+    "fontSize": "{typography.size.body}",
+    "padding": "max(0px, calc((48px - 1em * {typography.lineHeight.control}) / 2 - {border.width.default})) {space.component.padding}"
+  }
+});
+export const BUTTON_DANGER_VARIANTS=freeze({
+  "primary": {
+    "backgroundColor": "{color.status.danger}",
+    "color": "{color.status.dangerContrast}",
+    "borderColor": "transparent",
+    "--ds-interaction-hover-surface": "{color.action.dangerHover}",
+    "--ds-interaction-hover-text": "{color.action.dangerHoverText}",
+    "--ds-interaction-active-surface": "{color.action.dangerActive}",
+    "--ds-interaction-active-text": "{color.action.dangerActiveText}"
+  },
+  "tertiary": {
+    "backgroundColor": "transparent",
+    "color": "{color.status.danger}",
+    "borderColor": "{color.status.danger}",
+    "--ds-interaction-hover-surface": "{color.action.dangerHover}",
+    "--ds-interaction-hover-text": "{color.action.dangerHoverText}",
+    "--ds-interaction-active-surface": "{color.action.dangerActive}",
+    "--ds-interaction-active-text": "{color.action.dangerActiveText}"
+  },
+  "ghost": {
+    "backgroundColor": "transparent",
+    "color": "{color.status.danger}",
+    "borderColor": "transparent",
+    "--ds-interaction-hover-surface": "{color.action.dangerHover}",
+    "--ds-interaction-hover-text": "{color.action.dangerHoverText}",
+    "--ds-interaction-active-surface": "{color.action.dangerActive}",
+    "--ds-interaction-active-text": "{color.action.dangerActiveText}"
+  }
+});
+export const buttonVariantIds=component=>Object.keys(component.variants).filter(id=>!Object.hasOwn(BUTTON_COMPATIBILITY_VARIANTS,id));
 export const COMPONENT_LIBRARY=freeze({
+  "link": {
+    name: 'Link', description: 'Navigation til en side, fil eller sektion med native ankersemantik.',
+    usage: 'Angiv href og meningsfuld tekst. Brug navigation til menulinks. Knaplignende navigationsmål bruger button med href og den ønskede fremhævelse. action understøttes kun til ældre integrationer. Markér aktuelt mål med aria-current.',
+    composes: [],
+    parts: { root: { selector: '.ds-link', styles: { fontFamily: '{typography.font.body}', fontSize: '{typography.size.body}', lineHeight: '{typography.lineHeight.body}', color: '{color.text.primary}', textDecoration: 'underline', borderRadius: '{radius.control}', overflowWrap: 'anywhere' } } },
+    variants: {
+      navigation: { description: 'Et navigationsmål med større klikflade.', styles: { display: 'inline-flex', alignItems: 'center', minHeight: '44px', boxSizing: 'border-box', padding: '{space.component.paddingCompact} {space.component.padding}', textDecoration: 'none' } },
+      action: { description: 'Historisk kompatibilitet; nye knaplignende links bruger button med href.', styles: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: '44px', boxSizing: 'border-box', padding: '{space.component.paddingCompact} {space.component.padding}', backgroundColor: '{color.background.control}', border: '{border.width.default} solid {color.border.field}', textDecoration: 'none' } }
+    },
+    states: {
+      hover: { description: 'Synlig feedback under pegemarkøren.', styles: { backgroundColor: '{color.action.neutralHover}', color: '{color.action.neutralHoverText}', textDecoration: 'underline' } },
+      active: { description: 'Linket aktiveres.', styles: { backgroundColor: '{color.action.neutralActive}', color: '{color.action.neutralActiveText}' } },
+      focus: { description: 'Synligt tastaturfokus.', styles: { outline: '{border.width.focus} solid {color.focus}', outlineOffset: '{border.offset.focus}' } },
+      current: { description: 'Aktuelt navigationsmål med aria-current.', styles: { fontWeight: '{typography.weight.heading}', textDecoration: 'underline' } }
+    },
+    preview: { tag: 'a', part: 'root', attrs: { href: '#indhold' }, text: 'Læs mere' }
+  },
+  "navigation": {
+    name: 'Navigation', description: 'Navngivet navigation med en liste af links.',
+    usage: 'Brug nav og native links til websites. Giv flere navigationer forskellige navne. Produktet ejer links, aktuelt mål og mobilmenuens åbning. Brug ikke menu/menubar til almindelig websitenavigation.',
+    composes: ['link'],
+    parts: {
+      root: { selector: '.ds-navigation', styles: { minWidth: '0' } },
+      list: { selector: '.ds-navigation__list', styles: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '{space.component.gap}', listStyleType: 'none', margin: '0', padding: '0' } },
+      item: { selector: '.ds-navigation__item', styles: { minWidth: '0' } }
+    },
+    variants: { vertical: { description: 'Lodret liste til en smal menu eller footer.', parts: { list: { styles: { flexDirection: 'column', alignItems: 'start' } } } } },
+    states: {},
+    preview: { tag: 'nav', part: 'root', attrs: { 'aria-label': 'Navigation' }, children: [{ tag: 'ul', part: 'list', children: [{ tag: 'li', part: 'item', children: [{ component: 'link' }] }] }] }
+  },
+  "image": {
+    name: 'Billede', description: 'Responsivt billede med valgfri tilknyttet billedtekst.',
+    usage: 'Angiv src, alt og eventuelt caption. Beskriv informative billeder; brug alt="" til dekoration. Standard bevarer hele originalen. landscape og square beskærer; brug dem kun når motivet tåler det. Produktet ejer billedrettigheder og ressourcer.',
+    composes: [],
+    parts: {
+      root: { selector: '.ds-image', styles: { display: 'flex', flexDirection: 'column', gap: '{space.component.gap}', margin: '0', minWidth: '0' } },
+      media: { selector: '.ds-image__media', styles: { display: 'block', width: '100%', maxWidth: '100%', height: 'auto', borderRadius: '{radius.control}', objectFit: 'contain' } },
+      caption: { selector: '.ds-image__caption', styles: { fontFamily: '{typography.font.body}', fontSize: '{typography.size.small}', lineHeight: '{typography.lineHeight.body}', color: '{color.text.secondary}' } }
+    },
+    variants: {
+      landscape: { description: 'Beskåret til et liggende 3:2-format.', parts: { media: { styles: { aspectRatio: '3 / 2', objectFit: 'cover' } } } },
+      square: { description: 'Beskåret til et kvadrat.', parts: { media: { styles: { aspectRatio: '1', objectFit: 'cover' } } } }
+    },
+    states: {},
+    preview: { tag: 'figure', part: 'root', children: [{ tag: 'img', part: 'media', attrs: { alt: 'En cirkel på en ensfarvet flade.' } }, { tag: 'figcaption', part: 'caption', text: 'En enkel form og dens omgivelser.' }] }
+  },
   "text": {
     "name": "Tekst",
     "description": "Læsetekst og supplerende information.",
@@ -1015,8 +1335,8 @@ export const COMPONENT_LIBRARY=freeze({
   },
   "button": {
     "name": "Knap",
-    "description": "En navngivet handling med tydeligt hierarki.",
-    "usage": "Brug native button til handlinger. Primær fremhævning angiver den vigtigste lokale handling; utilgængelige handlinger bruger disabled.",
+    "description": "En fælles knapfamilie med fire fremhævelser, uafhængig størrelse og native handling eller navigation.",
+    "usage": "Primary er næste hovedhandling. Secondary er en solid neutral ledsager til primary; tertiary kan stå alene; ghost er supplerende. Vælg size small (32 px), medium (44 px) eller large (48 px) uafhængigt af variant. intent danger bruges med primary, tertiary eller ghost. href giver et native link med samme fremtoning. Uden sideikon er teksten centreret med symmetrisk padding. iconOnly kræver et tilgængeligt navn. loading deaktiverer under arbejde. Historiske variantnavne understøttes kun som kompatibilitet.",
     "composes": [],
     "parts": {
       "root": {
@@ -1025,9 +1345,9 @@ export const COMPONENT_LIBRARY=freeze({
           "display": "inline-flex",
           "alignItems": "center",
           "justifyContent": "center",
-          "gap": "{space.component.gap}",
+          "gap": "{space.component.gapLarge}",
           "minHeight": "max(44px, {size.control.height})",
-          "padding": "{space.component.paddingCompact} {space.component.padding}",
+          "padding": "max(0px, calc((44px - 1em * {typography.lineHeight.control}) / 2 - {border.width.default})) {space.component.padding}",
           "border": "{border.width.default} solid transparent",
           "borderRadius": "{radius.control}",
           "fontFamily": "{typography.font.body}",
@@ -1049,7 +1369,9 @@ export const COMPONENT_LIBRARY=freeze({
           "--ds-interaction-active-surface": "{color.action.primaryActive}",
           "--ds-interaction-active-text": "{color.action.primaryActiveText}",
           "wordBreak": "normal",
-          "flexShrink": "0"
+          "flexShrink": "0",
+          "textAlign": "center",
+          "borderColor": "transparent"
         }
       },
       "heading": {
@@ -1077,29 +1399,37 @@ export const COMPONENT_LIBRARY=freeze({
           "overflowWrap": "normal",
           "wordBreak": "normal"
         }
+      },
+      "icon": {
+        "selector": ".ds-button__icon",
+        "styles": {
+          "display": "none",
+          "flexShrink": "0",
+          "width": "1em",
+          "height": "1em",
+          "lineHeight": 1
+        }
+      },
+      "progress": {
+        "selector": ".ds-button__progress",
+        "styles": {
+          "display": "none",
+          "flexShrink": "0",
+          "width": "1em",
+          "height": "1em",
+          "border": "2px solid currentColor",
+          "borderRightColor": "transparent",
+          "borderRadius": "50%"
+        }
       }
     },
     "variants": {
-      "desktop": {
-  "description": "Kompakt desktopbetjening med 32 px klikflader. Brug standardvarianten ved touch eller behov for større mål.",
-  "styles": {
-    ...DESKTOP_CONTROL_STYLES,
-    "minWidth": "32px",
-    "backgroundColor": "{color.background.control}",
-    "color": "{color.text.primary}",
-    "borderColor": "{color.border.field}",
-    "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-    "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-    "--ds-interaction-active-surface": "{color.action.neutralActive}",
-    "--ds-interaction-active-text": "{color.action.neutralActiveText}"
-  }
-},
       "primary": {
-        "description": "Vigtigste lokale handling.",
+        "description": "Den vigtigste næste handling i den aktuelle opgave.",
         "styles": {
           "backgroundColor": "{color.action.primary}",
           "color": "{color.action.primaryText}",
-          "padding": "{space.component.paddingCompact} {space.component.padding}",
+          "borderColor": "transparent",
           "--ds-interaction-hover-surface": "{color.action.primaryHover}",
           "--ds-interaction-hover-text": "{color.action.primaryHoverText}",
           "--ds-interaction-active-surface": "{color.action.primaryActive}",
@@ -1107,224 +1437,35 @@ export const COMPONENT_LIBRARY=freeze({
         }
       },
       "secondary": {
-        "description": "Supplerende handling.",
+        "description": "Solid neutral ledsager til primary, eksempelvis Tilbage eller Annuller.",
         "styles": {
-          "backgroundColor": "{color.background.control}",
-          "color": "{color.text.primary}",
-          "borderColor": "{color.border.field}",
-          "padding": "{space.component.paddingCompact} {space.component.padding}",
-          "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-          "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-          "--ds-interaction-active-surface": "{color.action.neutralActive}",
-          "--ds-interaction-active-text": "{color.action.neutralActiveText}"
+          "backgroundColor": "{color.background.inverse}",
+          "color": "{color.text.inverse}",
+          "borderColor": "transparent",
+          "--ds-interaction-hover-surface": "{color.action.secondaryHover}",
+          "--ds-interaction-hover-text": "{color.action.secondaryHoverText}",
+          "--ds-interaction-active-surface": "{color.action.secondaryActive}",
+          "--ds-interaction-active-text": "{color.action.secondaryActiveText}"
+        }
+      },
+      "tertiary": {
+        "description": "Konturknap til mindre eller selvstændige handlinger.",
+        "styles": {
+          "backgroundColor": "transparent",
+          "color": "{color.action.primary}",
+          "borderColor": "{color.action.primary}",
+          "--ds-interaction-hover-surface": "{color.action.primaryHover}",
+          "--ds-interaction-hover-text": "{color.action.primaryHoverText}",
+          "--ds-interaction-active-surface": "{color.action.primaryActive}",
+          "--ds-interaction-active-text": "{color.action.primaryActiveText}"
         }
       },
       "ghost": {
-        "description": "Lav visuel fremhævning.",
+        "description": "Laveste fremhævelse til supplerende handlinger og værktøjer.",
         "styles": {
           "backgroundColor": "transparent",
-          "color": "{color.action.subtleText}",
-          "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-          "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-          "--ds-interaction-active-surface": "{color.action.neutralActive}",
-          "--ds-interaction-active-text": "{color.action.neutralActiveText}"
-        }
-      },
-      "danger": {
-        "description": "Destruktiv handling eller fejlstatus.",
-        "styles": {
-          "backgroundColor": "{color.status.danger}",
-          "color": "{color.status.dangerContrast}",
-          "padding": "{space.component.paddingCompact} {space.component.padding}",
-          "--ds-interaction-hover-surface": "{color.action.dangerHover}",
-          "--ds-interaction-hover-text": "{color.action.dangerHoverText}",
-          "--ds-interaction-active-surface": "{color.action.dangerActive}",
-          "--ds-interaction-active-text": "{color.action.dangerActiveText}"
-        }
-      },
-      "accent": {
-        "description": "Særskilt fremhævning.",
-        "styles": {
-          "backgroundColor": "{color.brand.accent}",
-          "color": "{color.background.canvas}",
-          "borderColor": "{color.brand.accent}",
-          "padding": "{space.component.paddingCompact} {space.component.padding}",
-          "--ds-interaction-hover-surface": "{color.action.accentHover}",
-          "--ds-interaction-hover-text": "{color.action.accentHoverText}",
-          "--ds-interaction-active-surface": "{color.action.accentActive}",
-          "--ds-interaction-active-text": "{color.action.accentActiveText}"
-        }
-      },
-      "toolbar": {
-        "description": "Kompakt handling i en gruppe.",
-        "styles": {
-          "border": "0",
-          "backgroundColor": "transparent",
-          "padding": "{space.component.paddingCompact}",
-          "color": "{color.text.primary}",
-          "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-          "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-          "--ds-interaction-active-surface": "{color.action.neutralActive}",
-          "--ds-interaction-active-text": "{color.action.neutralActiveText}"
-        }
-      },
-      "icon": {
-        "description": "Handling med ikon.",
-        "styles": {
-          "border": "0",
-          "backgroundColor": "transparent",
-          "padding": "{space.component.paddingCompact}",
-          "display": "flex",
-          "alignItems": "center",
-          "color": "{color.text.primary}",
-          "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-          "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-          "--ds-interaction-active-surface": "{color.action.neutralActive}",
-          "--ds-interaction-active-text": "{color.action.neutralActiveText}"
-        }
-      },
-      "menu": {
-        "description": "Handling i en menuliste.",
-        "styles": {
-          "display": "block",
-          "width": "100%",
-          "textAlign": "left",
-          "border": "0",
-          "backgroundColor": "transparent",
-          "padding": "{space.component.paddingCompact}",
-          "color": "{color.text.primary}",
-          "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-          "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-          "--ds-interaction-active-surface": "{color.action.neutralActive}",
-          "--ds-interaction-active-text": "{color.action.neutralActiveText}"
-        },
-        "parts": {
-          "description": {
-            "styles": {
-              "display": "block"
-            }
-          }
-        }
-      },
-      "dismiss": {
-        "description": "Lukke- eller afvisningshandling.",
-        "styles": {
-          "border": "0",
-          "backgroundColor": "transparent",
-          "padding": "{space.component.paddingCompact}",
-          "fontSize": "{typography.size.close}",
-          "lineHeight": 1,
-          "color": "{color.text.secondary}",
-          "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-          "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-          "--ds-interaction-active-surface": "{color.action.neutralActive}",
-          "--ds-interaction-active-text": "{color.action.neutralActiveText}"
-        }
-      },
-      "list-item": {
-        "description": "Handling knyttet til en listepost.",
-        "styles": {
-          "display": "block",
-          "width": "100%",
-          "textAlign": "left",
-          "border": "0",
-          "borderBottom": "{border.width.default} solid {color.border.default}",
-          "backgroundColor": "transparent",
-          "padding": "{space.component.paddingCompact}",
-          "color": "{color.text.primary}",
-          "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-          "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-          "--ds-interaction-active-surface": "{color.action.neutralActive}",
-          "--ds-interaction-active-text": "{color.action.neutralActiveText}"
-        },
-        "parts": {
-          "description": {
-            "styles": {
-              "display": "block"
-            }
-          }
-        }
-      },
-      "link": {
-        "description": "Typografisk fremhævet handling.",
-        "styles": {
-          "border": "0",
-          "backgroundColor": "transparent",
-          "padding": "{space.component.paddingCompact}",
-          "fontWeight": "{typography.weight.strong}",
-          "color": "{color.action.subtleText}",
-          "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-          "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-          "--ds-interaction-active-surface": "{color.action.neutralActive}",
-          "--ds-interaction-active-text": "{color.action.neutralActiveText}"
-        }
-      },
-      "danger-subtle": {
-        "description": "Destruktiv handling med lav fremhævning.",
-        "styles": {
-          "border": "0",
-          "backgroundColor": "transparent",
-          "color": "{color.status.danger}",
-          "fontWeight": "{typography.weight.strong}",
-          "padding": "{space.component.paddingCompact}",
-          "--ds-interaction-hover-surface": "{color.action.dangerHover}",
-          "--ds-interaction-hover-text": "{color.action.dangerHoverText}",
-          "--ds-interaction-active-surface": "{color.action.dangerActive}",
-          "--ds-interaction-active-text": "{color.action.dangerActiveText}"
-        }
-      },
-      "rounded": {
-        "description": "Afrundet handling.",
-        "styles": {
-          "border": "{border.width.default} solid {color.border.field}",
-          "backgroundColor": "{color.caption.surface}",
-          "borderRadius": "{radius.pill}",
-          "padding": "{space.component.paddingCompact} {space.component.padding}",
-          "color": "{color.text.primary}",
-          "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-          "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-          "--ds-interaction-active-surface": "{color.action.neutralActive}",
-          "--ds-interaction-active-text": "{color.action.neutralActiveText}"
-        }
-      },
-      "dismiss-small": {
-        "description": "Lille lukkehandling.",
-        "styles": {
-          "border": "0",
-          "backgroundColor": "transparent",
-          "padding": "{space.component.paddingCompact}",
-          "fontSize": "{typography.size.clock}",
-          "lineHeight": 1,
-          "color": "{color.text.secondary}",
-          "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-          "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-          "--ds-interaction-active-surface": "{color.action.neutralActive}",
-          "--ds-interaction-active-text": "{color.action.neutralActiveText}"
-        }
-      },
-      "compact": {
-        "description": "Kompakt opbygning.",
-        "styles": {
-          "fontSize": "{typography.size.small}",
-          "padding": "{space.component.paddingCompact} {space.component.padding}",
-          "border": "{border.width.default} solid {color.border.field}",
-          "backgroundColor": "{color.background.control}",
-          "color": "{color.text.primary}",
-          "--ds-interaction-hover-surface": "{color.action.neutralHover}",
-          "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
-          "--ds-interaction-active-surface": "{color.action.neutralActive}",
-          "--ds-interaction-active-text": "{color.action.neutralActiveText}"
-        }
-      },
-      "dismiss-compact": {
-        "description": "Lukkehandling i en tæt opbygning.",
-        "styles": {
-          "border": "0",
-          "backgroundColor": "transparent",
-          "fontSize": "{typography.size.panel}",
-          "padding": "{space.component.paddingCompact}",
-          "lineHeight": 1,
-          "color": "{color.text.secondary}",
+          "color": "{color.action.primary}",
+          "borderColor": "transparent",
           "--ds-interaction-hover-surface": "{color.action.neutralHover}",
           "--ds-interaction-hover-text": "{color.action.neutralHoverText}",
           "--ds-interaction-active-surface": "{color.action.neutralActive}",
@@ -1369,11 +1510,13 @@ export const COMPONENT_LIBRARY=freeze({
         }
       },
       "disabled": {
+        "description": "Native deaktiveret handling eller utilgængeligt navigationsmål.",
         "styles": {
-          "opacity": "{opacity.disabled}",
+          "backgroundColor": "{color.disabled.surface}",
+          "color": "{color.disabled.text}",
+          "borderColor": "transparent",
           "cursor": "not-allowed"
-        },
-        "description": "Native deaktiveret kontrol."
+        }
       },
       "pressed": {
         "description": "Aktiv toggle med aria-pressed=true.",
@@ -1410,6 +1553,12 @@ export const COMPONENT_LIBRARY=freeze({
             }
           }
         }
+      },
+      "loading": {
+        "description": "Arbejder med bevaret label og fremhævelse; native handling er deaktiveret.",
+        "styles": {
+          "cursor": "progress"
+        }
       }
     },
     "preview": {
@@ -1428,6 +1577,20 @@ export const COMPONENT_LIBRARY=freeze({
           "tag": "span",
           "part": "description",
           "text": "En kort forklaring til handlingen."
+        },
+        {
+          "tag": "span",
+          "part": "icon",
+          "attrs": {
+            "aria-hidden": "true"
+          }
+        },
+        {
+          "tag": "span",
+          "part": "progress",
+          "attrs": {
+            "aria-hidden": "true"
+          }
         }
       ]
     }

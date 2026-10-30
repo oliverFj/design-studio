@@ -2,6 +2,8 @@
 
 Et fælles, framework-uafhængigt komponentbibliotek med udskiftelige temaer, agentprocedure, offline-editor i browseren og interaktiv web-showcase.
 
+Kildekode: [oliverFj/design-studio på GitHub](https://github.com/oliverFj/design-studio).
+
 Biblioteket bestemmer struktur, semantik og grundlayout. Temaet bestemmer farver, typografi, afstandsværdier, kanter og skygger. Produktet bestemmer indhold, navigation og forretningslogik.
 
 ## Åbn Design Studio
@@ -31,18 +33,21 @@ Se [produktion og levering](docs/PRODUCTION.md) for kontrol før levering, opdat
 
 ## Ét bibliotek, flere temaer
 
-- **Komponenter:** Det samme katalog af komponenter i alle temaer. Vælg varianter, læs anvendelse og inspicér den fælles definition.
+- **Komponenter:** Det samme katalog i alle temaer. Klik på kortets top for at se varianter og tilstande. Rækkens eksempler skjules, mens korttoppene bliver som klikbare faner med uændret bredde. Klik på den aktive top eller tryk Escape for at lukke.
+- **Animation og effekter:** Afprøv den fælles standard for udfoldning og tilbagevenden: 240 ms i begge retninger, uden ekstra forsinkelse og med respekt for reduceret bevægelse.
 - **Tokens:** Redigér temaets værdier. Bibliotekets dokumenterede standardværdier dækker roller, som temaet ikke overskriver.
 - **Brandguide:** Principper, anvendelsesregler, godkendte logoer, skrifter og originalressourcer.
 - **Temaet:** Navn, beskrivelse, historik, JSON-eksport og genereret CSS.
 
-Under **Designsystem → Designmønstre** findes interaktive eksempler på en objekteditor med kontekstpanel inspireret af FormLab, en formular, en liste med detaljevisning, et ressourcebibliotek samt fortryd/gentag med gemmepunkt. De samme eksempler indgår i web-showcasen og kan afprøves med alle temaer. `node tools/cli.mjs examples PROJECT_DIR` kopierer valgfri referencekode og den selvstændige historikhjælper til et tilknyttet projekt uden overskrivning. Se [genbrug af designmønstre](docs/INTEGRATION.md#valgfrie-sammensætningseksempler).
+Under **Designsystem → Designmønstre** findes interaktive eksempler på en objekteditor med kontekstpanel inspireret af FormLab, en formular, en liste med detaljevisning, et ressourcebibliotek og fortryd/gentag med gemmepunkt samt header/navigation, hero, footer og billedgalleri. De samme eksempler indgår i web-showcasen og kan afprøves med alle temaer. `node tools/cli.mjs examples PROJECT_DIR` kopierer valgfri referencekode og den selvstændige historikhjælper til et tilknyttet projekt uden overskrivning. Se [genbrug af designmønstre](docs/INTEGRATION.md#valgfrie-sammensætningseksempler).
 
 Komponentstruktur redigeres i det fælles bibliotek, ikke i hvert tema. Padding og gap kommer fra biblioteket. De semantiske spacingtokens skal være positive; temaet kan hverken udelade grundlayoutet eller erstatte det med nul-padding.
 
 Temaet valideres før åbning og gemning. Ugyldige kladder kan redigeres, men ikke gemmes som gyldige temaer. **Hent CSS** under **Temaet** henter temaets genererede CSS. Når en hentet temafil er lagt tilbage i et produkt, opdateres produktets CSS og runtime med `sync`.
 
-Bibliotek 2.8.0 har 34 fælles roller og otte offentlige temaer. `menubar`, `menu` og `menu-item` giver fælles struktur og regler for program- og kontekstmenuer. Desktopvarianter giver kompakte 32 px kontroller. Træets standard bruger kompakte rækker; roomy bevarer de større klikflader. Castle Studio v2 er et separat tema; det oprindelige Castle Studio og Atelier bevares. `tree` viser hierarkisk indhold med valg, foldning og rækkehandlinger gennem den fælles `mountTree`-runtime. `stack` styrer afstand mellem komponenter, `scroll-area` giver indlejret indhold én synlig ramme, og handlingsfamilierne bruger fælles hover-/tryk-tokens. Se [integrationsguiden](docs/INTEGRATION.md) for API og sammensætning og [temaformatet](docs/PACKAGE-FORMAT.md) for kontrakten. Biblioteksversionen er særskilt fra editorens versionsnummer. Komponentvisningen centrerer selvstændige eksempler; formularer, træer og sammensatte paneler bevarer deres anvendelige bredde og tekstretning.
+Bibliotek 3.0.0 har 37 fælles roller og otte offentlige temaer. Knapfamilien har fire fremhævelser: primary, secondary, tertiary og ghost. Størrelse og destruktiv betydning vælges særskilt; knaplignende navigation bruger samme rolle med native links. `link`, `navigation` og `image` dækker websites sammen med de fælles designmønstre. Billedeksemplerne bruger det valgte temas palette; produktets egne billeder bevares.
+
+`tree`, `stack`, `scroll-area` og programmenuerne bevarer deres eksisterende roller. Historiske knapvarianter understøttes til kompatibilitet, mens ny kode bruger den fælles knapfamilie. Se [integrationsguiden](docs/INTEGRATION.md) for API og sammensætning og [temaformatet](docs/PACKAGE-FORMAT.md) for kontrakten. Biblioteksversionen er særskilt fra editorens versionsnummer.
 
 ## Brug i et produkt
 
@@ -90,6 +95,7 @@ Showcasen bruger samme bibliotek, renderer og offentlige temaer. Den kræver ing
 
 - core/library.mjs: fælles katalog og dokumenterede token-defaults.
 - core/components.mjs: sikker fælles markup, native DOM og dialoghjælpere.
+- core/motion.mjs: fælles animation med reduceret bevægelse; eksporteres også fra components.mjs.
 - core/quality.mjs: semantisk kontrast, målbare variantpar og grundlæggende læsbarhed.
 - core/engine.mjs og core/contract.mjs: validering, tokenopløsning, CSS og migration.
 - packages/: Studio Light, Midnight Editorial, Fjordside og Castle Studio samt Atelier, Signal og Nocturne, der viser bibliotekets spændvidde.
@@ -114,3 +120,5 @@ Format 1 beholder sin eksisterende CSS. Konvertering til format 2 er eksplicit o
 
 Temaudskiftning bevarer komponentkataloget. Produktets egen kode skal følge bibliotekets dele og semantik. Validering kontrollerer kontrakten og målbare kontrastpar; den erstatter ikke kontrol af produktets konkrete indhold, adaptere og brugerforløb.
 
+
+Tidligere designudkast og referenceskitser ligger i `discussions and ideas/`. De er idéhistorik; den aktuelle editor bygges fra `studio/` til rodens `index.html`.

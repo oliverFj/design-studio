@@ -24,7 +24,7 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
   const stack = (...children) => { const node = c('stack'); node.replaceChildren(...children); return node; };
   const compact = (...children) => { const node = c('stack', { variant: 'compact' }); node.replaceChildren(...children); return node; };
   const field = (key, label, value, options = {}) => c('field', { label, value, hint: '', controlVariant: 'desktop', idPrefix: prefix + '-' + key, ...options });
-  const button = (text, action, options = {}) => c('button', { text, variant: 'desktop', attrs: { 'data-action': action }, ...options });
+  const button = (text, action, options = {}) => c('button', { text, variant: 'tertiary', size:'small', attrs: { 'data-action': action }, ...options });
   const card = (title, ...children) => {
     const node = c('card', { slots: { header: { component: 'heading', options: { text: title, variant: 'panel' } }, body: '', footer: '' } });
     node.querySelector('.ds-card__body').replaceChildren(...children); node.querySelector('.ds-card__footer').remove(); return node;
@@ -93,7 +93,7 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
   function refreshTree() { const options = treeOptions(); tree.update(options); summary.textContent = state.selectedIds.length + ' valgt' + (!options.items.length ? ' · Ingen søgeresultater' : ''); }
   function renderPreview() {
     const nodes = state.objects.filter(item => !inherited(item, 'visible')).map(item => {
-      const node = c('button', { text: 'Vælg ' + item.label, variant: state.selectedIds.includes(item.id) ? 'primary' : 'secondary', disabled: inherited(item, 'locked'), attrs: { 'data-object': item.id, 'aria-pressed': String(state.selectedIds.includes(item.id)) } });
+      const node = c('button', { text: 'Vælg ' + item.label, variant: state.selectedIds.includes(item.id) ? 'primary' : 'tertiary', disabled: inherited(item, 'locked'), attrs: { 'data-object': item.id, 'aria-pressed': String(state.selectedIds.includes(item.id)) } });
       node.addEventListener('click', event => {
         const ids = event.ctrlKey || event.metaKey ? state.selectedIds.includes(item.id) ? state.selectedIds.filter(id => id !== item.id) : [...state.selectedIds, item.id] : [item.id]; choose(ids, true);
       });

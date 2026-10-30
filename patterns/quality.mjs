@@ -40,7 +40,8 @@ export function compositionStructureReport(root, { composition, scenario = 'init
   add('heading-anatomy', 'Overskrifter er ikke indlejret i overskrifter', !nested.length, nested.length + ' ugyldige overskriftsforældre.');
   const compact = textControls(root).filter(node => node.getAttribute('data-variant') === 'desktop');
   add('control-density', composition === 'form' ? 'Formularen bevarer standardkontroller' : 'Værktøjsfelter bruger desktopvarianten',
-    textControls(root).length > 0 && (composition === 'form' ? !compact.length : compact.length === textControls(root).length),
+    (!COMPOSITIONS[composition]?.components.includes('field') || textControls(root).length > 0)
+      && (composition === 'form' ? !compact.length : compact.length === textControls(root).length),
     compact.length + ' af ' + textControls(root).length + ' tekstkontroller bruger desktop.');
   if (composition === 'editor') {
     const workspace = all.find(node => hasClass(node, 'composition-workbench'));
