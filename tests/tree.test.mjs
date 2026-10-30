@@ -38,9 +38,15 @@ const part=(node,name)=>walk(node,child=>child.getAttribute('class')==='ds-tree_
 const key=(document,value,options={})=>event(document.activeElement,'keydown',{key:value,...options});
 function fixture(options={}){const document=dom(),host=document.createElement('section');document.body.appendChild(host);const tree=mountTree(pack('studio-light'),host,{items:[],...options},{document});return {document,host,tree};}
 
+test('removing the final focused row returns focus to the empty tree',()=>{
+ const {document,tree}=fixture({items:[{id:'only',label:'Sidste række'}]});
+ byId(tree,'only').focus();tree.update({items:[]});
+ assert.equal(document.activeElement,tree.element);assert.equal(tree.element.getAttribute('tabindex'),'0');
+});
+
 test('tree is one neutral shared component in all eight themes, with native preview and safe attributes',()=>{
  const themes=readdirSync(new URL('../packages/',import.meta.url)).filter(name=>name.endsWith('.json'));assert.equal(themes.length,8);
- for(const name of themes){const theme=pack(name.slice(0,-5));assert.deepEqual(validatePackage(theme),{valid:true,errors:[]});const components=getComponents(theme);assert.equal(Object.keys(components).length,37);assert.deepEqual(components.tree.composes,['button','badge']);const css=generateCSS(theme);assert.match(css,/\.ds-tree \.ds-tree__group/);assert.match(css,/\.ds-tree__item[^\n]* > \.ds-tree__row/);assert.match(css,/\[hidden\].*display: none !important/);assert.match(css,/min-height: max\(44px,/);}
+ for(const name of themes){const theme=pack(name.slice(0,-5));assert.deepEqual(validatePackage(theme),{valid:true,errors:[]});const components=getComponents(theme);assert.equal(Object.keys(components).length,60);assert.deepEqual(components.tree.composes,['button','badge']);const css=generateCSS(theme);assert.match(css,/\.ds-tree \.ds-tree__group/);assert.match(css,/\.ds-tree__item[^\n]* > \.ds-tree__row/);assert.match(css,/\[hidden\].*display: none !important/);assert.match(css,/min-height: max\(44px,/);}
  const theme=pack('studio-light'),html=renderComponent(theme,'tree',{state:['selected','focus','disabled']});assert.match(html,/^<ul[^>]+role="tree"/);assert.doesNotMatch(html.slice(0,html.indexOf('>')),/aria-selected/);assert.match(html,/<li[^>]+aria-selected="true"/);assert.match(html,/<button[^>]+class="ds-tree__label"[^>]+disabled/);const toggle=html.match(/<button\b(?=[^>]*\bclass="ds-tree__toggle")[^>]*>/)?.[0];assert.ok(toggle,'preview has a native fold button');assert.match(toggle,/aria-disabled="false"/);
  assert.match(renderComponent(theme,'tree',{attrs:{draggable:false,'aria-label':'<Items>'}}),/draggable="false"/);assert.match(renderComponent(theme,'tree',{attrs:{'aria-label':'<Items>'}}),/aria-label="&lt;Items&gt;"/);assert.throws(()=>renderComponent(theme,'tree',{attrs:{draggable:'yes'}}),/draggable/);assert.throws(()=>renderComponent(theme,'tree',{attrs:{onclick:'run()'}}),/Unsupported/);
  const document=dom(),preview=createComponent(theme,'tree',{}, {document});assert.equal(preview.tagName,'UL');assert.equal(part(preview,'toggle').tagName,'BUTTON');assert.equal(part(preview,'action').tagName,'BUTTON');

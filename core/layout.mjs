@@ -1,3 +1,5 @@
+import { BREAKPOINTS } from './scales.mjs';
+
 /** Optional outer-layout primitives. Products own columns, placement and overrides. */
 export const LAYOUT_PROFILES = Object.freeze({
   prose: Object.freeze({ name: 'Læsetekst', maxWidth: '70ch', usage: 'Forklaringer, vejledning og længere tekst.' }),
@@ -58,10 +60,10 @@ export function generateAppShellCSS(scope = '.ds-scope') {
     `${panels('[data-panel-open="false"] > .ds-panel-side')}, ${panels('[data-panel-open="false"] > .ds-panel-resize')} { display: none; }`,
     `${resize} { min-inline-size: 0; min-block-size: 0; padding: 0; border: 0; border-radius: 0; display: grid; place-items: center; color: var(--ds-color-border-field, currentColor); background: var(--ds-color-background-canvas, transparent); cursor: ew-resize; touch-action: none; user-select: none; }`,
     `${panels(' > .ds-panel-resize::before')} { content: ''; display: block; inline-size: 2px; block-size: 2.5rem; border-radius: 1px; background: currentColor; }`,
-    `${panels(' > .ds-panel-resize:hover')} { color: var(--ds-color-action-neutralHoverText, currentColor); background: var(--ds-color-action-neutralHover, transparent); }`,
+    `${panels(' > .ds-panel-resize:hover')} { color: var(--ds-color-action-neutral-hover-text, currentColor); background: var(--ds-color-action-neutral-hover-surface, transparent); }`,
     `${panels(' > .ds-panel-content:focus-visible')}, ${panels(' > .ds-panel-side:focus-visible')}, ${panels(' > .ds-panel-resize:focus-visible')}, ${forms(' > .ds-form-fields:focus-visible')} { outline: max(3px, var(--ds-border-width-focus, 3px)) solid var(--ds-color-focus, currentColor); outline-offset: calc(-1 * max(3px, var(--ds-border-width-focus, 3px))); }`,
     `${actions} { display: flex; flex-wrap: wrap; gap: var(--ds-space-component-gap, 6px); padding: var(--ds-space-component-padding, 12px); border-block-start: var(--ds-border-width-default, 1px) solid var(--ds-color-border-default, currentColor); background: var(--ds-color-background-surface, transparent); }`,
-    '@media (min-width: 801px) and (min-height: 481px) {',
+    `@media (min-width: ${BREAKPOINTS.workspace + 1}px) and (min-height: ${BREAKPOINTS.short + 1}px) {`,
     `  ${shell('')} { display: grid; grid-template-columns: var(--ds-app-navigation-width, 14rem) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); block-size: var(--ds-app-height, var(--ds-app-viewport-height, 100vh)); overflow: hidden; }`,
     `  ${navigation} { overflow: auto; overscroll-behavior: contain; }`,
     `  ${workspace} { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; }`,
@@ -82,13 +84,13 @@ export function generateAppShellCSS(scope = '.ds-scope') {
     `  ${shell('')} { --ds-app-viewport-height: 100dvh; }`,
     '}',
     '@supports not (scrollbar-gutter: stable) {',
-    '  @media (min-width: 801px) and (min-height: 481px) {',
+    `  @media (min-width: ${BREAKPOINTS.workspace + 1}px) and (min-height: ${BREAKPOINTS.short + 1}px) {`,
     `    ${content} { overflow-y: scroll; }`,
     `    ${panelContent}, ${panelSide}, ${fields}, ${compact('')} { overflow-y: scroll; }`,
     `    ${compact(' > .ds-panel-content')}, ${compact(' > .ds-panel-side')}, ${compact(' > .ds-panel-side .ds-form-fields')} { overflow-y: visible; }`,
     '  }',
     '}',
-    '@media (max-width: 800px), (max-height: 480px) {',
+    `@media (max-width: ${BREAKPOINTS.workspace}px), (max-height: ${BREAKPOINTS.short}px) {`,
     `  ${shell('')} { display: block; block-size: auto; overflow: visible; }`,
     `  ${workspace} { display: block; overflow: visible; }`,
     `  ${navigation}, ${content} { overflow: visible; overscroll-behavior: auto; }`,

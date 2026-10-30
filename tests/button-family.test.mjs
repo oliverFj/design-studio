@@ -3,11 +3,15 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {COMPONENT_LIBRARY,BUTTON_COMPATIBILITY_VARIANTS,BUTTON_SIZES} from '../core/library.mjs';
 import {getComponents,generateCSS} from '../core/engine.mjs';
+import {resolveThemeMode} from '../core/theme-modes.mjs';
 import {createComponent,createComponentFactory,createComponentRenderer,renderComponent} from '../core/components.mjs';
 import {renderComponentCatalog,createCatalogState,catalogVariants} from '../studio/component-catalog.mjs';
 import {PUBLIC_THEME_IDS} from '../tools/public-themes.mjs';
 import {dom} from './support/dom.mjs';
-const themes=PUBLIC_THEME_IDS.map(id=>JSON.parse(readFileSync(new URL('../packages/'+id+'.json',import.meta.url),'utf8')));
+const themes=PUBLIC_THEME_IDS.map(id=>{
+ const source=JSON.parse(readFileSync(new URL('../packages/'+id+'.json',import.meta.url),'utf8'));
+ return resolveThemeMode(source,source.defaultMode??'light');
+});
 
 test('four public button levels coexist with historical recipes in every theme',()=>{
  assert.deepEqual(Object.keys(COMPONENT_LIBRARY.button.variants),['primary','secondary','tertiary','ghost']);
@@ -50,7 +54,7 @@ test('expanded catalog renders real component variants and state samples with un
   for(const id of Object.keys(components))for(const view of ['variants','states']){
    state.expanded=id;state.views[id]=view;
    const html=renderComponentCatalog(theme,{components,state,selected:id});
-   const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
+   const ids=[...html.matchAll(/\sid="([^"]+)"/g)].map(m=>m[1]);
    assert.equal(new Set(ids).size,ids.length,theme.id+'/'+id+'/'+view);
    for(const [,target]of html.matchAll(/\b(?:for|aria-labelledby|aria-controls)="([^"]+)"/g))for(const ref of target.split(' '))assert.ok(ids.includes(ref),id+': '+ref);
    assert.equal((html.match(/class="specimen selected expanded"/g)||[]).length,1);

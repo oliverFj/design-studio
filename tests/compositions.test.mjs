@@ -207,10 +207,11 @@ test('resource selection stays on the card and leaves one primary use action wit
   const primaryActions = () => element.querySelectorAll('button').filter(node => node.getAttribute('data-variant') === 'primary');
   assert.deepEqual(primaryActions(), [element.querySelector('[data-action="use-resource"]')]);
   const selectedCard = () => element.querySelectorAll('.composition-resource-card').find(node => node.getAttribute('data-selected') === 'true');
-  assert.match(selectedCard().textContent, /Startskabelon.*✓ Valgt/);
+  assert.match(selectedCard().textContent, /Startskabelon.*Valgt/);
+  assert.ok(selectedCard().querySelector('[data-icon="check"]'));
   fire(element.querySelector('[data-resource="compact"]'), 'click');
   assert.equal(state.selected, 'compact');
-  assert.match(selectedCard().textContent, /Kompakt opsætning.*✓ Valgt/);
+  assert.match(selectedCard().textContent, /Kompakt opsætning.*Valgt/);
   assert.equal(element.querySelectorAll('.composition-resource-card').filter(node => node.getAttribute('data-selected') === 'true').length, 1);
   assert.equal(document.activeElement, element.querySelector('[data-resource="compact"]'));
   assert.equal(document.activeElement.getAttribute('aria-pressed'), 'true');

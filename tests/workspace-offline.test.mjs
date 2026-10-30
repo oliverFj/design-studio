@@ -45,6 +45,18 @@ test('the realistic workspace is one executable offline HTML file with all publi
     assert.equal(app.querySelector('.ds-panel-content').scrollTop, 90, id + ': changing theme preserves project-list scroll');
     assert.equal(app.querySelector('.ds-form-fields').scrollTop, 140, id + ': changing theme preserves form-field scroll');
   }
+  const originalTitle = title, modePicker = document.querySelector('#example-color-mode-control');
+  const themeCSS = document.querySelector('#theme-styles');
+  for (const mode of ['light', 'dark', 'system']) {
+    const previousCSS = themeCSS.textContent;
+    modePicker.focus(); modePicker.value = mode; fire(modePicker, 'change');
+    assert.equal(app.querySelector('#workspace-title-control'), originalTitle, mode + ': palette changes keep the native controls mounted');
+    assert.equal(title.value, 'Bevar min kladde', mode + ': palette changes preserve the unfinished draft');
+    assert.equal(document.activeElement, modePicker, mode + ': palette changes keep focus on the picker');
+    assert.equal(app.querySelector('.ds-app-content').scrollTop, 180, mode + ': palette changes preserve content scroll');
+    assert.equal(app.querySelector('.ds-form-fields').scrollTop, 140, mode + ': palette changes preserve form scroll');
+    if (mode !== 'light') assert.notEqual(themeCSS.textContent, previousCSS, mode + ': palette changes update the generated theme');
+  }
   const beforeUnload = fire(window, 'beforeunload');
   assert.equal(beforeUnload.defaultPrevented, true, 'an unfinished project draft protects against accidental closing');
 });

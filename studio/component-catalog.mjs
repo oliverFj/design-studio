@@ -1,19 +1,42 @@
-import {createComponentRenderer,animateStandard} from '../core/components.mjs';
-import {buttonVariantIds} from '../core/library.mjs';
+import {createComponentRenderer,animateStandard,renderIcon} from '../core/components.mjs';
+import {buttonVariantIds,COMPONENT_COVERAGE} from '../core/library.mjs';
+import {renderMenuExample,bindMenuExamples} from './menu-example.mjs';
+import {renderNavigationExample,bindNavigationExamples} from './navigation-example.mjs';
+import {renderOverlayExample,bindOverlayExamples} from './overlay-example.mjs';
+import {renderContentExample,bindContentExamples} from './content-example.mjs';
+import {renderInputChoiceExample,bindInputChoiceExamples} from './input-choice-example.mjs';
+import {renderFeedbackExample,bindFeedbackExamples} from './feedback-example.mjs';
+import {renderFileExample,bindFileExamples} from './file-example.mjs';
+import {renderDataTableExample,bindDataTableExamples} from './data-table-example.mjs';
+import {renderDataGridExample,bindDataGridExamples} from './data-grid-example.mjs';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const stateNames={normal:'Normal',hover:'Hover',active:'Trykket ned',focus:'Tastaturfokus',disabled:'Deaktiveret',loading:'Arbejder',pressed:'Valgt',current:'Aktuelt mål',expanded:'Udvidet'};
+const coverageStatus={available:'Implementeret',partial:'Delvis adfærd',planned:'Planlagt'};
+const coverageBehavior={static:'Indhold og layout',native:'Native kontrol',controller:'Fælles controller'};
 export const createCatalogState=()=>({expanded:null,views:{},buttonSize:'medium',buttonIntent:'normal'});
 export const catalogVariants=(pack,id,component)=>pack.schemaVersion===2&&id==='button'?buttonVariantIds(component):Object.keys(component.variants??{}).filter(variant=>pack.schemaVersion!==2||id!=='link'||variant!=='action');
 
 export function renderComponentCatalog(pack,{components,state,selected,variantFor=()=>undefined}={}){
  const render=createComponentRenderer(pack);
+ const planned=Object.entries(COMPONENT_COVERAGE).filter(([,item])=>item.status==='planned');
+ const coverage=pack.schemaVersion===2?'<details class="catalog-coverage"><summary>Dækning: '+Object.keys(components).length+' roller i biblioteket · '+planned.length+' planlagte</summary><p class="help">Implementeret beskriver leveret struktur og adfærd, ikke en tilgængelighedsgodkendelse. Et statisk preview er ikke en færdig interaktion.</p><ul>'+Object.entries(components).map(([id,component])=>{
+  const item=COMPONENT_COVERAGE[id];return '<li><strong>'+escape(component.name)+'</strong> · '+escape(coverageStatus[item?.status]??'Ikke vurderet')+' · '+escape(coverageBehavior[item?.behavior]??'Ikke vurderet')+(item?.entryPoint?' · <code>'+escape(item.entryPoint)+'</code>':'')+'<p class="help">'+escape(item?.note??'Ingen registreret leverancebeskrivelse.')+'</p></li>';
+ }).join('')+'</ul>'+(planned.length?'<h3>Planlagte roller</h3><ul>'+planned.map(([id,item])=>'<li>'+escape(item.name)+' · <code>'+escape(id)+'</code></li>').join('')+'</ul>':'<p>Der er ingen planlagte roller i det aftalte katalog.</p>')+'</details>':'';
  let details='';
  const specimen=(id,variant,prefix,condition)=>{
   const intent=id==='button'?state.buttonIntent:'normal';
   if(intent==='danger'&&variant==='secondary')return '<p class="catalog-unavailable">Secondary bruges til neutrale ledsagehandlinger.</p>';
+  if(id==='menubar'&&!condition)return renderMenuExample(pack,prefix,render);
+  if(id==='tabs'&&!condition)return renderNavigationExample(pack,prefix,render);
+  if(['dialog','drawer','popover','tooltip'].includes(id)&&!condition)return renderOverlayExample(pack,id,prefix,render,variant);
+  if(['combobox','multiselect','date-picker','time-picker'].includes(id)&&!condition)return renderInputChoiceExample(pack,id,prefix,render,variant);
+  if(['spinner','progress','skeleton','toast','empty-state'].includes(id)&&!condition)return renderFeedbackExample(pack,id,prefix,render,variant);
+  if(id==='file-upload'&&!condition)return renderFileExample(pack,prefix,render,variant);
+  if(id==='data-table'&&!condition)return renderDataTableExample(pack,prefix,render);
+  if(id==='data-grid'&&!condition)return renderDataGridExample(pack,prefix,render);
   return render(id,{variant,idPrefix:prefix,open:id==='dialog',...(condition&&condition!=='normal'?{state:condition}:{}),...(id==='button'&&condition?{text:'Gem'}:{}),...(id==='button'&&pack.schemaVersion===2?{size:state.buttonSize,intent}:{}),...(id==='button'&&condition==='loading'?{loading:true}:{})});
  };
- return '<div class="component-grid">'+Object.entries(components).map(([id,component])=>{
+ return coverage+'<div class="component-grid">'+Object.entries(components).map(([id,component])=>{
   const variants=catalogVariants(pack,id,component),samples=[...variants];
   if(!samples.length||!samples.includes(component.preview?.variant??['default','primary','neutral','horizontal'].find(v=>variants.includes(v))))samples.unshift(undefined);
   const order=['hover','active','focus','disabled','loading','pressed','current'];
@@ -25,16 +48,19 @@ export function renderComponentCatalog(pack,{components,state,selected,variantFo
    const picker='<div class="catalog-panel-toolbar"><div class="catalog-view-picker"><div class="segmented" role="group" aria-label="Visning for '+escape(component.name)+'">'+['variants','states'].map(v=>'<button type="button" id="'+prefix+'-'+v+'" data-catalog-view="'+v+'" class="'+(view===v?'active':'')+'" aria-pressed="'+(view===v)+'">'+(v==='variants'?'Varianter':'Tilstande')+'</button>').join('')+'</div><code class="catalog-technical-name">'+escape(id)+'</code></div>'+axes+'</div>';
    const variantGrid=()=>'<div class="catalog-variants">'+samples.map((variant,index)=>'<section class="catalog-variant"><h3>'+escape(variant??'Grundudgave')+'</h3><p class="help">'+escape(component.variants?.[variant]?.description??component.description)+'</p><div class="catalog-sample ds-scope">'+specimen(id,variant,prefix+'-variant-'+index)+'</div></section>').join('')+'</div>';
    const matrix=()=>states.length===1?'<p class="help">Komponenten har ingen særskilt deklarerede tilstande.</p>':'<p class="help">Tilstandene vises fast. Tabellen kan rulles vandret.</p><div class="catalog-state-scroll" tabindex="0" role="region" aria-label="Tilstande for '+escape(component.name)+'"><table class="catalog-state-table"><caption class="sr-only">Varianter og tilstande for '+escape(component.name)+'</caption><thead><tr><th scope="col">Variant</th>'+states.map(s=>'<th scope="col">'+escape(stateNames[s]??s)+'</th>').join('')+'</tr></thead><tbody>'+samples.map((variant,index)=>'<tr><th scope="row">'+escape(variant??'Grundudgave')+'</th>'+states.map(s=>'<td><div class="catalog-sample ds-scope" inert>'+specimen(id,variant,prefix+'-'+index+'-'+s,s)+'</div></td>').join('')+'</tr>').join('')+'</tbody></table></div>';
-   panel='<div class="catalog-expansion" id="'+prefix+'-panel" data-catalog-details="'+id+'" role="region" aria-labelledby="'+prefix+'-name"><div class="catalog-panel">'+picker+(view==='variants'?variantGrid():matrix())+'</div></div>';
+   panel='<div class="catalog-expansion" id="'+prefix+'-panel" data-catalog-details="'+id+'" role="region" aria-labelledby="'+prefix+'-name"><div class="catalog-panel">'+picker+(view==='variants'?variantGrid():matrix())+(id==='avatar-group'&&view==='variants'?'<section class="catalog-variant"><h3>Indhold og handlinger sammen</h3>'+renderContentExample(pack,prefix+'-content',render)+'</section>':'')+'</div></div>';
    details=panel;
   }
-  return '<article class="specimen'+(selected===id?' selected':'')+(open?' expanded':'')+'" data-catalog-card="'+id+'"><h3 class="catalog-heading"><button type="button" class="specimen-label" id="'+prefix+'-toggle" data-catalog-toggle="'+id+'" aria-expanded="'+open+'"'+(open?' aria-controls="'+prefix+'-panel"':'')+'><b id="'+prefix+'-name" title="'+escape(component.name)+'">'+escape(component.name)+'</b><span class="catalog-summary"><small>'+samples.length+' '+(samples.length===1?'variant':'varianter')+'</small><span aria-hidden="true">'+(open?'⌃':'⌄')+'</span></span></button></h3><div class="specimen-preview ds-scope">'+specimen(id,variantFor(id),'specimen-'+id)+'</div></article>';
+  return '<article class="specimen'+(selected===id?' selected':'')+(open?' expanded':'')+'" data-catalog-card="'+id+'"><h3 class="catalog-heading"><button type="button" class="specimen-label" id="'+prefix+'-toggle" data-catalog-toggle="'+id+'" aria-expanded="'+open+'"'+(open?' aria-controls="'+prefix+'-panel"':'')+'><b id="'+prefix+'-name" title="'+escape(component.name)+'">'+escape(component.name)+'</b><span class="catalog-summary"><small>'+samples.length+' '+(samples.length===1?'variant':'varianter')+'</small><span aria-hidden="true">'+renderIcon(open?'chevron-up':'chevron-down',{size:'small'})+'</span></span></button></h3><div class="specimen-preview ds-scope">'+specimen(id,variantFor(id),'specimen-'+id)+'</div></article>';
  }).join('')+details+'</div>';
 }
 
 export function bindComponentCatalog(root,{state,onChange,allowNavigation=()=>true,document=globalThis.document}){
  const grid=root.querySelector('.component-grid');
  if(!grid)return {destroy(){}};
+ const menus=bindMenuExamples(grid);
+ const navigation=bindNavigationExamples(grid),overlays=bindOverlayExamples(grid),content=bindContentExamples(grid);
+ const additions=[bindInputChoiceExamples(grid),bindFeedbackExamples(grid),bindFileExamples(grid),bindDataTableExamples(grid),bindDataGridExamples(grid)];
  const cards=[...grid.querySelectorAll('[data-catalog-card]')],panel=grid.querySelector('[data-catalog-details]');
  const view=document.defaultView??globalThis;
  const reveals=new Set();
@@ -127,6 +153,6 @@ export function bindComponentCatalog(root,{state,onChange,allowNavigation=()=>tr
  root.querySelectorAll('[data-catalog-view]').forEach(button=>button.addEventListener('click',()=>{state.views[state.expanded]=button.dataset.catalogView;refresh(state.expanded,button.id);}));
  root.querySelector('[data-catalog-size]')?.addEventListener('change',event=>{state.buttonSize=event.target.value;refresh(state.expanded,event.target.id);});
  root.querySelector('[data-catalog-intent]')?.addEventListener('change',event=>{state.buttonIntent=event.target.value;refresh(state.expanded,event.target.id);});
- grid.addEventListener('keydown',event=>{if(event.key==='Escape'&&state.expanded&&(panel?.contains(event.target)||event.target.closest('[data-catalog-card]')?.dataset.catalogCard===state.expanded)){event.preventDefault();void toggle(state.expanded);}});
- return {destroy(){disposed=true;observer?.disconnect();animation?.cancel();for(const effect of reveals)effect.cancel();}};
+ grid.addEventListener('keydown',event=>{if(!event.defaultPrevented&&event.key==='Escape'&&state.expanded&&(panel?.contains(event.target)||event.target.closest('[data-catalog-card]')?.dataset.catalogCard===state.expanded)){event.preventDefault();void toggle(state.expanded);}});
+ return {destroy(){disposed=true;menus.destroy();navigation.destroy();overlays.destroy();content.destroy();for(const control of additions)control.destroy();observer?.disconnect();animation?.cancel();for(const effect of reveals)effect.cancel();}};
 }

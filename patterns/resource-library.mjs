@@ -1,4 +1,4 @@
-import { createComponentFactory, createLayout } from '../core/components.mjs';
+import { createComponentFactory, createLayout, createIcon } from '../core/components.mjs';
 
 export function createResourceLibraryState() {
   return { query: '', type: 'all', favoritesOnly: false, view: 'grid', selected: 'starter', lastUsed: null, items: [
@@ -58,7 +58,7 @@ export function mountResourceLibrary(theme, { document = globalThis.document, st
     for (const [id, node] of viewButtons) { node.setAttribute('aria-pressed', String(state.view === id)); node.setAttribute('data-state', state.view === id ? 'selected' : 'idle'); }
     favoriteButtons = new Map(); openButtons = new Map(); results.className = state.view === 'grid' ? 'composition-resource-grid' : 'composition-resource-list';
     const nodes = filtered.map(item => {
-      const favorite = button(item.favorite ? '★ Favorit' : '☆ Gem favorit', 'favorite', 'ghost');
+      const favorite = c('button', { text: item.favorite ? 'Favorit' : 'Gem favorit', variant: 'ghost', iconName: item.favorite ? 'star-filled' : 'star', attrs: { 'data-action': 'favorite' } });
       favorite.setAttribute('aria-label', (item.favorite ? 'Fjern ' : 'Føj ') + item.title + (item.favorite ? ' fra favoritter' : ' til favoritter')); favorite.setAttribute('aria-pressed', String(item.favorite)); favorite.setAttribute('data-resource-favorite', item.id);
       favoriteButtons.set(item.id, favorite);
       favorite.addEventListener('click', () => {
@@ -74,7 +74,10 @@ export function mountResourceLibrary(theme, { document = globalThis.document, st
       open.addEventListener('click', () => { state.selected = item.id; render(); openButtons.get(item.id).focus(); notify(item.title + ' er valgt.'); });
       if (state.view === 'list') { const row = document.createElement('div'); row.className = 'composition-resource-row'; row.append(open, favorite); return row; }
       const tags = document.createElement('div'); tags.className = 'composition-actions'; tags.append(...item.tags.map(text => c('badge', { text })));
-      if (item.id === state.selected) tags.append(c('badge', { text: '✓ Valgt', variant: 'data' }));
+      if (item.id === state.selected) {
+        const selectedBadge = c('badge', { text: 'Valgt', variant: 'data' });
+        selectedBadge.insertBefore(createIcon('check',{size:'small'},{document}),selectedBadge.firstChild); tags.append(selectedBadge);
+      }
       const actions = document.createElement('div'); actions.className = 'composition-actions'; actions.append(open, favorite);
       const resource = card(item.title, [c('text', { text: item.type, variant: 'small' }), c('text', { text: item.description }), tags, actions]);
       resource.className += ' composition-resource-card'; resource.setAttribute('data-selected', String(item.id === state.selected));

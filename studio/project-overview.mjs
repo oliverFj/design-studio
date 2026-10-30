@@ -33,7 +33,7 @@ export function createProjectOverview(theme, {
 
   function renderExample() {
     const heading = component('heading', { text: draft.name, variant: 'title' });
-    const add = component('action-button', { label: 'Nyt projekt', icon: '+', shortcut: 'Alt+N', variant: 'horizontal', attrs: { 'aria-keyshortcuts': 'Alt+N' } });
+    const add = component('action-button', { label: 'Nyt projekt', iconName: 'plus', shortcut: 'Alt+N', variant: 'horizontal', attrs: { 'aria-keyshortcuts': 'Alt+N' } });
     add.addEventListener('click', () => modal.showModal());
     const headingRow = element('div', 'example-heading', [
       element('div', 'example-heading-copy', [

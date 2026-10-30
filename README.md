@@ -10,6 +10,8 @@ Biblioteket bestemmer struktur, semantik og grundlayout. Temaet bestemmer farver
 
 Dobbeltklik på **[index.html](index.html)** i systemmappen. Design Studio åbner direkte i din normale browser og fungerer offline. Der kræves ingen server, Windows-app, terminal eller installeret Node.js for at bruge den færdige fil. Alle otte medfølgende temaer er indbygget.
 
+De medfølgende temaer har sammenhørende lyse og mørke farvetilstande. Farvetilstanden kan følge systemet eller vælges manuelt; det manuelle valg har forrang. Temafilen gemmer begge tilstande, mens en CSS-eksport gælder den valgte fremtoning. Ældre enkeltstående temaer bliver ikke automatisk konverteret.
+
 **Åbn tema** læser en JSON-fil, du vælger, eksempelvis et projekts `design/design.json`. **Gem tema** henter det aktuelle tema som en JSON-fil med tokens, brandguide, originalressourcer og historik. Browseren håndterer placeringen; den oprindeligt åbnede fil overskrives ikke automatisk. Gem den hentede fil på den ønskede placering, og erstat projektets tema bevidst, hvis ændringen skal bruges dér.
 
 Åbnede temaer og ændringer findes i den aktuelle browsersession. Gem dem som filer før genindlæsning eller lukning; hentede temaer kan åbnes igen med **Åbn tema**. De indbyggede temaer er kopier fra seneste build, og redigering ændrer ikke filerne i `packages/`.
@@ -29,7 +31,7 @@ npm run build
 
 Efter kode-, design- eller temaændringer køres `npm run build` igen. Brugeren skal derefter blot genindlæse browseren. Håndredigér ikke `index.html`. Rene dokumentationsændringer kræver ikke et nyt build. CLI-værktøjerne til produktintegration kræver Node.js 20 eller nyere.
 
-Se [produktion og levering](docs/PRODUCTION.md) for kontrol før levering, opdatering, tilbageførsel og eksport af web-showcasen.
+`npm run release` pakker det aktuelle build som en offline-ZIP med licenser og en separat kilde-ZIP med låsefil. Kildepakken indeholder ingen installerede afhængigheder; brug `npm ci` på den aktuelle platform. Se [produktion og levering](docs/PRODUCTION.md) for pakker, kontrol, opdatering og web-showcase.
 
 ## Ét bibliotek, flere temaer
 
@@ -45,29 +47,37 @@ Komponentstruktur redigeres i det fælles bibliotek, ikke i hvert tema. Padding 
 
 Temaet valideres før åbning og gemning. Ugyldige kladder kan redigeres, men ikke gemmes som gyldige temaer. **Hent CSS** under **Temaet** henter temaets genererede CSS. Når en hentet temafil er lagt tilbage i et produkt, opdateres produktets CSS og runtime med `sync`.
 
-Bibliotek 3.0.0 har 37 fælles roller og otte offentlige temaer. Knapfamilien har fire fremhævelser: primary, secondary, tertiary og ghost. Størrelse og destruktiv betydning vælges særskilt; knaplignende navigation bruger samme rolle med native links. `link`, `navigation` og `image` dækker websites sammen med de fælles designmønstre. Billedeksemplerne bruger det valgte temas palette; produktets egne billeder bevares.
+Bibliotek 3.4.1 har 60 fælles roller og otte offentlige temaer med lyse og mørke tilstande. Hele det aftalte katalog er implementeret; dækningsoversigten har ingen resterende planlagte roller. Den skelner mellem statisk indhold/layout, native adfærd og fælles controllere. Det er dækning af dette katalog, ikke et løfte om alle komponenttyper eller en tilgængelighedscertificering.
+
+Kataloget omfatter nu også combobox, multivalg, native dato/tid, spinner, progress, skeleton, toast, tom tilstand, lokalt filvalg, datatabel og redigerbart datagrid. Datatabellen bevarer native tabelnavigation; datagrid har særskilt cellenavigation, markering, kladder og atomisk indsættelse. Produktet ejer data, forespørgsler, kommandoer og lagring. Knapfamilien har fire fremhævelser med særskilt størrelse og betydning; historiske varianter bevares til kompatibilitet.
+
+Farver har primitive `palette.*`-værdier med semantiske referencer. Fælles skalaer dækker spacing, elevation, lag og ikonstørrelser. Tabler Icons 3.50.0 er den fælles ikonstandard som et lokalt SVG-udvalg med medfølgende MIT-licens. Der er ingen ikonfont eller CDN-afhængighed. Se [temaformatet](docs/PACKAGE-FORMAT.md) og [ikon- og farvetilstandsintegration](docs/INTEGRATION.md#lyse-og-mørke-farvetilstande).
+
+Feltgrænser mod kontrol-, indholds- og grundflader har et bindende minimum på 3:1. Valideringen kontrollerer også effektive feltopskrifter og begge farvetilstande. CSS indeholder tilpasninger til mere kontrast, reduceret bevægelse og forced colors. Native kalender-/tidsvælgere, filvælger og progress-tegning afhænger desuden af browser og operativsystem.
 
 `tree`, `stack`, `scroll-area` og programmenuerne bevarer deres eksisterende roller. Historiske knapvarianter understøttes til kompatibilitet, mens ny kode bruger den fælles knapfamilie. Se [integrationsguiden](docs/INTEGRATION.md) for API og sammensætning og [temaformatet](docs/PACKAGE-FORMAT.md) for kontrakten. Biblioteksversionen er særskilt fra editorens versionsnummer.
 
 ## Brug i et produkt
 
+[Agentarbejdsgangen](docs/AGENT-WORKFLOW.md) er den fælles indgang til valg af tema, komponenter, layout, interaktion og kontrol. [Integrationsguiden](docs/INTEGRATION.md) beskriver de fælles controllere, filvalg og data-API'er. Brug den relevante controller frem for lokal interaktionslogik. Dialoghjælperne bruger browserens native dialog; `open: true` alene giver ikke modaladfærd.
+
 Giv agenten denne instruktion:
 
-> Brug Design Studio-systemet i E:/AI projekter/Design Studio. Læs README.md, AGENTS.md og docs/AGENT-WORKFLOW.md. Vælg komponenter fra det fælles bibliotek, og brug projektets tema til deres visuelle udtryk.
+> Brug det tilknyttede Design Studio-system. Læs README.md, AGENTS.md og docs/AGENT-WORKFLOW.md. Find produktets faktiske designfiler i design-studio.project.json. Vælg komponenter fra det fælles bibliotek, og brug projektets tema til deres visuelle udtryk.
 
 Opret tilknytningen fra systemmappen:
 
 ~~~sh
-node tools/cli.mjs init "E:/sti/til/produkt" --theme studio-light
+node tools/cli.mjs init PROJECT_DIR --theme studio-light
 ~~~
 
-Projektmappen skal eksistere. Kommandoen opretter et minimalt offlineprojekt med kildefiler i `src/`, `tools/build.mjs`, `package.json` med `npm run build` og en færdig `index.html`, som kan åbnes med det samme. Den opretter også tema, CSS, fælles komponentruntime, eventuelle brandoriginaler, projektkonfiguration og en anvisning i produktets AGENTS.md. Eksisterende output overskrives ikke; ved filkonflikter ændres intet.
+Erstat `PROJECT_DIR` med den faktiske projektsti; mappen skal eksistere. Kommandoen opretter et minimalt offlineprojekt med kildefiler i `src/`, `tools/build.mjs`, `package.json` med `npm run build` og en færdig `index.html`, som kan åbnes med det samme. Den opretter også tema, CSS, fælles komponentruntime, eventuelle brandoriginaler, projektkonfiguration og en anvisning i produktets AGENTS.md. Eksisterende output overskrives ikke; ved filkonflikter ændres intet.
 
 Nye projekter får også `npm run doctor` og fælles filhåndtering med Åbn projekt/Gem projekt. Doctor kontrollerer tema, CSS, runtime, komponentadaptere og om offlinefilen er opdateret. Det ændrer ingen filer. Filmodulet validerer JSON, formatversion og projektdata og håndterer annulleret filvalg. Se [integrationsguiden](docs/INTEGRATION.md#projekttjek-med-doctor).
 
 Startprojektet kan tilpasses frit. `node tools/cli.mjs update PROJECT_DIR` viser valgfrie versionsopdateringer; tilføj `--apply` for at anvende sikre ændringer. Egen kode bevares, og ændrede filer får separate forslag til manuel fletning. Buildet foretager ingen automatiske opdateringer. Se [opdateringsreglerne](docs/INTEGRATION.md#valgfrie-opdateringer-af-startprojektet).
 
-Nye produkter åbnes direkte fra deres egen `index.html`, ligesom FormLab. Agenten kører `npm install` i produktet ved første udviklingsopsætning, redigerer `src`-filerne og kører `npm run build` efter ændringer, så brugeren blot genindlæser browseren. Den færdige fil kræver ingen installation, og produktets build er uafhængigt af Design Studios mappe. Se [arbejdsmetoden for nye projekter](docs/AGENT-WORKFLOW.md#start-et-projekt).
+Nye produkter åbnes direkte fra deres egen `index.html`, ligesom FormLab. Agenten kører `npm install` i produktet ved første udviklingsopsætning, redigerer `src`-filerne og kører `npm run build` efter ændringer, så brugeren blot genindlæser browseren. Den færdige fil kræver ingen installation, og produktets build er uafhængigt af Design Studios mappe. Se [arbejdsmetoden for nye projekter](docs/AGENT-WORKFLOW.md#start-eller-fortsæt-et-produkt).
 
 I et eksisterende produkt bruges `node tools/cli.mjs init PROJECT_DIR --design-only` for kun at oprette designtilknytningen og bevare produktets app- og buildopsætning.
 
@@ -76,7 +86,7 @@ Importér komponentruntime fra design/runtime/components.mjs, eller forbind det 
 Efter tema- eller biblioteksændringer:
 
 ~~~sh
-node tools/cli.mjs sync "E:/sti/til/produkt"
+node tools/cli.mjs sync PROJECT_DIR
 ~~~
 
 ## Designgrundlag
@@ -89,12 +99,23 @@ Find først en eksisterende rolle. Tilføj om nødvendigt en variant eller en ny
 
 ## Web-showcase
 
-Showcasen bruger samme bibliotek, renderer og offentlige temaer. Den kræver ingen backend til tema- og komponentskift. Kør npm run sync:design-studio i E:/AI projekter/Hjemmeside før hjemmesidens normale build. Det eksporterer gennem tools/build-showcase.mjs til public/design-studio. Andre websites kan bruge tools/build-showcase.mjs --out DIRECTORY. Hjemmesidens projektside forklarer systemet og åbner demoen. Temaer redigeres i offline-editoren via index.html; showcasen er en separat demo til websites.
+Showcasen bruger samme bibliotek, renderer og offentlige temaer. Den kræver ingen backend til tema- og komponentskift. I den tilknyttede hjemmeside køres `npm run sync:design-studio` før hjemmesidens normale build. Det eksporterer gennem `tools/build-showcase.mjs` til `public/design-studio`. Andre websites kan bruge `tools/build-showcase.mjs --out DIRECTORY`. Hjemmesidens projektside forklarer systemet og åbner demoen. Temaer redigeres i offline-editoren via index.html; showcasen er en separat demo til websites.
+
+## Portabilitet og kontrolgrænser
+
+De offentlige temaers primære skrifter følger med som lokale WOFF2-filer med deres licenser. Inter, Source Serif 4 og Roboto Mono erstatter afhængigheden af installerede systemskrifter; Castle bevarer Nunito og Alegreya, og Fjordside bevarer Platypi. De fælles webfontudsnit dækker dansk og vestlig latin. Platypi bevarer den oprindelige tegn- og akseldækning. Andre skriftsystemer kan bruge fallback, og rasterisering kan variere mellem browser og operativsystem.
+
+Offlinebuildet og web-showcasen genbruger gentagne data ved pakning. Den færdige editor kræver fortsat hverken netværk eller en ekstra runtime. Leveringsmanifestet viser de faktiske filstørrelser og kontrolsummer. CI er konfigureret til Windows, macOS og Linux; faktiske Mac-/Linux-kørsler er endnu ikke dokumenteret.
+
+Automatiske kontrakter og browserkontrol erstatter ikke hjælpemiddel- eller systemkontrol. Reel Windows-højkontrast, operativsystemets filvælger og brugerens direkte `file://`-forløb er endnu ikke manuelt verificeret som samlet leverance. Strukturelle offlineprøver og HTTP-kontrol dokumenterer andre dele af løsningen. Se [designgrundlagets kontrolafgrænsning](docs/DESIGN-FOUNDATIONS.md#kontrol-i-runtime).
 
 ## Indhold
 
 - core/library.mjs: fælles katalog og dokumenterede token-defaults.
-- core/components.mjs: sikker fælles markup, native DOM og dialoghjælpere.
+- core/components.mjs: sikker fælles markup, native DOM, dialogmarkup og indgang til de fælles controllere.
+- core/menus.mjs: fælles tastatur, fokus og åbning/lukning til kommandomenuer.
+- core/input-choices.mjs, core/feedback.mjs og core/uploads.mjs: filtrerede valg, meddelelser og lokalt filvalg.
+- core/data-table.mjs og core/data-grid.mjs: tabeladfærd og redigerbar arbejdskopi med validering.
 - core/motion.mjs: fælles animation med reduceret bevægelse; eksporteres også fra components.mjs.
 - core/quality.mjs: semantisk kontrast, målbare variantpar og grundlæggende læsbarhed.
 - core/engine.mjs og core/contract.mjs: validering, tokenopløsning, CSS og migration.
@@ -110,10 +131,10 @@ Showcasen bruger samme bibliotek, renderer og offentlige temaer. Den kræver ing
 ~~~sh
 npm test
 npm run check
-node tools/cli.mjs doctor "E:/sti/til/produkt"
+node tools/cli.mjs doctor PROJECT_DIR
 node tools/cli.mjs validate packages/studio-light.json
 node tools/cli.mjs compare packages/studio-light.json packages/midnight-editorial.json
-node tools/cli.mjs migrate "E:/produkt/design/design.json" --out "E:/produkt/design/theme-v2.json"
+node tools/cli.mjs migrate PROJECT_DIR/design/design.json --out PROJECT_DIR/design/theme-v2.json
 ~~~
 
 Format 1 beholder sin eksisterende CSS. Konvertering til format 2 er eksplicit og ændrer komponenternes grundlayout til bibliotekets standard. Bevar originalfilen og fjern eventuel dobbelt padding i produktet før overgangen. Ukendte roller skal registreres i biblioteket før migration.

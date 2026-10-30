@@ -26,10 +26,10 @@ test('schema and runtime share required tokens and component contract', () => {
 });
 test('alias chains resolve without changing package data', () => {
   const pack=base();
-  pack.tokens['color.brand.alias']=token('color', '{color.action.primary}');
+  pack.tokens['color.brand.alias']=token('color', '{color.action.primary.rest.surface}');
   pack.tokens['color.brand.alias2']=token('color', '{color.brand.alias}');
   const before=JSON.stringify(pack);
-  assert.equal(resolveTokens(pack)['color.brand.alias2'],pack.tokens['color.action.primary'].$value);
+  assert.equal(resolveTokens(pack)['color.brand.alias2'],resolveTokens(pack)['color.action.primary.rest.surface']);
   assert.equal(JSON.stringify(pack),before);
 });
 test('missing references in token aliases and style recipes are explained', () => {
@@ -47,12 +47,12 @@ test('circular aliases and incompatible aliases fail validation', () => {
   pack.tokens['color.brand.b']=token('color','{color.brand.a}');
   assert.match(errorsFor(pack),/circular token alias/);
   const wrongType=base();
-  wrongType.tokens['color.brand.a']=token('color','{space.1}');
+  wrongType.tokens['color.brand.a']=token('color','{space.scale.1}');
   assert.match(errorsFor(wrongType),/expected color/);
 });
 test('tokens require correctly typed values and documented meanings', () => {
   const pack=base();
-  pack.tokens['space.1'].$value='banana';
+  pack.tokens['space.scale.1'].$value='banana';
   pack.tokens['color.text.primary'].$value='#zzzzzz';
   pack.tokens['typography.weight.body'].$value=Infinity;
   delete pack.tokens['color.text.secondary'].description;
@@ -118,7 +118,7 @@ test('CSS variables cannot collide through equivalent dotted and dashed names', 
 });
 test('generated CSS scopes variables, recipes, variants and native control states', () => {
   const pack=base();
-  pack.components.field.states.focus.parts = {control:{styles:{outline:'1px solid {color.action.primary}'}}};
+  pack.components.field.states.focus.parts = {control:{styles:{outline:'1px solid {color.action.primary.rest.surface}'}}};
   const css=generateCSS(pack,{scope:'#product'});
   assert.match(css,/#product \{/);
   assert.match(css,/--ds-color-text-primary:/);
@@ -137,13 +137,13 @@ test('custom composite native controls map focus, checked and disabled within th
       name:id, description:'Composite native control', usage:'Label wraps its own native input', composes:[],
       parts:{
         root:{selector:`.ds-${id}`,styles:{display:'inline-flex'}},
-        control:{selector:`.ds-${id}__control`,styles:{accentColor:'{color.action.primary}'}},
+        control:{selector:`.ds-${id}__control`,styles:{accentColor:'{color.action.primary.rest.surface}'}},
         label:{selector:`.ds-${id}__label`,styles:{color:'{color.text.primary}'}}
       },
       variants:{},
       states:{
-        focus:{description:'Focus within the composite',styles:{outline:'1px solid {color.action.primary}'}},
-        checked:{description:'Native checked input marks the composite',styles:{color:'{color.action.primary}'},parts:{control:{styles:{backgroundColor:'{color.action.primary}'}}}},
+        focus:{description:'Focus within the composite',styles:{outline:'1px solid {color.action.primary.rest.surface}'}},
+        checked:{description:'Native checked input marks the composite',styles:{color:'{color.action.primary.rest.surface}'},parts:{control:{styles:{backgroundColor:'{color.action.primary.rest.surface}'}}}},
         disabled:{description:'Native disabled control',parts:{control:{styles:{opacity:0.5}},label:{styles:{color:'{color.text.secondary}'}}}}
       },
       preview:{tag:'label',part:'root',children:[{tag:'input',part:'control',attrs:{type:id === 'radio' ? 'radio' : 'checkbox'}},{tag:'span',part:'label',text:'Native control'}]}
@@ -162,7 +162,7 @@ test('custom composite native controls map focus, checked and disabled within th
     assert.ok(!css.includes(`${root}:focus-visible`));
     assert.ok(!css.includes(`${root} .ds-${id}__label:disabled`));
   }
-  pack.components.input.states.checked={description:'Standalone native checked control',styles:{color:'{color.action.primary}'}};
+  pack.components.input.states.checked={description:'Standalone native checked control',styles:{color:'{color.action.primary.rest.surface}'}};
   const standaloneCSS=generateCSS(pack,{scope:'#product'});
   assert.ok(standaloneCSS.includes('#product .ds-input:focus-visible {'));
   assert.ok(standaloneCSS.includes('#product .ds-input:is(:checked, [aria-checked="true"]) {'));
@@ -190,7 +190,7 @@ test('replacement preserves token types and composed elements', () => {
 });
 test('preview trees support custom safe components without executable markup', () => {
   const pack=base();
-  pack.components.notice={name:'Notice',description:'Test component',usage:'Status text',composes:[],parts:{root:{selector:'.ds-notice',styles:{padding:'{space.4}'}},label:{selector:'.ds-notice__label',styles:{color:'{color.text.primary}'}}},variants:{default:{description:'Default',styles:{}}},states:{},preview:{tag:'section',part:'root',variant:'default',children:[{tag:'strong',part:'label',text:'<escaped sample>'}]}};
+  pack.components.notice={name:'Notice',description:'Test component',usage:'Status text',composes:[],parts:{root:{selector:'.ds-notice',styles:{padding:'{space.scale.4}'}},label:{selector:'.ds-notice__label',styles:{color:'{color.text.primary}'}}},variants:{default:{description:'Default',styles:{}}},states:{},preview:{tag:'section',part:'root',variant:'default',children:[{tag:'strong',part:'label',text:'<escaped sample>'}]}};
   assert.equal(validatePackage(pack).valid,true);
   pack.components.notice.preview.children[0].attrs={onclick:'alert(1)'};
   assert.match(errorsFor(pack),/unsupported preview attribute/);
@@ -200,7 +200,7 @@ test('preview trees support custom safe components without executable markup', (
 });
 test('preview trees validate part references, input attributes and depth', () => {
   const pack=base();
-  pack.components.button.preview={tag:'button',part:'missing',attrs:{disabled:'yes',type:'file'}};
+  pack.components.button.preview={tag:'button',part:'missing',attrs:{disabled:'yes',type:'unsupported'}};
   const errors=errorsFor(pack);
   assert.match(errors,/preview root must use root part/);
   assert.match(errors,/component part does not exist/);
@@ -253,7 +253,7 @@ test('brand sections and logos reference existing typed roles and image resource
   pack.brand.logos.push({id:'mark',name:'Logo',asset:'mark',usage:'Place on paper.',background:'color.background.canvas',foreground:'color.text.primary'});
   assert.deepEqual(validatePackage(pack),{valid:true,errors:[]});
   pack.brand.sections[0].tokens=['missing'];pack.brand.sections[0].components=['missing'];
-  pack.brand.logos[0].background='space.1';pack.brand.logos[0].asset='missing';
+  pack.brand.logos[0].background='space.scale.1';pack.brand.logos[0].asset='missing';
   const errors=errorsFor(pack);
   assert.match(errors,/sections.0.tokens.0: reference does not exist/);
   assert.match(errors,/sections.0.components.0: reference does not exist/);
@@ -373,7 +373,7 @@ test('Castle surfaces retain positive shared padding and gaps independently of t
  assert.match(css,/\.ds-dialog-host \{[\s\S]*?padding: 0;/);
 });
 test('new shared roles and documented tokens work with a minimal existing theme',()=>{
- const theme={schemaVersion:2,id:'minimal',name:'Minimal',description:'Uses the central defaults.',tokens:{'color.action.primary':token('color','#663399')},history:[]};
+ const theme={schemaVersion:2,id:'minimal',name:'Minimal',description:'Uses the central defaults.',tokens:{'color.action.primary.rest.surface':token('color','#663399')},history:[]};
  assert.deepEqual(validatePackage(theme),{valid:true,errors:[]});
  assert.equal(resolveTokens(theme)['size.brand.logo'],DEFAULT_TOKENS['size.brand.logo'].$value);
  for(const id of ['action-button','range-field','inspector','tag','radio','switch','choice-field'])assert.match(renderComponent(theme,id),new RegExp('class="'+COMPONENT_LIBRARY[id].parts.root.selector.slice(1)+'"'));
@@ -390,7 +390,7 @@ test('themes cannot remove padding, gap, component parts or the shared catalog',
   const zero=themeFixture('studio-light');zero.tokens[id]=token('dimension','0');assert.match(errorsFor(zero),/must resolve to a positive/);
   const alias=themeFixture('studio-light');alias.tokens['space.zero']=token('dimension','0px');alias.tokens[id]=token('dimension','{space.zero}');assert.match(errorsFor(alias),/must resolve to a positive/);
  }
- const indirect=themeFixture('studio-light');indirect.tokens['space.component.paddingLarge']=token('dimension','{space.6}');indirect.tokens['space.6'].$value='0';assert.match(errorsFor(indirect),/must resolve to a positive/);
+ const indirect=themeFixture('studio-light');indirect.tokens['space.component.paddingLarge']=token('dimension','{space.scale.6}');indirect.tokens['space.scale.6'].$value='0';assert.match(errorsFor(indirect),/must resolve to a positive/);
 });
 test('schema appearance properties match runtime allowlist and reject v2 structural definitions',()=>{
  const schema=JSON.parse(readFileSync(new URL('../schema/design-package.schema.json',import.meta.url),'utf8'));
@@ -490,12 +490,12 @@ test('canonical catalog and previews use project-agnostic anatomy without legacy
  assert.doesNotMatch(source,/Castle|Fjordside|byggeværktøj|fortælling|borg|tårn|murkrone|rumpanel|terracotta|Nunito|Alegreya|setParam|limitsFor/i);
  for(const id of ['action-button','caption','choice-field','metric-row'])assert.ok(COMPONENT_LIBRARY[id]);
  for(const id of ['tool-button','simulation-caption','brandSelect','stat-row'])assert.equal(Object.hasOwn(COMPONENT_LIBRARY,id),false);
- assert.equal(Object.keys(COMPONENT_LIBRARY).length,37);
+ assert.equal(Object.keys(COMPONENT_LIBRARY).length,60);
  assert.equal(Object.keys(DEFAULT_TOKENS).some(id=>id.startsWith('color.scene.')),false);
- assert.deepEqual(COMPONENT_LIBRARY['action-button'].preview.children.map(node=>node.part),['icon','label','shortcut']);
+ assert.deepEqual(COMPONENT_LIBRARY['action-button'].preview.children.map(node=>node.part),['progress','icon','label','shortcut']);
 });
 test('old v2 component, variant, part, state, token and selector references remain explicit aliases',()=>{
- const minimal={schemaVersion:2,id:'aliases',name:'Aliases',description:'Compatibility fixture.',tokens:{'typography.font.narrative':token('fontFamily','Georgia, serif')},history:[],appearance:{'tool-button':{variants:{icon:{styles:{color:'{color.text.primary}'}}},states:{selected:{styles:{color:'{color.action.primaryText}'}}}},'simulation-caption':{parts:{clock:{styles:{backgroundColor:'{color.text.secondary}'}}}}}};
+ const minimal={schemaVersion:2,id:'aliases',name:'Aliases',description:'Compatibility fixture.',tokens:{'typography.font.narrative':token('fontFamily','Georgia, serif')},history:[],appearance:{'tool-button':{variants:{icon:{styles:{color:'{color.text.primary}'}}},states:{selected:{styles:{color:'{color.action.primary.rest.text}'}}}},'simulation-caption':{parts:{clock:{styles:{backgroundColor:'{color.text.secondary}'}}}}}};
  assert.deepEqual(validatePackage(minimal),{valid:true,errors:[]});
  const catalog=getComponents(minimal);assert.equal(Object.hasOwn(catalog,'tool-button'),false);assert.equal(catalog['action-button'].variants.horizontal.styles.color,'{color.text.primary}');
  assert.equal(resolveTokens(minimal)['typography.font.expressive'],'Georgia, serif');
@@ -579,8 +579,8 @@ test('vertical action buttons stretch in toolbars and framed controls share the 
  for(const id of ['input','select','action-button'])assert.ok(components[id].parts.root.styles.border.includes('{color.border.field}'));
  for(const id of ['field','choice-field'])assert.ok(components[id].parts.control.styles.border.includes('{color.border.field}'));
  assert.equal(components.button.variants.secondary.styles.borderColor,'transparent');
- assert.equal(components.button.variants.tertiary.styles.borderColor,'{color.action.primary}');
- const minimal={schemaVersion:2,id:'field-fallback',name:'Field fallback',description:'Shared default.',tokens:{},history:[]};assert.equal(resolveTokens(minimal)['color.border.field'],resolveTokens(minimal)['color.border.default']);
+ assert.equal(components.button.variants.tertiary.styles.borderColor,'{color.action.primary.rest.surface}');
+ const minimal={schemaVersion:2,id:'field-fallback',name:'Field fallback',description:'Shared default.',tokens:{},history:[]};assert.equal(resolveTokens(minimal)['color.border.field'],resolveTokens(minimal)['color.text.secondary']);
 });
 
 test('scroll areas retain owned nested anatomy, inset scrollbars and unclipped native viewport focus',()=>{
@@ -593,7 +593,7 @@ test('scroll areas retain owned nested anatomy, inset scrollbars and unclipped n
  assert.match(css,/\.ds-scroll-area__viewport \{[^}]*scrollbar-gutter: auto;/);
  assert.doesNotMatch(css,/\.ds-scroll-area[^{}]*\{[^}]*scrollbar-gutter: stable;/);
  assert.doesNotMatch(css,/#product \.ds-scroll-area\[data-variant="contained"\] \.ds-scroll-area__content \{/);
- assert.match(css,/\.ds-scroll-area__viewport \{[^}]*margin: var\(--ds-space-1\);[^}]*overflow: auto;/);
+ assert.match(css,/\.ds-scroll-area__viewport \{[^}]*margin: var\(--ds-space-scale-1\);[^}]*overflow: auto;/);
  assert.equal(components['scroll-area'].parts.viewport.styles.scrollbarColor,undefined,'shared scrollbar policy covers component and application scrollers together');
  assert.match(css,/:has\(> \.ds-scroll-area__viewport:focus-visible\)[^}]*> \.ds-scroll-area__viewport \{[^}]*outline: var\(--ds-border-width-focus\) solid var\(--ds-color-focus\);[^}]*outline-offset: calc\(-1 \* var\(--ds-border-width-focus\)\);/);
  assert.match(css,/padding: max\(var\(--ds-space-component-paddingCompact\), calc\(max\(3px, var\(--ds-border-width-focus\)\) \+ max\(2px, var\(--ds-border-offset-focus\)\)\)\);/);
@@ -615,9 +615,9 @@ test('list actions preserve heading and description parts and expose native curr
 test('semantic hover and active fills preserve primary, accent, danger and selected families',()=>{
  const theme=themeFixture('castle-studio'),components=getComponents(theme),css=generateCSS(theme,{scope:'#product'});
  const binding='--ds-interaction-hover-surface';
- assert.equal(components.button.parts.root.styles[binding],'{color.action.primaryHover}');
- for(const [variant,family]of [['secondary','secondary'],['tertiary','primary'],['ghost','neutral'],['danger','danger'],['danger-subtle','danger'],['accent','accent']])assert.equal(components.button.variants[variant].styles[binding],'{color.action.'+family+'Hover}');
- assert.equal(components['action-button'].states.pressed.styles[binding],'{color.action.primaryHover}');assert.equal(components['segmented-option'].states.pressed.styles[binding],'{color.action.selectedHover}');
+ assert.equal(components.button.parts.root.styles[binding],'{color.action.primary.hover.surface}');
+ for(const [variant,family]of [['secondary','secondary'],['tertiary','primary'],['ghost','neutral'],['danger','danger'],['danger-subtle','danger'],['accent','accent']])assert.equal(components.button.variants[variant].styles[binding],'{color.action.'+family+'.hover.surface}');
+ assert.equal(components['action-button'].states.pressed.styles[binding],'{color.action.primary.hover.surface}');assert.equal(components['segmented-option'].states.pressed.styles[binding],'{color.action.selected.hover.surface}');
  for(const id of ['button','action-button','segmented-option'])for(const state of ['hover','active']){
   assert.equal(components[id].states[state].styles.backgroundColor,'var(--ds-interaction-'+state+'-surface)');assert.equal(components[id].states[state].styles.color,'var(--ds-interaction-'+state+'-text)');assert.equal(Object.hasOwn(components[id].states[state].styles,'opacity'),false);
  }
@@ -626,7 +626,7 @@ test('semantic hover and active fills preserve primary, accent, danger and selec
  assert.match(css,/\.ds-toolbar__action:hover:not\(:is\(:disabled/);
  const bad=themeFixture('studio-light');bad.appearance.button={parts:{root:{styles:{[binding]:'#fff'}}}};assert.match(errorsFor(bad),/layout is owned by the shared library/);
  const minimal={schemaVersion:2,id:'interaction-defaults',name:'Defaults',description:'No custom interaction tokens.',tokens:{},history:[]},tokens=resolveTokens(minimal);
- assert.notEqual(tokens['color.action.primaryHover'],tokens['color.action.primary']);assert.notEqual(tokens['color.action.neutralHover'],tokens['color.background.control']);assert.deepEqual(validatePackage(minimal),{valid:true,errors:[]});
+ assert.notEqual(tokens['color.action.primary.hover.surface'],tokens['color.action.primary.rest.surface']);assert.notEqual(tokens['color.action.neutral.hover.surface'],tokens['color.background.control']);assert.deepEqual(validatePackage(minimal),{valid:true,errors:[]});
 });
 
 test('scroll surface composition has one frame, retains native inner anatomy and supports fixed-header bodies',()=>{
@@ -646,7 +646,7 @@ test('shared stacks separate composed controls without adding inner padding or t
  assert.deepEqual(components.stack.parts.root.styles,{display:'flex',flexDirection:'column',minWidth:'0',gap:'{space.component.gapLarge}'});assert.deepEqual(components.stack.variants.compact.styles,{gap:'{space.component.gap}'});assert.deepEqual(components.stack.variants['disclosure-body'].styles,{gap:'{space.component.gap}',paddingBlockStart:'{space.component.gapLarge}'});
  const document={createElement(tag){return{tag,attrs:{},children:[],setAttribute(name,value){this.attrs[name]=value;},appendChild(child){this.children.push(child);}};},createTextNode(text){return{text};}};
  const stack=createComponent(theme,'stack',{}, {document});assert.equal(stack.attrs.class,'ds-stack');assert.equal(stack.attrs['data-variant'],'default');assert.deepEqual(stack.children.map(child=>child.attrs.class),['ds-instruction-note','ds-field','ds-button']);assert.equal(stack.children[1].children.find(child=>child.tag==='input').attrs.class,'ds-input');
- const html=renderComponent(theme,'stack',{variant:'compact',slots:{root:[{component:'segmented-control'},{component:'instruction-note'}]}});assert.match(html,/class="ds-stack" data-variant="compact"><div[^>]*class="ds-segmented-control"/);assert.equal(components['segmented-control'].parts.root.styles.gap,'{space.1}');assert.doesNotMatch(css,/#product \.ds-stack [*>]/);
+ const html=renderComponent(theme,'stack',{variant:'compact',slots:{root:[{component:'segmented-control'},{component:'instruction-note'}]}});assert.match(html,/class="ds-stack" data-variant="compact"><div[^>]*class="ds-segmented-control"/);assert.equal(components['segmented-control'].parts.root.styles.gap,'{space.scale.1}');assert.doesNotMatch(css,/#product \.ds-stack [*>]/);
  const missing=base();missing.components.card.preview.children=[{component:'missing'}];assert.match(errorsFor(missing),/shared component does not exist/);
  const undeclared=base();undeclared.components.card.composes=[];undeclared.components.card.preview.children=[{component:'field'}];assert.match(errorsFor(undeclared),/must be declared in composes/);
 });

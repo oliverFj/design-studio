@@ -1,5 +1,5 @@
 import {materializePackage,resolveTokens} from '../core/engine.mjs';
-import {themeContrastReport,componentContrastReport,controlBoundaryReport} from '../core/quality.mjs';
+import {themeContrastReport,componentContrastReport,controlBoundaryReport,componentBoundaryReport} from '../core/quality.mjs';
 import {componentGeometryReport} from '../core/geometry.mjs';
 import {compositionQualityReport} from '../patterns/quality.mjs';
 import {COMPOSITIONS} from '../patterns/catalog.mjs';
@@ -8,7 +8,7 @@ const labels={pass:'Bestået',warning:'Advarsel',unmeasurable:'Kan ikke måles'}
 const count=checks=>({pass:checks.filter(c=>c.status==='pass').length,warning:checks.filter(c=>c.status==='warning').length,unmeasurable:checks.filter(c=>c.status==='unmeasurable').length});
 
 /** Explicit quality review; pattern checks never run on a token keystroke. */
-export function createQualityStudio(state,{escape,validation,render,notice,document=globalThis.document,runPatterns=compositionQualityReport}){
+export function createQualityStudio(state,{escape,validation,getTheme=()=>state.pack,render,notice,document=globalThis.document,runPatterns=compositionQualityReport}){
   let subject=null,revision=0,patternResult=null,running=false;
   const invalidate=()=>{revision++;patternResult=null;running=false;subject=state.pack;};
   const sync=()=>{if(subject!==state.pack)invalidate();};
@@ -20,7 +20,7 @@ export function createQualityStudio(state,{escape,validation,render,notice,docum
       (check.details?'<p>'+escape(check.details)+'</p>':'')+'</li>').join('')+'</ul>';
   }
   const pairs=checks=>checks.map(check=>({status:check.ratio===null?'unmeasurable':check.passed?'pass':'warning',label:check.component?check.component+'.'+check.part+' · '+check.variant+' / '+check.state:check.foreground+' / '+check.background,
-    component:check.component,details:(check.ratio===null?'Farveparret kan ikke måles sikkert.':check.ratio.toFixed(2)+':1 · pejlemærke '+check.minimum+':1')+(check.context?' · '+check.context:'')}));
+    component:check.component,details:(check.ratio===null?'Farveparret kan ikke måles sikkert.':check.ratio.toFixed(2)+':1 · minimum '+check.minimum+':1')+(check.context?' · '+check.context:'')}));
   function group(title,checks,{open=false,summaryOnly=false}={}){
     const totals=count(checks),failed=checks.filter(check=>check.status!=='pass');
     return '<details class="quality-group"'+(open||failed.length?' open':'')+'><summary>'+escape(title)+' <span>'+totals.pass+'/'+checks.length+' bestået'+(totals.warning?' · '+totals.warning+' advarsler':'')+(totals.unmeasurable?' · '+totals.unmeasurable+' kan ikke måles':'')+'</span></summary>'+
@@ -31,10 +31,10 @@ export function createQualityStudio(state,{escape,validation,render,notice,docum
     if(state.pack.schemaVersion!==2)return '<div class="canvas-toolbar"><h2>Kvalitet</h2></div><p class="help">De fælles geometri- og mønsterprøver kræver temaformat 2. Format 1 beholder sin eksisterende validering.</p>';
     const checked=validation();
     if(!checked.valid)return '<div class="canvas-toolbar"><h2>Kvalitet</h2></div><p class="help">Ret temaets valideringsfejl før den samlede kontrol. Der vises ingen resultater fra en tidligere gyldig kladde.</p><pre class="error-box">'+escape(checked.errors.join('\n'))+'</pre>';
-    const model=materializePackage(state.pack),resolved=resolveTokens(state.pack);
-    const foundations=pairs(themeContrastReport(resolved)),components=pairs(componentContrastReport(model,resolved)),boundaries=pairs(controlBoundaryReport(resolved)),geometry=componentGeometryReport(model,resolved);
+    const theme=getTheme(),model=materializePackage(theme),resolved=resolveTokens(theme);
+    const foundations=pairs(themeContrastReport(resolved)),components=pairs(componentContrastReport(model,resolved)),boundaries=pairs([...controlBoundaryReport(resolved),...componentBoundaryReport(model,resolved)]),geometry=componentGeometryReport(model,resolved);
     const totals=count([...foundations,...components,...boundaries,...geometry]);
-    return '<div class="canvas-toolbar"><h2>Kvalitet</h2></div><p class="help">Kontrollér det aktuelle tema som både komponenter og samlede mønstre. Beregningerne er rådgivende og ændrer ikke temaet.</p>'+
+    return '<div class="canvas-toolbar"><h2>Kvalitet</h2></div><p class="help">Kontrollér det aktuelle tema som både komponenter og samlede mønstre. Farve- og feltkantkrav håndhæves også ved validering og gemning. Geometri og mønsterprøver supplerer med afgrænsede kontroller.</p>'+
       '<div class="quality-overview"><span><strong>'+totals.pass+'</strong> bestået</span><span><strong>'+totals.warning+'</strong> advarsler</span><span><strong>'+totals.unmeasurable+'</strong> kan ikke måles</span></div>'+
       group('Semantiske tekst- og fokuspar',foundations)+group('Komponenternes tekst og tilstande',components,{summaryOnly:true})+
       group('Interaktive feltkanter',boundaries)+group('Beregnet kontrolgeometri',geometry)+
@@ -43,12 +43,12 @@ export function createQualityStudio(state,{escape,validation,render,notice,docum
       (patternResult?group('Struktur og udvalgte forløb',patternResult.checks)+'<ul class="help">'+patternResult.limitations.map(text=>'<li>'+escape(text)+'</li>').join('')+'</ul>':'')+'</section>';
   }
   function inspector(){
-    return '<div class="inspector-heading">Kontrollens rækkevidde</div><h2>Kvalitet med synligt grundlag</h2><p>Geometri beregnes fra temaets værdier og bibliotekets opskrifter ved en rem-base på 16 px. Ukendt CSS får resultatet Kan ikke måles.</p><div class="inspector-section"><h3>Feltkanter</h3><p>3:1 bruges som pejlemærke for interaktive kanter. Dekorative kortkanter vurderes særskilt. Resultatet er ikke en tilgængelighedscertificering.</p></div><div class="inspector-section"><h3>Kontrollér også i brug</h3><p>Zoom, smalle paneler, lange labels, font-rendering og hjælpemidler kræver fortsat relevant browserkontrol. Mønsterprøverne måler ikke pixels.</p></div><div class="inspector-section"><h3>Efter ændringer</h3><p>Resultater for designmønstre nulstilles ved temaændring. Kør prøverne igen, når kladden er klar.</p></div>';
+    return '<div class="inspector-heading">Kontrollens rækkevidde</div><h2>Kvalitet med synligt grundlag</h2><p>Geometri beregnes fra temaets værdier og bibliotekets opskrifter ved en rem-base på 16 px. Ukendt CSS får resultatet Kan ikke måles.</p><div class="inspector-section"><h3>Feltkanter</h3><p>3:1 er et bindende minimum for feltgrænser mod kontrol-, indholds- og grundflader. Også eksplicitte feltopskrifter og varianter kontrolleres. Dekorative kortkanter er ikke omfattet. Resultatet er ikke en tilgængelighedscertificering.</p></div><div class="inspector-section"><h3>Kontrollér også i brug</h3><p>Zoom, smalle paneler, lange labels, font-rendering og hjælpemidler kræver fortsat relevant browserkontrol. Mønsterprøverne måler ikke pixels.</p></div><div class="inspector-section"><h3>Efter ændringer</h3><p>Resultater for designmønstre nulstilles ved temaændring. Kør prøverne igen, når kladden er klar.</p></div>';
   }
   function bind(){
     document.querySelector('#run-pattern-quality')?.addEventListener('click',async()=>{
       if(running||!validation().valid)return;
-      sync();const job=revision,theme=structuredClone(state.pack),themeSubject=subject;
+      sync();const job=revision,theme=structuredClone(getTheme()),themeSubject=subject;
       running=true;const button=document.querySelector('#run-pattern-quality');if(button){button.disabled=true;button.textContent='Kontrollerer…';}
       try{
         const result=await runPatterns(theme,{document,onProgress:progress=>{

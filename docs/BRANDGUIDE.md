@@ -48,13 +48,13 @@ UX, indhold og produktarkitektur bestemmes fortsat af projektet. En brandregel k
 Når et nyt projekt oprettes med `init`, kopieres hele pakken. Eventuelle brandressourcer udpakkes automatisk under `design/assets`. Projektets `AGENTS.md` henviser til brandregler og originaler. Eksisterende designfiler og ressourcer overskrives ikke.
 
 ```powershell
-node tools/cli.mjs init "E:\Projekter\Mit Produkt" --theme fjordside
+node tools/cli.mjs init "PROJECT_DIR" --theme fjordside
 ```
 
 Ved manuel integration, eller når du har fået en ny pakke, kan ressourcerne udpakkes særskilt:
 
 ```powershell
-node tools/cli.mjs assets "E:\Projekter\Mit Produkt\design\design.json" --out "E:\Projekter\Mit Produkt\design\assets"
+node tools/cli.mjs assets "PROJECT_DIR/design/design.json" --out "PROJECT_DIR/design/assets"
 ```
 
 Kommandoen viser alle de faktiske filstier. Hele eksporten kontrolleres, før noget skrives. Der bruges filnavne uden mapper, og symbolske links i outputstien afvises. Hvis et mål allerede findes, stopper kommandoen uden at overskrive filer. Ved en skrivefejl fjernes kun filer og tomme mapper, som kommandoen selv har oprettet. Brug en ny mappe, når du vil hente en opdateret udgave ved siden af eksisterende ressourcer.
@@ -67,6 +67,6 @@ Forbind den udvalgte logofil gennem projektets sædvanlige assetmekanisme. Eksem
 
 Stien er kun et eksempel; projektets buildværktøj og offentlige mappe bestemmer den faktiske sti. Kontroller, at den refererer til den udpakkede original, og følg den valgte logovariants anvisninger. Brug tom `alt`, hvis projektets konkrete sammenhæng allerede formidler samme navn og billedet er dekorativt.
 
-Pakkens indlejrede skrifter bliver automatisk til `@font-face` med data-URL i den genererede CSS. CSS kan derfor flyttes sammen med projektet uden et ekstra fontstylesheet. Skrifttokens bestemmer, hvor fontfamilien bruges. Bevar licensteksterne sammen med de øvrige ressourcer i projektet.
+Pakkens indlejrede skrifter bliver automatisk til `@font-face` med data-URL i den genererede CSS. CSS kan derfor flyttes sammen med projektet uden et ekstra fontstylesheet. Skrifttokens bestemmer, hvor fontfamilien bruges. De offentlige temaer leverer deres primære skrifter som lokal WOFF2 med dansk og vestlig latin; Platypi bevarer hele det oprindelige TTF-tegnsæt og de variable vægte. Andre skriftsystemer kan bruge fallback. Bevar de originale licenstekster sammen med ressourcerne; fontvalg må ikke afhænge af, at en bestemt systemskrift er installeret.
 
 Læs også [INTEGRATION.md](INTEGRATION.md), [AGENT-WORKFLOW.md](AGENT-WORKFLOW.md) og [PACKAGE-FORMAT.md](PACKAGE-FORMAT.md).

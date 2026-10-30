@@ -37,7 +37,7 @@ export const COMPOSITIONS = Object.freeze({
     qualityScenarios: Object.freeze(['initial', 'tabs']),
   }),
   form: Object.freeze({
-    name: 'Formular med validering', version: '1.0.0', layout: 'form',
+    name: 'Formular med validering', version: '1.0.1', layout: 'form',
     description: 'En lille formular med label, hjælp, feltfejl, bekræftelse og fortrydelse.',
     usage: 'Til indstillinger og registrering. Gemningen i demonstrationen gælder kun denne session; produktet bestemmer sin lagring.',
     components: ['card', 'field', 'checkbox', 'button', 'stack', 'alert', 'heading', 'text'],

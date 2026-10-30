@@ -51,12 +51,12 @@ export const THEME_CONTRAST_PAIRS = Object.freeze([
   ['color.text.primary','color.background.surface'], ['color.text.secondary','color.background.surface'],
   ['color.text.muted','color.background.surface'], ['color.text.label','color.background.surface'],
   ['color.text.primary','color.background.subtle'], ['color.text.secondary','color.background.subtle'],
-  ['color.text.primary','color.background.control'], ['color.text.secondary','color.background.control'],
+  ['color.text.primary','color.background.control'], ['color.text.secondary','color.background.control'], ['color.text.muted','color.background.control'],
   ['color.text.primary','color.background.detail'], ['color.text.inverse','color.background.inverse'],
-  ['color.action.primaryText','color.action.primary'], ['color.action.subtleText','color.action.subtle'],
+  ['color.action.primary.rest.text','color.action.primary.rest.surface'], ['color.action.selected.rest.text','color.action.selected.rest.surface'],
   ['color.status.dangerText','color.status.dangerSurface'], ['color.status.danger','color.background.control'],
   ['color.caption.text','color.caption.surface'], ['color.caption.labelText','color.caption.labelSurface'],
-  ...['neutral','primary','secondary','selected','danger','accent'].flatMap(family=>['Hover','Active'].map(state=>['color.action.'+family+state+'Text','color.action.'+family+state])),
+  ...['neutral','primary','secondary','selected','danger','accent'].flatMap(family=>['hover','active'].map(state=>['color.action.'+family+'.'+state+'.text','color.action.'+family+'.'+state+'.surface'])),
   ['color.focus','color.background.canvas',3], ['color.focus','color.background.surface',3], ['color.focus','color.background.control',3],
 ].map(pair => Object.freeze(pair)));
 /** Test semantic foundations, not every possible product layout or appearance override. */
@@ -73,13 +73,45 @@ export function themeContrastReport(resolved) {
     return {foreground,background,minimum,ratio,passed:ratio !== null && ratio >= minimum};
   });
 }
-/** Advisory field-boundary contrast, separate from decorative dividers and save validation. */
+/** Required field boundaries. Decorative card/divider borders are not controls. */
 export function controlBoundaryReport(resolved) {
-  return ['color.background.control','color.background.surface'].map(background=>{
+  return ['color.background.control','color.background.surface','color.background.canvas'].map(background=>{
     const foreground='color.border.field',ratio=contrastRatio(resolved[foreground],resolved[background]),minimum=3;
-    return {foreground,background,ratio,minimum,passed:ratio!==null&&ratio>=minimum,advisory:true,
-      context:'Pejlemærke for en synlig feltkant. Kravet afhænger af, om kanten er nødvendig for at identificere feltet.'};
+    return {foreground,background,ratio,minimum,passed:ratio!==null&&ratio>=minimum,advisory:false,
+      context:'Bindende minimum for bibliotekets synlige feltgrænser. Dekorative kanter er ikke omfattet.'};
   });
+}
+
+/** Effective native field recipes, including appearance variants. A strong token
+ * alone must not let a local border/background override hide a field boundary.
+ * Native checkbox/radio/range paint is controlled by the browser and is not
+ * reported as if this static inspection could measure it.
+ */
+export function componentBoundaryReport(model,resolved) {
+  const report=[],surface=parseColor(resolved['color.background.surface']),canvas=parseColor(resolved['color.background.canvas']);
+  const resolve=value=>typeof value==='string'?value.replace(/\{([^}]+)\}/g,(_,id)=>String(resolved[id]??'')):value;
+  // The combobox wrapper and the grid cells are containers; the native control
+  // and the grid's temporary editor own their actual input boundaries.
+  for(const [id,part]of [['input','root'],['select','root'],['field','control'],['choice-field','control'],['textarea','control'],['number-input','control'],['combobox','control'],['multiselect','control'],['date-picker','control'],['time-picker','control'],['file-upload','control'],['data-grid','editor']]){
+    const component=model.components?.[id];if(!component)continue;
+    const base={...(id==='field'?model.components.input?.parts.root?.styles:{}),...component.parts?.[part]?.styles};
+    for(const [variant,treatment]of [['base',{}],...Object.entries(component.variants??{})]){
+      for(const [state,condition]of [['idle',{}],...Object.entries(component.states??{}).filter(([state])=>state!=='disabled')]){
+        const styles={...base,...(part==='root'?treatment.styles:treatment.parts?.[part]?.styles),...(part==='root'?condition.styles:condition.parts?.[part]?.styles)};
+        const border=resolve(styles.border),width=resolve(styles.borderWidth)??String(border??'').split(/\s+/)[0];
+        const style=resolve(styles.borderStyle)??String(border??'').split(/\s+/)[1];
+        const color=resolve(styles.borderColor)??String(border??'').replace(/^\S+\s+\S+\s+/, '');
+        const visible=style!=='none'&&style!=='hidden'&&Number.parseFloat(width)>0;
+        let control=parseColor(resolve(styles.backgroundColor));
+        if(control&&control[3]<1)control=surface?compositeColor(control,surface):null;
+        for(const [background,paint]of [['control',control],['surface',surface],['canvas',canvas]]){
+          const ratio=visible?contrastRatio(color,paint):0,minimum=3;
+          report.push({component:id,part,variant,state,foreground:'border',background,ratio,minimum,passed:ratio!==null&&ratio>=minimum});
+        }
+      }
+    }
+  }
+  return report;
 }
 function pixels(value) {
   const match = /^(\d*\.?\d+)(px|rem|em)$/.exec(String(value));
@@ -123,6 +155,8 @@ export function validateThemeQuality(model,resolved) {
     if (!color || color[3] !== 1) errors.push('tokens.'+id+': foundational surface must be an opaque, measurable color (hex, rgb, hsl, oklab, oklch or color(srgb)).');
   }
   for (const check of themeContrastReport(resolved)) if (!check.passed) errors.push('tokens.'+check.foreground+' on '+check.background+': '+(check.ratio===null?'unmeasurable color':check.ratio.toFixed(2)+':1 contrast')+'; minimum '+check.minimum+':1.');
+  for (const check of controlBoundaryReport(resolved)) if (!check.passed) errors.push('tokens.'+check.foreground+' on '+check.background+': '+(check.ratio===null?'unmeasurable field boundary':check.ratio.toFixed(2)+':1 field boundary contrast')+'; minimum '+check.minimum+':1.');
+  for (const check of componentBoundaryReport(model,resolved)) if (!check.passed) errors.push('components.'+check.component+'.'+check.part+' ['+check.variant+'/'+check.state+'] on '+check.background+': '+(check.ratio===null?'unmeasurable field boundary':check.ratio.toFixed(2)+':1 field boundary contrast')+'; minimum '+check.minimum+':1.');
   for (const check of componentContrastReport(model,resolved)) if(!check.passed) errors.push('components.'+check.component+'.'+check.part+' ['+check.variant+'/'+check.state+']: '+check.ratio.toFixed(2)+':1 contrast; minimum '+check.minimum+':1.');
   for (const [id,minimum] of [['size.control.height',24],['typography.size.body',14]]) {
     const size=pixels(resolved[id]);

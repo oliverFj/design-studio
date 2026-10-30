@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Udforsk Design Studio: ét fælles komponentbibliotek med syv gennemarbejdede visuelle temaer.">
+  <meta name="description" content="Udforsk Design Studio: ét fælles komponentbibliotek med forskellige visuelle temaer i lys og mørk tilstand.">
   <title>Design Studio · Komponenter & temaer</title>
   <link rel="stylesheet" href="./showcase.css">
   <link rel="stylesheet" href="./preview/project-overview.css">
@@ -19,12 +19,13 @@
     <section class="intro" aria-labelledby="intro-title">
       <div>
         <p class="eyebrow">ÉT BIBLIOTEK. MANGE MULIGHEDER.</p>
-        <h1 id="intro-title">Et fælles fundament.<br><span>Syv forskellige udtryk.</span></h1>
+        <h1 id="intro-title">Et fælles fundament.<br><span>Mange forskellige udtryk.</span></h1>
         <p class="intro-copy">Fra rolig produktflade til markant identitet. Skift tema, og oplev det samme interface med en helt anden karakter.</p>
       </div>
       <div class="theme-control">
         <div class="control-heading"><h2>Vælg et udtryk</h2><span id="theme-count"></span></div>
         <div id="themes" class="theme-list" aria-label="Temaer"></div>
+        <label class="variant-control color-mode-control" for="color-mode">Farvetilstand<select id="color-mode"><option value="system">System</option><option value="light">Lys</option><option value="dark">Mørk</option></select></label>
         <p id="theme-description" class="theme-description"></p>
       </div>
     </section>

@@ -11,9 +11,10 @@
     "build": "node tools/build-offline.mjs",
     "start": "node tools/open-offline.mjs",
     "example:build": "node tools/build-workspace.mjs",
-    "test": "node --test tests/*.test.mjs",
+    "test": "node tools/run-tests.mjs",
     "check": "node tools/check-themes.mjs",
-    "showcase:build": "node tools/build-showcase.mjs"
+    "showcase:build": "node tools/build-showcase.mjs",
+    "release": "node tools/build-release.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.2"

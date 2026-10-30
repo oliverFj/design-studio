@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 
 // Bump when the starter templates change; separate from the component library.
-export const STARTER_VERSION = '1.1.0';
+export const STARTER_VERSION = '1.2.0';
 export const STARTER_FILES = ['package.json', '.gitignore', 'src/index.html', 'src/app.mjs', 'src/styles.css', 'tools/build.mjs'];
 export const PACKAGE_FIELDS = ['type', 'private', 'engines.node', 'scripts.build', 'scripts.doctor', 'devDependencies.esbuild'];
 export const contentHash = content => createHash('sha256').update(content).digest('hex');
@@ -20,7 +20,7 @@ export async function starterFiles(studioRoot, { id, name }) {
       const title = name.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
       content = content.replace('<title>Offlineprojekt</title>', () => '<title>' + title + '</title>');
     }
-    if (file === 'tools/build.mjs') content = content.replace("'../../../tools/offline-checks.mjs'", "'../design/tools/offline-checks.mjs'");
+    if (file === 'tools/build.mjs') content = content.replace("'../../../tools/offline-checks.mjs'", "'../design/tools/offline-checks.mjs'").replace("'../../../core/icons.mjs'", "'../design/runtime/icons.mjs'");
     return { relative: file, content };
   }));
 }

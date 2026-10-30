@@ -8433,6 +8433,58 @@
         }
       },
       "additionalProperties": false
+    },
+    "defaultMode": {
+      "enum": [
+        "light",
+        "dark"
+      ]
+    },
+    "modes": {
+      "type": "object",
+      "required": [
+        "light",
+        "dark"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "light": {
+          "type": "object",
+          "required": [
+            "tokens"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "tokens": {
+              "type": "object",
+              "propertyNames": {
+                "pattern": "^[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*$"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/token"
+              }
+            }
+          }
+        },
+        "dark": {
+          "type": "object",
+          "required": [
+            "tokens"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "tokens": {
+              "type": "object",
+              "propertyNames": {
+                "pattern": "^[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*$"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/token"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "$defs": {
@@ -8728,7 +8780,22 @@
                 "footer",
                 "dl",
                 "dt",
-                "dd"
+                "dd",
+                "textarea",
+                "ol",
+                "fieldset",
+                "legend",
+                "output",
+                "details",
+                "summary",
+                "table",
+                "caption",
+                "thead",
+                "tbody",
+                "tr",
+                "th",
+                "td",
+                "progress"
               ]
             },
             "part": {
@@ -8753,9 +8820,18 @@
             "attrs": {
               "type": "object",
               "properties": {
-                "href": { "type": "string", "maxLength": 1000 },
-                "src": { "type": "string", "maxLength": 1000 },
-                "alt": { "type": "string", "maxLength": 1000 },
+                "href": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "src": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "alt": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
                 "disabled": {
                   "type": "boolean"
                 },
@@ -8778,7 +8854,9 @@
                     "url",
                     "range",
                     "color",
-                    "date"
+                    "date",
+                    "time",
+                    "file"
                   ]
                 },
                 "value": {
@@ -8834,9 +8912,86 @@
                 "aria-expanded": {
                   "type": "string",
                   "maxLength": 1000
+                },
+                "open": {
+                  "type": "boolean"
+                },
+                "hidden": {
+                  "type": "boolean"
+                },
+                "required": {
+                  "type": "boolean"
+                },
+                "readonly": {
+                  "type": "boolean"
+                },
+                "multiple": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "for": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "rows": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "cols": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "inputmode": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "minlength": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "maxlength": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "autocomplete": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "accept": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "scope": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "colspan": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "rowspan": {
+                  "type": "string",
+                  "maxLength": 1000
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": false,
+              "patternProperties": {
+                "^(aria|data)-[a-z-]+$": {
+                  "type": "string",
+                  "maxLength": 1000
+                }
+              }
+            },
+            "iconName": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
             }
           },
           "additionalProperties": false,
@@ -9351,8 +9506,22 @@
           }
         },
         "not": {
-          "required": [
-            "appearance"
+          "anyOf": [
+            {
+              "required": [
+                "appearance"
+              ]
+            },
+            {
+              "required": [
+                "modes"
+              ]
+            },
+            {
+              "required": [
+                "defaultMode"
+              ]
+            }
           ]
         }
       }
@@ -9373,5 +9542,13 @@
         }
       }
     }
-  ]
+  ],
+  "dependentRequired": {
+    "modes": [
+      "defaultMode"
+    ],
+    "defaultMode": [
+      "modes"
+    ]
+  }
 }

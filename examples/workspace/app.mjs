@@ -1,4 +1,4 @@
-import { createComponentFactory, createLayout } from '../../core/components.mjs';
+import { createComponentFactory, createLayout, mountTabs } from '../../core/components.mjs';
 import { mountPanelControls } from '../../core/panels.mjs';
 import { createWorkspaceState, PROJECT_STATUSES, projectDraft, validateProjectDraft } from './data.mjs';
 
@@ -8,6 +8,7 @@ const tabs = [['overview', 'Overblik'], ['tasks', 'Opgaver'], ['settings', 'Inds
 /** A small product composition. The shared library owns every control and its anatomy. */
 export function mountWorkspace(theme, { document = globalThis.document, state = createWorkspaceState(), onChange = () => {}, announce = () => {} } = {}) {
   state.drafts = Object.assign(Object.create(null), state.drafts);
+  state.validationRequested = Object.assign(Object.create(null), state.validationRequested);
   state.panel ??= { open: true, width: 420 };
   const c = createComponentFactory(theme, { document });
   const el = (tag, className = '') => { const node = document.createElement(tag); if (className) node.className = className; return node; };
@@ -55,6 +56,7 @@ export function mountWorkspace(theme, { document = globalThis.document, state = 
   const panels = mountPanelControls({ container: layout, panel: detail, handle, toggle: togglePanel, minimum: 300, maximum: 560, width: state.panel.width, open: state.panel.open, document,
     onChange: value => { state.panel = { open: value.open, width: value.width }; togglePanel.textContent = value.open ? 'Skjul projektdetaljer' : 'Vis projektdetaljer'; },
   });
+  let detailTabs;
 
   function renderNavigation() {
     const active = state.projects.filter(item => item.status !== 'completed').length;
@@ -117,8 +119,9 @@ export function mountWorkspace(theme, { document = globalThis.document, state = 
     host.append(stack([text(done + ' af ' + project.tasks.length + ' opgaver er afsluttet.', 'small'), tasks]));
     if (!project.tasks.length) host.append(c('instruction-note', { text: 'Projektet har endnu ingen opgaver.' }));
   }
-  function renderSettings(project, host, errors = {}) {
+  function renderSettings(project, host) {
     const draft = state.drafts[project.id] ??= projectDraft(project);
+    const errors = state.validationRequested[project.id] ? validateProjectDraft(draft) : {};
     const form = el('form', 'ds-form-layout'); form.setAttribute('novalidate', '');
     const fields = [];
     const field = (key, label, options = {}) => {
@@ -140,9 +143,10 @@ export function mountWorkspace(theme, { document = globalThis.document, state = 
     form.append(formFields, actions);
     form.addEventListener('submit', event => {
       event.preventDefault(); const invalid = validateProjectDraft(draft);
-      if (Object.keys(invalid).length) { renderDetail(invalid); detail.querySelector('[aria-invalid="true"]')?.focus(); notify('Ret de markerede felter.'); return; }
+      if (Object.keys(invalid).length) { state.validationRequested[project.id] = true; renderDetail(); detail.querySelector('[aria-invalid="true"]')?.focus(); notify('Ret de markerede felter.'); return; }
       for (const key of Object.keys(draft)) project[key] = typeof draft[key] === 'string' ? draft[key].trim() : draft[key];
       state.drafts[project.id] = projectDraft(project);
+      delete state.validationRequested[project.id];
       project.activity.push('Projektets oplysninger er opdateret.'); project.activity = project.activity.slice(-50);
       // A saved status may move the project out of the current filter. Keep it visible.
       if ((state.filter === 'active' && project.status === 'completed') || (state.filter === 'completed' && project.status !== 'completed')) state.filter = 'all';
@@ -151,39 +155,36 @@ export function mountWorkspace(theme, { document = globalThis.document, state = 
       }
       render(); detail.querySelector('[data-action="save-project"]')?.focus(); changed('Projektet er opdateret. Hent arbejdsrummet for at gemme det som en fil.');
     });
-    reset.addEventListener('click', () => { state.drafts[project.id] = projectDraft(project); renderDetail(); detail.querySelector('[data-action="reset-project"]').focus(); notify('Projektets gemte oplysninger er gendannet.'); });
+    reset.addEventListener('click', () => { state.drafts[project.id] = projectDraft(project); delete state.validationRequested[project.id]; renderDetail(); detail.querySelector('[data-action="reset-project"]').focus(); notify('Projektets gemte oplysninger er gendannet.'); });
     host.append(form);
   }
-  function renderDetail(errors = {}) {
+  function renderDetail() {
+    detailTabs?.destroy();detailTabs=null;
     const project = selectedProject();
     if (!project) { detail.replaceChildren(c('instruction-note', { text: 'Vælg et projekt, når listen har resultater.' })); return; }
     const badge = c('badge', { text: PROJECT_STATUSES[project.status], variant: project.status === 'review' ? 'accent' : 'default' });
     const title = heading(project.title, 2, 'panel', { id: 'workspace-project-heading' });
     const tabBar = c('segmented-control', { variant: 'wrap' }); tabBar.replaceChildren(); tabBar.setAttribute('role', 'tablist'); tabBar.setAttribute('aria-label', 'Projektets indhold');
-    const panel = el('div', 'workspace-tab-content'); panel.setAttribute('id', 'workspace-tab-panel'); panel.setAttribute('role', 'tabpanel'); panel.setAttribute('aria-labelledby', 'workspace-tab-' + state.tab); panel.setAttribute('tabindex', '0');
-    if (state.tab === 'settings') panel.className += ' workspace-settings-panel';
+    const tabPanels=[];
     for (const [id, label] of tabs) {
-      const node = c('segmented-option', { text: label, variant: 'desktop', attrs: { id: 'workspace-tab-' + id, 'data-tab': id, role: 'tab', 'aria-selected': String(id === state.tab), 'aria-controls': 'workspace-tab-panel', tabindex: id === state.tab ? '0' : '-1' } });
-      node.removeAttribute('aria-pressed'); if (id === state.tab) node.setAttribute('data-state', 'pressed');
-      const activate = () => { state.tab = id; renderDetail(); detail.querySelector('[data-tab="' + id + '"]').focus(); };
-      node.addEventListener('click', activate);
-      node.addEventListener('keydown', event => {
-        const index = tabs.findIndex(([tab]) => tab === id); const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : event.key === 'ArrowRight' ? (index + 1) % tabs.length : event.key === 'ArrowLeft' ? (index + tabs.length - 1) % tabs.length : null;
-        if (next === null) return; event.preventDefault(); state.tab = tabs[next][0]; renderDetail(); detail.querySelector('[data-tab="' + state.tab + '"]').focus();
-      });
+      const node = c('segmented-option', { text: label, variant: 'desktop', attrs: { id: 'workspace-tab-' + id, 'data-tab': id,'data-tab-id':id,role: 'tab', 'aria-selected': String(id === state.tab), 'aria-controls': 'workspace-tab-panel-'+id, tabindex: id === state.tab ? '0' : '-1' } });
+      node.removeAttribute('aria-pressed');
       tabBar.append(node);
+      const panel=el('div','workspace-tab-content');panel.setAttribute('id','workspace-tab-panel-'+id);panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby','workspace-tab-'+id);panel.setAttribute('tabindex','0');
+      if(id==='settings'){panel.className+=' workspace-settings-panel';renderSettings(project,panel);}
+      else if(id==='tasks')renderTasks(project,panel);
+      else renderOverview(project,panel);
+      tabPanels.push(panel);
     }
     const label = el('div', 'workspace-detail-label'); label.append(badge, text(project.client, 'small'));
-    if (state.tab === 'settings') renderSettings(project, panel, errors);
-    else if (state.tab === 'tasks') renderTasks(project, panel);
-    else renderOverview(project, panel);
     const surface = c('card', { slots: { header: { tag: 'header' }, body: { tag: 'div' }, footer: '' } });
     surface.className += ' workspace-detail-surface';
     surface.querySelector('.ds-card__header').className += ' workspace-detail-header';
     surface.querySelector('.ds-card__body').className += ' workspace-detail-body';
     surface.querySelector('.ds-card__header').append(stack([label, title, tabBar], 'default'));
-    surface.querySelector('.ds-card__footer').remove(); surface.querySelector('.ds-card__body').append(panel);
+    surface.querySelector('.ds-card__footer').remove(); surface.querySelector('.ds-card__body').append(...tabPanels);
     detail.replaceChildren(surface);
+    detailTabs=mountTabs(surface,{selectedId:state.tab,onChange(id){state.tab=id;}});
   }
   function render() {
     search.querySelector('input').value = state.query;
@@ -199,5 +200,5 @@ export function mountWorkspace(theme, { document = globalThis.document, state = 
     panels.setOpen(true); render(); detail.querySelector('#workspace-title-control').focus(); changed('Projektet er oprettet. Tilpas dets oplysninger.');
   });
   render();
-  return { element: root, state, panels, destroy() { panels.destroy(); root.remove(); }, refresh: render };
+  return { element: root, state, panels, destroy() { detailTabs?.destroy();panels.destroy(); root.remove(); }, refresh: render };
 }

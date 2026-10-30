@@ -10,7 +10,7 @@ Fjordside-pakken er omsat fra Design System-mappen, især brandguiden v1.2.1, to
 
 Varmt papir og kalk fylder fladen. Tryksværte bærer teksten. Terracotta bruges sparsomt, til én særlig handling eller markering pr. blik. Kildens 90/8/2-regel er en kompositionsregel; tokenværdier kan ikke alene håndhæve den.
 
-Platypi bærer overskrifter, display og redaktionelle citater. Helvetica Neue/Helvetica/Arial bruges til funktioner, webbrødtekst, labels og tal. I trykte dokumenter bruges Platypi også som brødtekst. Afstande følger kildens 8px-rytme med små halvtrin.
+Platypi bærer overskrifter, display og redaktionelle citater. Den lokale Inter-webfont bruges til funktioner, webbrødtekst, labels og tal og overtager den oprindelige Helvetica-staks tilbageholdende rolle. I trykte dokumenter bruges Platypi også som brødtekst. Afstande følger kildens 8px-rytme med små halvtrin.
 
 Kontroller og kort er firkantede. Almindelige kort er flade og har fine kanter; kun løsrevne lag bruger skygge. Hover og tryk ændrer farve og kant, ikke størrelse eller placering. Fokus følger bibliotekets synlige markering på mindst 3 deklarerede pixels uden for kontrollen.
 
@@ -47,9 +47,9 @@ Brandguiden kan ses og redigeres på interfacets Brandguide-side. sources-feltet
 
 ## Skrifter og logoer følger JSON-filen
 
-brand.assets indlejrer syv ressourcer som base64: fire originale logo-SVG'er, Platypi normal og kursiv samt den uændrede OFL-licens. De følger derfor med, når pakken gemmes, eksporteres eller importeres. brand.logos forbinder mærkerne med deres anvendelse og baggrunds-/forgrundstokens.
+brand.assets indlejrer de fire originale logo-SVG'er, Platypi normal og kursiv, de fælles Inter-/Roboto Mono-webfonte og deres uændrede OFL-licenser som base64. De følger derfor med, når pakken gemmes, eksporteres eller importeres. brand.logos forbinder mærkerne med deres anvendelse og baggrunds-/forgrundstokens.
 
-De normale og kursive Platypi-variablefonte dækker vægt 300–800. De kommer fra [Google Fonts' Platypi-kilde](https://github.com/google/fonts/tree/main/ofl/platypi). CSS-genereringen laver de nødvendige font-face-definitioner fra pakkens data; det er ikke længere nødvendigt at indlæse et separat fonts.css for denne pakke. Bevar den medfølgende OFL.txt ved videre distribution af fontfilerne.
+De normale og kursive Platypi-variablefonte dækker vægt 300–800. De medfølgende TTF-originaler er konverteret til WOFF2 uden subsetting; tegn, glyffer, advance widths og variable aksler er bevaret. Originalerne ligger fortsat under assets/fjordside/fonts. Proveniens og SHA-256 er registreret i assets/fonts/manifest.json. CSS-genereringen indlejrer de nødvendige font-face-definitioner fra pakkens data. Bevar de medfølgende OFL-licenser ved videre distribution af fontfilerne.
 
 De fire standardmærker er uændrede kopier af kildens terracotta-, papir-, sværte- og currentColor-mærke. Brug de faktiske SVG-data; rekonstruer ikke monogrammet. Standardfilerne har ingen indbygget frizone. Kildens særskilte avatarvarianter findes fortsat i originalmappen og er ikke indlejret i denne pakke.
 
@@ -62,7 +62,7 @@ assets/fjordside i systemmappen indeholder fortsat de oprindelige ledsagerfiler 
 Start med:
 
 ~~~powershell
-node tools/cli.mjs init "E:\Projekter\Mit Produkt" --theme fjordside
+node tools/cli.mjs init "PROJECT_DIR" --theme fjordside
 ~~~
 
 init opretter projektets designpakke, genereret CSS og konfiguration og udpakker de medfølgende ressourcer til design/assets. CSS indeholder fontdefinitionerne. Projektets agent forbinder produktet med CSS og bruger de udpakkede logoer efter projektets normale assetmekanisme. Bevar fontlicensen sammen med ressourcerne.
@@ -70,7 +70,7 @@ init opretter projektets designpakke, genereret CSS og konfiguration og udpakker
 Ressourcer kan også udpakkes særskilt:
 
 ~~~powershell
-node tools/cli.mjs assets packages/fjordside.json --out "E:\Projekter\Mit Produkt\design\assets"
+node tools/cli.mjs assets packages/fjordside.json --out "PROJECT_DIR/design/assets"
 ~~~
 
 Følg derefter den almindelige integration. Læs brandguiden før nye visuelle valg, genbrug temaets tokens og det fælles bibliotek og registrer produktets faktiske komponentimplementeringer. Denne pakke kopierer ikke kildens React-logik eller websiteforløb.

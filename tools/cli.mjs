@@ -369,33 +369,24 @@ async function initialize(projectArgument, theme, designOnly = false) {
 ## Design Studio
 
 Brug Design Studio-systemet i ${ROOT.replaceAll('\\', '/')}.
-Læs systemets AGENTS.md og README.md før visuelt arbejde.
-Projektets tema er design/design.json; design/design.css genereres fra temaet og det fælles bibliotek.
-Læs også docs/AGENT-WORKFLOW.md og docs/DESIGN-FOUNDATIONS.md i systemmappen.
-Standard for nye projekter: lever projektets egen index.html i roden, som åbnes direkte via file:// i browseren, ligesom FormLab.
-Den færdige app skal fungere offline uden server, terminal, startfil eller installeret runtime.
-Brug projektets npm run build til at pakke programkode, komponentruntime, CSS og nødvendige ressourcer til offlinebrug; undgå CDN-afhængigheder og lokale fetch-/modulindlæsninger, der kræver en server.
-Agenten installerer udviklingsafhængigheder og genbygger efter kode-, design-, tema- og ressourceændringer, også efter sync af ændrede designfiler. Brugeren skal blot genindlæse browseren.
-Brug browserens filvælger og downloads til projektfiler; downloads overskriver ikke automatisk originalfilen. Browserlagring kan supplere de gemte filer.
-Brug fælles filhåndtering fra design/runtime/files.mjs: createProjectFile forbinder produktets format-id, version og datavalidering med åbning/gemning. Afvis ugyldige eller ukendte filversioner uden at erstatte den aktuelle tilstand.
-Kør npm run doctor i offline-startprojektet, eller node tools/cli.mjs doctor PROJECT_DIR fra Design Studio. Doctor ændrer ikke filer og erstatter ikke relevant funktionskontrol. Kør sync ved forældet runtime/CSS og derefter npm run build ved forældet offlinefil.
-Startprojektet er et udgangspunkt, ikke en fast arkitektur. tools/cli.mjs update PROJECT_DIR viser valgfrie opdateringer; --apply bevarer lokalt ændrede filer og lægger forslag til manuel fletning ved siden af projektkoden. Opdateringer er ikke et krav for at bruge eller bygge produktet.
-Kontrollér proportionalt, at produktets færdige index.html fungerer via file://; en fungerende udviklingsserver er ikke tilstrækkelig.
-${designOnly ? 'Init er kørt med --design-only og har kun oprettet designtilknytningen.' : 'Init har oprettet src/app.mjs, src/styles.css, src/index.html, tools/build.mjs, package.json og en færdig index.html. Redigér src-filerne og genbyg; håndredigér ikke den genererede index.html. Kør npm install ved første udviklingsopsætning; den færdige index.html virker uden installation og uden Design Studios mappe.'}
-Bevar eksisterende projekters arkitektur, medmindre en omlægning er bestilt. Afvig kun fra offline-standarden ved udtrykkelige brugerkrav eller konkret nødvendig funktionalitet, og forklar behovet.
-Importér fælles komponenter fra design/runtime/components.mjs; brug renderComponent/createComponent, eller en tynd frameworkadapter.
-Brug de fælles breddeprofiler prose, form, panel, split, workspace og fluid: class="ds-layout" med data-layout under ds-scope, eller createLayout fra components.mjs. Tilpas en ramme lokalt med --ds-layout-max-width i produktets CSS; profilerne bestemmer ikke produktets kolonner eller funktioner.
-Grundlayout, semantik og komponentstruktur ejes af core/library.mjs i Design Studio, aldrig af temaet.
-design-studio.project.json registrerer projektets komponentimplementeringer i components.
-For hver implementeret komponent: tilføj komponent-id med {file, export}; file er projektets relative filsti, export er navnet på eksporten.
-Læs brandprincipper, sektionsregler og logobrug i pakkens brand-felt før visuelt arbejde, når pakken har en brandguide.
-Når pakken har brandressourcer, ligger de i design/assets; brug logo-originalerne efter pakkens anvisninger.
-Pakkens eventuelle indlejrede skrifter indgår automatisk i den genererede CSS.
-Find registrerede implementeringer og det fælles katalog før du bygger UI. Genbrug komponenter og temaets tokens.
-Nye genbrugelige komponenter tilføjes i systemets core/library.mjs med projektagnostiske navne, beskrivelser, eksempler og defaults; ikke i temaet. Brug kanoniske komponent-id'er og Fluent 2/Carbon-principperne beskrevet i DESIGN-FOUNDATIONS.md.
-Efter biblioteksændringer: kør sync for produktet, og opdatér showcasen. Produktets særlige sammensætninger kan forblive lokale.
-UX, indhold, handlinger og produktarkitektur bestemmes af dette projekt.
-Efter ændringer: validér temaet og kør tools/cli.mjs sync PROJECT_DIR, så runtime og CSS følges ad.
+Læs systemets AGENTS.md og README.md samt docs/AGENT-WORKFLOW.md før UI-arbejde. Arbejdsgangen er den fælles indgang; docs/INTEGRATION.md indeholder API-eksempler, og docs/DESIGN-FOUNDATIONS.md forklarer designprincipperne. Følg også dette produkts egne anvisninger.
+Find design-studio.project.json og brug dens faktiske stier og scope. Projektets tema er design/design.json; design/design.css og design/runtime genereres af sync og må ikke håndredigeres.
+
+Lever som standard projektets egen index.html i roden, som åbnes direkte via file:// uden server, terminal eller installeret runtime.
+Brug projektets npm run build til at pakke kode, runtime, CSS og nødvendige ressourcer til offlinebrug; undgå CDN'er og lokale fetch-/modulkald, der kræver en server.
+Agenten installerer udviklingsafhængigheder og genbygger efter kode-, tema- og ressourceændringer. Brugeren skal blot genindlæse browseren.
+${designOnly ? 'Init er kørt med --design-only og har kun oprettet designtilknytningen. Bevar produktets eksisterende app og build.' : 'Init har oprettet src-filer, tools/build.mjs, package.json og en færdig index.html. Kør npm install ved første udviklingsopsætning. Redigér src-filerne, ikke den genererede index.html.'}
+Bevar eksisterende arkitektur og brand. En anden driftsmodel kræver et udtrykkeligt brugerkrav eller konkret nødvendig funktionalitet.
+
+Genbrug biblioteket fra design/runtime/components.mjs og temaets tokens under ds-scope. Brug de fælles breddeprofiler gennem createLayout eller ds-layout/data-layout; produktet ejer kolonner og placering.
+Registrér kun faktiske frameworkadaptere i konfigurationens components med verificerede file og export. Direkte runtimebrug kræver ingen lokal adapter. Nye genbrugelige roller og varianter udvikles i det fælles bibliotek, ikke som lokale kopier.
+Brug de fælles controllere til interaktion: mountMenuControls til kommandomenuer, mountTree til hierarkier og native showModal()/close() til dialoger. Produktet ejer data, kommandoer og validering. Bevar kladder, fejl og valg ved temaskift; ryd controllere ved genmontering.
+Læs brandprincipper, sektionsregler og logobrug i temaet. Brug logo-originalerne fra design/assets efter brandreglerne og bevar licenser.
+Brug createProjectFile fra design/runtime/files.mjs med produktets format-id, version og validering. Annullerede eller ugyldige åbninger bevarer state. Downloads overskriver ikke automatisk originalfilen.
+
+Kør sync fra systemmappen ved ændret tema eller fælles runtime og genbyg derefter produktet. Rene produktændringer kræver ikke sync. Brug npm run doctor i offline-startprojektet til at finde konkrete fejl; kontrollen ændrer ikke filer.
+tools/cli.mjs update PROJECT_DIR viser valgfrie skabelonopdateringer. Gennemgå planen før --apply; lokale ændringer bevares. Opdatering erstatter ikke dette produkts AGENTS.md.
+Kontrollér den berørte funktion proportionelt. Nye skærme skal inspiceres i browseren med relevant tastatur, smal bredde og fejl-/tomtilstande. HTTP-kontrol beviser ikke file://; respekter værktøjets URL-politik og angiv manglende kontrol præcist.
 Åbn "${path.join(ROOT, 'index.html')}" direkte i browseren, og vælg Åbn tema for at indlæse "${packageFile}".
 Gem tema henter en JSON-fil. Placér den som projektets design/design.json før sync; originalfilen overskrives ikke automatisk.
 `;

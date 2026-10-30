@@ -4,6 +4,8 @@ Design Studios standardleverance er én selvstændig `index.html`. Brugeren åbn
 
 ## Byg og lever offline-editoren
 
+Dette er kontrollen af en samlet systemleverance. Ved almindelige iterationer følges den proportionale kontrol i [agentarbejdsgangen](AGENT-WORKFLOW.md#kontrollér-den-berørte-funktion); rene dokumentationsændringer kræver ikke tests eller genbygning. Kør kun `npm ci`, når udviklingsafhængigheder skal installeres fra låsefilen.
+
 Fra projektmappen med Node.js 20 eller nyere:
 
 ```sh
@@ -18,6 +20,23 @@ npm run build
 Åbn den byggede fil direkte i browseren før levering. Kontrollér det berørte brugerforløb, og ved ændringer i filhåndtering også åbning og download af et tema. Automatiske kontroller erstatter ikke denne konkrete browserkontrol. Rene dokumentationsændringer kræver hverken nyt build eller gentagelse af kodekontroller.
 
 Kopiér den færdige `index.html` til modtageren. Notér det anvendte Git-commit sammen med leverancen, så kildegrundlaget kan findes igen. Der er ingen separat installation eller serveropsætning hos modtageren.
+
+## Leveringspakker og portabel opsætning
+
+Efter build kan `npm run release` samle to ZIP-filer i `artifacts/release/`:
+
+- `design-studio-offline.zip` indeholder den byggede `index.html` og læsbare ikon-/skriftlicenser. Pak den ud, og åbn `index.html`.
+- `design-studio-source.zip` indeholder de nødvendige kilder, temaer, ressourcer, tests, værktøjer og låsefil. Pak den ud på Windows, macOS eller Linux, og kør `npm ci` før udvikling eller build.
+
+`manifest.json` angiver filnavne, byteantal og SHA-256 for arkiver og indhold. Pakningen bruger en afgrænset liste af kildemapper og filtyper; installerede `node_modules`, platformbinærer, `.git`, miljøfiler, logs og byggeoutput kopieres ikke til kildepakken. Kopiér derfor aldrig hele arbejdsmappen som installationspakke. `node tools/build-release.mjs --out DIRECTORY` vælger en anden outputmappe. Kommandoen pakker det eksisterende offlinebuild og bygger det ikke automatisk igen.
+
+Installer altid udviklingsafhængigheder fra låsefilen på den aktuelle platform med `npm ci`. En anden platforms `node_modules` skal ikke medbringes. `npm test` finder testfiler gennem Node, så kommandoen ikke afhænger af shellens udvidelse af jokertegn. Testprojekter bruger en separat midlertidig mappe under `artifacts/test-runs/`, som fjernes efter kørslen; brugerens globale miljøindstillinger ændres ikke.
+
+Repositoryets CI er sat op til installation, tests, temakontrol, offlinebuild, showcase og pakning på Windows, macOS og Linux. En konfigureret matrix er ikke dokumentation for en gennemført kørsel; kontrollér resultaterne i den relevante CI-kørsel før en platformsgaranti.
+
+De lokale WOFF2-filer, originale licenser og fontmanifest følger kildepakken. Et almindeligt build kræver hverken fontdownload eller Python. Ved vedligeholdelse af fontressourcer regenererer `node tools/build-fonts.mjs` temaernes indlejrede fontdata fra de indcheckede filer og kontrollerer dem mod manifestets SHA-256. Bevar Platypis oprindelige TTF-filer som kildegrundlag. Offline- og showcasebuild håndhæver desuden størrelsesbudgetter før skrivning.
+
+[Størrelsesgrænserne](../tools/delivery-size.mjs) gælder ukomprimerede UTF-8-filer: 1.500.000 bytes for editoren, 1.250.000 for arbejdsrumseksemplet og 800.000 for showcasens temamodul. En overskridelse stopper buildet; undersøg dublering og ressourcer, før en eventuel ny grænse besluttes.
 
 ## Gemning og opdatering
 
@@ -47,4 +66,4 @@ npm run showcase:build
 
 Dette eksporterer en separat webdemo til `artifacts/showcase/` med offentlige temaer, komponenter, designmønstre, manifest og licensfiler. Hele mappen leveres samlet gennem et website. Showcasen bruger browsermoduler og er beregnet til webhosting; den selvstændige offline-editor leveres fra rodens `index.html`.
 
-Til en anden eksportmappe bruges `node tools/build-showcase.mjs --out DIRECTORY`. På den tilknyttede hjemmeside køres `npm run sync:design-studio` fra `E:/AI projekter/Hjemmeside` og derefter hjemmesidens normale build. Eksport og build offentliggør ikke automatisk hjemmesiden.
+Til en anden eksportmappe bruges `node tools/build-showcase.mjs --out DIRECTORY`. På den tilknyttede hjemmeside køres `npm run sync:design-studio` fra hjemmesidens faktiske projektmappe og derefter hjemmesidens normale build. Eksport og build offentliggør ikke automatisk hjemmesiden.

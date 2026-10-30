@@ -10,3 +10,7 @@
 .specimen[data-catalog-row].expanded{z-index:2;margin-bottom:-1px}
 
 .motion-studio{display:grid;gap:24px}.motion-intro{border:1px solid var(--studio-border);border-radius:var(--studio-radius-card);background:var(--studio-surface);padding:24px}.motion-intro h3,.motion-preview>h3{margin:0 0 12px;font-size:1.15rem}.motion-intro>p:not(.eyebrow){max-width:70ch;color:var(--studio-muted);font-size:.9rem;line-height:1.6}.motion-facts{display:flex;flex-wrap:wrap;gap:24px 40px;margin:24px 0 0}.motion-facts div{display:grid;gap:6px}.motion-facts dt{font-size:.75rem;color:var(--studio-muted)}.motion-facts dd{margin:0;font-size:.875rem;font-weight:600}.motion-preview>.help{margin:0 0 20px}.motion-accessibility{margin:0}.nav-item svg{flex-shrink:0}
+
+.catalog-sample>:is(.ds-combobox,.ds-multiselect,.ds-date-picker,.ds-time-picker,.ds-file-upload,.ds-progress,.ds-data-table,.ds-data-grid,[data-input-choice-example],[data-feedback-example],[data-file-example],[data-data-table-example],[data-grid-example]){width:100%;min-width:0}
+.catalog-sample :is([data-input-choice-example],[data-feedback-example],[data-file-example],[data-data-table-example],[data-grid-example]){min-width:0;display:flex;flex-direction:column;gap:var(--ds-space-component-gap)}
+.catalog-variants:has(.ds-data-grid,.ds-data-table)>.catalog-variant{grid-column:1/-1}

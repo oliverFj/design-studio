@@ -1,9 +1,12 @@
+import {canonicalizeTokenSet,canonicalTokenReferences,canonicalTokenId} from './scales.mjs';
 import { PACKAGE_SCHEMA_VERSION, TOKEN_TYPES, REQUIRED_TOKENS, COMPONENT_CONTRACTS, TOKEN_REFERENCE_PATTERN, cssVariableName } from './contract.mjs';
 import {COMPONENT_LIBRARY, DEFAULT_TOKENS, APPEARANCE_PROPERTIES, POSITIVE_SPACING_TOKENS, LIBRARY_VERSION, COMPONENT_ALIASES, VARIANT_ALIASES, STATE_ALIASES, PART_ALIASES, TOKEN_ALIASES, LEGACY_SELECTORS, canonicalComponentId, canonicalVariantId, canonicalStateId, canonicalPartId} from './library.mjs';
 export {LIBRARY_VERSION, canonicalComponentId, canonicalVariantId, canonicalPartId, canonicalStateId} from './library.mjs';
 import {validateThemeQuality, contrastRatio} from './quality.mjs';
 import { generateLayoutCSS, generateScrollbarCSS } from './layout.mjs';
 import { BUTTON_COMPATIBILITY_VARIANTS, BUTTON_SIZES, BUTTON_DANGER_VARIANTS } from './library.mjs';
+import { generateIconCSS, ICON_NAMES } from './icons.mjs';
+import { generatePreferenceCSS } from './preferences.mjs';
 
 const own = (object, key) => Object.hasOwn(object, key);
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -32,12 +35,13 @@ const enumProperties = {
   whiteSpace: ['normal', 'nowrap', 'pre', 'pre-wrap', 'pre-line', 'break-spaces'],
   wordBreak: ['normal', 'break-all', 'keep-all', 'break-word'], overflowWrap: ['normal', 'break-word', 'anywhere'],
   borderStyle: ['none', 'solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset'],
+  borderCollapse: ['collapse','separate'],
   outlineStyle: ['none', 'solid', 'dashed', 'dotted', 'double'],
   flexDirection: ['row', 'column', 'row-reverse', 'column-reverse'], flexWrap: ['nowrap', 'wrap', 'wrap-reverse'],
   justifyContent: ['normal', 'start', 'end', 'flex-start', 'flex-end', 'center', 'space-between', 'space-around', 'space-evenly', 'stretch'],
   alignItems: ['normal', 'start', 'end', 'flex-start', 'flex-end', 'center', 'stretch', 'baseline'],
   alignSelf: ['auto', 'normal', 'start', 'end', 'flex-start', 'flex-end', 'center', 'stretch', 'baseline'],
-  cursor: ['auto', 'default', 'pointer', 'text', 'not-allowed', 'wait', 'progress', 'grab', 'grabbing', 'help', 'crosshair', 'move'],
+  cursor: ['auto', 'default', 'pointer', 'text', 'not-allowed', 'wait', 'progress', 'grab', 'grabbing', 'help', 'crosshair', 'move', 'cell'],
   overflow: ['visible', 'hidden', 'clip', 'scroll', 'auto'], overflowX: ['visible', 'hidden', 'clip', 'scroll', 'auto'], overflowY: ['visible', 'hidden', 'clip', 'scroll', 'auto'],
   overscrollBehavior: ['auto', 'contain', 'none'], scrollbarWidth: ['auto', 'thin', 'none'], scrollbarGutter: ['auto', 'stable', 'stable both-edges'],
   position: ['static', 'relative', 'absolute', 'fixed', 'sticky'], userSelect: ['auto', 'none', 'text', 'all'],
@@ -179,8 +183,8 @@ function validateTreatment(treatment, path, parts, tokens, resolved, errors, req
     }
   }
 }
-const previewTags = new Set(['a', 'nav', 'figure', 'figcaption', 'img', 'div', 'span', 'p', 'strong', 'label', 'button', 'input', 'select', 'option', 'h2', 'h3', 'hr', 'section', 'article', 'header', 'footer', 'dl', 'dt', 'dd', 'ul', 'li']);
-const previewInputTypes = new Set(['button', 'submit', 'reset', 'text', 'email', 'number', 'password', 'checkbox', 'radio', 'search', 'tel', 'url', 'range', 'color', 'date']);
+const previewTags = new Set(['a', 'nav', 'figure', 'figcaption', 'img', 'div', 'span', 'p', 'strong', 'label', 'button', 'input', 'select', 'option', 'textarea', 'h2', 'h3', 'hr', 'section', 'article', 'header', 'footer', 'dl', 'dt', 'dd', 'ul', 'ol', 'li', 'fieldset', 'legend', 'output', 'details', 'summary', 'table', 'caption', 'thead', 'tbody', 'tr', 'th', 'td', 'progress']);
+const previewInputTypes = new Set(['button', 'submit', 'reset', 'text', 'email', 'number', 'password', 'checkbox', 'radio', 'search', 'tel', 'url', 'range', 'color', 'date', 'time', 'file']);
 function validatePreview(tree, component, path, errors, catalog) {
   let count = 0;
   function visit(node, nodePath, depth) {
@@ -194,7 +198,8 @@ function validatePreview(tree, component, path, errors, catalog) {
       else if (!component.composes?.includes(node.component)) errors.push(nodePath+'.component: must be declared in composes.');
       return;
     }
-    allowedKeys(node, ['tag', 'part', 'text', 'children', 'attrs', 'variant'], nodePath, errors);
+    allowedKeys(node, ['tag', 'part', 'text', 'children', 'attrs', 'variant','iconName'], nodePath, errors);
+    if(own(node,'iconName')&&(node.tag!=='span'||!ICON_NAMES.includes(node.iconName)||own(node,'text')||own(node,'children')))errors.push(nodePath+'.iconName: expected a trusted icon name on an empty span.');
     if (!previewTags.has(node.tag)) errors.push(nodePath + '.tag: unsupported preview tag.');
     if (depth === 0 && node.part !== 'root') errors.push(nodePath + '.part: preview root must use root part.');
     if (own(node, 'part') && (typeof node.part !== 'string' || !own(component.parts, node.part))) errors.push(nodePath + '.part: component part does not exist.');
@@ -203,11 +208,11 @@ function validatePreview(tree, component, path, errors, catalog) {
     if (own(node, 'attrs')) {
       if (!record(node.attrs)) errors.push(nodePath + '.attrs: must be an object.');
       else for (const [attribute, value] of Object.entries(node.attrs)) {
-        if (['disabled', 'checked'].includes(attribute)) {
+        if (['disabled', 'checked', 'open', 'hidden', 'required', 'readonly', 'multiple'].includes(attribute)) {
           if (typeof value !== 'boolean') errors.push(nodePath + '.attrs.' + attribute + ': must be boolean.');
         } else if (attribute === 'tabindex') {
           if (!['0','-1'].includes(value)) errors.push(nodePath + '.attrs.tabindex: must be 0 or -1.');
-        } else if (['href', 'src', 'alt', 'type', 'value', 'placeholder', 'aria-label', 'aria-hidden', 'aria-pressed', 'aria-selected', 'aria-disabled', 'aria-expanded', 'aria-haspopup', 'aria-checked', 'aria-multiselectable', 'aria-level', 'aria-posinset', 'aria-setsize', 'role', 'min', 'max', 'step'].includes(attribute)) {
+        } else if (['href', 'src', 'alt', 'id', 'for', 'name', 'type', 'value', 'placeholder', 'role', 'min', 'max', 'step', 'rows', 'cols', 'inputmode', 'minlength', 'maxlength', 'autocomplete', 'accept', 'scope', 'colspan', 'rowspan'].includes(attribute)||/^aria-[a-z-]+$/.test(attribute)||/^data-[a-z-]+$/.test(attribute)) {
           if (typeof value !== 'string' || value.length > 1000) errors.push(nodePath + '.attrs.' + attribute + ': expected a string of at most 1000 characters.');
           else if (attribute === 'type' && !previewInputTypes.has(value)) errors.push(nodePath + '.attrs.type: unsupported input type.');
         } else errors.push(nodePath + '.attrs.' + attribute + ': unsupported preview attribute.');
@@ -531,18 +536,12 @@ const stateSelector = (id, component) => ({
   active: ':active', disabled: ':is(:disabled, [aria-disabled="true"], [data-state="disabled"])',
   checked: nestedControl(component)
     ? `:is([aria-checked="true"], :has(${component.parts.control.selector}:checked))`
-    : ':is(:checked, [aria-checked="true"])', readOnly: ':read-only',
+    : ':is(:checked, [aria-checked="true"])', readOnly: nestedControl(component)?':has('+component.parts.control.selector+'[readonly])':'[readonly]',
   invalid: ':is(:user-invalid, [aria-invalid="true"])', selected: '[aria-selected="true"]',
   current: ':is([aria-current]:not([aria-current="false"]))', expanded: '[aria-expanded="true"]', loading: '[aria-busy="true"]',
 }[id] ?? `[data-state="${id}"]`);
-/** Generate scoped component CSS. Recipes cannot inject selectors or external resources. */
-export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
-  assertValid(pack);
-  if (typeof scope !== 'string' || !/^[.#][a-zA-Z_][a-zA-Z0-9_-]*$/.test(scope)) throw new Error('CSS scope must be a single class or ID selector.');
-  const sourceVersion=pack.schemaVersion;
-  pack=effectivePackage(pack);
-  const resolved = resolveUnchecked(pack.tokens, []);
-  const fontRules = (pack.brand?.assets ?? []).filter(asset => asset.font).map(asset => [
+function fontFaceRules(pack) {
+  return (pack.brand?.assets ?? []).filter(asset => asset.font).map(asset => [
     '@font-face {',
     '  font-family: "' + asset.font.family + '";',
     '  font-style: ' + asset.font.style + ';',
@@ -551,6 +550,22 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
     '  src: url("' + brandAssetDataURL(asset) + '") format("' + brandMimeTypes[asset.mimeType].format + '");',
     '}'
   ].join('\n'));
+}
+
+/** Generate local font faces without adopting a theme’s component styles. */
+export function generateFontCSS(pack) {
+  assertValid(pack);
+  return fontFaceRules(pack).join("\n\n");
+}
+
+/** Generate scoped component CSS. Recipes cannot inject selectors or external resources. */
+export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
+  assertValid(pack);
+  if (typeof scope !== 'string' || !/^[.#][a-zA-Z_][a-zA-Z0-9_-]*$/.test(scope)) throw new Error('CSS scope must be a single class or ID selector.');
+  const sourceVersion=pack.schemaVersion;
+  pack=effectivePackage(pack);
+  const resolved = resolveUnchecked(pack.tokens, []);
+  const fontRules = fontFaceRules(pack);
   const rules = [`/* Design Studio: ${pack.id}, schema ${sourceVersion}${sourceVersion===2?' / library '+LIBRARY_VERSION:''} */`, ...fontRules, `${scope} {`,
     ...Object.entries(resolved).map(([id, value]) => `  ${cssVariableName(id)}: ${value};`), ...(sourceVersion===2 ? ['  color-scheme: '+(contrastRatio('#ffffff', resolved['color.background.canvas']) > contrastRatio('#000000', resolved['color.background.canvas']) ? 'dark' : 'light')+';'] : []), '}'];
   function emit(selector, styles) {
@@ -558,22 +573,46 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
     const selectors=sourceVersion===2?expandLegacySelectors(selector):[selector];
     rules.push('', `${selectors.map(selector=>scope+' '+selector).join(', ')} {`, ...Object.entries(styles).map(([property, value]) => `  ${cssProperty(property)}: ${cssValue(value)};`), '}');
   }
-  if(sourceVersion===2){rules.push('', generateLayoutCSS(scope), generateScrollbarCSS(scope), `${scope} [hidden] { display: none !important; }`);emit('dialog.ds-dialog:not([open])',{display:'none'});emit('dialog.ds-dialog-host:not([open])',{display:'none'});}
+  if(sourceVersion===2){rules.push('', generateLayoutCSS(scope), generateScrollbarCSS(scope), generateIconCSS(scope), `${scope} [hidden] { display: none !important; }`);emit('dialog.ds-dialog:not([open])',{display:'none'});emit('dialog.ds-dialog-host:not([open])',{display:'none'});}
   else if(pack.components.tree)rules.push('', `${scope} .ds-tree [hidden] { display: none !important; }`);
-  if(sourceVersion===2)emit('.ds-dialog-host',{border:'0',padding:'0',backgroundColor:'transparent',color:'inherit',width:'calc(100% - 2rem)',maxWidth:'{size.dialog.maxWidth}'});
+  if(sourceVersion===2){emit('.ds-dialog-host',{border:'0',padding:'0',backgroundColor:'transparent',color:'inherit',width:'calc(100% - 2rem)',maxWidth:'{size.dialog.maxWidth}',zIndex:'{layer.dialog}'});emit('.ds-menu',{zIndex:'{layer.popover}'});emit('.ds-tooltip',{zIndex:'{layer.tooltip}'});}
+  if(sourceVersion===2){
+    emit('.ds-dialog-host',{maxHeight:'calc(100dvh - 2rem)',overflowY:'auto',overscrollBehavior:'contain'});
+    emit('.ds-dialog-host::backdrop',{backgroundColor:'rgba(0, 0, 0, .45)'});
+    emit('.ds-drawer-host',{position:'fixed',insetInlineStart:'auto',insetInlineEnd:'0',insetBlock:'0',margin:'0',width:'min(28rem, calc(100vw - 1rem))',maxWidth:'none',height:'100dvh',maxHeight:'100dvh'});
+    emit('.ds-drawer-host[data-side="start"]',{insetInlineStart:'0',insetInlineEnd:'auto'});
+    emit('.ds-avatar-group__item:focus-within',{zIndex:'1'});
+    for(const id of ['combobox','multiselect']){
+      emit('.ds-'+id+'__option[aria-selected="true"]',{backgroundColor:'{color.action.selected.rest.surface}',color:'{color.action.selected.rest.text}'});
+      emit('.ds-'+id+'__option[data-active="true"]',{outline:'2px solid {color.focus}',outlineOffset:'-3px'});
+      emit('.ds-'+id+'__option[aria-disabled="true"]',{color:'{color.disabled.text}',cursor:'not-allowed'});
+    }
+    emit('.ds-file-upload[data-drag-state="over"]',{outline:'max(3px, var(--ds-border-width-focus)) solid {color.focus}',outlineOffset:'2px'});
+    emit('.ds-spinner__indicator',{animation:'ds-feedback-spin .8s linear infinite'});
+    emit('.ds-skeleton',{animation:'ds-skeleton-pulse 1.6s ease-in-out infinite'});
+    rules.push('@keyframes ds-feedback-spin { to { transform: rotate(360deg); } }','@keyframes ds-skeleton-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }');
+    const placeholderParts=new Set();
+    for(const component of Object.values(pack.components)){
+      const visit=node=>{if(node?.part&&(node.tag==='textarea'||node.tag==='input'&&!['button','submit','reset','checkbox','radio','range','color'].includes(node.attrs?.type)))placeholderParts.add(component.parts[node.part].selector);for(const child of node?.children??[])visit(child);};
+      visit(component.preview);
+    }
+    for(const selector of placeholderParts)emit(selector+'::placeholder',{color:'{color.text.muted}',opacity:'1'});
+  }
   for (const [componentId, component] of Object.entries(pack.components)) {
     const root = component.parts.root.selector;
     // Direct anatomy belongs to this component; it must not repaint a nested component.
-    function anatomyPath(node, partId, path=[]) {
+    function anatomyPaths(node, partId, path=[]) {
+      const result=[];
       for (const child of node?.children??[]) {
         if (!child?.part) continue;
         const childPath=[...path,component.parts[child.part].selector];
-        if (child.part===partId) return childPath;
-        const nested=anatomyPath(child,partId,childPath);if(nested)return nested;
+        if (child.part===partId) result.push(childPath);
+        result.push(...anatomyPaths(child,partId,childPath));
       }
+      return result;
     }
     const treeComponent=componentId==='tree';
-    const partSelector=(parent,partId)=>{if(partId==='root')return parent;if(treeComponent)return parent+' '+component.parts[partId].selector;const path=sourceVersion===2?anatomyPath(component.preview,partId):null;return parent+(path?' > '+path.join(' > '):' '+component.parts[partId].selector);};
+    const partSelector=(parent,partId)=>{if(partId==='root')return parent;if(treeComponent)return parent+' '+component.parts[partId].selector;const paths=sourceVersion===2?anatomyPaths(component.preview,partId):[];const selectors=[...new Set(paths.map(path=>parent+' > '+path.join(' > ')))];return selectors.length>1?':is('+selectors.join(', ')+')':selectors[0]??parent+' '+component.parts[partId].selector;};
     for (const [partId, part] of Object.entries(component.parts)) emit(partSelector(root,partId), part.styles);
     // Density belongs to the native control and remains independent of field errors.
     if(sourceVersion===2&&['field','choice-field'].includes(componentId)){
@@ -598,11 +637,19 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
         for(const [size,styles]of Object.entries(BUTTON_SIZES))emit(root+'[data-icon-only="true"][data-size="'+size+'"]',{width:styles.minHeight,minWidth:styles.minWidth});
         emit(root+'[aria-busy="true"] > .ds-button__progress',{display:'inline-block'});
       }
+      if(componentId==='action-button')emit(root+'[aria-busy="true"] > .ds-action-button__progress',{display:'inline-block'});
     }
     const transientState=id=>['hover','active'].includes(id);
     const interactivePart=partId=>{let found=false;const visit=node=>{if(node?.part===partId&&['button','input','select','textarea'].includes(node.tag))found=true;for(const child of node?.children??[])visit(child);};visit(component.preview);return found;};
     const disabledGuard=':not(:is(:disabled, [aria-disabled="true"], [data-state~="disabled"]))';
     for (const [stateId, state] of Object.entries(component.states).sort(([a],[b])=>Number(transientState(a))-Number(transientState(b)))) {
+      if(sourceVersion===2&&['tabs','accordion','breadcrumb','pagination','data-table','data-grid'].includes(componentId)){
+        for(const [partId,part]of Object.entries(state.parts??{})){
+          const native=stateId==='focus'?':focus-visible':componentId==='data-table'&&stateId==='selected'?'[data-state~="selected"]':stateSelector(stateId,{parts:{root:component.parts[partId]}});
+          emit(partSelector(root,partId)+':is('+native+', [data-state~="'+stateId+'"])'+(transientState(stateId)?disabledGuard:''),part.styles);
+        }
+        continue;
+      }
       if(treeComponent){
         // Recursive items have independent state. A selected ancestor must not
         // select its descendants, and hovering a child must not paint its parent.
@@ -633,12 +680,13 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
         emit(root+'[data-variant="'+variant+'"][aria-busy="true"]',{backgroundColor:styles.backgroundColor,color:styles.color,borderColor:styles.borderColor,opacity:'1',cursor:'progress'});
       }
       for(const [variant,styles]of Object.entries(BUTTON_DANGER_VARIANTS))emit(root+'[data-variant="'+variant+'"][data-intent="danger"][aria-busy="true"]',{backgroundColor:styles.backgroundColor,color:styles.color,borderColor:styles.borderColor});
-      rules.push(`${scope} .ds-button[aria-busy="true"] > .ds-button__progress { animation: ds-button-spin .8s linear infinite; }`, '@keyframes ds-button-spin { to { transform: rotate(360deg); } }', `@media (prefers-reduced-motion: reduce) { ${scope} .ds-button > .ds-button__progress { animation: none !important; } }`);
+      rules.push(`${scope} :is(.ds-button[aria-busy="true"] > .ds-button__progress, .ds-action-button[aria-busy="true"] > .ds-action-button__progress) { animation: ds-button-spin .8s linear infinite; }`, '@keyframes ds-button-spin { to { transform: rotate(360deg); } }', `@media (prefers-reduced-motion: reduce) { ${scope} :is(.ds-button > .ds-button__progress, .ds-action-button > .ds-action-button__progress) { animation: none !important; } }`);
     }
   }
   if(sourceVersion===2){
     const selectors=interactiveSelectors(pack.components).flatMap(expandLegacySelectors).map(selector=>`${scope} ${selector}:focus-visible`);
     if(selectors.length)rules.push('',selectors.join(', ')+' {','  outline: max(3px, var(--ds-border-width-focus)) solid var(--ds-color-focus) !important;','  outline-offset: max(2px, var(--ds-border-offset-focus)) !important;','  opacity: 1 !important;','}');
+    rules.push(generatePreferenceCSS(scope));
   }
   return `${rules.join('\n')}\n`;
 }
@@ -685,7 +733,7 @@ function applyAppearance(components, appearance) {
 }
 function effectivePackage(pack) {
   if (pack.schemaVersion===1) return pack;
-  const {appearance,...theme}=normalizeThemeUnchecked(pack);
+  const {appearance,modes,defaultMode,...theme}=normalizeThemeUnchecked(pack);
   const library=structuredClone(COMPONENT_LIBRARY);
   Object.assign(library.button.variants,structuredClone(BUTTON_COMPATIBILITY_VARIANTS));
   return {...theme,schemaVersion:1,tokens:{...structuredClone(DEFAULT_TOKENS),...structuredClone(theme.tokens)},components:applyAppearance(library,appearance)};
@@ -731,7 +779,7 @@ export function validatePackage(pack) {
   if(!record(pack))return {valid:false,errors:['package: must be an object.']};
   if(pack.schemaVersion===1)return validateLegacyPackage(pack);
   if(pack.schemaVersion!==2)return {valid:false,errors:['schemaVersion: expected 1 or 2.']};
-  allowedKeys(pack,['schemaVersion','id','name','description','tokens','appearance','history','brand'],'package',errors);
+  allowedKeys(pack,['schemaVersion','id','name','description','tokens','appearance','history','brand','modes','defaultMode'],'package',errors);
   if(!record(pack.tokens))errors.push('tokens: must be an object.');
   if(own(pack,'appearance'))validateAppearance(normalizeAppearance(pack.appearance),errors);
   if(errors.length)return {valid:false,errors};
@@ -744,6 +792,23 @@ export function validatePackage(pack) {
     if(typeof value!=='string'||!lengthPattern.test(value)||parseFloat(value)<=0||value.endsWith('%'))errors.push('tokens.'+id+': shared component spacing must resolve to a positive absolute or font-relative dimension.');
   }
   if(!errors.length)errors.push(...validateThemeQuality(model,resolved));
+  const baseValid=errors.length===0;
+  if(own(pack,'modes')){
+    if(!record(pack.modes))errors.push('modes: must be an object with light and dark token overrides.');
+    else {
+      allowedKeys(pack.modes,['light','dark'],'modes',errors);
+      if(!['light','dark'].includes(pack.defaultMode))errors.push('defaultMode: expected light or dark for a paired theme.');
+      for(const mode of ['light','dark']){
+        const override=pack.modes[mode];
+        if(!record(override)||!record(override.tokens)){errors.push('modes.'+mode+': expected an object with tokens.');continue;}
+        allowedKeys(override,['tokens'],'modes.'+mode,errors);
+        // The authored default mode often repeats the already validated base.
+        if(baseValid&&Object.entries(override.tokens).every(([id,token])=>own(pack.tokens,id)&&JSON.stringify(token)===JSON.stringify(pack.tokens[id])))continue;
+        const candidate={...pack,tokens:{...canonicalizeTokenSet(pack.tokens),...canonicalizeTokenSet(override.tokens)}};delete candidate.modes;delete candidate.defaultMode;
+        errors.push(...validatePackage(candidate).errors.map(error=>'modes.'+mode+'.'+error));
+      }
+    }
+  }else if(own(pack,'defaultMode'))errors.push('defaultMode requires a paired modes definition.');
   return {valid:errors.length===0,errors:[...new Set(errors)]};
 }
 /** Get the effective catalog without mutating the source theme. */
@@ -825,8 +890,11 @@ function normalizeAppearance(appearance){
 function normalizeThemeUnchecked(pack){
  if(pack.schemaVersion===1)return structuredClone(pack);
  const theme=structuredClone(pack);
+ theme.tokens=canonicalizeTokenSet(theme.tokens);
+ if(theme.modes)for(const mode of Object.values(theme.modes))if(record(mode)&&record(mode.tokens))mode.tokens=canonicalizeTokenSet(mode.tokens);
  if(record(theme.tokens))for(const [oldId,id]of Object.entries(TOKEN_ALIASES))if(own(theme.tokens,oldId)&&!own(theme.tokens,id))theme.tokens[id]=structuredClone(theme.tokens[oldId]);
- if(own(theme,'appearance'))theme.appearance=normalizeAppearance(theme.appearance);
+ if(own(theme,'appearance')){theme.appearance=normalizeAppearance(theme.appearance);const visit=node=>{for(const [key,value]of Object.entries(node??{}))if(typeof value==='string')node[key]=canonicalTokenReferences(value);else if(value&&typeof value==='object')visit(value);};visit(theme.appearance);}
+ for(const section of theme.brand?.sections??[])if(Array.isArray(section.tokens))section.tokens=section.tokens.map(canonicalTokenId);
  for(const section of theme.brand?.sections??[])if(Array.isArray(section.components))section.components=[...new Set(section.components.map(canonicalComponentId))];
  return theme;
 }

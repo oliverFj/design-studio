@@ -64,7 +64,7 @@ export function mountWebPattern(theme, id, { document = globalThis.document, sta
     const hero = node('section', 'composition-hero'); hero.setAttribute('aria-labelledby', prefix + '-title');
     const title = component('heading', { text: 'Giv idéerne plads til at vokse', variant: 'display', attrs: { id: prefix + '-title' } });
     const actions = node('div', 'composition-actions');
-    actions.replaceChildren(component('button',{text:'Udforsk samlingen',href:'#'+prefix+'-samling',variant:'primary',size:'large',icon:'→'}),component('button',{text:'Kontakt os',href:'#'+prefix+'-kontakt',variant:'tertiary',size:'large'}));
+    actions.replaceChildren(component('button',{text:'Udforsk samlingen',href:'#'+prefix+'-samling',variant:'primary',size:'large',iconName:'arrow-right'}),component('button',{text:'Kontakt os',href:'#'+prefix+'-kontakt',variant:'tertiary',size:'large'}));
     hero.append(stack(text('Inspiration og nye perspektiver'), title, text('Et sted at opdage, undersøge og samle det, du vil arbejde videre med.'), actions), image(images[0], { caption: '' }));
     root.append(stack(hero, destinations()));
   }

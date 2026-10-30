@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { mountComposition } from '../patterns/compositions.mjs';
 import { dom, fire } from './support/dom.mjs';
+import { PUBLIC_THEME_IDS } from '../tools/public-themes.mjs';
 
 // These tests exercise explicit focus and key handlers, not native Tab traversal or paint.
 const themes = ['fjordside', 'midnight-editorial'].map(id => JSON.parse(readFileSync(new URL('../packages/' + id + '.json', import.meta.url), 'utf8')));
@@ -57,6 +58,41 @@ test('form validation focuses the first remaining error and successful submit an
     assert.equal(input('name').value, state.saved.name);
     destroy();
   }
+});
+
+test('form errors and honest save feedback survive theme remounts without losing edits', () => {
+  const document = dom();
+  let mounted = mountComposition(themes[0], 'form', { document });
+  const state = mounted.state;
+  document.body.append(mounted.element);
+  const input = key => mounted.element.querySelector('#composition-form-' + key + '-control');
+  input('name').value = ''; fire(input('name'), 'input');
+  fire(mounted.element.querySelector('form'), 'submit');
+  for (const id of PUBLIC_THEME_IDS) {
+    mounted.destroy();
+    const theme = JSON.parse(readFileSync(new URL('../packages/' + id + '.json', import.meta.url), 'utf8'));
+    mounted = mountComposition(theme, 'form', { document, state }); document.body.append(mounted.element);
+    assert.equal(input('name').value, '');
+    assert.equal(input('name').getAttribute('aria-invalid'), 'true', id + ': errors remain visible');
+    assert.match(mounted.element.textContent, /Ret de markerede felter/);
+  }
+  input('name').value = 'Et gyldigt navn'; fire(input('name'), 'input');
+  fire(mounted.element.querySelector('form'), 'submit');
+  assert.ok(mounted.element.querySelector('.ds-alert'));
+  mounted.destroy(); mounted = mountComposition(themes[0], 'form', { document, state }); document.body.append(mounted.element);
+  assert.ok(mounted.element.querySelector('.ds-alert'), 'the confirmation also survives a theme change');
+  input('name').focus(); input('name').value = 'En ny kladde'; fire(input('name'), 'input');
+  assert.equal(document.activeElement, input('name'), 'editing does not replace the focused input');
+  assert.equal(mounted.element.querySelector('.ds-alert'), null, 'the saved claim disappears on editing');
+  assert.match(mounted.element.textContent, /ikke er gemt/);
+  mounted.destroy(); mounted = mountComposition(themes[1], 'form', { document, state }); document.body.append(mounted.element);
+  assert.equal(input('name').value, 'En ny kladde');
+  assert.equal(mounted.element.querySelector('.ds-alert'), null);
+  assert.match(mounted.element.textContent, /ikke er gemt/);
+  fire(mounted.element.querySelector('[data-action="reset-form"]'), 'click');
+  assert.equal(input('name').value, 'Et gyldigt navn');
+  assert.equal(input('name').getAttribute('aria-invalid'), null);
+  mounted.destroy();
 });
 
 test('list selection and review restore focus while search keeps focus through empty results', () => {

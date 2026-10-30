@@ -1,4 +1,4 @@
-import { createComponentFactory, createLayout, mountTree } from '../core/components.mjs';
+import { createComponentFactory, createLayout, mountTree, mountTabs } from '../core/components.mjs';
 
 // Adapted from FormLab's object-panel.js and inspector in ui.js (2026-10-27).
 // The model is deliberately generic; geometry and application commands stay in the product.
@@ -48,7 +48,7 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
   layout.append(workspace, dock);
   const status = c('text', { text: 'Ctrl/⌘-klik eller Shift i træet vælger flere. Gruppehandlinger ændrer ikke valget.', variant: 'small', attrs: { role: 'status', 'aria-live': 'polite' } });
   root.append(layout, status);
-  let tree;
+  let tree, inspectorTabs;
   const itemById = id => state.objects.find(item => item.id === id);
   const selected = () => state.selectedIds.map(itemById).filter(Boolean);
   const inherited = (item, key) => {
@@ -68,8 +68,8 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
       id: item.id, label: item.label, meta: inherited(item, 'locked') ? 'Låst' : inherited(item, 'visible') ? 'Skjult' : item.kind === 'group' ? 'Gruppe' : 'Objekt',
       disabled: inherited(item, 'locked') || inherited(item, 'visible'), children: treeItems(item.id),
       actions: item.kind === 'group' ? [
-        { id: 'visibility', label: item.visible ? 'Skjul gruppen' : 'Vis gruppen', icon: item.visible ? '◉' : '○', pressed: item.visible },
-        { id: 'lock', label: item.locked ? 'Lås gruppen op' : 'Lås gruppen', icon: item.locked ? '▣' : '◇', pressed: item.locked },
+        { id: 'visibility', label: item.visible ? 'Skjul gruppen' : 'Vis gruppen', iconName: item.visible ? 'eye' : 'eye-off', pressed: item.visible },
+        { id: 'lock', label: item.locked ? 'Lås gruppen op' : 'Lås gruppen', iconName: item.locked ? 'lock' : 'lock-open', pressed: item.locked },
       ] : [],
     }));
   }
@@ -112,6 +112,7 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
     details.addEventListener('toggle', () => { state.folds[key] = details.open; }); return details;
   }
   function renderInspector(errors = {}) {
+    inspectorTabs?.destroy(); inspectorTabs=null;
     const selection = selected(), single = selection.length === 1 ? selection[0] : null;
     const locked = selection.some(item => inherited(item, 'locked'));
     const title = single ? single.label : selection.length ? selection.length + ' objekter valgt' : 'Intet valgt';
@@ -163,30 +164,20 @@ export function mountObjectWorkbench(theme, { document = globalThis.document, st
     const actions = compact(c('text', { text: 'Handlinger gælder udvalget. Gruppevalg og låste objekter kan ikke flyttes her.', variant: 'small' }), target, move);
     const tabs = c('segmented-control', { variant: 'wrap' }); tabs.replaceChildren(); tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', 'Objektoplysninger');
     const sections = [['properties', 'Egenskaber', propertyContent], ['relations', 'Relationer', relations], ['actions', 'Handlinger', actions]];
-    const panels = [], tabNodes = [];
-    function activate(id, focus = false) {
-      state.tab = id;
-      sections.forEach(([value], index) => { const active = value === id; tabNodes[index].setAttribute('aria-selected', String(active)); tabNodes[index].setAttribute('tabindex', active ? '0' : '-1'); tabNodes[index].setAttribute('data-state', active ? 'selected' : 'idle'); panels[index].hidden = !active; });
-      if (focus) tabNodes[sections.findIndex(([value]) => value === id)].focus();
-    }
+    const panels = [];
     for (const [id, label, content] of sections) {
-      const tab = c('segmented-option', { text: label, variant: 'desktop', attrs: { role: 'tab', id: prefix + '-tab-' + id, 'aria-controls': prefix + '-panel-' + id, 'data-tab': id } });
+      const tab = c('segmented-option', { text: label, variant: 'desktop', attrs: { role: 'tab', id: prefix + '-tab-' + id, 'aria-controls': prefix + '-panel-' + id, 'data-tab': id, 'data-tab-id':id } });
       tab.removeAttribute('aria-pressed');
-      const panel = el('div', 'composition-tab-panel'); panel.setAttribute('role', 'tabpanel'); panel.setAttribute('id', prefix + '-panel-' + id); panel.setAttribute('aria-labelledby', prefix + '-tab-' + id);
+      const panel = el('div', 'composition-tab-panel'); panel.setAttribute('role', 'tabpanel'); panel.setAttribute('id', prefix + '-panel-' + id); panel.setAttribute('aria-labelledby', prefix + '-tab-' + id);panel.setAttribute('tabindex','0');
       panel.append(scroll(content, label, 'composition-inspector-scroll'));
-      tab.addEventListener('click', () => activate(id));
-      tab.addEventListener('keydown', event => {
-        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-        event.preventDefault(); const current = sections.findIndex(([value]) => value === id);
-        activate(sections[event.key === 'Home' ? 0 : event.key === 'End' ? 2 : (current + (event.key === 'ArrowRight' ? 1 : 2)) % 3][0], true);
-      });
-      tabNodes.push(tab); panels.push(panel); tabs.append(tab);
+      panels.push(panel); tabs.append(tab);
     }
-    activate(state.tab); inspector.append(tabs, ...panels); inspectorHost.replaceChildren(inspector);
+    inspector.append(tabs, ...panels); inspectorHost.replaceChildren(inspector);
+    inspectorTabs=mountTabs(inspector,{selectedId:state.tab,onChange(id){state.tab=id;}});
   }
   const onSearch = event => { state.query = event.target.value; refreshTree(); };
   search.querySelector('input').addEventListener('input', onSearch);
   tree = mountTree(theme, treeHost, { ...treeOptions(), label: 'Objekter', idPrefix: prefix + '-tree' }, { document });
   refreshTree(); renderPreview(); renderInspector();
-  return { element: root, state, destroy() { search.querySelector('input').removeEventListener('input', onSearch); tree.destroy(); root.remove(); } };
+  return { element: root, state, destroy() { search.querySelector('input').removeEventListener('input', onSearch); inspectorTabs?.destroy();tree.destroy(); root.remove(); } };
 }

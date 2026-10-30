@@ -2,7 +2,7 @@ import { createBrandStudio } from './brand.mjs';
 
 import { validatePackage, resolveTokens, generateCSS, validateCompatibility, getComponents, materializePackage, migratePackage } from '../core/engine.mjs';
 
-import { renderComponent, mountPanelControls } from '../core/components.mjs';
+import { renderComponent, mountPanelControls, renderIcon } from '../core/components.mjs';
 import { DEFAULT_TOKENS, COMPONENT_LIBRARY, TOKEN_ALIASES } from '../core/library.mjs';
 import { tokenUsageReport } from '../core/token-usage.mjs';
 import { usageLabel, usageDetails } from './token-usage.mjs';
@@ -16,6 +16,7 @@ import { readJSONFile, downloadFile } from '../core/files.mjs';
 import { mountCompositionGallery, createGalleryState } from '../patterns/gallery.mjs';
 import {renderMotionView} from './motion.mjs';
 import {createCatalogState,renderComponentCatalog,bindComponentCatalog,catalogVariants} from './component-catalog.mjs';
+import {resolveThemeMode,createColorModePreference} from '../core/theme-modes.mjs';
 
 const root = document.querySelector('#app');
 const shellStyle = document.createElement('style');
@@ -35,18 +36,17 @@ let compositionGallery;
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone = value => structuredClone(value);
 const themeStorage = createThemeStorage(bundledThemes, { download });
+const colorPreference=createColorModePreference({key:'design-studio.color-mode',onChange(){if(state.pack){readModel=null;qualityStudio.invalidate();cssPreview();render();}}});
+const activeTheme=()=>resolveThemeMode(state.pack,colorPreference.value,colorPreference.resolved);
 const brandStudio = createBrandStudio(state, {escape, field, edited, render, notice, allowNavigation, download});
-const qualityStudio = createQualityStudio(state, {escape, validation:()=>validation(), render, notice});
-const icon = name => {
-  const paths = { motion:'<path d="M4 16h3l3-8 4 10 3-10h3"/><path d="M4 4h16M4 22h16"/>', quality:'<path d="M5 4h14v16H5zM8 9l2 2 5-5M8 15h8"/>', patterns:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M14 3v18M3 10h11M14 14h7"/>', brand:'<path d="M4 5h16v14H4zM8 9h8M8 13h5"/><path d="m17 15 2 2"/>', components:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>', tokens:'<path d="M12 3 21 8v8l-9 5-9-5V8zM3 8l9 5 9-5M12 13v8"/>', package:'<path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/>' };
-  return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(paths[name] || paths.components)+'</svg>';
-};
+const qualityStudio = createQualityStudio(state, {escape, validation:()=>validation(), getTheme:activeTheme, render, notice});
+const icon = name => renderIcon(({motion:'activity',quality:'shield-check',patterns:'template',brand:'palette',components:'components',tokens:'cube',package:'file-text'})[name] ?? 'components');
 let readModel = null, lastValidModel = null, lastPreviewTheme = null;
 const previewTheme = () => lastPreviewTheme || state.pack;
 const model = () => {
   if (readModel) return readModel;
-  try { lastValidModel = readModel = materializePackage(state.pack); }
-  catch { readModel = { ...state.pack, tokens: { ...DEFAULT_TOKENS, ...state.pack.tokens }, components: state.pack.schemaVersion === 1 ? state.pack.components : lastValidModel?.components || COMPONENT_LIBRARY }; }
+  try { lastValidModel = readModel = materializePackage(activeTheme()); }
+  catch { const draft=activeTheme();readModel = { ...draft, tokens: { ...DEFAULT_TOKENS, ...draft.tokens }, components: draft.schemaVersion === 1 ? draft.components : lastValidModel?.components || COMPONENT_LIBRARY }; }
   return readModel;
 };
 const components = () => model().components;
@@ -57,7 +57,13 @@ function tokenUsage(){
   if(usageModel!==current){usageModel=current;usageCache=tokenUsageReport(current,{compatibilityTokens:[...Object.keys(TOKEN_ALIASES),'size.switch.checkedOffset']});}
   return usageCache;
 }
-const editableToken = () => state.pack.tokens[state.token] ||= clone(themeTokens()[state.token]);
+const editableToken = () => {
+ if(!state.pack.modes)return state.pack.tokens[state.token] ||= clone(themeTokens()[state.token]);
+ const tokens=state.pack.modes[colorPreference.resolved].tokens;
+ const token=tokens[state.token] ||= clone(themeTokens()[state.token]);
+ if(colorPreference.resolved===state.pack.defaultMode)state.pack.tokens[state.token]=token;
+ return token;
+};
 const dirty = () => state.pack && (JSON.stringify(state.pack) !== state.saved || state.recipeDraft !== null);
 const validation = () => state.pack ? validatePackage(state.pack) : { valid: false, errors: [] };
 const groupName = id => ({color:'Farver',typography:'Typografi',space:'Afstande',radius:'Hjørner',shadow:'Skygger',duration:'Overgange',border:'Kanter',size:'Størrelser',opacity:'Gennemsigtighed'})[id] || id;
@@ -72,13 +78,14 @@ function notice(message, error = false) {
   document.querySelector('#announcer').textContent = message;
 }
 function cssPreview() {
-  const checked = validation();
+  const theme=activeTheme(),checked=validatePackage(theme);
   if (!checked.valid) return checked;
   let style = document.querySelector('#package-styles');
   if (!style) { style = document.createElement('style'); style.id = 'package-styles'; document.head.append(style); }
-  style.textContent = generateCSS(state.pack);
+  style.textContent = generateCSS(theme);
+  document.documentElement.style.colorScheme=state.pack.modes?colorPreference.resolved:'normal';
   document.documentElement.classList.add('ds-scope');
-  lastPreviewTheme = clone(state.pack);
+  lastPreviewTheme = theme;
   return checked;
 }
 function refreshStatus() {
@@ -158,7 +165,7 @@ function tokensView() {
 function tokenInspector() {
   const id=state.token, token=themeTokens()[id];
   if (!token) return '<p class="help">Vælg et token.</p>';
-  let value=token.$value;try{value=resolveTokens(state.pack)[id];}catch{}
+  let value=token.$value;try{value=resolveTokens(activeTheme())[id];}catch{}
   const hex=token.$type==='color' && /^#[0-9a-f]{6}$/i.test(String(token.$value));
   return '<div class="inspector-heading">Token</div><h2>'+escape(groupName(id.split('.')[0]))+'</h2><p class="inspector-id">'+escape(id)+'</p><div class="property-row"><span>Type</span><span>'+escape(token.$type)+'</span></div><div class="inspector-section">'+field('token-value','Værdi',token.$value)+
     (hex?'<div class="color-editor"><input type="color" id="token-color" value="'+escape(token.$value)+'" aria-label="Vælg farve"><span class="help">Vælg en farve</span></div>':'')+
@@ -187,7 +194,7 @@ function render() {
   root.innerHTML='<a class="studio-skip" href="#studio-content">Gå til indhold</a><div class="shell ds-app-shell"><aside data-scrollbar-surface="inverse" class="sidebar ds-app-navigation" tabindex="0" aria-label="Designsystemets navigation"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Design Studio</div><div><div class="side-label">Designsystem</div><nav class="navigation" aria-label="Design Studio">'+[['brand','Brandguide'],['components','Komponenter'],['patterns','Designmønstre'],['motion','Animation og effekter'],['tokens','Tokens'],['quality','Kvalitet'],['package','Temaet']].map(([view,name])=>'<button type="button" class="nav-item '+(state.view===view?'active':'')+'" data-view="'+view+'" '+(state.view===view?'aria-current="page"':'')+'>'+icon(view)+name+'</button>').join('')+'</nav></div><div class="side-footer"><strong>Fælles struktur. Eget udtryk.</strong>Fælles bibliotek · temaer</div></aside><div class="workspace ds-app-workspace"><header class="topbar ds-app-header"><div class="breadcrumb">Design Studio <span>/</span><strong>'+(state.view==='motion'?'Animation og effekter':state.view==='patterns'?'Designmønstre':state.view==='quality'?'Kvalitet':'Temaer')+'</strong></div><div class="actions"><button type="button" class="studio-button quiet" id="toggle-inspector" aria-controls="studio-inspector"'+(wideView?' hidden':'')+'>'+(inspectorPanel.open?'Skjul egenskaber':'Vis egenskaber')+'</button><button type="button" class="studio-button quiet" id="discard" hidden>Fortryd ændringer</button><button type="button" class="studio-button" id="import">Åbn tema</button><button type="button" class="studio-button primary" id="save">Gem tema</button><input type="file" id="import-file" accept=".json,application/json" hidden></div></header><main id="studio-main" class="ds-app-content studio-main" tabindex="-1" aria-label="Design Studio – indhold"><div class="page-heading"><div><p class="eyebrow">Komponentbibliotek og temaer</p><h1>'+escape(state.pack.name)+'</h1><p class="page-description">'+escape(state.pack.description)+'</p></div><label class="package-picker" for="package-select">Aktivt tema<select id="package-select">'+state.packages.map(pack=>'<option value="'+escape(pack.key)+'" '+(pack.key===state.key?'selected':'')+'>'+escape(pack.name)+'</option>').join('')+'</select></label></div><div class="content ds-panel-layout'+(wideView?' patterns-content':'')+'" data-panel-open="'+(!wideView&&inspectorPanel.open)+'"><section id="studio-content" class="canvas ds-panel-content" tabindex="0" aria-label="Designindhold">'+(state.view==='brand'?brandStudio.content():state.view==='components'?componentsView():state.view==='patterns'?patternsView():state.view==='motion'?renderMotionView(previewTheme(),motionState):state.view==='tokens'?tokensView():state.view==='quality'?qualityStudio.content():packageView())+'</section><button type="button" id="inspector-resize" class="inspector-resize ds-panel-resize" aria-label="Tilpas egenskabspanelets bredde"></button><aside id="studio-inspector" class="inspector ds-panel-side" tabindex="0" aria-label="Egenskaber">'+(state.view==='brand'?brandStudio.inspector():state.view==='components'?componentInspector():wideView?'':state.view==='tokens'?tokenInspector():state.view==='quality'?qualityStudio.inspector():packageInspector())+'</aside></div></main><footer id="status-bar" class="status-bar ds-app-footer" role="status"></footer></div></div>';
   document.querySelectorAll('[data-swatch]').forEach(el=> {
     const id=el.dataset.swatch;
-    if(themeTokens()[id].$type==='color') {try {el.style.backgroundColor=resolveTokens(state.pack)[id];}catch{}}
+    if(themeTokens()[id].$type==='color') {try {el.style.backgroundColor=resolveTokens(activeTheme())[id];}catch{}}
     else el.textContent=themeTokens()[id].$type==='fontFamily'?'Aa':'';
   });
   const exampleHost = document.querySelector('#project-overview-host');
@@ -247,7 +254,7 @@ function changeToken(value) {
   const row=document.querySelector('[data-value="'+CSS.escape(state.token)+'"]');if(row)row.textContent=value;
   const hex=document.querySelector('#token-color');if(hex && /^#[0-9a-f]{6}$/i.test(value))hex.value=value;
   try {
-    const resolved=resolveTokens(state.pack);
+    const resolved=resolveTokens(activeTheme());
     const el=document.querySelector('#token-example');if(el)el.textContent=resolved[state.token];
     document.querySelectorAll('[data-swatch]').forEach(el=>{if(themeTokens()[el.dataset.swatch].$type==='color')el.style.backgroundColor=resolved[el.dataset.swatch];});
   }catch{}
@@ -260,6 +267,13 @@ function bindInspectionLinks(scope=document){
   scope.querySelectorAll('[data-token]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.token=el.dataset.token;state.view='tokens';render();}}));
 }
 function bind() {
+  const modeLabel=document.createElement('label');modeLabel.className='package-picker';modeLabel.htmlFor='color-mode';modeLabel.textContent='Farvetilstand';
+  const modeSelect=document.createElement('select');modeSelect.id='color-mode';
+  for(const [value,text]of [['system','Automatisk'],['light','Lys'],['dark','Mørk']]){const option=document.createElement('option');option.value=value;option.textContent=text;modeSelect.append(option);}
+  modeSelect.value=colorPreference.value;modeSelect.disabled=!state.pack.modes;modeLabel.append(modeSelect);
+  const themeLabel=document.querySelector('#package-select').parentElement,themeOptions=document.createElement('div');themeOptions.className='theme-options';
+  themeLabel.before(themeOptions);themeOptions.append(themeLabel,modeLabel);
+  modeSelect.addEventListener('change',()=>{colorPreference.set(modeSelect.value);document.querySelector('#color-mode').focus();});
   catalogControls=bindComponentCatalog(root,{state:state.view==='motion'?motionState:catalogState,allowNavigation,onChange(id){if(state.view!=='motion')state.component=id;render();}});
   document.querySelector('#migrate-theme')?.addEventListener('click', () => {
     try { state.pack = migratePackage(state.pack); state.variants = {}; render(); notice('Temaet er konverteret som en kladde. Gennemgå det, og gem eller eksportér.'); }
@@ -307,7 +321,7 @@ function bind() {
   document.querySelector('#variant-select')?.addEventListener('change',event=>{state.variants[state.component]=event.target.value;render();});
   document.querySelector('#package-name')?.addEventListener('input',event=>{state.pack.name=event.target.value;document.querySelector('h1').textContent=event.target.value;edited();});
   document.querySelector('#package-description')?.addEventListener('input',event=>{state.pack.description=event.target.value;document.querySelector('.page-description').textContent=event.target.value;edited();});
-  document.querySelector('#download-css')?.addEventListener('click',()=>{if(!validation().valid||state.recipeDraft!==null){notice('Ret fejlene før du henter CSS.',true);return;}download(state.pack.id+'.css',generateCSS(state.pack),'text/css');});
+  document.querySelector('#download-css')?.addEventListener('click',()=>{if(!validation().valid||state.recipeDraft!==null){notice('Ret fejlene før du henter CSS.',true);return;}download(state.pack.id+'.css',generateCSS(activeTheme()),'text/css');});
 }
 window.addEventListener('beforeunload',event=>{if(dirty()){event.preventDefault();event.returnValue='';}});
 async function startStudio() {

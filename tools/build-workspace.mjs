@@ -1,10 +1,13 @@
-import { build } from 'esbuild';
+import { build, transform } from 'esbuild';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { validatePackage } from '../core/engine.mjs';
 import { PUBLIC_THEME_IDS } from './public-themes.mjs';
 import { offlineIssues } from './offline-checks.mjs';
+import {TABLER_LICENSE} from '../core/icons.mjs';
+import {dataModule} from './bundle-data.mjs';
+import {assertDeliverySize} from './delivery-size.mjs';
 
 const studioRoot = fileURLToPath(new URL('../', import.meta.url));
 
@@ -25,7 +28,7 @@ export async function buildWorkspaceHTML(root = studioRoot) {
       name: 'workspace-themes',
       setup(builder) {
         builder.onResolve({ filter: /bundled-themes\.mjs$/ }, () => ({ path: 'themes', namespace: 'workspace' }));
-        builder.onLoad({ filter: /^themes$/, namespace: 'workspace' }, () => ({ contents: 'export default ' + JSON.stringify(themes), loader: 'js' }));
+        builder.onLoad({ filter: /^themes$/, namespace: 'workspace' }, () => ({ contents: dataModule(themes), loader: 'js' }));
       },
     }],
   });
@@ -33,11 +36,13 @@ export async function buildWorkspaceHTML(root = studioRoot) {
     readFile(path.join(directory, 'index.template.html'), 'utf8'),
     readFile(path.join(directory, 'styles.css'), 'utf8'),
   ]);
-  const html = template
-    .replace('<link rel="stylesheet" href="./styles.css">', () => '<style>' + styles.replace(/<\/style/gi, '<\\/style') + '</style>')
+  const css = (await transform(styles,{loader:'css',minify:true,legalComments:'none'})).code;
+  const html = template.replace('</head>',()=>'<script type="text/plain" id="tabler-license">'+TABLER_LICENSE+'</script></head>')
+    .replace('<link rel="stylesheet" href="./styles.css">', () => '<style>' + css.replace(/<\/style/gi, '<\\/style') + '</style>')
     .replace('<script type="module" src="./boot.mjs"></script>', () => '<script>' + bundle.outputFiles[0].text.replace(/<\/script/gi, '<\\/script') + '</script>');
   const issues = offlineIssues(html);
   if (issues.length) throw new Error('Arbejdsrum: ' + issues.join('\n'));
+  assertDeliverySize('workspace',html);
   return html;
 }
 

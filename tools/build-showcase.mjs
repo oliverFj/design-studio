@@ -1,8 +1,12 @@
+import {transform} from 'esbuild';
+import {dataModule} from './bundle-data.mjs';
+import {assertDeliverySize} from './delivery-size.mjs';
 import { mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { resolve, join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createTheme, getComponents, validatePackage } from '../core/engine.mjs';
 import { LIBRARY_VERSION } from '../core/library.mjs';
+import { TABLER_LICENSE } from '../core/icons.mjs';
 import { PUBLIC_THEME_IDS } from './public-themes.mjs';
 import { COMPOSITIONS, PATTERN_FILES } from '../patterns/catalog.mjs';
 
@@ -22,30 +26,36 @@ for (const id of PUBLIC_THEME_IDS) {
   themes.push(theme);
 }
 const browserImports = source => source.replace(/\.mjs(['"])/g, '.js$1');
+const compactJS = async source => (await transform(source,{loader:'js',minify:true,target:'es2022',legalComments:'none'})).code;
+const compactCSS = async source => (await transform(source,{loader:'css',minify:true,legalComments:'none'})).code;
+const themeModule=await compactJS(dataModule(themes,{exportName:'themes'}));
+assertDeliverySize('themes',themeModule);
 await mkdir(join(output, 'patterns'), { recursive: true });
 for (const name of PATTERN_FILES) {
   const source = await readFile(join(studio, 'patterns', name), 'utf8');
-  await writeFile(join(output, 'patterns', name.replace('.mjs', '.js')), browserImports(source), 'utf8');
+  await writeFile(join(output, 'patterns', name.replace('.mjs', '.js')), name.endsWith('.mjs')?await compactJS(browserImports(source)):await compactCSS(source), 'utf8');
 }
 await mkdir(join(output, 'core'), { recursive: true });
-for (const name of ['contract.mjs', 'library.mjs', 'quality.mjs', 'geometry.mjs', 'token-usage.mjs', 'engine.mjs', 'components.mjs', 'layout.mjs', 'panels.mjs', 'motion.mjs']) {
+for (const name of ['contract.mjs', 'library.mjs', 'quality.mjs', 'geometry.mjs', 'token-usage.mjs', 'engine.mjs', 'components.mjs', 'layout.mjs', 'panels.mjs', 'motion.mjs', 'menus.mjs','icons.mjs','scales.mjs','preferences.mjs','theme-modes.mjs','navigation.mjs','overlays.mjs','input-choices.mjs','feedback.mjs','uploads.mjs','data-table.mjs','data-grid.mjs']) {
   const source = await readFile(join(studio, 'core', name), 'utf8');
-  await writeFile(join(output, 'core', name.replace('.mjs', '.js')), browserImports(source), 'utf8');
+  await writeFile(join(output, 'core', name.replace('.mjs', '.js')), await compactJS(browserImports(source)), 'utf8');
   await rm(join(output, 'core', name), { force: true });
 }
 await mkdir(join(output, 'preview'), { recursive: true });
-for (const name of ['project-overview.mjs', 'project-overview.css']) {
+await mkdir(join(output,'licenses'),{recursive:true});
+await writeFile(join(output,'licenses','tabler-icons-MIT.txt'),TABLER_LICENSE);
+for (const name of ['project-overview.mjs', 'project-overview.css', 'menu-example.mjs','navigation-example.mjs','overlay-example.mjs','content-example.mjs','input-choice-example.mjs','feedback-example.mjs','file-example.mjs','data-table-example.mjs','data-grid-example.mjs']) {
   const source = await readFile(join(studio, 'studio', name), 'utf8');
-  await writeFile(join(output, 'preview', name.replace('.mjs', '.js')), browserImports(source), 'utf8');
+  await writeFile(join(output, 'preview', name.replace('.mjs', '.js')), name.endsWith('.mjs')?await compactJS(browserImports(source)):await compactCSS(source), 'utf8');
 }
 for (const name of ['index.html', 'showcase.css', 'showcase.mjs']) {
   const destination = name.replace('.mjs', '.js');
   const source = await readFile(join(studio, 'showcase', name), 'utf8');
-  await writeFile(join(output, destination), browserImports(source), 'utf8');
+  await writeFile(join(output, destination), name.endsWith('.mjs')?await compactJS(browserImports(source)):name.endsWith('.css')?await compactCSS(source):browserImports(source), 'utf8');
 }
 await rm(join(output, 'showcase.mjs'), { force: true });
 await rm(join(output, 'themes.mjs'), { force: true });
-await writeFile(join(output, 'themes.js'), 'export const themes = ' + JSON.stringify(themes) + ';\n', 'utf8');
+await writeFile(join(output, 'themes.js'), themeModule, 'utf8');
 for (const theme of themes) {
   for (const asset of theme.brand?.assets ?? []) {
     if (asset.mimeType !== 'text/plain') continue;

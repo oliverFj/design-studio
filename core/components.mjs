@@ -1,15 +1,32 @@
 import {getComponents, brandAssetDataURL, resolveTokens} from './engine.mjs';
 export { createLayout, generateAppShellCSS } from './layout.mjs';
 export { mountPanelControls } from './panels.mjs';
+export {resolveThemeMode,createColorModePreference} from './theme-modes.mjs';
+export { mountMenuControls } from './menus.mjs';
+export {mountTooltip,mountPopover,mountDialog,mountDrawer} from './overlays.mjs';
+import {normalizeNavigationPreview} from './navigation.mjs';
+export {mountTabs} from './navigation.mjs';
+import {normalizeDataGridPreview} from './data-grid.mjs';
+export {mountDataGrid,parseGridTSV,serializeGridTSV} from './data-grid.mjs';
+import {normalizeFeedbackPreview} from './feedback.mjs';
+import {normalizeFileUploadPreview} from './uploads.mjs';
+export {mountToast} from './feedback.mjs';
+export {mountFileUpload,validateFileSelection} from './uploads.mjs';
+import {normalizeDataTablePreview} from './data-table.mjs';
+export {mountDataTable} from './data-table.mjs';
+import {normalizeInputChoicePreview} from './input-choices.mjs';
+export {mountCombobox,mountMultiselect} from './input-choices.mjs';
 export { animateStandard, STANDARD_MOTION } from './motion.mjs';
 import {COMPONENT_LIBRARY, canonicalComponentId, canonicalVariantId, canonicalStateId, canonicalPartId} from './library.mjs';
 import { BUTTON_SIZES } from './library.mjs';
+import { iconModel, createIcon } from './icons.mjs';
+export { createIcon, renderIcon, ICON_NAMES, TABLER_VERSION } from './icons.mjs';
 
-const tags=new Set(['a','nav','figure','figcaption','div','span','p','strong','label','button','input','select','option','h1','h2','h3','h4','h5','h6','hr','section','article','header','footer','dialog','textarea','ul','li','img','dl','dt','dd']);
-const inputTypes=new Set(['button','submit','reset','text','email','number','password','checkbox','radio','search','tel','url','range','color','date']);
+const tags=new Set(['a','nav','figure','figcaption','div','span','p','strong','label','button','input','select','option','h1','h2','h3','h4','h5','h6','hr','section','article','header','footer','dialog','textarea','ul','ol','li','img','dl','dt','dd','fieldset','legend','output','details','summary','table','caption','thead','tbody','tr','th','td','progress']);
+const inputTypes=new Set(['button','submit','reset','text','email','number','password','checkbox','radio','search','tel','url','range','color','date','time','file']);
 const booleans=new Set(['disabled','checked','selected','multiple','required','readOnly','readonly','hidden','open']);
 const voidTags=new Set(['input','hr','img']);
-const safeAttribute=name=>booleans.has(name)||['href','src','alt','id','for','name','type','value','placeholder','min','max','step','rows','cols','autocomplete','role','title','tabindex','draggable'].includes(name)||/^aria-[a-z-]+$/.test(name)||/^data-[a-z-]+$/.test(name);
+const safeAttribute=name=>booleans.has(name)||['href','src','alt','id','for','name','type','value','placeholder','min','max','step','rows','cols','inputmode','minlength','maxlength','autocomplete','role','title','tabindex','draggable','accept','scope','colspan','rowspan'].includes(name)||/^aria-[a-z-]+$/.test(name)||/^data-[a-z-]+$/.test(name);
 // URLs are checked before either HTML serialization or native DOM construction.
 function safeURL(value, image=false){
  const url=String(value).trim();
@@ -22,12 +39,12 @@ const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 /** Offline sample illustrations using the selected theme's resolved palette. */
 export function createImageExamples(pack){
  const tokens=resolveTokens(pack),color=id=>escape(tokens[id]);
- const primary=color('color.action.primary'),accent=color('color.brand.accent');
+ const primary=color('color.action.primary.rest.surface'),accent=color('color.brand.accent');
  return [
   ['Cirkel','En cirkel på en ensfarvet flade.',color('color.background.subtle'),`<circle cx="300" cy="200" r="110" fill="${primary}"/>`],
   ['Bue','En bue over en cirkel.',color('color.background.subtle'),`<circle cx="300" cy="210" r="105" fill="${accent}"/><path fill="${primary}" d="M130 300V190a170 170 0 0 1 340 0v110h-55V190a115 115 0 0 0-230 0v110z"/>`],
   ['Balance','En cirkel balancerer over to forskudte flader.',color('color.background.surface'),`<circle cx="300" cy="120" r="65" fill="${accent}"/><path fill="${primary}" d="M100 220h280v60H100zM250 290h250v55H250z"/>`],
-  ['Rytme','Fire lodrette former med forskellig højde.',color('color.action.subtle'),`<path fill="${primary}" d="M100 320V170h65v150zM320 320V130h65v190z"/><path fill="${accent}" d="M210 320V80h65v240zM430 320V210h65v110z"/>`],
+  ['Rytme','Fire lodrette former med forskellig højde.',color('color.action.selected.rest.surface'),`<path fill="${primary}" d="M100 320V170h65v150zM320 320V130h65v190z"/><path fill="${accent}" d="M210 320V80h65v240zM430 320V210h65v110z"/>`],
  ].map(([title,alt,background,shapes])=>({title,alt,src:'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect width="600" height="400" fill="${background}"/>${shapes}</svg>`)}));
 }
 let sequence=0;
@@ -48,8 +65,22 @@ function model(pack,id,options,components,depth=0){
  if(depth>12)throw new Error('Component composition exceeds maximum depth 12.');
  if(pack.schemaVersion===2)id=canonicalComponentId(id);
  const component=components[id];if(!component)throw new Error('Unknown shared component: '+id);
+ const standardContent=['avatar','avatar-group'].includes(id)&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
+ const sharedFeedback=['spinner','progress','skeleton','toast','empty-state'].includes(id)&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
+ const sharedFileChoice=id==='file-upload'&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
+ const navigationComponent=['tabs','accordion','breadcrumb','pagination'].includes(id)&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
+ const newFormComponent=['textarea','number-input','field-group'].includes(id)&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
+ const inputChoiceComponent=['combobox','multiselect','date-picker','time-picker'].includes(id)&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
+ const sharedOverlay=['drawer','popover'].includes(id)&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
+ const sharedGrid=id==='data-grid'&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
+ const dialogLike=id==='dialog'||sharedOverlay&&id==='drawer',overlayWithParts=dialogLike||sharedOverlay;
  if(options.controlVariant!==undefined&&(!['field','choice-field'].includes(id)||options.controlVariant!=='desktop'))throw new Error('Unsupported control variant: '+options.controlVariant);
  let iconAsset;
+ if(options.iconName!==undefined){
+  if(!['button','action-button','menu-item','tag','segmented-option'].includes(id))throw new Error('iconName is only supported by button, action-button, menu-item, tag and segmented-option.');
+  iconModel(options.iconName);
+  if(options.icon!==undefined||options.iconAssetId!==undefined)throw new Error('Choose one icon source: iconName, icon or iconAssetId.');
+ }
  if(id==='action-button'&&options.iconAssetId!==undefined){iconAsset=pack.brand?.assets?.find(asset=>asset.id===options.iconAssetId);if(!iconAsset||!iconAsset.mimeType.startsWith('image/'))throw new Error('Unknown approved icon image asset: '+options.iconAssetId);}
  const identifier=prefix(options), slots=Object.fromEntries(Object.entries(options.slots??{}).map(([key,value])=>[pack.schemaVersion===2?canonicalPartId(id,key):key,value]));
  if(id==='action-button'){if(options.icon!==undefined)slots.icon=options.icon;if(options.shortcut!==undefined)slots.shortcut=String(options.shortcut);}
@@ -62,20 +93,30 @@ function model(pack,id,options,components,depth=0){
  let variant=options.variant??component.preview?.variant??['default','primary','neutral','horizontal'].find(key=>Object.hasOwn(component.variants,key));
  if(pack.schemaVersion===2&&variant)variant=canonicalVariantId(id,variant);
  if(variant&&!Object.hasOwn(component.variants,variant))throw new Error('Unknown component variant: '+id+'.'+variant);
+ if(id==='tag'&&options.pressed!==undefined)variant=options.pressed?'selected':'default';
+ if(id==='action-button'&&variant==='icon-only'&&(options.iconName!==undefined||options.icon!==undefined||options.iconAssetId!==undefined)&&!String(options.label??options.text??options.attrs?.['aria-label']??'').trim())throw new Error('Icon-only action-button requires an accessible name.');
  const buttonLike=['button','action-button'].includes(id);
  if(buttonLike&&options.size!==undefined&&!Object.hasOwn(BUTTON_SIZES,options.size))throw new Error('Unknown button size: '+options.size);
  if(buttonLike&&options.intent!==undefined&&!['normal','danger'].includes(options.intent))throw new Error('Unknown button intent: '+options.intent);
  if(id==='action-button'&&options.emphasis!==undefined&&!['primary','secondary','tertiary','ghost'].includes(options.emphasis))throw new Error('Unknown button emphasis: '+options.emphasis);
  if(buttonLike&&options.intent==='danger'&&(options.emphasis??variant)==='secondary')throw new Error('Danger requires primary, tertiary or ghost emphasis.');
  const stateList=Array.isArray(options.state)?options.state:[options.state];
- const loading=id==='button'&&(options.loading||stateList.includes('loading'));
+ const loading=buttonLike&&(options.loading||stateList.includes('loading'));
  const unavailable=Boolean(options.disabled||stateList.includes('disabled')||loading);
  if(id==='button'&&options.icon!==undefined)slots.icon=String(options.icon);
  if(id==='button'&&options.iconOnly&&!String(options.label??options.attrs?.['aria-label']??options.text??'').trim())throw new Error('Icon-only button requires an accessible name.');
- if(id==='button'&&options.iconOnly&&options.icon===undefined&&!slots.icon)throw new Error('Icon-only button requires an icon.');
- if(options.error&&['field','choice-field'].includes(id))variant='invalid';
- const hasError=['field','choice-field'].includes(id)&&(Boolean(options.error)||variant==='invalid');
- const hasHint=options.hint!=='';
+ if(id==='button'&&options.iconOnly&&options.icon===undefined&&options.iconName===undefined&&!slots.icon)throw new Error('Icon-only button requires an icon.');
+ const formField=['field','choice-field','range-field'].includes(id)||newFormComponent&&['textarea','number-input'].includes(id)||inputChoiceComponent;
+ const formChoice=['checkbox','radio','switch'].includes(id);
+ const fieldGroup=newFormComponent&&id==='field-group';
+ const describedForm=formField||formChoice||fieldGroup;
+ if(options.error&&describedForm)variant='invalid';
+ const invalid=describedForm&&(Boolean(options.error)||variant==='invalid');
+ const findPreviewPart=(node,part)=>node?.part===part?node:(node?.children??[]).map(child=>findPreviewPart(child,part)).find(Boolean);
+ const error=options.error??slots.error??findPreviewPart(component.preview,'error')?.text;
+ const hasError=invalid&&(typeof error==='string'?Boolean(error.trim()):error!==undefined);
+ const hint=options.hint??slots.hint??findPreviewPart(component.preview,'hint')?.text;
+ const hasHint=typeof hint==='string'?Boolean(hint.trim()):hint!==undefined;
  function visit(source,root=false,slotApplied=false,nodeDepth=0){
   if(nodeDepth>12)throw new Error('Component tree exceeds maximum depth 12.');
   if(typeof source==='string')return {tag:'span',text:source,attrs:{},children:[]};
@@ -90,6 +131,7 @@ function model(pack,id,options,components,depth=0){
   if(node.part&&!Object.hasOwn(component.parts,node.part))throw new Error('Unknown component part: '+id+'.'+node.part);
   const part=node.part;
   if(!slotApplied&&part&&Object.hasOwn(slots,part)){
+   delete node.iconName;
    const slot=slots[part];
    if(typeof slot==='string'){node.text=slot;delete node.children;}
    else if(Array.isArray(slot)||slot?.component){node.children=Array.isArray(slot)?slot:[slot];delete node.text;if(node.tag==='p'||/^h[1-6]$/.test(node.tag))node.tag='div';}
@@ -97,28 +139,59 @@ function model(pack,id,options,components,depth=0){
    else throw new Error('Expected text or declarative nodes in component slot '+part);
   }
   if(!tags.has(node.tag))throw new Error('Unsupported component tag: '+node.tag);
-  if(root&&options.text!==undefined&&id!=='action-button'&&!(id==='button'&&(options.icon!==undefined||slots.icon!==undefined||options.iconOnly||loading))){node.text=String(options.text);delete node.children;}
-  const suppliedAttrs={...node.attrs,...(root?options.attrs:{})};
+  if(root&&options.text!==undefined&&id!=='action-button'&&!(id==='button'&&(options.icon!==undefined||options.iconName!==undefined||slots.icon!==undefined||options.iconOnly||loading))&&!(['tag','segmented-option'].includes(id)&&options.iconName!==undefined)){node.text=String(options.text);delete node.children;}
+  const suppliedAttrs={...node.attrs,...(root&&!dialogLike?options.attrs:{})};
   if(id==='action-button'&&Object.hasOwn(suppliedAttrs,'src'))throw new Error('Unsupported component attribute: src');
   const attrs=attributes(suppliedAttrs);
+  if(sharedFeedback){
+   if(root&&id==='skeleton'){attrs['aria-hidden']='true';delete attrs.role;delete attrs.tabindex;}
+   if(['toast','empty-state'].includes(id)&&['title','body'].includes(part))attrs.id=identifier+'-'+part;
+   if(id==='progress'&&part==='label')attrs.for=identifier+'-progress';
+   if(id==='progress'&&part==='control'){
+    if(node.tag!=='progress')throw new Error('Progress requires a native progress element.');
+    const normalized=findPreviewPart(preview,'control').attrs;
+    Object.assign(attrs,normalized);if(normalized.value===undefined)delete attrs.value;
+   }
+  }
+  if(sharedFileChoice){
+   if(part==='label')attrs.for=identifier+'-files';
+   if(['hint','error','status'].includes(part)){
+    attrs.id=identifier+'-'+part;
+    if(['hint','error'].includes(part)){if(findPreviewPart(preview,part).attrs.hidden)attrs.hidden=true;else delete attrs.hidden;}
+   }
+   if(part==='control'){
+    if(node.tag!=='input')throw new Error('file-upload requires a native file input.');
+    if(attrs.value!==undefined)throw new Error('File inputs cannot be prefilled.');
+    attrs.type='file';attrs.id=identifier+'-files';
+    const normalized=findPreviewPart(preview,'control').attrs;
+    for(const name of ['accept','multiple']){if(normalized[name]!==undefined)attrs[name]=normalized[name];else delete attrs[name];}
+    const described=new Set((attrs['aria-describedby']??'').split(/\s+/).filter(Boolean));
+    for(const name of ['hint','error'])if(!findPreviewPart(preview,name).attrs.hidden)described.add(identifier+'-'+name);
+    if(described.size)attrs['aria-describedby']=[...described].join(' ');
+    if(!findPreviewPart(preview,'error').attrs.hidden)attrs['aria-invalid']='true';
+   }
+  }
   if(part)attrs.class=component.parts[part].selector.slice(1);
   if(root&&variant)attrs['data-variant']=variant;
   if(root&&buttonLike){
    if(options.size)attrs['data-size']=options.size;
    if(options.intent&&options.intent!=='normal')attrs['data-intent']=options.intent;
    if(id==='action-button'&&options.emphasis)attrs['data-emphasis']=options.emphasis;
+   if(loading){attrs['aria-busy']='true';attrs['data-loading']='true';}
   }
+  if(id==='action-button'&&part==='progress'&&!loading)attrs.hidden=true;
+  if(id==='action-button'&&part==='icon'&&loading)attrs.hidden=true;
   if(id==='button'){
    if(root){
     const href=options.href??attrs.href;
     if(href!==undefined){node.tag='a';delete attrs.type;if(unavailable){delete attrs.href;attrs.role='link';attrs['aria-disabled']='true';attrs.tabindex='-1';}else attrs.href=safeURL(href);}
-    if(options.icon!==undefined||slots.icon!==undefined){attrs['data-has-icon']='true';}
+    if(options.icon!==undefined||options.iconName!==undefined||slots.icon!==undefined){attrs['data-has-icon']='true';}
     if(options.iconOnly){attrs['data-icon-only']='true';attrs['aria-label']=String(options.label??options.attrs?.['aria-label']??options.text);}
     if(loading){attrs['aria-busy']='true';attrs['data-loading']='true';}
    }
    if(part==='heading'&&(options.text!==undefined||options.label!==undefined))node.text=String(options.text??options.label);
    if(part==='heading'&&options.iconOnly)attrs.hidden=true;
-   if(part==='icon'&&((options.icon===undefined&&slots.icon===undefined)||loading))attrs.hidden=true;
+   if(part==='icon'&&((options.icon===undefined&&options.iconName===undefined&&slots.icon===undefined)||loading))attrs.hidden=true;
    if(part==='progress'&&!loading)attrs.hidden=true;
   }
   if(root&&id==='link'&&options.href!==undefined)attrs.href=safeURL(options.href);
@@ -130,55 +203,145 @@ function model(pack,id,options,components,depth=0){
   if(id==='image'&&part==='caption'&&options.caption!==undefined){node.text=String(options.caption);if(options.caption==='')attrs.hidden=true;}
   if(!root&&node.variant)attrs['data-variant']=node.variant;
   if(root&&options.state){const states=(Array.isArray(options.state)?options.state:[options.state]).map(state=>pack.schemaVersion===2?canonicalStateId(id,state):state);for(const state of states)if(!Object.hasOwn(component.states,state))throw new Error('Unknown component state: '+state);if(id!=='tree'){attrs['data-state']=states.join(' ');if(states.includes('selected'))attrs['aria-selected']='true';if(states.includes('pressed'))attrs['aria-pressed']='true';if(states.includes('expanded'))attrs['aria-expanded']='true';if(states.includes('loading'))attrs['aria-busy']='true';}}
+  if(newFormComponent&&part==='control'&&id==='textarea'&&node.tag!=='textarea')throw new Error('textarea requires a native textarea control.');
+  if(newFormComponent&&part==='control'&&id==='number-input'&&node.tag!=='input')throw new Error('number-input requires a native input control.');
+  if(inputChoiceComponent&&part==='control'&&node.tag!=='input')throw new Error(id+' requires a native input control.');
   const nativeControl=['input','select','textarea'].includes(node.tag);
   if(nativeControl){
-   for(const key of ['name','value','placeholder','type','min','max','step'])if(options[key]!==undefined)Object.assign(attrs,attributes({[key]:String(options[key])}));
-   for(const key of ['disabled','checked','required','readOnly'])if(options[key]!==undefined){const attribute=key==='readOnly'?'readonly':key;if(options[key])attrs[attribute]=true;else delete attrs[attribute];}
+   for(const key of ['name','value','placeholder','type','min','max','step','rows','cols','minlength','maxlength','inputmode','autocomplete'])if(options[key]!==undefined)Object.assign(attrs,attributes({[key]:String(options[key])}));
+   for(const key of ['disabled','checked','required'])if(options[key]!==undefined){attributes({[key]:options[key]});if(options[key])attrs[key]=true;else delete attrs[key];}
+   const supportsReadOnly=node.tag==='textarea'||node.tag==='input'&&!['checkbox','radio','range','button','submit','reset','color'].includes(attrs.type);
+   const readOnly=options.readOnly??options.readonly??(stateList.includes('readOnly')?true:undefined);
+   if(supportsReadOnly&&readOnly!==undefined){attributes({readonly:readOnly});if(readOnly)attrs.readonly=true;else delete attrs.readonly;}
+   if(root&&['input','select'].includes(id)){
+    if(options.label!==undefined)attrs['aria-label']=String(options.label);
+    else if(options.attrs?.['aria-labelledby'])delete attrs['aria-label'];
+    if(options.error||variant==='invalid')attrs['aria-invalid']='true';
+   }
+   if(newFormComponent&&id==='number-input'&&part==='control'){
+    if(options.type!==undefined&&options.type!=='number')throw new Error('number-input requires native type=number.');
+    if(node.tag!=='input')throw new Error('number-input requires a native input control.');
+    attrs.type='number';
+   }
+   if(inputChoiceComponent&&part==='control'){
+    attrs.value=findPreviewPart(preview,'control').attrs.value;
+    attrs.type=id==='date-picker'?'date':id==='time-picker'?'time':'text';
+    if(id==='combobox'||id==='multiselect')Object.assign(attrs,{role:'combobox','aria-autocomplete':'list','aria-haspopup':'listbox','aria-expanded':'false','aria-controls':identifier+'-listbox'});
+   }
   }
   if(node.tag==='button'){
    attrs.type??='button';
    if(options.disabled!==undefined){if(options.disabled)attrs.disabled=true;else delete attrs.disabled;}
    if(root&&loading)attrs.disabled=true;
   }
-  if(id!=='tree'&&(nativeControl||node.tag==='button')&&(Array.isArray(options.state)?options.state:[options.state]).includes('disabled'))attrs.disabled=true;
+  if(id!=='tree'&&!(navigationComponent&&id==='tabs')&&(nativeControl||node.tag==='button')&&(Array.isArray(options.state)?options.state:[options.state]).includes('disabled'))attrs.disabled=true;
   if(root&&options.disabled)attrs['aria-disabled']='true';
   if(id==='action-button'&&part==='label'&&(options.label!==undefined||options.text!==undefined))node.text=String(options.label??options.text);
-  if(id==='action-button'&&['icon','shortcut'].includes(part)&&(Object.hasOwn(options,'label')||Object.hasOwn(options,'text'))&&!Object.hasOwn(options,part)&&!Object.hasOwn(slots,part)&&!(part==='icon'&&iconAsset)){attrs.hidden=true;delete node.text;delete node.children;}
+  if(id==='action-button'&&['icon','shortcut'].includes(part)&&(Object.hasOwn(options,'label')||Object.hasOwn(options,'text'))&&!Object.hasOwn(options,part)&&!Object.hasOwn(slots,part)&&!(part==='icon'&&(iconAsset||options.iconName!==undefined))){attrs.hidden=true;delete node.text;delete node.children;}
   if(id==='action-button'&&part==='shortcut'&&node.text===''&&!node.children?.length)attrs.hidden=true;
-  if(root&&id==='action-button'&&options.pressed!==undefined){attrs['aria-pressed']=String(Boolean(options.pressed));attrs['data-state']=options.pressed?'pressed':'idle';}
+  if(root&&['button','action-button','tag','segmented-option'].includes(id)&&options.pressed!==undefined){
+   attrs['aria-pressed']=String(Boolean(options.pressed));
+   const states=new Set((attrs['data-state']??'').split(/\s+/).filter(Boolean));
+   if(options.pressed)states.add('pressed');else states.delete('pressed');
+   if(states.size)attrs['data-state']=[...states].join(' ');else delete attrs['data-state'];
+  }
+  if(root&&id==='tag'&&variant==='selected'&&options.pressed===undefined)attrs['aria-pressed']='true';
+  if(root&&['toolbar','segmented-control'].includes(id)&&options.label!==undefined){attrs.role='group';attrs['aria-label']=String(options.label);}
   if(root&&id==='action-button'&&variant==='icon-only')attrs['aria-label']??=String(options.label??options.text??'Tilføj');
   if(root&&id==='action-button'&&options.shortcut)attrs['aria-keyshortcuts']??=String(options.shortcut);
-  if(part==='value'&&id==='range-field'&&options.value!==undefined)node.text=String(options.value);
-  if(['field','range-field','choice-field'].includes(id)){
+  if(part==='value'&&id==='range-field'){attrs.for=identifier+'-control';if(options.value!==undefined)node.text=String(options.value);}
+  if(describedForm){
    if(part==='label'){attrs.for=identifier+'-control';if(options.label!==undefined)node.text=String(options.label);}
-   if(part==='control'){
+   if(formChoice&&part==='label'){delete attrs.for;attrs.id=identifier+'-label';}
+   if(fieldGroup&&part==='legend'){attrs.id=identifier+'-legend';if(options.label!==undefined)node.text=String(options.label);}
+   if(part==='control'||fieldGroup&&root){
     attrs.id=identifier+'-control';
+    if(formChoice)attrs['aria-labelledby']=identifier+'-label';
+    if(fieldGroup){attrs['aria-labelledby']=identifier+'-legend';if(options.disabled||stateList.includes('disabled'))attrs.disabled=true;}
     if(options.controlVariant){
      if(!['input','select'].includes(node.tag))throw new Error('Desktop field controls require a native input or select.');
      attrs['data-variant']=options.controlVariant;
     }
-    const described=[];if(component.parts.hint&&hasHint)described.push(identifier+'-hint');if(hasError)described.push(identifier+'-error');
-    if(described.length)attrs['aria-describedby']=described.join(' ');
-    if(hasError)attrs['aria-invalid']='true';
+    const described=(attrs['aria-describedby']??'').split(/\s+/).filter(Boolean);if(component.parts.hint&&hasHint)described.push(identifier+'-hint');if(hasError)described.push(identifier+'-error');
+    if(described.length)attrs['aria-describedby']=[...new Set(described)].join(' ');
+    if(invalid)attrs['aria-invalid']='true';
    }
    if(part==='hint'){attrs.id=identifier+'-hint';if(options.hint!==undefined)node.text=String(options.hint);if(!hasHint)attrs.hidden=true;}
    if(part==='error'){attrs.id=identifier+'-error';if(options.error!==undefined)node.text=String(options.error);if(!hasError)attrs.hidden=true;}
   }
-  if(['checkbox','radio','switch'].includes(id)&&part==='label'&&options.label!==undefined)node.text=String(options.label);
-  if(id==='dialog'&&part==='title')attrs.id=identifier+'-title';
-  if(id==='dialog'&&part==='body')attrs.id=identifier+'-body';
+  if(overlayWithParts&&part==='title'){attrs.id=identifier+'-title';if(options.title!==undefined)node.text=String(options.title);}
+  if(overlayWithParts&&part==='body'){attrs.id=identifier+'-body';if(options.body!==undefined){node.text=String(options.body);delete node.children;}}
+  if(root&&sharedOverlay&&id==='popover'){attrs['aria-labelledby']=identifier+'-title';if(options.describeBody!==false)attrs['aria-describedby']=identifier+'-body';}
   if(id==='alert'&&root)attrs.role=options.role??(variant==='danger'?'alert':'status');
   if(id==='tooltip'&&root){attrs.role='tooltip';attrs.id=identifier+'-tooltip';}
   if(id==='switch'&&part==='control')attrs.role='switch';
+  if(node.tag==='textarea'&&options.value!==undefined){node.text=String(options.value);delete attrs.value;}
   let children=(node.children??[]).map(child=>visit(child,false,false,nodeDepth+1));
+  if(node.iconName!==undefined){if(node.tag!=='span')throw new Error('Declarative icons require a span container.');delete node.text;children=[iconModel(node.iconName,{size:id==='action-button'?'medium':'small'})];}
+  if(options.iconName!==undefined&&part===(id==='menu-item'?'symbol':'icon')){delete node.text;children=[iconModel(options.iconName,{size:options.iconSize??(id==='menu-item'?'small':'medium')})];}
   if(id==='action-button'&&part==='icon'&&iconAsset){delete node.text;children=[{tag:'img',attrs:{class:'ds-action-button__asset',src:brandAssetDataURL(iconAsset),alt:''},children:[]}];}
-  if(node.tag==='select'&&options.value!==undefined)for(const child of children)if(child.tag==='option'&&(child.attrs.value??child.text)===String(options.value))child.attrs.selected=true;
+  if(node.tag==='select'&&options.value!==undefined)for(const child of children)if(child.tag==='option'){delete child.attrs.selected;if((child.attrs.value??child.text)===String(options.value))child.attrs.selected=true;}
   if(voidTags.has(node.tag)&&(node.text!==undefined||children.length))throw new Error('Native void control cannot have children.');
   return {tag:node.tag,attrs,text:node.text,children};
  }
- const tree=visit(component.preview??COMPONENT_LIBRARY[canonicalComponentId(id)]?.preview,true);
+ let preview=component.preview??COMPONENT_LIBRARY[canonicalComponentId(id)]?.preview;
+ // Shared input-choice preview normalization.
+ if(inputChoiceComponent)preview=normalizeInputChoicePreview(id,preview,options,identifier);
+ // Shared feedback and file-choice preview normalization.
+ if(sharedFeedback)preview=normalizeFeedbackPreview(id,preview,options,identifier);
+ if(sharedFileChoice)preview=normalizeFileUploadPreview(preview,options,identifier);
+ // Shared data-table preview normalization.
+ const standardDataTable=id==='data-table'&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
+ if(standardDataTable)preview=normalizeDataTablePreview(preview,options,identifier);
+ // Shared data-grid preview normalization.
+ if(sharedGrid)preview=normalizeDataGridPreview(preview,options,identifier);
+ // Shared content preview normalization.
+ if(standardContent&&id==='avatar'){
+  const name=String(options.name??options.label??'Anna Larsen').trim();
+  if(!name)throw new Error('Avatar requires a non-empty accessible name.');
+  const graphemes=value=>typeof Intl.Segmenter==='function'?[...new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(value)].map(segment=>segment.segment):Array.from(value);
+  const words=name.split(/\s+/),initials=options.initials===undefined?[words[0],...(words.length>1?[words.at(-1)]:[])].map(word=>graphemes(word)[0]).join('').toLocaleUpperCase():graphemes(String(options.initials).trim()).slice(0,2).join('');
+  preview={tag:'span',part:'root',attrs:{role:'img','aria-label':name,'data-avatar':'true'},children:[{tag:'span',part:'initials',attrs:{'aria-hidden':'true'},text:initials||'?'}]};
+  if(options.src!==undefined&&String(options.src).trim())preview.children.push({tag:'img',part:'image',attrs:{src:safeURL(options.src,true),alt:'','aria-hidden':'true','data-avatar-image':'true',hidden:true}});
+ }
+ if(standardContent&&id==='avatar-group'){
+  preview=structuredClone(preview);
+  if(options.label!==undefined)preview.attrs['aria-label']=String(options.label);
+  if(!String(preview.attrs['aria-label']??'').trim())throw new Error('Avatar group requires an accessible name.');
+  {
+   const items=options.items??[{name:'Anna Larsen'},{name:'Mikkel Holm'},{name:'Sara Østergaard'}];
+   if(!Array.isArray(items))throw new Error('Avatar group items must be an array.');
+   preview.children=items.map((item,index)=>{
+    if(!item||typeof item!=='object'||Array.isArray(item)||!String(item.name??item.label??'').trim())throw new Error('Each avatar group item requires a name.');
+    return {tag:'li',part:'item',children:[{component:'avatar',options:{...item,idPrefix:identifier+'-avatar-'+index}}]};
+   });
+  }
+ }
+ if(['tag','segmented-option'].includes(id)&&options.iconName!==undefined){
+  preview=structuredClone(preview);
+  preview.children=[{tag:'span',part:'icon',attrs:{'aria-hidden':'true'}},{tag:'span',part:'label',text:String(options.text??options.label??preview.text??'')}];
+  delete preview.text;
+ }
+ // Shared form preview normalization.
+ if(fieldGroup){
+  preview=structuredClone(preview);
+  let childIndex=0;
+  const identify=node=>{if(node.component){node.options={...node.options,idPrefix:node.options?.idPrefix??identifier+'-field-'+(++childIndex)};}for(const child of node.children??[])identify(child);};
+  const body=slots.body;
+  if(body&&typeof body==='object'){slots.body=structuredClone(body);for(const node of Array.isArray(slots.body)?slots.body:[slots.body])identify(node);}
+  else identify(preview);
+ }
+ // Shared navigation preview normalization.
+ if(navigationComponent){preview=normalizeNavigationPreview(id,preview,options,identifier);if(id==='tabs'&&options.orientation!==undefined)variant=options.orientation==='vertical'?'vertical':'default';}
+ // Shared overlay preview normalization.
+ const tree=visit(preview,true);
+ if(standardDataTable)delete tree.attrs['aria-selected'];
+ if(navigationComponent&&id==='tabs'||sharedGrid)delete tree.attrs['aria-selected'];
  if(id==='tree'&&options.state){const item=tree.children?.[0],states=Array.isArray(options.state)?options.state:[options.state];if(item){item.attrs['data-state']=states.join(' ');for(const state of ['selected','expanded','disabled'])if(states.includes(state))item.attrs['aria-'+state]='true';if(states.includes('disabled'))for(const child of item.children?.[0]?.children??[])if(child.tag==='button'){if(child.attrs.class===component.parts.label.selector.slice(1))child.attrs.disabled=true;else child.attrs['aria-disabled']='false';}}}
- if(id==='dialog')return {tag:'dialog',attrs:{class:'ds-dialog-host','aria-labelledby':identifier+'-title','aria-describedby':identifier+'-body',...(options.open?{open:true}:{})},children:[tree]};
+ if(dialogLike){
+  const supplied=attributes(options.attrs);delete tree.attrs.id;
+  return {tag:'dialog',attrs:{class:'ds-dialog-host'+(id==='drawer'?' ds-drawer-host':''),id:identifier+'-host',...(!supplied['aria-label']?{'aria-labelledby':identifier+'-title'}:{}),...(options.describeBody!==false?{'aria-describedby':identifier+'-body'}:{}),...supplied,...(id==='drawer'?{'data-side':variant??'end'}:{}),...(options.open?{open:true}:{})},children:[tree]};
+ }
  return tree;
 }
 function serialize(node){
@@ -187,9 +350,12 @@ function serialize(node){
 }
 /** Safe HTML from the same shared declarative implementation used by createComponent.
  * options: variant, state, idPrefix, text, slots, attrs and native control values.
- * button: size (small/medium/large), intent (normal/danger), href, icon, iconOnly,
- * label and loading. action-button accepts size, intent and emphasis independently
- * of its orientation variant. Four new button levels coexist with legacy recipes.
+ * button: size (small/medium/large), intent (normal/danger), href, iconName (Tabler), legacy icon, iconOnly,
+ * label and loading. action-button accepts size, intent, emphasis and loading independently
+ * of its orientation variant. tag/segmented-option accept iconName and pressed.
+ * avatar accepts name, src and initials; avatar-group accepts label and items.
+ * Native avatars bind image fallbacks automatically; HTML uses mountAvatarFallbacks.
+ * Four new button levels coexist with legacy recipes.
  * field/choice-field accept controlVariant: 'desktop' independently of validation state.
  * slots accept escaped text, declarative nodes, arrays or {component, options}.
  * Dialog returns a native dialog host: call showModal()/close() in the product.
@@ -209,15 +375,34 @@ export function createComponentFactory(pack,{document=globalThis.document}={}) {
  return (id,options={})=>createNative(model(snapshot,id,options,components),document);
 }
 function createNative(tree,document) {
- function create(node){
-  const element=document.createElement(node.tag);
+ function create(node,svg=false){
+  svg ||= node.tag==='svg';
+  const element=svg&&document.createElementNS?document.createElementNS('http://www.w3.org/2000/svg',node.tag):document.createElement(node.tag);
   for(const [name,value]of Object.entries(node.attrs??{}))element.setAttribute(name,value===true?'':value);
   if(node.text!==undefined)element.appendChild(document.createTextNode(String(node.text)));
-  for(const child of node.children??[])element.appendChild(create(child));
+  for(const child of node.children??[])element.appendChild(create(child,svg));
   if(node.attrs?.value!==undefined&&'value' in element)element.value=node.attrs.value;
+  if(node.attrs?.['data-avatar']==='true')mountAvatarFallbacks(element);
   return element;
  }
  return create(tree);
+}
+
+const avatarImageBindings=new WeakMap();
+/** Bind HTML-rendered avatar images. Initials remain available while loading or after failure. */
+export function mountAvatarFallbacks(root){
+ const images=[...(root?.matches?.('[data-avatar-image]')?[root]:[]),...(root?.querySelectorAll?.('[data-avatar-image]')??[])],owned=[];
+ for(const image of images){
+  if(avatarImageBindings.has(image))continue;
+  const initials=image.parentNode?.querySelector('.ds-avatar__initials');
+  const hidden=(node,value)=>{if(!node)return;node.hidden=value;if(value)node.setAttribute('hidden','');else node.removeAttribute('hidden');};
+  const ready=()=>{hidden(image,false);hidden(initials,true);},failed=()=>{hidden(image,true);hidden(initials,false);};
+  const loaded=()=>image.naturalWidth===0?failed():ready();
+  image.addEventListener('load',loaded);image.addEventListener('error',failed);
+  avatarImageBindings.set(image,true);owned.push([image,loaded,failed]);
+  if(image.complete&&image.naturalWidth>0)ready();else failed();
+ }
+ return {destroy(){for(const [image,loaded,failed]of owned){image.removeEventListener('load',loaded);image.removeEventListener('error',failed);avatarImageBindings.delete(image);}owned.length=0;}};
 }
 
 /** Controlled hierarchical list. Product callbacks own selection, expansion,
@@ -232,6 +417,7 @@ export function mountTree(pack,host,options={}, {document=globalThis.document}={
  const part=(tag,name)=>{const node=document.createElement(tag);node.setAttribute('class',component.parts[name].selector.slice(1));return node;};
  const attr=(node,name,value)=>{if(value===null||value===undefined)node.removeAttribute(name);else node.setAttribute(name,String(value));};
  const hidden=(node,value)=>{node.hidden=Boolean(value);if(value)node.setAttribute('hidden','');else node.removeAttribute('hidden');};
+ const setIcon=(node,name,fallback='')=>{node.textContent='';if(name!==undefined)node.appendChild(createIcon(name,{size:'small'},{document}));else node.textContent=String(fallback);};
  const listen=(node,type,handler)=>{node.addEventListener(type,handler);listeners.push([node,type,handler]);};
  const unlisten=node=>{for(let i=listeners.length-1;i>=0;i--)if(listeners[i][0]===node){node.removeEventListener(listeners[i][1],listeners[i][2]);listeners.splice(i,1);}};
  const selected=()=>new Set(config.selectedIds??[]),expanded=()=>new Set(config.expandedIds??[]);
@@ -280,16 +466,16 @@ export function mountTree(pack,host,options={}, {document=globalThis.document}={
  function updateRecord(record,item,ancestors,index,size){
   record.item=item;record.ancestors=ancestors;record.parentId=ancestors.at(-1)??null;
   const branch=Boolean(item.children?.length),open=branch&&expanded().has(item.id);attr(record.li,'aria-level',ancestors.length+1);attr(record.li,'aria-posinset',index+1);attr(record.li,'aria-setsize',size);attr(record.li,'aria-selected',selected().has(item.id));attr(record.li,'aria-disabled',item.disabled?'true':null);attr(record.li,'aria-expanded',branch?String(open):null);
-  hidden(record.fold,!branch);hidden(record.spacer,branch);hidden(record.group,!open);attr(record.fold,'aria-label',(open?'Luk ':'Åbn ')+item.label);record.fold.textContent=open?'▾':'▸';record.name.textContent=item.label;record.icon.textContent=item.icon??'';hidden(record.icon,item.icon===undefined||item.icon==='');record.meta.textContent=item.meta??'';hidden(record.meta,item.meta===undefined||item.meta==='');record.badge.textContent=item.badge??'';hidden(record.badge,item.badge===undefined||item.badge==='');attr(record.li,'aria-describedby',item.meta===undefined||item.meta===''?null:record.meta.getAttribute('id'));record.label.disabled=Boolean(item.disabled);attr(record.label,'aria-disabled',String(Boolean(item.disabled)));attr(record.row,'draggable',String(Boolean(item.draggable&&!item.disabled)));
+  hidden(record.fold,!branch);hidden(record.spacer,branch);hidden(record.group,!open);attr(record.fold,'aria-label',(open?'Luk ':'Åbn ')+item.label);setIcon(record.fold,open?'chevron-down':'chevron-right');record.name.textContent=item.label;setIcon(record.icon,item.iconName,item.icon??'');hidden(record.icon,item.iconName===undefined&&(item.icon===undefined||item.icon===''));record.meta.textContent=item.meta??'';hidden(record.meta,item.meta===undefined||item.meta==='');record.badge.textContent=item.badge??'';hidden(record.badge,item.badge===undefined||item.badge==='');attr(record.li,'aria-describedby',item.meta===undefined||item.meta===''?null:record.meta.getAttribute('id'));record.label.disabled=Boolean(item.disabled);attr(record.label,'aria-disabled',String(Boolean(item.disabled)));attr(record.row,'draggable',String(Boolean(item.draggable&&!item.disabled)));
   const wanted=new Set((item.actions??[]).map(action=>action.id));
   for(const [id,button]of record.actionNodes)if(!wanted.has(id)){unlisten(button);button.remove();record.actionNodes.delete(id);}
   let cursor=record.actions.firstChild;
-  for(const action of item.actions??[]){let button=record.actionNodes.get(action.id);if(!button){button=part('button','action');attr(button,'type','button');record.actionNodes.set(action.id,button);listen(button,'click',event=>{event.stopPropagation();const current=record.item.actions?.find(action=>action.id===button.getAttribute('data-tree-action'));if(!current||current.disabled)return;config.onAction?.(record.id,current.id,{item:record.item,event});});}attr(button,'data-tree-action',action.id);attr(button,'aria-label',action.label);attr(button,'title',action.label);attr(button,'aria-pressed',action.pressed===undefined?null:String(Boolean(action.pressed)));attr(button,'aria-disabled',String(Boolean(action.disabled)));button.disabled=Boolean(action.disabled);button.textContent=action.icon??action.label;if(button!==cursor)record.actions.insertBefore(button,cursor);cursor=button.nextSibling;}
+  for(const action of item.actions??[]){let button=record.actionNodes.get(action.id);if(!button){button=part('button','action');attr(button,'type','button');record.actionNodes.set(action.id,button);listen(button,'click',event=>{event.stopPropagation();const current=record.item.actions?.find(action=>action.id===button.getAttribute('data-tree-action'));if(!current||current.disabled)return;config.onAction?.(record.id,current.id,{item:record.item,event});});}attr(button,'data-tree-action',action.id);attr(button,'aria-label',action.label);attr(button,'title',action.label);attr(button,'aria-pressed',action.pressed===undefined?null:String(Boolean(action.pressed)));attr(button,'aria-disabled',String(Boolean(action.disabled)));button.disabled=Boolean(action.disabled);setIcon(button,action.iconName,action.icon??action.label);if(button!==cursor)record.actions.insertBefore(button,cursor);cursor=button.nextSibling;}
   hidden(record.actions,!wanted.size);paint(record);
  }
  function validateItems(items){
   if(!Array.isArray(items))throw new Error('Tree items must be an array.');const seen=new Set();let count=0;
-  const visit=(items,depth=0)=>{if(depth>64)throw new Error('Tree exceeds 64 levels.');for(const item of items){if(!item||typeof item.id!=='string'||!item.id||item.id.length>200||seen.has(item.id)||typeof item.label!=='string')throw new Error('Tree items need unique text ids and labels.');seen.add(item.id);if(++count>5000)throw new Error('Tree exceeds 5000 items.');for(const key of ['icon','meta','badge'])if(item[key]!==undefined&&!['string','number'].includes(typeof item[key]))throw new Error('Tree '+key+' must be text.');if(item.actions!==undefined&&!Array.isArray(item.actions))throw new Error('Tree actions must be an array.');const actions=new Set();for(const action of item.actions??[]){if(!action||typeof action.id!=='string'||!action.id||actions.has(action.id)||typeof action.label!=='string')throw new Error('Tree actions need unique ids and labels.');actions.add(action.id);}if(item.children!==undefined){if(!Array.isArray(item.children))throw new Error('Tree children must be an array.');visit(item.children,depth+1);}}};visit(items);return seen;
+  const visit=(items,depth=0)=>{if(depth>64)throw new Error('Tree exceeds 64 levels.');for(const item of items){if(!item||typeof item.id!=='string'||!item.id||item.id.length>200||seen.has(item.id)||typeof item.label!=='string')throw new Error('Tree items need unique text ids and labels.');seen.add(item.id);if(item.iconName!==undefined)iconModel(item.iconName);if(++count>5000)throw new Error('Tree exceeds 5000 items.');for(const key of ['icon','meta','badge'])if(item[key]!==undefined&&!['string','number'].includes(typeof item[key]))throw new Error('Tree '+key+' must be text.');if(item.actions!==undefined&&!Array.isArray(item.actions))throw new Error('Tree actions must be an array.');const actions=new Set();for(const action of item.actions??[]){if(!action||typeof action.id!=='string'||!action.id||actions.has(action.id)||typeof action.label!=='string')throw new Error('Tree actions need unique ids and labels.');if(action.iconName!==undefined)iconModel(action.iconName);actions.add(action.id);}if(item.children!==undefined){if(!Array.isArray(item.children))throw new Error('Tree children must be an array.');visit(item.children,depth+1);}}};visit(items);return seen;
  }
  function update(next={}){
   if(destroyed)throw new Error('The tree has been destroyed.');
@@ -304,7 +490,7 @@ export function mountTree(pack,host,options={}, {document=globalThis.document}={
   if(!records.has(focusedId)||!visible.includes(records.get(focusedId))||!navigable(records.get(focusedId))){focusedId=previousFocus?.ancestors.slice().reverse().find(id=>visible.includes(records.get(id))&&navigable(records.get(id)))??visible.find(record=>selected().has(record.id)&&navigable(record))?.id??visible.find(navigable)?.id??null;}
   if(!ids.has(anchorId))anchorId=null;applyStops();
   if(previousActive&&element.contains(previousActive)){const record=rowFor(previousActive);if(record&&!visible.includes(record))records.get(focusedId)?.li.focus();else if(document.activeElement!==previousActive)previousActive.focus?.({preventScroll:true});}
-  else if(hadTreeFocus&&focusedId)records.get(focusedId)?.li.focus();
+  else if(hadTreeFocus){if(focusedId)records.get(focusedId)?.li.focus();else element.focus();}
   return api;
  }
  listen(element,'focusin',event=>{const record=rowFor(event.target);if(record&&visible.includes(record)&&navigable(record)){focusedId=record.id;applyStops();}});

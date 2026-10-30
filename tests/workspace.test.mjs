@@ -129,6 +129,39 @@ test('workspace drafts survive project and theme changes; invalid edits cannot o
   remounted.destroy();
 });
 
+test('workspace tabs preserve mounted panels, unfinished controls and panel scroll',()=>{
+ const {element,state,destroy}=fixture();
+ const tab=id=>element.querySelector('[data-tab="'+id+'"]');
+ fire(tab('settings'),'click');
+ const title=field(element,'title'),panel=element.querySelector('#'+tab('settings').getAttribute('aria-controls'));
+ set(title,'Min ufærdige kladde');panel.scrollTop=85;
+ fire(tab('overview'),'click');assert.equal(panel.getAttribute('hidden'),'');
+ fire(tab('settings'),'click');
+ assert.equal(field(element,'title'),title);assert.equal(title.value,'Min ufærdige kladde');assert.equal(panel.scrollTop,85);
+ assert.equal(state.tab,'settings');assert.equal(element.querySelectorAll('[role="tabpanel"]').length,3);
+ destroy();
+});
+
+test('workspace validation survives theme changes and stays attached to the correct project', () => {
+  let mounted = fixture();
+  fire(mounted.element.querySelector('[data-tab="settings"]'), 'click');
+  set(field(mounted.element, 'title'), ''); fire(mounted.element.querySelector('form'), 'submit');
+  const state = mounted.state; mounted.destroy();
+  mounted = fixture('midnight-editorial', state);
+  assert.equal(field(mounted.element, 'title').getAttribute('aria-invalid'), 'true');
+  fire(mounted.element.querySelector('[data-project="atlas"]'), 'click');
+  assert.equal(field(mounted.element, 'title').getAttribute('aria-invalid'), null);
+  fire(mounted.element.querySelector('[data-project="kyst"]'), 'click');
+  assert.equal(field(mounted.element, 'title').getAttribute('aria-invalid'), 'true');
+  set(field(mounted.element, 'title'), 'Rettet navn');
+  mounted.destroy(); mounted = fixture('fjordside', state);
+  assert.equal(field(mounted.element, 'title').getAttribute('aria-invalid'), null, 'validation uses the current draft');
+  fire(action(mounted.element, 'reset-project'), 'click');
+  assert.equal(field(mounted.element, 'title').value, state.projects[0].title);
+  assert.equal(field(mounted.element, 'title').getAttribute('aria-invalid'), null);
+  mounted.destroy();
+});
+
 test('saving a renamed and completed project keeps that project visible and focused', () => {
   const { element, state, document, destroy } = fixture();
   set(field(element, 'search'), 'Kyst');

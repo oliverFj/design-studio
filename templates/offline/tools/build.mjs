@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { buildStamp } from '../../../tools/offline-checks.mjs';
+import {TABLER_LICENSE} from '../../../core/icons.mjs';
 
 export async function buildHTML(root) {
   const bundle = await build({
@@ -20,7 +21,7 @@ export async function buildHTML(root) {
   const script = bundle.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
   const stamp = await buildStamp(root, [...Object.keys(bundle.metafile.inputs), 'src/index.html', 'src/styles.css', 'design/design.css', 'package.json', 'tools/build.mjs', 'design/tools/offline-checks.mjs']);
   return template
-    .replace('</head>', () => stamp + '\n</head>')
+    .replace('</head>', () => stamp + '\n<script type="text/plain" id="tabler-license">'+TABLER_LICENSE+'</script>\n</head>')
     .replace('<link rel="stylesheet" href="./styles.css">', () => '<style>' + css + '</style>')
     .replace('<script type="module" src="./app.mjs"></script>', () => '<script>' + script + '</script>');
 }

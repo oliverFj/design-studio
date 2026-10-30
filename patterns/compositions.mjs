@@ -51,12 +51,13 @@ export function mountComposition(theme, id, {
   };
   const field = (key, label, value, options = {}) => component('field', { idPrefix: prefix + '-' + key, label, value, hint: '', ...options });
   const button = (text, action, options = {}) => component('button', { text, attrs: { 'data-action': action }, ...options });
-  const status = component('text', { text: '', variant: 'small', attrs: { role: 'status', 'aria-live': 'polite' } });
-  const notify = message => { status.textContent = message; announce(message); onChange(state); };
+  const status = component('text', { text: state.message ?? '', variant: 'small', attrs: { role: 'status', 'aria-live': 'polite' } });
+  const notify = message => { state.message = message; status.textContent = message; announce(message); onChange(state); };
 
   if (id === 'form') {
     const host = element('div', 'composition-form'); root.append(host, status);
-    function render(errors = {}, saved = false) {
+    function render(errors = state.errors ?? {}, saved = state.confirmed ?? false) {
+      state.errors = errors; state.confirmed = saved;
       const form = element('form'); form.noValidate = true;
       const name = field('name', 'Navn', state.draft.name, { required: true, error: errors.name || '', hint: 'Et navn, der er nemt at genkende.' });
       const email = field('email', 'E-mail', state.draft.email, { type: 'email', required: true, error: errors.email || '', hint: 'Brug en adresse, du kan kontaktes på.' });
@@ -67,18 +68,23 @@ export function mountComposition(theme, id, {
       const content = [name, email, checkbox, actions];
       if (saved) content.push(component('alert', { slots: { title: 'Gemt i eksemplet', body: 'Indstillingerne bevares, mens du skifter tema. Ingen fil er skrevet.' } }));
       form.append(card('Indstillinger', [stack(...content)]));
-      name.querySelector('input').addEventListener('input', event => { state.draft.name = event.target.value; });
-      email.querySelector('input').addEventListener('input', event => { state.draft.email = event.target.value; });
-      checkbox.querySelector('input').addEventListener('change', event => { state.draft.notifications = event.target.checked; });
+      const edited = () => {
+        if (!state.confirmed) return;
+        state.confirmed = false; form.querySelector('.ds-alert')?.remove();
+        notify('Der er ændringer, som ikke er gemt i eksemplet.');
+      };
+      name.querySelector('input').addEventListener('input', event => { state.draft.name = event.target.value; edited(); });
+      email.querySelector('input').addEventListener('input', event => { state.draft.email = event.target.value; edited(); });
+      checkbox.querySelector('input').addEventListener('change', event => { state.draft.notifications = event.target.checked; edited(); });
       form.addEventListener('submit', event => {
         event.preventDefault(); const invalid = {};
         if (!state.draft.name.trim()) invalid.name = 'Udfyld et navn.';
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.draft.email.trim())) invalid.email = 'Angiv en gyldig e-mailadresse.';
-        if (Object.keys(invalid).length) { render(invalid); host.querySelector('[aria-invalid="true"]')?.focus(); notify('Ret de markerede felter.'); return; }
+        if (Object.keys(invalid).length) { render(invalid, false); host.querySelector('[aria-invalid="true"]')?.focus(); notify('Ret de markerede felter.'); return; }
         state.saved = { ...state.draft, name: state.draft.name.trim(), email: state.draft.email.trim() };
         state.draft = { ...state.saved }; render({}, true); host.querySelector('[data-action="save-form"]').focus(); notify('Indstillingerne er gemt i eksemplet.');
       });
-      reset.addEventListener('click', () => { state.draft = { ...state.saved }; render(); host.querySelector('[data-action="reset-form"]').focus(); notify('De senest gemte værdier er gendannet.'); });
+      reset.addEventListener('click', () => { state.draft = { ...state.saved }; render({}, false); host.querySelector('[data-action="reset-form"]').focus(); notify('De senest gemte værdier er gendannet.'); });
       host.replaceChildren(form);
     }
     render();
