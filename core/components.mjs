@@ -19,6 +19,8 @@ export {mountCombobox,mountMultiselect} from './input-choices.mjs';
 export { animateStandard, STANDARD_MOTION } from './motion.mjs';
 import {COMPONENT_LIBRARY, canonicalComponentId, canonicalVariantId, canonicalStateId, canonicalPartId} from './library.mjs';
 import { BUTTON_SIZES } from './library.mjs';
+import {FJORDSIDE_SIGNATURE} from './signature-assets.mjs';
+import {contrastRatio} from './quality.mjs';
 import { iconModel, createIcon } from './icons.mjs';
 export { createIcon, renderIcon, ICON_NAMES, TABLER_VERSION } from './icons.mjs';
 
@@ -65,6 +67,7 @@ function model(pack,id,options,components,depth=0){
  if(depth>12)throw new Error('Component composition exceeds maximum depth 12.');
  if(pack.schemaVersion===2)id=canonicalComponentId(id);
  const component=components[id];if(!component)throw new Error('Unknown shared component: '+id);
+ if(id==='signature'&&options.name!==undefined&&!String(options.name).trim())throw new Error('Signature requires a non-empty name.');
  const standardContent=['avatar','avatar-group'].includes(id)&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
  const sharedFeedback=['spinner','progress','skeleton','toast','empty-state'].includes(id)&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
  const sharedFileChoice=id==='file-upload'&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
@@ -139,7 +142,7 @@ function model(pack,id,options,components,depth=0){
    else throw new Error('Expected text or declarative nodes in component slot '+part);
   }
   if(!tags.has(node.tag))throw new Error('Unsupported component tag: '+node.tag);
-  if(root&&options.text!==undefined&&id!=='action-button'&&!(id==='button'&&(options.icon!==undefined||options.iconName!==undefined||slots.icon!==undefined||options.iconOnly||loading))&&!(['tag','segmented-option'].includes(id)&&options.iconName!==undefined)){node.text=String(options.text);delete node.children;}
+  if(root&&options.text!==undefined&&id!=='action-button'&&id!=='signature'&&!(id==='button'&&(options.icon!==undefined||options.iconName!==undefined||slots.icon!==undefined||options.iconOnly||loading))&&!(['tag','segmented-option'].includes(id)&&options.iconName!==undefined)){node.text=String(options.text);delete node.children;}
   const suppliedAttrs={...node.attrs,...(root&&!dialogLike?options.attrs:{})};
   if(id==='action-button'&&Object.hasOwn(suppliedAttrs,'src'))throw new Error('Unsupported component attribute: src');
   const attrs=attributes(suppliedAttrs);
@@ -195,6 +198,28 @@ function model(pack,id,options,components,depth=0){
    if(part==='progress'&&!loading)attrs.hidden=true;
   }
   if(root&&id==='link'&&options.href!==undefined)attrs.href=safeURL(options.href);
+  if(id==='signature'){
+   const identity=options.identity===undefined?null:options.identity==='fjordside'?FJORDSIDE_SIGNATURE:null;
+   if(options.identity!==undefined&&!identity)throw new Error('Unknown signature identity: '+options.identity);
+   if(root){
+    node.tag='a';
+    attrs.href=safeURL(options.href??identity?.href??attrs.href);
+    if(identity)attrs['data-identity']='fjordside';
+    if(unavailable){node.tag='span';delete attrs.href;attrs.role='link';attrs['aria-disabled']='true';attrs.tabindex='-1';}
+   }
+   if(part==='name')node.text=String(options.name??identity?.name??node.text);
+   if(part==='logo'&&(options.logoSrc||identity)){
+    let src=options.logoSrc;
+    if(!src){
+     const colors=resolveTokens(pack),background=colors[['quiet','compact'].includes(variant)?'color.background.canvas':'color.background.control'];
+     const backgrounds=[background,colors['color.action.neutral.hover.surface'],colors['color.action.neutral.active.surface']];
+     const tone=options.logoTone??['ink','paper'].sort((a,b)=>Math.min(...backgrounds.map(bg=>contrastRatio(a==='ink'?'#26221e':'#edeae3',bg)??0))-Math.min(...backgrounds.map(bg=>contrastRatio(b==='ink'?'#26221e':'#edeae3',bg)??0))).at(-1);
+     if(!Object.hasOwn(identity.logos,tone))throw new Error('Unknown signature logo tone: '+tone);
+     src=identity.logos[tone];
+    }
+    node.tag='img';attrs.src=safeURL(src,true);attrs.alt='';delete attrs['aria-hidden'];delete node.text;delete node.children;
+   }
+  }
   if(id==='image'&&part==='media'){
    attrs.src=safeURL(options.src??attrs.src??createImageExamples(pack)[0].src,true);
    if(options.alt!==undefined)attrs.alt=String(options.alt);

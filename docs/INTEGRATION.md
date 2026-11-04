@@ -2,7 +2,9 @@
 
 Følg [agentarbejdsgangen](AGENT-WORKFLOW.md) for rækkefølge, valg af komponenter og proportional kontrol. Denne guide beskriver API og integration; produktets egne anvisninger ejer skærme og funktioner.
 
-API'et beskriver bibliotek 3.4.1 og de 60 implementerede roller i det aftalte katalog. `COMPONENT_COVERAGE` viser den relevante runtimeindgang; almindelig komponentmarkup forbinder ikke automatisk en kompleks controller. Brug produktets faktiske filstier fra `design-studio.project.json`.
+API'et beskriver bibliotek 3.5.0 og de 61 implementerede roller i det aftalte katalog. `COMPONENT_COVERAGE` viser den relevante runtimeindgang; almindelig komponentmarkup forbinder ikke automatisk en kompleks controller. Brug produktets faktiske filstier fra `design-studio.project.json`.
+
+Brug [den fælles signaturkomponent](SIGNATURE.md), når et produkt skal krediteres med Fjordside-logo og Oliver Fjordside i Platypi. [Onlinevejledningen](WEBSITE-SHOWCASE.md) beskriver opdatering og udgivelse af Design Studio på hjemmesiden.
 
 ## Tilknyt og synkronisér
 

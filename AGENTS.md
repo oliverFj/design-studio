@@ -39,3 +39,5 @@ Ved biblioteksændringer: kontrollér de berørte roller i alle medfølgende tem
 Format 1 kan fortsat læses. Migration er eksplicit med `migrate FILE --out NEW_FILE`; bevar originalen og gennemgå tidligere indvendige afstande, så format 2 ikke giver dobbelt padding.
 
 Ved almindelige iterationer opdateres dokumentation kun efter brugerens ønske eller ved konkret væsentlig teknisk risiko. Når dokumentation bestilles, beskriv den aktuelle implementering, fjern forældede regler og undgå løbende sessionshistorik. Lever kort på dansk med ændring, faktisk kontrol og væsentlige begrænsninger.
+
+- **Projekter på Olivers hjemmeside:** Se [docs/WEBSITE-SHOWCASE.md](docs/WEBSITE-SHOWCASE.md) for projektregistrering, logolinks og status på screenshot- og produktkortworkflowet.

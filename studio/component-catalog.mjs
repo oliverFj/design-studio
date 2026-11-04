@@ -34,7 +34,7 @@ export function renderComponentCatalog(pack,{components,state,selected,variantFo
   if(id==='file-upload'&&!condition)return renderFileExample(pack,prefix,render,variant);
   if(id==='data-table'&&!condition)return renderDataTableExample(pack,prefix,render);
   if(id==='data-grid'&&!condition)return renderDataGridExample(pack,prefix,render);
-  return render(id,{variant,idPrefix:prefix,open:id==='dialog',...(condition&&condition!=='normal'?{state:condition}:{}),...(id==='button'&&condition?{text:'Gem'}:{}),...(id==='button'&&pack.schemaVersion===2?{size:state.buttonSize,intent}:{}),...(id==='button'&&condition==='loading'?{loading:true}:{})});
+  return render(id,{...(id==='signature'?{identity:'fjordside'}:{}),variant,idPrefix:prefix,open:id==='dialog',...(condition&&condition!=='normal'?{state:condition}:{}),...(id==='button'&&condition?{text:'Gem'}:{}),...(id==='button'&&pack.schemaVersion===2?{size:state.buttonSize,intent}:{}),...(id==='button'&&condition==='loading'?{loading:true}:{})});
  };
  const cards=Object.entries(components).map(([id,component])=>{
   const variants=catalogVariants(pack,id,component),samples=[...variants];

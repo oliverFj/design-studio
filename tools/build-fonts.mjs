@@ -1,7 +1,6 @@
 import {readFile,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {validatePackage} from '../core/engine.mjs';
-import {PUBLIC_THEME_IDS} from './public-themes.mjs';
 
 // Offline regeneration from the reviewed webfonts and their original licenses.
 // manifest.json pins the exact upstream files and records Platypi conversion.
@@ -40,7 +39,7 @@ for(const [id,family]of Object.entries(manifest.families)){
  fontAssets.push({id:'license-'+id,name:family.family+' · OFL-licens',fileName:id+'-OFL.txt',mimeType:'text/plain',data:license.toString('base64'),description:'Uændret original SIL Open Font License, som følger fontfilerne.'});
  assetsByFamily[id]=fontAssets;
 }
-for(const id of PUBLIC_THEME_IDS){
+for(const id of Object.keys(families)){
  const file=new URL('packages/'+id+'.json',root),theme=JSON.parse(await readFile(file,'utf8'));
  const body=id.startsWith('castle-studio')?'Nunito, system-ui, sans-serif':sans;
  const heading=id==='fjordside'?'Platypi, Georgia, serif':['atelier','midnight-editorial'].includes(id)?serif:'{typography.font.body}';

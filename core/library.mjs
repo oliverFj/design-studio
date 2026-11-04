@@ -1,6 +1,6 @@
 /** Project-agnostic component anatomy and semantic defaults. Visual themes own appearance. */
 import {DEFAULT_SCALE_TOKENS,TOKEN_NAME_ALIASES} from './scales.mjs';
-export const LIBRARY_VERSION='3.4.2';
+export const LIBRARY_VERSION='3.5.0';
 export { LAYOUT_PROFILES } from './layout.mjs';
 function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
 // Keep one-line desktop controls at 32px without clipping larger type or wrapped labels.
@@ -1469,6 +1469,29 @@ export const COMPONENT_LIBRARY=freeze({
       current: { description: 'Aktuelt navigationsmål med aria-current.', styles: { fontWeight: '{typography.weight.heading}', textDecoration: 'underline' } }
     },
     preview: { tag: 'a', part: 'root', attrs: { href: '#indhold' }, text: 'Læs mere' }
+  },
+  "signature": {
+    name:'Signatur',description:'Et link med afsenderens logo og navn, tilpasset produktets tema.',
+    usage:'Brug til afsenderkreditering i header, footer, sidepanel eller Om-visning. Angiv name, href og logoSrc. En dokumenteret afsenderidentitet kan vælges gennem identity. Produktet ejer placering. Bevar navn, logoproportioner og frizone; vælg ikke signaturen som produktets primære handling.',
+    composes:[],
+    parts:{
+      root:{selector:'.ds-signature',styles:{display:'inline-flex',alignItems:'center',justifyContent:'center',gap:'max(12px, {space.component.gap})',boxSizing:'border-box',minHeight:'44px',minWidth:'0',maxWidth:'100%',padding:'max(12px, {space.component.paddingCompact}) max(12px, {space.component.padding})',border:'{border.width.default} solid {color.border.field}',borderRadius:'{radius.control}',backgroundColor:'{color.background.control}',color:'{color.text.primary}',textDecoration:'none',cursor:'pointer'}},
+      logo:{selector:'.ds-signature__logo',styles:{display:'block',width:'24px',height:'24px',flex:'0 0 auto',objectFit:'contain'}},
+      name:{selector:'.ds-signature__name',styles:{fontFamily:'"DS Signature Platypi", Platypi, Georgia, serif',fontSize:'16px',fontWeight:'400',letterSpacing:'-0.024em',lineHeight:'1.4',overflowWrap:'anywhere',minWidth:'0'}}
+    },
+    variants:{
+      default:{description:'Indrammet signatur til header og selvstændige områder.',styles:{}},
+      quiet:{description:'Diskret signatur uden ramme til footer eller sidepanel.',styles:{borderColor:'transparent',backgroundColor:'transparent'}},
+      compact:{description:'Mindre typografi og logo til smalle paneler; klikfladen bevares.',styles:{gap:'max(10px, {space.component.gap})',padding:'max(10px, {space.component.paddingCompact})'},parts:{logo:{styles:{width:'20px',height:'20px'}},name:{styles:{fontSize:'14px'}}}},
+      stacked:{description:'Logo over navn til en centreret Om-visning eller footer.',styles:{flexDirection:'column',gap:'max(14px, {space.component.gap})',padding:'max(14px, {space.component.padding})'},parts:{logo:{styles:{width:'28px',height:'28px'}},name:{styles:{textAlign:'center'}}}}
+    },
+    states:{
+      hover:{description:'Synlig feedback på linket.',styles:{backgroundColor:'{color.action.neutral.hover.surface}',color:'{color.action.neutral.hover.text}'}},
+      active:{description:'Linket aktiveres.',styles:{backgroundColor:'{color.action.neutral.active.surface}',color:'{color.action.neutral.active.text}'}},
+      focus:{description:'Synligt tastaturfokus.',styles:{outline:'{border.width.focus} solid {color.focus}',outlineOffset:'{border.offset.focus}'}},
+      disabled:{description:'En utilgængelig signatur har ingen destination eller tabstop.',styles:{cursor:'not-allowed',opacity:'{opacity.disabled}'}}
+    },
+    preview:{tag:'a',part:'root',variant:'default',attrs:{href:'#afsender'},children:[{tag:'span',part:'logo',attrs:{'aria-hidden':'true'},text:'◇'},{tag:'span',part:'name',text:'Afsendernavn'}]}
   },
   "navigation": {
     name: 'Navigation', description: 'Navngivet navigation med en liste af links.',
@@ -5152,7 +5175,7 @@ export const canonicalPartId=(id,key)=>PART_ALIASES[canonicalComponentId(id)]?.[
  * kept beside the canonical roles so planned work never becomes fake previews
  * or a separate component library. Update this contract with new runtime roles.
  */
-const NATIVE_COMPONENTS=new Set(['link','navigation','button','input','field','select','checkbox','dialog','tag','radio','switch','choice-field','toolbar','action-button','segmented-option','segmented-control','range-field','scroll-area','textarea','number-input','field-group','accordion','breadcrumb','pagination','date-picker','time-picker','progress']);
+const NATIVE_COMPONENTS=new Set(['signature','link','navigation','button','input','field','select','checkbox','dialog','tag','radio','switch','choice-field','toolbar','action-button','segmented-option','segmented-control','range-field','scroll-area','textarea','number-input','field-group','accordion','breadcrumb','pagination','date-picker','time-picker','progress']);
 const COMPONENT_CONTROLLERS={tree:'mountTree',menubar:'mountMenuControls',menu:'mountMenuControls','menu-item':'mountMenuControls',tabs:'mountTabs',tooltip:'mountTooltip',popover:'mountPopover',drawer:'mountDrawer',dialog:'mountDialog',combobox:'mountCombobox',multiselect:'mountMultiselect',toast:'mountToast','file-upload':'mountFileUpload','data-table':'mountDataTable','data-grid':'mountDataGrid'};
 const PLANNED_COMPONENTS={};
 export const COMPONENT_COVERAGE=freeze({

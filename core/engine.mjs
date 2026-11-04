@@ -7,6 +7,7 @@ import { generateLayoutCSS, generateScrollbarCSS } from './layout.mjs';
 import { BUTTON_COMPATIBILITY_VARIANTS, BUTTON_SIZES, BUTTON_DANGER_VARIANTS } from './library.mjs';
 import { generateIconCSS, ICON_NAMES } from './icons.mjs';
 import { generatePreferenceCSS } from './preferences.mjs';
+import {SIGNATURE_FONT_CSS} from './signature-assets.mjs';
 
 const own = (object, key) => Object.hasOwn(object, key);
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -555,7 +556,7 @@ function fontFaceRules(pack) {
 /** Generate local font faces without adopting a theme’s component styles. */
 export function generateFontCSS(pack) {
   assertValid(pack);
-  return fontFaceRules(pack).join("\n\n");
+  return [...fontFaceRules(pack),...(pack.schemaVersion===2?[SIGNATURE_FONT_CSS]:[])].join("\n\n");
 }
 
 /** Generate scoped component CSS. Recipes cannot inject selectors or external resources. */
@@ -565,7 +566,7 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
   const sourceVersion=pack.schemaVersion;
   pack=effectivePackage(pack);
   const resolved = resolveUnchecked(pack.tokens, []);
-  const fontRules = fontFaceRules(pack);
+  const fontRules = [...fontFaceRules(pack),...(sourceVersion===2?[SIGNATURE_FONT_CSS]:[])];
   const rules = [`/* Design Studio: ${pack.id}, schema ${sourceVersion}${sourceVersion===2?' / library '+LIBRARY_VERSION:''} */`, ...fontRules, `${scope} {`,
     ...Object.entries(resolved).map(([id, value]) => `  ${cssVariableName(id)}: ${value};`), ...(sourceVersion===2 ? ['  color-scheme: '+(contrastRatio('#ffffff', resolved['color.background.canvas']) > contrastRatio('#000000', resolved['color.background.canvas']) ? 'dark' : 'light')+';'] : []), '}'];
   function emit(selector, styles) {

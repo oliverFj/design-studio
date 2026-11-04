@@ -8430,6 +8430,263 @@
             }
           },
           "additionalProperties": false
+        },
+        "signature": {
+          "type": "object",
+          "properties": {
+            "parts": {
+              "type": "object",
+              "properties": {
+                "root": {
+                  "$ref": "#/$defs/appearancePart"
+                },
+                "logo": {
+                  "$ref": "#/$defs/appearancePart"
+                },
+                "name": {
+                  "$ref": "#/$defs/appearancePart"
+                }
+              },
+              "additionalProperties": false
+            },
+            "variants": {
+              "type": "object",
+              "properties": {
+                "default": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "logo": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "name": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "quiet": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "logo": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "name": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "compact": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "logo": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "name": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "stacked": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "logo": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "name": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "states": {
+              "type": "object",
+              "properties": {
+                "hover": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "logo": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "name": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "active": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "logo": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "name": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "focus": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "logo": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "name": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "disabled": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "logo": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "name": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false

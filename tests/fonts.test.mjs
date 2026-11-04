@@ -79,7 +79,7 @@ test('theme font CSS is offline and uses WOFF2; decorative system names remain f
  for(const id of PUBLIC_THEME_IDS){
   const pack=resolveThemeMode(theme(id),'light'),css=generateCSS(pack);
   const rules=css.match(/@font-face\s*\{[^}]+\}/g)??[];
-  assert.equal(rules.length,pack.brand.assets.filter(asset=>asset.font).length);
+  assert.equal(rules.length,pack.brand.assets.filter(asset=>asset.font).length+1);
   for(const rule of rules){assert.match(rule,/data:font\/woff2;base64,/);assert.match(rule,/format\("woff2"\)/);assert.doesNotMatch(rule,/https?:\/\//);}
  }
 });

@@ -2,7 +2,7 @@
 
 Design Studio har et projektagnostisk komponentbibliotek. En komponent navngives efter sin funktion og opbygning. Temaer giver den et visuelt udtryk; produktet leverer indhold og adfærd. Et startsæts oprindelse bestemmer aldrig bibliotekets anvendelse.
 
-Bibliotek 3.4.1 dækker de 60 roller i det aftalte katalog. Målet er robuste fælles byggesten, forskellige temaudtryk og en standard, som agenter kan videreføre mellem sessioner. Kataloget er afgrænset; nye produktbehov kan stadig kræve nye fælles roller.
+Bibliotek 3.5.0 dækker de 61 roller i det aftalte katalog. Målet er robuste fælles byggesten, forskellige temaudtryk og en standard, som agenter kan videreføre mellem sessioner. Kataloget er afgrænset; nye produktbehov kan stadig kræve nye fælles roller.
 
 ## Faglige kilder
 
@@ -139,7 +139,7 @@ Disse regler og automatiske prøver er afgrænset understøttelse. De er ikke en
 
 Tabler Icons 3.50.0 er den fælles SVG-standard. Outline bruger samme geometri og stregtykkelse; farven følger den aktuelle tekstfarve. Et ikon bestemmer ikke klikfladen, og ikonknapper har et forståeligt tilgængeligt navn. Kun registret med det anvendte udvalg distribueres sammen med MIT-licensen. Brandoriginaler erstattes ikke af generiske symboler.
 
-`COMPONENT_COVERAGE` beskriver de 60 implementerede roller i 3.4.1 uden resterende planlagte roller i det aftalte katalog. Den skelner mellem statisk indhold/layout, native adfærd og fælles controllere med deres faktiske indgange. Metadata beskriver denne leverance; de er ikke en tilgængelighedsgodkendelse eller dækning af enhver tænkelig komponenttype.
+`COMPONENT_COVERAGE` beskriver de 61 implementerede roller i 3.5.0 uden resterende planlagte roller i det aftalte katalog. Den skelner mellem statisk indhold/layout, native adfærd og fælles controllere med deres faktiske indgange. Metadata beskriver denne leverance; de er ikke en tilgængelighedsgodkendelse eller dækning af enhver tænkelig komponenttype.
 
 ## Indhold, formularer og overlays
 

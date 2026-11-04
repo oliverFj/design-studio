@@ -85,7 +85,7 @@ test('init builds a standalone offline app and source edits can be rebuilt', asy
   assert.match(await fs.readFile(path.join(project, 'src/app.mjs'), 'utf8'), /createProjectFile/);
   assert.ok(await fs.stat(path.join(project, 'design/runtime/files.mjs')));
   const builder = await fs.readFile(new URL('../templates/offline/tools/build.mjs', import.meta.url), 'utf8');
-  assert.equal(await fs.readFile(path.join(project, 'tools/build.mjs'), 'utf8'), builder.replace("'../../../tools/offline-checks.mjs'", "'../design/tools/offline-checks.mjs'").replace("'../../../core/icons.mjs'", "'../design/runtime/icons.mjs'"));
+  assert.equal(await fs.readFile(path.join(project, 'tools/build.mjs'), 'utf8'), builder.replace("'../../../tools/offline-checks.mjs'", "'../design/tools/offline-checks.mjs'").replace("'../../../core/icons.mjs'", "'../design/runtime/icons.mjs'").replace("'../../../core/signature-assets.mjs'", "'../design/runtime/signature-assets.mjs'"));
   const sourceFile = path.join(project, 'src/app.mjs');
   await fs.appendFile(sourceFile, '\ndocument.title = "Rebuilt offline app";\n');
   const rebuilt = await buildHTML(project);

@@ -66,4 +66,6 @@ npm run showcase:build
 
 Dette eksporterer en separat webdemo til `artifacts/showcase/` med offentlige temaer, komponenter, designmønstre, manifest og licensfiler. Hele mappen leveres samlet gennem et website. Showcasen bruger browsermoduler og er beregnet til webhosting; den selvstændige offline-editor leveres fra rodens `index.html`.
 
-Til en anden eksportmappe bruges `node tools/build-showcase.mjs --out DIRECTORY`. På den tilknyttede hjemmeside køres `npm run sync:design-studio` fra hjemmesidens faktiske projektmappe og derefter hjemmesidens normale build. Eksport og build offentliggør ikke automatisk hjemmesiden.
+Til en anden eksportmappe bruges `node tools/build-showcase.mjs --out DIRECTORY`. Til den fulde Studio-udgave uden gemning og eksport bruges `node tools/build-showcase.mjs --studio --out DIRECTORY`. Den bygges fra editorens faktiske interface, og besøgende kan eksperimentere i deres egen browser.
+
+Den tilknyttede hjemmeside bruger den fulde udgave. Kør `npm run sync:design-studio`, `npm run build:production` og `npm run deploy:production` fra hjemmesidens projektmappe, når en onlineopdatering er bestilt. Eksport og build offentliggør ikke automatisk hjemmesiden. Se [den samlede onlinevejledning](WEBSITE-SHOWCASE.md).

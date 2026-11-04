@@ -1,6 +1,5 @@
 import {readFile,writeFile} from 'node:fs/promises';
 import {validatePackage} from '../core/engine.mjs';
-import {PUBLIC_THEME_IDS} from './public-themes.mjs';
 
 // Authored identity anchors. Shared semantic mappings below never define markup.
 const identities={
@@ -56,7 +55,7 @@ function semantics(mode,neutralAction){
  return values;
 }
 const outputs=[];
-for(const id of PUBLIC_THEME_IDS){
+for(const id of Object.keys(identities)){
  const file=new URL('../packages/'+id+'.json',import.meta.url),theme=JSON.parse(await readFile(file,'utf8'));
  const [neutral,brand,paper,defaultMode,neutralAction,accent]=identities[id],light=semantics('light',neutralAction),dark=semantics('dark',neutralAction);
  theme.tokens={...theme.tokens,...palette(neutral,brand,paper,accent),...(defaultMode==='dark'?dark:light)};

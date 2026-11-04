@@ -8,7 +8,7 @@ Biblioteket bestemmer struktur, semantik og grundlayout. Temaet bestemmer farver
 
 ## Åbn Design Studio
 
-Dobbeltklik på **[index.html](index.html)** i systemmappen. Design Studio åbner direkte i din normale browser og fungerer offline. Der kræves ingen server, Windows-app, terminal eller installeret Node.js for at bruge den færdige fil. Alle otte medfølgende temaer er indbygget.
+Dobbeltklik på **[index.html](index.html)** i systemmappen. Design Studio åbner direkte i din normale browser og fungerer offline. Der kræves ingen server, Windows-app, terminal eller installeret Node.js for at bruge den færdige fil. Alle medfølgende temaer er indbygget.
 
 De medfølgende temaer har sammenhørende lyse og mørke farvetilstande. Farvetilstanden kan følge systemet eller vælges manuelt; det manuelle valg har forrang. Temafilen gemmer begge tilstande, mens en CSS-eksport gælder den valgte fremtoning. Ældre enkeltstående temaer bliver ikke automatisk konverteret.
 
@@ -47,7 +47,7 @@ Komponentstruktur redigeres i det fælles bibliotek, ikke i hvert tema. Padding 
 
 Temaet valideres før åbning og gemning. Ugyldige kladder kan redigeres, men ikke gemmes som gyldige temaer. **Hent CSS** under **Temaet** henter temaets genererede CSS. Når en hentet temafil er lagt tilbage i et produkt, opdateres produktets CSS og runtime med `sync`.
 
-Bibliotek 3.4.1 har 60 fælles roller og otte offentlige temaer med lyse og mørke tilstande. Hele det aftalte katalog er implementeret; dækningsoversigten har ingen resterende planlagte roller. Den skelner mellem statisk indhold/layout, native adfærd og fælles controllere. Det er dækning af dette katalog, ikke et løfte om alle komponenttyper eller en tilgængelighedscertificering.
+Bibliotek 3.5.0 har 61 fælles roller og en samling offentlige temaer med lyse og mørke tilstande. Temasamlingen udvides løbende, blandt andet når nye produkter udvikles; der er ikke et fast antal temaer. Hele det aftalte katalog er implementeret; dækningsoversigten har ingen resterende planlagte roller. Den skelner mellem statisk indhold/layout, native adfærd og fælles controllere. Det er dækning af dette katalog, ikke et løfte om alle komponenttyper eller en tilgængelighedscertificering.
 
 Kataloget omfatter nu også combobox, multivalg, native dato/tid, spinner, progress, skeleton, toast, tom tilstand, lokalt filvalg, datatabel og redigerbart datagrid. Datatabellen bevarer native tabelnavigation; datagrid har særskilt cellenavigation, markering, kladder og atomisk indsættelse. Produktet ejer data, forespørgsler, kommandoer og lagring. Knapfamilien har fire fremhævelser med særskilt størrelse og betydning; historiske varianter bevares til kompatibilitet.
 
@@ -99,7 +99,11 @@ Find først en eksisterende rolle. Tilføj om nødvendigt en variant eller en ny
 
 ## Web-showcase
 
-Showcasen bruger samme bibliotek, renderer og offentlige temaer. Den kræver ingen backend til tema- og komponentskift. I den tilknyttede hjemmeside køres `npm run sync:design-studio` før hjemmesidens normale build. Det eksporterer gennem `tools/build-showcase.mjs` til `public/design-studio`. Andre websites kan bruge `tools/build-showcase.mjs --out DIRECTORY`. Hjemmesidens projektside forklarer systemet og åbner demoen. Temaer redigeres i offline-editoren via index.html; showcasen er en separat demo til websites.
+[Den offentlige udgave](https://oliver.fjordside.dk/design-studio/index.html) viser hele Design Studio med samme interface og bibliotek som den lokale editor. Besøgende kan eksperimentere med temaer, tokens og brandguide, men kan ikke åbne eller gemme temafiler eller eksportere. Deres ændringer påvirker ingen produkter og forsvinder ved genindlæsning.
+
+Onlineudgaven er en bygget kopi og opdateres ikke af et lokalt build. [Onlinevejledningen](docs/WEBSITE-SHOWCASE.md) beskriver synkronisering, produktionsbuild og udgivelse fra hjemmesidens projektmappe. tools/build-showcase.mjs --studio --out DIRECTORY eksporterer den fulde offentlige udgave; uden --studio eksporteres den tidligere særskilte komponentdemo.
+
+[Signaturkomponenten](docs/SIGNATURE.md) giver produkter et tematilpasset link med Fjordside-logo og Oliver Fjordside i Platypi.
 
 ## Portabilitet og kontrolgrænser
 

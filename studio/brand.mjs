@@ -14,7 +14,7 @@ const slug = value => {const id=value.toLowerCase().normalize('NFKD').replace(/[
 const uniqueId = (items, base) => {let id=base,index=2;while(items.some(item=>item.id===id))id=base+'-'+index++;return id;};
 
 /** The guide edits the same package as tokens and recipes, without executable markup. */
-export function createBrandStudio(state, {escape:e, field, edited, render, notice, allowNavigation, download}) {
+export function createBrandStudio(state, {escape:e, field, edited, render, notice, allowNavigation, download, showcase=false}) {
   let selected={kind:'overview',id:null}, key=null, uploadTarget=null;
   const guide = () => state.pack.brand;
   const tokens = () => state.pack.schemaVersion === 2 ? { ...DEFAULT_TOKENS, ...state.pack.tokens } : state.pack.tokens;
@@ -61,7 +61,7 @@ export function createBrandStudio(state, {escape:e, field, edited, render, notic
     const heroLogo=valid&&primaryAsset?'<div class="brand-hero-mark" style="background:'+e(resolved[primary.background] || resolved['color.background.canvas'])+'"><img class="brand-hero-logo" src="'+e(dataURL(primaryAsset,resolved[primary.foreground] || resolved['color.text.primary']))+'" alt="'+e(primary.name)+'"></div>':'';
     const logos=brand.logos.map(logo=>{
       const asset=assets.get(logo.asset),background=resolved[logo.background] || resolved['color.background.canvas'],color=resolved[logo.foreground] || resolved['color.text.primary'];
-      return '<article class="brand-logo-card'+active('logos',logo.id)+'"><div class="brand-logo-surface" style="background:'+e(background || 'transparent')+';color:'+e(color || 'inherit')+'">'+(valid&&asset?'<img src="'+e(dataURL(asset,color))+'" alt="'+e(logo.name)+'">':'<span>Logo</span>')+'</div><div class="brand-logo-caption">'+pick('logos',logo.id,logo.name)+'<p>'+e(logo.usage)+'</p>'+(asset?'<button class="brand-link" type="button" data-brand-download="'+e(asset.id)+'">Hent original · '+e(asset.fileName)+'</button>':'')+'</div></article>';
+      return '<article class="brand-logo-card'+active('logos',logo.id)+'"><div class="brand-logo-surface" style="background:'+e(background || 'transparent')+';color:'+e(color || 'inherit')+'">'+(valid&&asset?'<img src="'+e(dataURL(asset,color))+'" alt="'+e(logo.name)+'">':'<span>Logo</span>')+'</div><div class="brand-logo-caption">'+pick('logos',logo.id,logo.name)+'<p>'+e(logo.usage)+'</p>'+(asset&&!showcase?'<button class="brand-link" type="button" data-brand-download="'+e(asset.id)+'">Hent original · '+e(asset.fileName)+'</button>':'')+'</div></article>';
     }).join('');
     return toolbar+'<div class="brand-document ds-scope"><header class="brand-hero">'+heroLogo+'<div>'+pick('overview',null,'Identitet')+'<h2>'+e(brand.name)+'</h2><p>'+e(brand.summary)+'</p></div></header>'+
       (brand.principles.length?'<section class="brand-principles" aria-label="Designprincipper">'+brand.principles.map(item=>'<article class="'+active('principles',item.id)+'">'+pick('principles',item.id,item.title)+'<p>'+e(item.description)+'</p></article>').join('')+'</section>':'')+
@@ -71,7 +71,7 @@ export function createBrandStudio(state, {escape:e, field, edited, render, notic
         (section.tokens.length?'<div class="brand-token-grid">'+section.tokens.map(id=>tokenSample(id,resolved)).join('')+'</div>':'')+
         (section.components.length?'<div class="brand-component-links">'+section.components.map(id=>'<button type="button" class="brand-link" data-brand-component="'+e(id)+'">Se '+e(components()[id]?.name || id)+'</button>').join('')+'</div>':'')+
         '<div class="brand-rule-columns">'+ruleList(section.dos,'Gør')+ruleList(section.donts,'Undgå')+'</div></section>').join('')+
-      '<section class="brand-section brand-resources"><h3>Originaler og ressourcer</h3><p>Disse filer følger med i designpakken. Download giver den originale fil.</p><div class="brand-resource-list">'+brand.assets.map(asset=>'<div class="brand-resource-row">'+pick('assets',asset.id,asset.name)+'<span>'+e(asset.fileName)+' · '+Math.round(asset.data.length*3/4/1024)+' KB</span><button type="button" class="brand-link" data-brand-download="'+e(asset.id)+'">Hent fil</button></div>').join('')+'</div></section>'+
+      '<section class="brand-section brand-resources"><h3>Originaler og ressourcer</h3><p>Disse filer følger med i designpakken.'+(showcase?'':' Download giver den originale fil.')+'</p><div class="brand-resource-list">'+brand.assets.map(asset=>'<div class="brand-resource-row">'+pick('assets',asset.id,asset.name)+'<span>'+e(asset.fileName)+' · '+Math.round(asset.data.length*3/4/1024)+' KB</span>'+(showcase?'':'<button type="button" class="brand-link" data-brand-download="'+e(asset.id)+'">Hent fil</button>')+'</div>').join('')+'</div></section>'+
       (brand.sources.length?'<section class="brand-section brand-sources"><h3>Grundlag og kilder</h3>'+brand.sources.map(source=>'<p><strong>'+e(source.title)+'</strong><span>'+e(source.location)+'</span></p>').join('')+'</section>':'')+'</div>';
   }
   function editField(property,label,value,{textarea=false}={}) {

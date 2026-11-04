@@ -9,6 +9,7 @@ import { LIBRARY_VERSION } from '../core/library.mjs';
 import { TABLER_LICENSE } from '../core/icons.mjs';
 import { PUBLIC_THEME_IDS } from './public-themes.mjs';
 import { COMPOSITIONS, PATTERN_FILES } from '../patterns/catalog.mjs';
+import {buildStudio} from './build-studio.mjs';
 
 const studio = fileURLToPath(new URL('../', import.meta.url));
 const outputIndex = process.argv.indexOf('--out');
@@ -17,14 +18,20 @@ const output = resolve(outputIndex >= 0 ? process.argv[outputIndex + 1] : join(s
 const themes = [];
 for (const id of PUBLIC_THEME_IDS) {
   const source = JSON.parse(await readFile(join(studio, 'packages', id + '.json'), 'utf8'));
+  if(source.id!==id)throw new Error(id+'.json: temaets id skal svare til filnavnet.');
   const theme = createTheme(source);
-  // Publish only the selected demo themes. Local source paths are editorial metadata.
+  // Publish the canonical collection. Local source paths are editorial metadata.
   if (theme.brand) theme.brand.sources = [];
+  theme.history = [];
   const validation = validatePackage(theme);
   if (!validation.valid) throw new Error(id + ': ' + validation.errors.join('\n'));
   getComponents(theme);
   themes.push(theme);
 }
+if(process.argv.includes('--studio')) {
+  await mkdir(output,{recursive:true});
+  await buildStudio({output:join(output,'index.html'),showcase:true,themes:themes.map(theme=>({key:theme.id,package:theme}))});
+} else {
 const browserImports = source => source.replace(/\.mjs(['"])/g, '.js$1');
 const compactJS = async source => (await transform(source,{loader:'js',minify:true,target:'es2022',legalComments:'none'})).code;
 const compactCSS = async source => (await transform(source,{loader:'css',minify:true,legalComments:'none'})).code;
@@ -36,7 +43,7 @@ for (const name of PATTERN_FILES) {
   await writeFile(join(output, 'patterns', name.replace('.mjs', '.js')), name.endsWith('.mjs')?await compactJS(browserImports(source)):await compactCSS(source), 'utf8');
 }
 await mkdir(join(output, 'core'), { recursive: true });
-for (const name of ['contract.mjs', 'library.mjs', 'quality.mjs', 'geometry.mjs', 'token-usage.mjs', 'engine.mjs', 'components.mjs', 'layout.mjs', 'panels.mjs', 'motion.mjs', 'menus.mjs','icons.mjs','scales.mjs','preferences.mjs','theme-modes.mjs','navigation.mjs','overlays.mjs','input-choices.mjs','feedback.mjs','uploads.mjs','data-table.mjs','data-grid.mjs']) {
+for (const name of ['contract.mjs', 'library.mjs', 'quality.mjs', 'geometry.mjs', 'token-usage.mjs', 'engine.mjs', 'components.mjs', 'signature-assets.mjs', 'layout.mjs', 'panels.mjs', 'motion.mjs', 'menus.mjs','icons.mjs','scales.mjs','preferences.mjs','theme-modes.mjs','navigation.mjs','overlays.mjs','input-choices.mjs','feedback.mjs','uploads.mjs','data-table.mjs','data-grid.mjs']) {
   const source = await readFile(join(studio, 'core', name), 'utf8');
   await writeFile(join(output, 'core', name.replace('.mjs', '.js')), await compactJS(browserImports(source)), 'utf8');
   await rm(join(output, 'core', name), { force: true });
@@ -72,4 +79,5 @@ await writeFile(join(output, 'manifest.json'), JSON.stringify({
   compositions: Object.entries(COMPOSITIONS).map(([id, item]) => ({ id, name: item.name, version: item.version, components: item.components })),
 }, null, 2) + '\n');
 console.log('Design Studio-showcase bygget: ' + output);
+}
 

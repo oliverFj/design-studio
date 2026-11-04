@@ -9,17 +9,17 @@ import {resolveTokens} from '../core/engine.mjs';
 
 // Exercise the real editor functions and event handlers; the test DOM does not
 // parse its HTML shell, so mount the small set of controls used by bind().
-async function editor(){
+async function editor({showcase=false}={}){
  const file=new URL('../studio/app.mjs',import.meta.url),source=readFileSync(file,'utf8');
  const exposed=source.replace(/startStudio\(\);\s*$/,'')+`
  render=()=>{};
  brandStudio.bind=()=>{};qualityStudio.bind=()=>{};
- download=(...args)=>globalThis.downloads.push(args);
- export const editorTest={state,model,tokenInspector,changeToken,bind,
+ if(!showcase)download=(...args)=>globalThis.downloads.push(args);
+ export const editorTest={state,model,tokenInspector,changeToken,bind,download,packageInspector,brandContent:()=>brandStudio.content(),
    chooseMode:value=>colorPreference.set(value),
    resetModel:()=>{readModel=null;},
    activeTheme};`;
- const result=await build({stdin:{contents:exposed,resolveDir:fileURLToPath(new URL('../studio/',import.meta.url)),sourcefile:'app.mjs'},bundle:true,write:false,format:'cjs',platform:'browser'});
+ const result=await build({stdin:{contents:exposed,resolveDir:fileURLToPath(new URL('../studio/',import.meta.url)),sourcefile:'app.mjs'},bundle:true,write:false,format:'cjs',platform:'browser',define:{__STUDIO_SHOWCASE__:JSON.stringify(showcase)}});
  const document=dom(),window=document.createElement('window');
  document.head=document.createElement('head');document.documentElement=document.createElement('html');document.documentElement.classList={add(){}};
  const root=document.createElement('div');root.setAttribute('id','app');document.body.append(root);
@@ -65,4 +65,14 @@ test('editor mode edits, inspector values and CSS export retain the selected mod
  assert.equal(pack.modes.light.tokens['color.background.canvas'].$value,'#f5f5f6');
  assert.equal(pack.modes.dark.tokens['color.background.canvas'].$value,darkCanvas);
  assert.equal(api.model().tokens['color.background.canvas'].$value,'#f5f5f6');
+});
+
+test('public studio allows theme experiments while omitting exports and blocking downloads',async()=>{
+ const {api,downloads}=await editor({showcase:true});
+ api.chooseMode('dark');api.changeToken('#181a25');
+ assert.equal(api.state.pack.modes.dark.tokens['color.background.canvas'].$value,'#181a25');
+ assert.doesNotMatch(api.packageInspector(),/id="download-css"/);
+ assert.doesNotMatch(api.brandContent(),/data-brand-download/);
+ api.download('theme.json','{}','application/json');
+ assert.equal(downloads.length,0);
 });

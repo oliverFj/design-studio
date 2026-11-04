@@ -490,7 +490,7 @@ test('canonical catalog and previews use project-agnostic anatomy without legacy
  assert.doesNotMatch(source,/Castle|Fjordside|byggeværktøj|fortælling|borg|tårn|murkrone|rumpanel|terracotta|Nunito|Alegreya|setParam|limitsFor/i);
  for(const id of ['action-button','caption','choice-field','metric-row'])assert.ok(COMPONENT_LIBRARY[id]);
  for(const id of ['tool-button','simulation-caption','brandSelect','stat-row'])assert.equal(Object.hasOwn(COMPONENT_LIBRARY,id),false);
- assert.equal(Object.keys(COMPONENT_LIBRARY).length,60);
+ assert.equal(Object.keys(COMPONENT_LIBRARY).length,61);
  assert.equal(Object.keys(DEFAULT_TOKENS).some(id=>id.startsWith('color.scene.')),false);
  assert.deepEqual(COMPONENT_LIBRARY['action-button'].preview.children.map(node=>node.part),['progress','icon','label','shortcut']);
 });

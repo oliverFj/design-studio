@@ -6,6 +6,7 @@ import { validatePackage } from '../core/engine.mjs';
 import { PUBLIC_THEME_IDS } from './public-themes.mjs';
 import { offlineIssues } from './offline-checks.mjs';
 import {TABLER_LICENSE} from '../core/icons.mjs';
+import {SIGNATURE_LICENSE} from '../core/signature-assets.mjs';
 import {dataModule} from './bundle-data.mjs';
 import {assertDeliverySize} from './delivery-size.mjs';
 
@@ -37,7 +38,7 @@ export async function buildWorkspaceHTML(root = studioRoot) {
     readFile(path.join(directory, 'styles.css'), 'utf8'),
   ]);
   const css = (await transform(styles,{loader:'css',minify:true,legalComments:'none'})).code;
-  const html = template.replace('</head>',()=>'<script type="text/plain" id="tabler-license">'+TABLER_LICENSE+'</script></head>')
+  const html = template.replace('</head>',()=>'<script type="text/plain" id="tabler-license">'+TABLER_LICENSE+'\n\n'+SIGNATURE_LICENSE+'</script></head>')
     .replace('<link rel="stylesheet" href="./styles.css">', () => '<style>' + css.replace(/<\/style/gi, '<\\/style') + '</style>')
     .replace('<script type="module" src="./boot.mjs"></script>', () => '<script>' + bundle.outputFiles[0].text.replace(/<\/script/gi, '<\\/script') + '</script>');
   const issues = offlineIssues(html);

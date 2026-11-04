@@ -6,6 +6,7 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {build} from 'esbuild';
+import {PUBLIC_THEME_IDS} from '../tools/public-themes.mjs';
 
 const execute=promisify(execFile),root=fileURLToPath(new URL('../',import.meta.url));
 
@@ -14,6 +15,8 @@ test('the exported showcase HTML and complete JavaScript graph resolve only to d
  const output=await mkdtemp(path.join(parent,'export with spaces-'));
  t.after(async()=>{assert.ok(path.resolve(output).startsWith(path.resolve(parent)+path.sep));await rm(output,{recursive:true,force:true});});
  await execute(process.execPath,[path.join(root,'tools/build-showcase.mjs'),'--out',output],{cwd:root,windowsHide:true});
+ const manifest=JSON.parse(await readFile(path.join(output,'manifest.json'),'utf8'));
+ assert.deepEqual(manifest.themes.map(theme=>theme.id),PUBLIC_THEME_IDS,'the export includes the complete discovered collection');
  const page=path.join(output,'index.html'),html=await readFile(page,'utf8');
  const attribute=(tag,name)=>tag.match(new RegExp('\\b'+name+'=["\']([^"\']+)["\']','i'))?.[1];
  const references=[];

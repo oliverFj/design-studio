@@ -2,7 +2,7 @@
 
 Denne vejledning er den fælles arbejdsgang fra produktstart til kontrolleret leverance. Produktets egne anvisninger bestemmer indhold, funktioner og arkitektur. Genbrug viden fra den aktuelle session; genlæs kun ændrede eller relevante dele.
 
-Bibliotek 3.4.1 leverer de 60 roller i det aftalte katalog på tværs af otte temaer og deres lyse/mørke tilstande. Brug dækningsoversigten til at skelne mellem indhold, native adfærd og en controller, der skal forbindes. Katalogets dækning er ikke en tilgængelighedscertificering eller et universelt komponentløfte.
+Bibliotek 3.5.0 leverer de 61 roller i det aftalte katalog på tværs af de medfølgende temaer og deres lyse/mørke tilstande. Temasamlingen er åben for nye produkttemaer og har ikke et fast antal. Brug dækningsoversigten til at skelne mellem indhold, native adfærd og en controller, der skal forbindes. Katalogets dækning er ikke en tilgængelighedscertificering eller et universelt komponentløfte.
 
 ## Find grundlaget
 
@@ -46,6 +46,8 @@ Lever som standard en selvstændig `index.html`, der kan åbnes via `file://` ud
 4. Importér `createComponent`, `createComponentFactory` eller `renderComponent` fra projektets kopierede runtime. Brug native controls og fælles dele. Registrér kun faktiske frameworkadaptere i konfigurationens `components` med verificerede `file` og `export`; direkte brug af runtime kræver ingen lokal adapter.
 
 Temaet må ikke erstatte display, struktur, positionering, padding, gap eller fokusmekanik. Justér tæthed gennem positive semantiske spacingtokens. Produktets CSS ejer kun sammensætningen; opret ikke lokale kopier af fælles komponentroller. Se [afstande og indlejrede flader](INTEGRATION.md#afstande-og-indlejrede-flader) frem for at genskabe deres regler i produktet.
+
+Ved personlig afsenderkreditering bruges [signature med Fjordside-identiteten](SIGNATURE.md). Vælg variant og placering efter produktet; bevar produktets eget brand.
 
 ## Forbind den faktiske adfærd
 
@@ -91,7 +93,7 @@ Brug ved lokal browserkontrol en bygget fil over en loopback-server, der kun uds
 
 Ved ændret filhåndtering: afprøv gemning, genåbning og afvisning af en ugyldig fil uden datatab. Doctor skal acceptere produktets aktuelle build. Rapportér kort ændringen, de udførte kontroller og væsentlige begrænsninger. Dokumentation konsolideres, når brugeren bestiller det; opret ikke løbende sessionsrapporter.
 
-For 3.4.1 er reel Windows-højkontrast, operativsystemets filvælger og det samlede direkte `file://`-forløb fortsat uden manuel verifikation. Faktiske Mac-/Linux-kørsler er heller ikke dokumenteret. Angiv den udførte kontrol præcist; lokale WOFF2-filer og en konfigureret CI-matrix erstatter ikke platform- og hjælpemiddelkontrol. Ved en systemleverance bruges [leveringspakkerne](PRODUCTION.md#leveringspakker-og-portabel-opsætning), som holder installerede afhængigheder og lokale filer ude af kildepakken.
+For 3.5.0 er reel Windows-højkontrast, operativsystemets filvælger og det samlede direkte `file://`-forløb fortsat uden manuel verifikation. Faktiske Mac-/Linux-kørsler er heller ikke dokumenteret. Angiv den udførte kontrol præcist; lokale WOFF2-filer og en konfigureret CI-matrix erstatter ikke platform- og hjælpemiddelkontrol. Ved en systemleverance bruges [leveringspakkerne](PRODUCTION.md#leveringspakker-og-portabel-opsætning), som holder installerede afhængigheder og lokale filer ude af kildepakken.
 
 ## Når selve systemet ændres
 
