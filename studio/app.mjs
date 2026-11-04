@@ -15,7 +15,8 @@ import { createThemeStorage } from './theme-storage.mjs';
 import { readJSONFile, downloadFile } from '../core/files.mjs';
 import { mountCompositionGallery, createGalleryState } from '../patterns/gallery.mjs';
 import {renderMotionView} from './motion.mjs';
-import {createCatalogState,renderComponentCatalog,bindComponentCatalog,catalogVariants} from './component-catalog.mjs';
+import {createCatalogState,bindComponentCatalog,catalogVariants} from './component-catalog.mjs';
+import {renderCatalogBrowser,bindCatalogBrowser,filterCatalog} from './catalog-browser.mjs';
 import {resolveThemeMode,createColorModePreference} from '../core/theme-modes.mjs';
 
 const root = document.querySelector('#app');
@@ -136,7 +137,7 @@ function componentsView() {
   const toolbar = '<div class="canvas-toolbar"><h2>Komponenter <span class="count">'+entries.length+'</span></h2><div class="segmented" aria-label="Visning"><button type="button" data-mode="catalog" class="'+(state.mode==='catalog'?'active':'')+'" aria-pressed="'+(state.mode==='catalog')+'">Bibliotek</button><button type="button" data-mode="example" class="'+(state.mode==='example'?'active':'')+'" aria-pressed="'+(state.mode==='example')+'">Samlet eksempel</button></div></div>';
   if (state.mode === 'example' && state.pack.schemaVersion === 2) return toolbar+'<div id="project-overview-host"></div><p class="help">Samme samlede eksempel som i web-showcasen. Prøv temaer, indstillinger og et nyt projekt her.</p>';
   if (state.mode === 'example') return toolbar+'<div class="example-stage ds-scope"><div class="example-width"><div class="example-header"><div><p class="preview-copy preview-muted">Din samling</p><h2 class="ds-heading">Næste gode idé</h2></div><span class="ds-badge" data-variant="default">Kladde</span></div>'+cardMarkup('example')+'<div class="ds-card" data-variant="default"><header class="ds-card__header"><h3 class="preview-title">Gør den til din</h3></header><div class="ds-card__body"><div class="example-fields">'+dsField('Titel','Min nye samling','example-title')+dsField('Beskrivelse','Noter og inspiration','example-description')+'</div></div><footer class="ds-card__footer">'+button('Gem samling')+button('Annuller','secondary')+'</footer></div></div></div><p class="help">Samme komponenter og indhold, uanset hvilket tema du vælger.</p>';
-  return toolbar+renderComponentCatalog(previewTheme(),{components:components(),state:catalogState,selected:state.component,variantFor});
+  return toolbar+renderCatalogBrowser(previewTheme(),{components:components(),state:catalogState,variantFor});
 }
 function componentInspector() {
   const id = state.component, source = components()[id];
@@ -217,7 +218,7 @@ function render() {
       },
     });
   }
-  renderedView = state.view + ':' + state.mode;
+  renderedView = state.view + ':' + state.mode + (state.view==='components'&&state.mode==='catalog'?':'+('overview:'+(catalogState.layout??'cards')):'');
   viewMemory.restore(root, renderedView);
 }
 async function load(key, checkCompatibility=false) {
@@ -263,7 +264,7 @@ function download(name,body,type) {
   downloadFile(name,body,type);
 }
 function bindInspectionLinks(scope=document){
-  scope.querySelectorAll('[data-component]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.component=el.dataset.component;state.view='components';render();}}));
+  scope.querySelectorAll('[data-component]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.component=el.dataset.component;state.view='components';state.mode='catalog';catalogState.expanded=state.component;if(!filterCatalog(components(),catalogState)[state.component]){catalogState.query='';catalogState.category='all';}render();}}));
   scope.querySelectorAll('[data-token]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.token=el.dataset.token;state.view='tokens';render();}}));
 }
 function bind() {
@@ -274,7 +275,7 @@ function bind() {
   const themeLabel=document.querySelector('#package-select').parentElement,themeOptions=document.createElement('div');themeOptions.className='theme-options';
   themeLabel.before(themeOptions);themeOptions.append(themeLabel,modeLabel);
   modeSelect.addEventListener('change',()=>{colorPreference.set(modeSelect.value);document.querySelector('#color-mode').focus();});
-  catalogControls=bindComponentCatalog(root,{state:state.view==='motion'?motionState:catalogState,allowNavigation,onChange(id){if(state.view!=='motion')state.component=id;render();}});
+  catalogControls=(state.view==='components'&&state.mode==='catalog'?bindCatalogBrowser:bindComponentCatalog)(root,{state:state.view==='motion'?motionState:catalogState,allowNavigation,onChange(id){if(state.view!=='motion'&&id)state.component=id;render();}});
   document.querySelector('#migrate-theme')?.addEventListener('click', () => {
     try { state.pack = migratePackage(state.pack); state.variants = {}; render(); notice('Temaet er konverteret som en kladde. Gennemgå det, og gem eller eksportér.'); }
     catch (error) { notice(error.message, true); }
