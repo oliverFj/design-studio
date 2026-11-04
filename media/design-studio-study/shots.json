@@ -1,0 +1,90 @@
+[
+  {
+    "id": "01-bibliotek",
+    "title": "Biblioteket i overblik",
+    "description": "Det søgbare komponentkatalog med kategorier og egenskabspanel.",
+    "theme": "studio-light",
+    "colorMode": "light",
+    "view": "components",
+    "mode": "catalog",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    }
+  },
+  {
+    "id": "02-knapfamilien",
+    "title": "Knapfamilien tæt på",
+    "description": "De fælles knappers varianter og deres anvendelse.",
+    "theme": "studio-light",
+    "colorMode": "light",
+    "view": "components",
+    "mode": "catalog",
+    "openComponent": "button",
+    "category": "actions",
+    "viewport": {
+      "width": 1440,
+      "height": 1120
+    },
+    "crop": "#catalog-inline-details"
+  },
+  {
+    "id": "03-samlet-eksempel",
+    "title": "Komponenter i sammenhæng",
+    "description": "Projektoverblikket viser komponenterne som en samlet grænseflade i Studio Light.",
+    "theme": "studio-light",
+    "colorMode": "light",
+    "view": "components",
+    "mode": "example",
+    "hideInspector": true,
+    "viewport": {
+      "width": 1440,
+      "height": 1340
+    },
+    "crop": "#project-overview-host"
+  },
+  {
+    "id": "04-samme-eksempel-nocturne",
+    "title": "Samme interface, et andet udtryk",
+    "description": "Præcis samme projektoverblik med Nocturnes mørke flader og lavendelaccent.",
+    "theme": "nocturne",
+    "colorMode": "dark",
+    "view": "components",
+    "mode": "example",
+    "hideInspector": true,
+    "viewport": {
+      "width": 1440,
+      "height": 1340
+    },
+    "crop": "#project-overview-host"
+  },
+  {
+    "id": "05-tokens",
+    "title": "Designbeslutninger som tokens",
+    "description": "Farvetokens og egenskaberne for den primære handlingsfarve. Ingen værdier er ændret.",
+    "theme": "studio-light",
+    "colorMode": "light",
+    "view": "tokens",
+    "mode": "catalog",
+    "token": "color.action.primary.rest.surface",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "crop": ".content"
+  },
+  {
+    "id": "06-designmoenstre",
+    "title": "Fra komponent til arbejdsflow",
+    "description": "Objekteditoren med arbejdsområde, hierarki og kontekstpanel viser et sammensat designmønster.",
+    "theme": "castle-studio",
+    "colorMode": "light",
+    "view": "patterns",
+    "mode": "catalog",
+    "viewport": {
+      "width": 1440,
+      "height": 1500
+    },
+    "crop": ".composition-demo"
+  }
+]

@@ -40,4 +40,4 @@ Format 1 kan fortsat læses. Migration er eksplicit med `migrate FILE --out NEW_
 
 Ved almindelige iterationer opdateres dokumentation kun efter brugerens ønske eller ved konkret væsentlig teknisk risiko. Når dokumentation bestilles, beskriv den aktuelle implementering, fjern forældede regler og undgå løbende sessionshistorik. Lever kort på dansk med ændring, faktisk kontrol og væsentlige begrænsninger.
 
-- **Projekter på Olivers hjemmeside:** Se [docs/WEBSITE-SHOWCASE.md](docs/WEBSITE-SHOWCASE.md) for projektregistrering, logolinks og status på screenshot- og produktkortworkflowet.
+- **Projekter på Olivers hjemmeside:** Se [docs/WEBSITE-SHOWCASE.md](docs/WEBSITE-SHOWCASE.md) for projektregistrering og logolinks. Følg [docs/PRODUCT-MEDIA.md](docs/PRODUCT-MEDIA.md) for screenshots, tre produktkortforslag og levering uden billedgenerering.

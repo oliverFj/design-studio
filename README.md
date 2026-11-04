@@ -103,6 +103,8 @@ Find først en eksisterende rolle. Tilføj om nødvendigt en variant eller en ny
 
 Onlineudgaven er en bygget kopi og opdateres ikke af et lokalt build. [Onlinevejledningen](docs/WEBSITE-SHOWCASE.md) beskriver synkronisering, produktionsbuild og udgivelse fra hjemmesidens projektmappe. tools/build-showcase.mjs --studio --out DIRECTORY eksporterer den fulde offentlige udgave; uden --studio eksporteres den tidligere særskilte komponentdemo.
 
+[Mediearbejdsgangen](docs/PRODUCT-MEDIA.md) beskriver screenshots, tre forskellige produktkortforslag og vurdering i hjemmesidens billedmål uden billedgenerering. Design Studio er reference med det godkendte kort **Samme form, flere udtryk** og seks screenshots. Redigerbare kompositioner og optageopskrifter ligger i `media/design-studio-study/`; de færdige, godkendte eksportfiler ligger i hjemmesidens projekt.
+
 [Signaturkomponenten](docs/SIGNATURE.md) giver produkter et tematilpasset link med Fjordside-logo og Oliver Fjordside i Platypi.
 
 ## Portabilitet og kontrolgrænser
