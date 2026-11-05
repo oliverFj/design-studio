@@ -46,6 +46,47 @@ export function contrastRatio(foreground, background) {
   const a = luminance(paint), b = luminance(bg);
   return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);
 }
+
+/** Bounded CSS gradients: explicit opaque sRGB stops from 0% to 100%. */
+export function parseGradient(value) {
+  if(typeof value!=='string')return null;
+  const match=/^(linear|radial)-gradient\((.+)\)$/.exec(value.trim());
+  if(!match)return null;
+  const parts=[];let depth=0,start=0;
+  for(let i=0;i<match[2].length;i++){
+    const character=match[2][i];if(character==='(')depth++;if(character===')'&&--depth<0)return null;
+    if(character===','&&depth===0){parts.push(match[2].slice(start,i).trim());start=i+1;}
+  }
+  if(depth!==0)return null;
+  parts.push(match[2].slice(start).trim());
+  const rawHeader=parts.shift(),header=rawHeader.replace(/ in srgb$/,'');
+  if(match[1]==='linear'?!/^(?:-?(?:\d*\.)?\d+(?:deg|turn|rad)|to (?:(?:top|bottom)(?: (?:left|right))?|left|right))$/.test(header):!/^(?:circle|ellipse)(?: at (?:\d+(?:\.\d+)?%|center) (?:\d+(?:\.\d+)?%|center))?$/.test(header))return null;
+  if(parts.length<2||parts.length>8)return null;
+  const colors=[];let previous=-1;
+  for(const part of parts){
+    const stop=/^(.+)\s+(\d+(?:\.\d+)?)%$/.exec(part);
+    if(!stop||/[;{}@<>\\]/.test(stop[1]))return null;
+    const position=Number(stop[2]),color=parseColor(stop[1]);
+    if(!color||color[3]!==1||position<previous||position>100)return null;
+    if(/^(?:oklch|oklab|color)\(/i.test(stop[1]))return null;
+    previous=position;colors.push(color);
+  }
+  if(!/\s0(?:\.0+)?%$/.test(parts[0])||previous!==100)return null;
+  return {colors,css:match[1]+'-gradient('+header+' in srgb, '+parts.join(', ')+')'};
+}
+
+/** Conservative bounds cover the full gradient, including colors between stops.
+ * A channel-wise bound can reject a safe gradient; it cannot certify only its endpoints. */
+export function gradientContrastRatio(foreground, gradient) {
+  const fg=typeof foreground==='string'?parseColor(foreground):foreground;
+  const paint=typeof gradient==='string'?parseGradient(gradient):gradient;
+  if(!fg||fg[3]!==1||!paint?.colors)return null;
+  const luminance=color=>.2126*linear(color[0])+.7152*linear(color[1])+.0722*linear(color[2]);
+  const lower=luminance([0,1,2].map(channel=>Math.min(...paint.colors.map(color=>color[channel]))));
+  const upper=luminance([0,1,2].map(channel=>Math.max(...paint.colors.map(color=>color[channel]))));
+  const text=luminance(fg);
+  return text<lower?(lower+.05)/(text+.05):text>upper?(text+.05)/(upper+.05):1;
+}
 export const THEME_CONTRAST_PAIRS = Object.freeze([
   ['color.text.primary','color.background.canvas'], ['color.text.secondary','color.background.canvas'],
   ['color.text.primary','color.background.surface'], ['color.text.secondary','color.background.surface'],
@@ -102,10 +143,10 @@ export function componentBoundaryReport(model,resolved) {
         const style=resolve(styles.borderStyle)??String(border??'').split(/\s+/)[1];
         const color=resolve(styles.borderColor)??String(border??'').replace(/^\S+\s+\S+\s+/, '');
         const visible=style!=='none'&&style!=='hidden'&&Number.parseFloat(width)>0;
-        let control=parseColor(resolve(styles.backgroundColor));
-        if(control&&control[3]<1)control=surface?compositeColor(control,surface):null;
+        let control=parseGradient(resolve(styles.background))??parseColor(resolve(styles.backgroundColor));
+        if(control&&!control.colors&&control[3]<1)control=surface?compositeColor(control,surface):null;
         for(const [background,paint]of [['control',control],['surface',surface],['canvas',canvas]]){
-          const ratio=visible?contrastRatio(color,paint):0,minimum=3;
+          const ratio=visible?(paint?.colors?gradientContrastRatio(color,paint):contrastRatio(color,paint)):0,minimum=3;
           report.push({component:id,part,variant,state,foreground:'border',background,ratio,minimum,passed:ratio!==null&&ratio>=minimum});
         }
       }
@@ -138,11 +179,12 @@ export function componentContrastReport(model,resolved) {
     for(const [variant,treatment]of variants)for(const [state,stateTreatment]of states)for(const part of textParts){
       const root={...component.parts.root?.styles,...treatment.styles,...stateTreatment.styles};
       const styles=part==='root'?root:{...root,...component.parts[part]?.styles,...treatment.parts?.[part]?.styles,...stateTreatment.parts?.[part]?.styles};
-      if(styles.display==='none'||!styles.color||!styles.backgroundColor||/^(inherit|transparent|initial|unset|revert|currentColor)$/.test(resolve(styles.color,styles))||/^(inherit|transparent|initial|unset|revert)$/.test(resolve(styles.backgroundColor,styles)))continue;
-      const fg=parseColor(resolve(styles.color,styles));let bg=parseColor(resolve(styles.backgroundColor,styles));if(!fg||!bg)continue;
-      if(bg[3]<1)bg=canvas?compositeColor(bg,canvas):null;if(bg?.[3]!==1)continue;
+      const gradient=parseGradient(resolve(styles.background,styles));
+      if(styles.display==='none'||!styles.color||/^(inherit|transparent|initial|unset|revert|currentColor)$/.test(resolve(styles.color,styles))||(!gradient&&(!styles.backgroundColor||/^(inherit|transparent|initial|unset|revert)$/.test(resolve(styles.backgroundColor,styles)))))continue;
+      const fg=parseColor(resolve(styles.color,styles));let bg=parseColor(resolve(styles.backgroundColor,styles));if(!gradient&&(!fg||!bg))continue;
+      if(!gradient){if(bg[3]<1)bg=canvas?compositeColor(bg,canvas):null;if(bg?.[3]!==1)continue;}
       const font=String(resolve(styles.fontSize,styles)??''),weight=Number(resolve(styles.fontWeight,styles))||400,fontPx=pixels(font),minimum=fontPx!==null&&(fontPx>=24||(fontPx>=18.667&&weight>=700))?3:4.5;
-      const ratio=contrastRatio(fg,bg);report.push({component:id,part,variant,state,ratio,minimum,passed:ratio!==null&&ratio>=minimum});
+      const ratio=gradient?gradientContrastRatio(fg,gradient):contrastRatio(fg,bg);report.push({component:id,part,variant,state,ratio,minimum,passed:ratio!==null&&ratio>=minimum});
     }
   }
   return report;
@@ -157,7 +199,7 @@ export function validateThemeQuality(model,resolved) {
   for (const check of themeContrastReport(resolved)) if (!check.passed) errors.push('tokens.'+check.foreground+' on '+check.background+': '+(check.ratio===null?'unmeasurable color':check.ratio.toFixed(2)+':1 contrast')+'; minimum '+check.minimum+':1.');
   for (const check of controlBoundaryReport(resolved)) if (!check.passed) errors.push('tokens.'+check.foreground+' on '+check.background+': '+(check.ratio===null?'unmeasurable field boundary':check.ratio.toFixed(2)+':1 field boundary contrast')+'; minimum '+check.minimum+':1.');
   for (const check of componentBoundaryReport(model,resolved)) if (!check.passed) errors.push('components.'+check.component+'.'+check.part+' ['+check.variant+'/'+check.state+'] on '+check.background+': '+(check.ratio===null?'unmeasurable field boundary':check.ratio.toFixed(2)+':1 field boundary contrast')+'; minimum '+check.minimum+':1.');
-  for (const check of componentContrastReport(model,resolved)) if(!check.passed) errors.push('components.'+check.component+'.'+check.part+' ['+check.variant+'/'+check.state+']: '+check.ratio.toFixed(2)+':1 contrast; minimum '+check.minimum+':1.');
+  for (const check of componentContrastReport(model,resolved)) if(!check.passed) errors.push('components.'+check.component+'.'+check.part+' ['+check.variant+'/'+check.state+']: '+(check.ratio===null?'unmeasurable contrast':check.ratio.toFixed(2)+':1 contrast')+'; minimum '+check.minimum+':1.');
   for (const [id,minimum] of [['size.control.height',24],['typography.size.body',14]]) {
     const size=pixels(resolved[id]);
     if (size===null || size < minimum) errors.push('tokens.'+id+': must be at least '+minimum+' CSS px; use px, rem or em (16px reference).');

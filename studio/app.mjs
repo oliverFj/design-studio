@@ -1,3 +1,4 @@
+import { renderPrinciples, bindPrinciples } from './principles.mjs';
 import { createBrandStudio } from './brand.mjs';
 
 import { validatePackage, resolveTokens, generateCSS, validateCompatibility, getComponents, materializePackage, migratePackage } from '../core/engine.mjs';
@@ -14,10 +15,10 @@ import bundledThemes from './bundled-themes.mjs';
 import { createThemeStorage } from './theme-storage.mjs';
 import { readJSONFile, downloadFile } from '../core/files.mjs';
 import { mountCompositionGallery, createGalleryState } from '../patterns/gallery.mjs';
-import {renderMotionView} from './motion.mjs';
+import {renderMotionView,bindMotionStudy} from './motion.mjs';
 import {createCatalogState,bindComponentCatalog,catalogVariants} from './component-catalog.mjs';
 import {renderCatalogBrowser,bindCatalogBrowser,filterCatalog} from './catalog-browser.mjs';
-import {resolveThemeMode,createColorModePreference} from '../core/theme-modes.mjs';
+import {resolveThemeMode,resolveThemeModeId,themeModeOptions,hasNamedThemeModes,createColorModePreference} from '../core/theme-modes.mjs';
 
 const showcase = typeof __STUDIO_SHOWCASE__ !== 'undefined' && __STUDIO_SHOWCASE__;
 const root = document.querySelector('#app');
@@ -34,15 +35,20 @@ const galleryState = createGalleryState();
 const catalogState=createCatalogState();
 const motionState=createCatalogState();
 let catalogControls;
+let motionStudyControls;
 let compositionGallery;
+let principlesControls;
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone = value => structuredClone(value);
 const themeStorage = createThemeStorage(bundledThemes, { download });
 const colorPreference=createColorModePreference({key:'design-studio.color-mode',onChange(){if(state.pack){readModel=null;qualityStudio.invalidate();cssPreview();render();}}});
-const activeTheme=()=>resolveThemeMode(state.pack,colorPreference.value,colorPreference.resolved);
+const namedModeChoices=new Map();
+const modeChoice=()=>hasNamedThemeModes(state.pack)?(Object.hasOwn(state.pack.modes,namedModeChoices.get(state.pack.id))?namedModeChoices.get(state.pack.id):state.pack.defaultMode):colorPreference.value;
+const activeMode=()=>resolveThemeModeId(state.pack,modeChoice(),colorPreference.resolved);
+const activeTheme=()=>resolveThemeMode(state.pack,modeChoice(),colorPreference.resolved);
 const brandStudio = createBrandStudio(state, {escape, field, edited, render, notice, allowNavigation, download, showcase});
 const qualityStudio = createQualityStudio(state, {escape, validation:()=>validation(), getTheme:activeTheme, render, notice});
-const icon = name => renderIcon(({motion:'activity',quality:'shield-check',patterns:'template',brand:'palette',components:'components',tokens:'cube',package:'file-text'})[name] ?? 'components');
+const icon = name => renderIcon(({principles:'file-text',motion:'activity',quality:'shield-check',patterns:'template',brand:'palette',components:'components',tokens:'cube',package:'file-text'})[name] ?? 'components');
 let readModel = null, lastValidModel = null, lastPreviewTheme = null;
 const previewTheme = () => lastPreviewTheme || state.pack;
 const model = () => {
@@ -61,14 +67,14 @@ function tokenUsage(){
 }
 const editableToken = () => {
  if(!state.pack.modes)return state.pack.tokens[state.token] ||= clone(themeTokens()[state.token]);
- const tokens=state.pack.modes[colorPreference.resolved].tokens;
+ const selected=activeMode(),tokens=state.pack.modes[selected].tokens;
  const token=tokens[state.token] ||= clone(themeTokens()[state.token]);
- if(colorPreference.resolved===state.pack.defaultMode)state.pack.tokens[state.token]=token;
+ if(selected===state.pack.defaultMode)state.pack.tokens[state.token]=token;
  return token;
 };
 const dirty = () => state.pack && (JSON.stringify(state.pack) !== state.saved || state.recipeDraft !== null);
 const validation = () => state.pack ? validatePackage(state.pack) : { valid: false, errors: [] };
-const groupName = id => ({color:'Farver',typography:'Typografi',space:'Afstande',radius:'Hjørner',shadow:'Skygger',duration:'Overgange',border:'Kanter',size:'Størrelser',opacity:'Gennemsigtighed'})[id] || id;
+const groupName = id => ({color:'Farver',typography:'Typografi',space:'Afstande',radius:'Hjørner',shadow:'Skygger',gradient:'Gradienter',duration:'Overgange',border:'Kanter',size:'Størrelser',opacity:'Gennemsigtighed'})[id] || id;
 function notice(message, error = false) {
   document.querySelector('.notification')?.remove();
   const node = document.createElement('div');
@@ -85,7 +91,7 @@ function cssPreview() {
   let style = document.querySelector('#package-styles');
   if (!style) { style = document.createElement('style'); style.id = 'package-styles'; document.head.append(style); }
   style.textContent = generateCSS(theme);
-  document.documentElement.style.colorScheme=state.pack.modes?colorPreference.resolved:'normal';
+  document.documentElement.style.colorScheme=state.pack.modes?.[activeMode()]?.colorScheme??(state.pack.modes?activeMode():'normal');
   document.documentElement.classList.add('ds-scope');
   lastPreviewTheme = theme;
   return checked;
@@ -169,7 +175,7 @@ function tokenInspector() {
   if (!token) return '<p class="help">Vælg et token.</p>';
   let value=token.$value;try{value=resolveTokens(activeTheme())[id];}catch{}
   const hex=token.$type==='color' && /^#[0-9a-f]{6}$/i.test(String(token.$value));
-  return '<div class="inspector-heading">Token</div><h2>'+escape(groupName(id.split('.')[0]))+'</h2><p class="inspector-id">'+escape(id)+'</p><div class="property-row"><span>Type</span><span>'+escape(token.$type)+'</span></div><div class="inspector-section">'+field('token-value','Værdi',token.$value)+
+  return '<div class="inspector-heading">Token</div><h2>'+escape(groupName(id.split('.')[0]))+'</h2><p class="inspector-id">'+escape(id)+'</p><div class="property-row"><span>Type</span><span>'+escape(token.$type)+'</span></div><div class="inspector-section">'+field('token-value','Værdi',token.$value,{textarea:token.$type==='gradient'})+
     (hex?'<div class="color-editor"><input type="color" id="token-color" value="'+escape(token.$value)+'" aria-label="Vælg farve"><span class="help">Vælg en farve</span></div>':'')+
     '<p class="help">Henvis til et andet token med <code>{token.navn}</code>.</p>'+field('token-description','Beskrivelse',token.description,{textarea:true})+'</div>'+
     '<div class="inspector-section"><h3>Aktuel værdi</h3><div class="token-example" id="token-example">'+escape(value)+'</div></div>'+
@@ -183,6 +189,7 @@ function packageInspector() {
 }
 function render() {
   catalogControls?.destroy();
+  principlesControls?.destroy(); principlesControls = null;
   if (!state.pack) return;
   if (renderedView !== null) viewMemory.capture(root, renderedView);
   inspectorControls?.destroy(); inspectorControls = null;
@@ -192,12 +199,16 @@ function render() {
     const currentURL=new URL(location.href);currentURL.searchParams.set('package',state.key);currentURL.searchParams.set('view',state.view);currentURL.searchParams.set('mode',state.mode);history.replaceState(null,'',currentURL);
   }
   cssPreview();
-  const wideView=['patterns','motion'].includes(state.view);
+  const wideView=['principles','patterns','motion'].includes(state.view);
+  document.title=state.view==='principles'?'Principper · Design Studio':'Design Studio · Komponenter og temaer';
   const themeActions=showcase?'<a class="studio-button quiet" href="../#project-studio">Om projektet</a>':'<button type="button" class="studio-button" id="import">Åbn tema</button><button type="button" class="studio-button primary" id="save">Gem tema</button><input type="file" id="import-file" accept=".json,application/json" hidden>';
-  root.innerHTML='<a class="studio-skip" href="#studio-content">Gå til indhold</a><div class="shell ds-app-shell"><aside data-scrollbar-surface="inverse" class="sidebar ds-app-navigation" tabindex="0" aria-label="Designsystemets navigation"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Design Studio</div><div><div class="side-label">Designsystem</div><nav class="navigation" aria-label="Design Studio">'+[['brand','Brandguide'],['components','Komponenter'],['patterns','Designmønstre'],['motion','Animation og effekter'],['tokens','Tokens'],['quality','Kvalitet'],['package','Temaet']].map(([view,name])=>'<button type="button" class="nav-item '+(state.view===view?'active':'')+'" data-view="'+view+'" '+(state.view===view?'aria-current="page"':'')+'>'+icon(view)+name+'</button>').join('')+'</nav></div><div class="side-footer">'+renderComponent(previewTheme(),'signature',{identity:'fjordside',variant:'compact'})+'</div></aside><div class="workspace ds-app-workspace"><header class="topbar ds-app-header"><div class="breadcrumb">Design Studio <span>/</span><strong>'+(state.view==='motion'?'Animation og effekter':state.view==='patterns'?'Designmønstre':state.view==='quality'?'Kvalitet':'Temaer')+'</strong></div><div class="actions"><button type="button" class="studio-button quiet" id="toggle-inspector" aria-controls="studio-inspector"'+(wideView?' hidden':'')+'>'+(inspectorPanel.open?'Skjul egenskaber':'Vis egenskaber')+'</button><button type="button" class="studio-button quiet" id="discard" hidden>Nulstil ændringer</button>'+themeActions+'</div></header><main id="studio-main" class="ds-app-content studio-main" tabindex="-1" aria-label="Design Studio – indhold"><div class="page-heading"><div><p class="eyebrow">Komponentbibliotek og temaer</p><h1>'+escape(state.pack.name)+'</h1><p class="page-description">'+escape(state.pack.description)+'</p></div><label class="package-picker" for="package-select">Aktivt tema<select id="package-select">'+state.packages.map(pack=>'<option value="'+escape(pack.key)+'" '+(pack.key===state.key?'selected':'')+'>'+escape(pack.name)+'</option>').join('')+'</select></label></div><div class="content ds-panel-layout'+(wideView?' patterns-content':'')+'" data-panel-open="'+(!wideView&&inspectorPanel.open)+'"><section id="studio-content" class="canvas ds-panel-content" tabindex="0" aria-label="Designindhold">'+(state.view==='brand'?brandStudio.content():state.view==='components'?componentsView():state.view==='patterns'?patternsView():state.view==='motion'?renderMotionView(previewTheme(),motionState):state.view==='tokens'?tokensView():state.view==='quality'?qualityStudio.content():packageView())+'</section><button type="button" id="inspector-resize" class="inspector-resize ds-panel-resize" aria-label="Tilpas egenskabspanelets bredde"></button><aside id="studio-inspector" class="inspector ds-panel-side" tabindex="0" aria-label="Egenskaber">'+(state.view==='brand'?brandStudio.inspector():state.view==='components'?componentInspector():wideView?'':state.view==='tokens'?tokenInspector():state.view==='quality'?qualityStudio.inspector():packageInspector())+'</aside></div></main><footer id="status-bar" class="status-bar ds-app-footer" role="status"></footer></div></div>';
-  document.querySelectorAll('[data-swatch]').forEach(el=> {
+  root.innerHTML='<a class="studio-skip" href="#studio-content">Gå til indhold</a><div class="shell ds-app-shell"><aside data-scrollbar-surface="inverse" class="sidebar ds-app-navigation" tabindex="0" aria-label="Designsystemets navigation"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Design Studio</div><div><div class="side-label">Designsystem</div><nav class="navigation" aria-label="Design Studio">'+[['principles','Principper'],['brand','Brandguide'],['components','Komponenter'],['patterns','Designmønstre'],['motion','Animation og effekter'],['tokens','Tokens'],['quality','Kvalitet'],['package','Temaet']].map(([view,name])=>'<button type="button" class="nav-item '+(state.view===view?'active':'')+'" data-view="'+view+'" '+(state.view===view?'aria-current="page"':'')+'>'+icon(view)+name+'</button>').join('')+'</nav></div><div class="side-footer">'+renderComponent(previewTheme(),'signature',{identity:'fjordside',variant:'compact'})+'</div></aside><div class="workspace ds-app-workspace"><header class="topbar ds-app-header"><div class="breadcrumb">Design Studio <span>/</span><strong>'+(state.view==='principles'?'Principper':state.view==='motion'?'Animation og effekter':state.view==='patterns'?'Designmønstre':state.view==='quality'?'Kvalitet':'Temaer')+'</strong></div><div class="actions"><button type="button" class="studio-button quiet" id="toggle-inspector" aria-controls="studio-inspector"'+(wideView?' hidden':'')+'>'+(inspectorPanel.open?'Skjul egenskaber':'Vis egenskaber')+'</button><button type="button" class="studio-button quiet" id="discard" hidden>Nulstil ændringer</button>'+themeActions+'</div></header><main id="studio-main" class="ds-app-content studio-main'+(state.view==='principles'?' principles-view':'')+'" tabindex="-1" aria-label="Design Studio – indhold"><div class="page-heading"><div><p class="eyebrow">'+(state.view==='principles'?'Designgrundlag':'Komponentbibliotek og temaer')+'</p><h1>'+(state.view==='principles'?'Principper':escape(state.pack.name))+'</h1><p class="page-description">'+(state.view==='principles'?'Vores fælles retning for temaer, komponenter, mønstre og produkter.':escape(state.pack.description))+'</p></div><label class="package-picker" for="package-select">Aktivt tema<select id="package-select">'+state.packages.map(pack=>'<option value="'+escape(pack.key)+'" '+(pack.key===state.key?'selected':'')+'>'+escape(pack.name)+'</option>').join('')+'</select></label></div><div class="content ds-panel-layout'+(wideView?' patterns-content':'')+'" data-panel-open="'+(!wideView&&inspectorPanel.open)+'"><section id="studio-content" class="canvas ds-panel-content" tabindex="0" aria-label="Designindhold">'+(state.view==='principles'?renderPrinciples(previewTheme()):state.view==='brand'?brandStudio.content():state.view==='components'?componentsView():state.view==='patterns'?patternsView():state.view==='motion'?renderMotionView(previewTheme(),motionState):state.view==='tokens'?tokensView():state.view==='quality'?qualityStudio.content():packageView())+'</section><button type="button" id="inspector-resize" class="inspector-resize ds-panel-resize" aria-label="Tilpas egenskabspanelets bredde"></button><aside id="studio-inspector" class="inspector ds-panel-side" tabindex="0" aria-label="Egenskaber">'+(state.view==='brand'?brandStudio.inspector():state.view==='components'?componentInspector():wideView?'':state.view==='tokens'?tokenInspector():state.view==='quality'?qualityStudio.inspector():packageInspector())+'</aside></div></main><footer id="status-bar" class="status-bar ds-app-footer" role="status"></footer></div></div>';
+  const swatches=document.querySelectorAll('[data-swatch]');
+  let swatchValues={};
+  if(swatches.length)try{swatchValues=resolveTokens(activeTheme());}catch{}
+  swatches.forEach(el=> {
     const id=el.dataset.swatch;
-    if(themeTokens()[id].$type==='color') {try {el.style.backgroundColor=resolveTokens(activeTheme())[id];}catch{}}
+    if(['color','gradient'].includes(themeTokens()[id].$type)) el.style.background=swatchValues[id]??'';
     else el.textContent=themeTokens()[id].$type==='fontFamily'?'Aa':'';
   });
   const exampleHost = document.querySelector('#project-overview-host');
@@ -259,7 +270,7 @@ function changeToken(value) {
   try {
     const resolved=resolveTokens(activeTheme());
     const el=document.querySelector('#token-example');if(el)el.textContent=resolved[state.token];
-    document.querySelectorAll('[data-swatch]').forEach(el=>{if(themeTokens()[el.dataset.swatch].$type==='color')el.style.backgroundColor=resolved[el.dataset.swatch];});
+    document.querySelectorAll('[data-swatch]').forEach(el=>{if(['color','gradient'].includes(themeTokens()[el.dataset.swatch].$type))el.style.background=resolved[el.dataset.swatch];});
   }catch{}
 }
 function download(name,body,type) {
@@ -270,18 +281,25 @@ function bindInspectionLinks(scope=document){
   scope.querySelectorAll('[data-token]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.token=el.dataset.token;state.view='tokens';render();}}));
 }
 function bind() {
+  motionStudyControls?.destroy();
+  motionStudyControls=state.view==='motion'?bindMotionStudy(root,motionState):null;
   const modeLabel=document.createElement('label');modeLabel.className='package-picker';modeLabel.htmlFor='color-mode';modeLabel.textContent='Farvetilstand';
   const modeSelect=document.createElement('select');modeSelect.id='color-mode';
-  for(const [value,text]of [['system','Automatisk'],['light','Lys'],['dark','Mørk']]){const option=document.createElement('option');option.value=value;option.textContent=text;modeSelect.append(option);}
-  modeSelect.value=colorPreference.value;modeSelect.disabled=!state.pack.modes;modeLabel.append(modeSelect);
+  for(const {value,label}of themeModeOptions(state.pack)){const option=document.createElement('option');option.value=value;option.textContent=label;modeSelect.append(option);}
+  modeSelect.value=modeChoice();modeSelect.disabled=!state.pack.modes;modeLabel.append(modeSelect);
   const themeLabel=document.querySelector('#package-select').parentElement,themeOptions=document.createElement('div');themeOptions.className='theme-options';
   themeLabel.before(themeOptions);themeOptions.append(themeLabel,modeLabel);
-  modeSelect.addEventListener('change',()=>{colorPreference.set(modeSelect.value);document.querySelector('#color-mode').focus();});
+  modeSelect.addEventListener('change',()=>{
+    if(hasNamedThemeModes(state.pack)){namedModeChoices.set(state.pack.id,modeSelect.value);readModel=null;qualityStudio.invalidate();cssPreview();render();}
+    else colorPreference.set(modeSelect.value);
+    document.querySelector('#color-mode').focus();
+  });
   catalogControls=(state.view==='components'&&state.mode==='catalog'?bindCatalogBrowser:bindComponentCatalog)(root,{state:state.view==='motion'?motionState:catalogState,allowNavigation,onChange(id){if(state.view!=='motion'&&id)state.component=id;render();}});
   document.querySelector('#migrate-theme')?.addEventListener('click', () => {
     try { state.pack = migratePackage(state.pack); state.variants = {}; render(); notice('Temaet er konverteret som en kladde. Gennemgå det, og gem eller eksportér.'); }
     catch (error) { notice(error.message, true); }
   });
+  if(state.view==='principles')principlesControls=bindPrinciples(root);
   brandStudio.bind();
   qualityStudio.bind();
   document.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',()=>{if(allowNavigation()){state.view=el.dataset.view;render();}}));
@@ -333,7 +351,7 @@ try{
   const params=new URLSearchParams(location.search);
   const requested=params.get('package');
   if(['catalog','example'].includes(params.get('mode')))state.mode=params.get('mode');
-  if(['brand','components','patterns','motion','tokens','quality','package'].includes(params.get('view')))state.view=params.get('view');
+  if(['principles','brand','components','patterns','motion','tokens','quality','package'].includes(params.get('view')))state.view=params.get('view');
   if(params.get('mode')==='patterns')state.view='patterns';
   const first=data.packages.find(p=>p.key===requested)?.key || data.packages.find(p=>p.id==='studio-light')?.key || data.packages[0]?.key;
   if(!first)throw new Error('Der er ingen designpakker. Tilføj en pakke i mappen packages, og åbn Design Studio igen.');

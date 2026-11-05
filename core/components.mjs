@@ -1,7 +1,7 @@
 import {getComponents, brandAssetDataURL, resolveTokens} from './engine.mjs';
 export { createLayout, generateAppShellCSS } from './layout.mjs';
 export { mountPanelControls } from './panels.mjs';
-export {resolveThemeMode,createColorModePreference} from './theme-modes.mjs';
+export {resolveThemeMode,resolveThemeModeId,themeModeOptions,hasNamedThemeModes,createColorModePreference} from './theme-modes.mjs';
 export { mountMenuControls } from './menus.mjs';
 export {mountTooltip,mountPopover,mountDialog,mountDrawer} from './overlays.mjs';
 import {normalizeNavigationPreview} from './navigation.mjs';
@@ -16,7 +16,7 @@ import {normalizeDataTablePreview} from './data-table.mjs';
 export {mountDataTable} from './data-table.mjs';
 import {normalizeInputChoicePreview} from './input-choices.mjs';
 export {mountCombobox,mountMultiselect} from './input-choices.mjs';
-export { animateStandard, STANDARD_MOTION } from './motion.mjs';
+export { animateStandard, animateThemed, STANDARD_MOTION } from './motion.mjs';
 import {COMPONENT_LIBRARY, canonicalComponentId, canonicalVariantId, canonicalStateId, canonicalPartId} from './library.mjs';
 import { BUTTON_SIZES } from './library.mjs';
 import {FJORDSIDE_SIGNATURE} from './signature-assets.mjs';

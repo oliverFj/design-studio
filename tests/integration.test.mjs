@@ -13,13 +13,13 @@ import { doctor } from '../tools/doctor.mjs';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 const silent = () => {};
-async function projectFixture(t) {
+async function projectFixture(t,theme='studio-light') {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'design-studio-v2-integration-'));
   t.after(async () => {
     assert.ok(path.resolve(directory).startsWith(path.resolve(os.tmpdir()) + path.sep));
     await fs.rm(directory, { recursive: true, force: true });
   });
-  await runCLI(['init', directory], { log: silent });
+  await runCLI(['init', directory, '--theme',theme], { log: silent });
   return directory;
 }
 test('init supplies a real shared runtime and sync preserves the project theme', async t => {
@@ -57,7 +57,7 @@ test('init builds a standalone offline app and source edits can be rebuilt', asy
   assert.ok(script);
   assert.doesNotThrow(() => new Script(script));
   const document = dom(), window = document.createElement('window');
-  document.title = 'Nyt projekt'; document.head = document.createElement('head');
+  document.title = 'Nyt projekt'; document.head = document.createElement('head');document.documentElement=document.createElement('html');
   const app = document.createElement('main'); app.setAttribute('id', 'app'); document.body.append(app);
   document.querySelector = selector => document.body.querySelector(selector);
   const context = createContext({ document, window, Intl, URL, Blob, atob, btoa, TextDecoder, TextEncoder, setTimeout, clearTimeout });

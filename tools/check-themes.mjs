@@ -14,7 +14,7 @@ for (const id of PUBLIC_THEME_IDS) {
     await runCLI(['compare', `packages/${PUBLIC_THEME_IDS[0]}.json`, `packages/${id}.json`]);
   }
   const theme=JSON.parse(await readFile(new URL('../packages/'+id+'.json',import.meta.url),'utf8'));
-  for(const mode of theme.modes?['light','dark']:[null]){
+  for(const mode of theme.modes?Object.keys(theme.modes):[null]){
     const snapshot=mode?resolveThemeMode(theme,mode):theme;
     // Build both actual appearances; validating only the base would miss export
     // failures or state-dependent regressions in the other color mode.

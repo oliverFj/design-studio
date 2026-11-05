@@ -8692,56 +8692,101 @@
       "additionalProperties": false
     },
     "defaultMode": {
-      "enum": [
-        "light",
-        "dark"
-      ]
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "not": {
+        "const": "system"
+      }
     },
     "modes": {
-      "type": "object",
-      "required": [
-        "light",
-        "dark"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "light": {
+      "anyOf": [
+        {
           "type": "object",
           "required": [
-            "tokens"
+            "light",
+            "dark"
           ],
           "additionalProperties": false,
           "properties": {
-            "tokens": {
+            "light": {
               "type": "object",
-              "propertyNames": {
-                "pattern": "^[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*$"
-              },
-              "additionalProperties": {
-                "$ref": "#/$defs/token"
+              "required": [
+                "tokens"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "tokens": {
+                  "type": "object",
+                  "propertyNames": {
+                    "pattern": "^[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*$"
+                  },
+                  "additionalProperties": {
+                    "$ref": "#/$defs/token"
+                  }
+                }
+              }
+            },
+            "dark": {
+              "type": "object",
+              "required": [
+                "tokens"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "tokens": {
+                  "type": "object",
+                  "propertyNames": {
+                    "pattern": "^[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*$"
+                  },
+                  "additionalProperties": {
+                    "$ref": "#/$defs/token"
+                  }
+                }
               }
             }
           }
         },
-        "dark": {
+        {
           "type": "object",
-          "required": [
-            "tokens"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "tokens": {
-              "type": "object",
-              "propertyNames": {
-                "pattern": "^[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*$"
+          "minProperties": 1,
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "not": {
+              "const": "system"
+            }
+          },
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "name",
+              "colorScheme",
+              "tokens"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
               },
-              "additionalProperties": {
-                "$ref": "#/$defs/token"
+              "colorScheme": {
+                "enum": [
+                  "light",
+                  "dark"
+                ]
+              },
+              "tokens": {
+                "type": "object",
+                "propertyNames": {
+                  "pattern": "^[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*$"
+                },
+                "additionalProperties": {
+                  "$ref": "#/$defs/token"
+                }
               }
             }
           }
         }
-      }
+      ]
     }
   },
   "$defs": {
@@ -8761,7 +8806,8 @@
             "fontWeight",
             "number",
             "duration",
-            "shadow"
+            "shadow",
+            "gradient"
           ]
         },
         "$value": {

@@ -45,6 +45,18 @@ test('the realistic workspace is one executable offline HTML file with all publi
     assert.equal(app.querySelector('.ds-panel-content').scrollTop, 90, id + ': changing theme preserves project-list scroll');
     assert.equal(app.querySelector('.ds-form-fields').scrollTop, 140, id + ': changing theme preserves form-field scroll');
   }
+  const themePicker=document.querySelector('#example-theme-control');themePicker.value='bauhaus';fire(themePicker,'change');
+  const namedTitle=app.querySelector('#workspace-title-control'),namedPicker=document.querySelector('#example-color-mode-control');
+  let namedCSS=document.querySelector('#theme-styles').textContent;
+  assert.deepEqual(Array.from(namedPicker.children,option=>option.textContent),['Solgul','Kalk','Signalrød']);
+  for(const mode of ['kalk','signalroed','solgul']){
+    namedPicker.focus();namedPicker.value=mode;fire(namedPicker,'change');
+    assert.equal(app.querySelector('#workspace-title-control'),namedTitle);
+    assert.equal(namedTitle.value,'Bevar min kladde');assert.equal(document.activeElement,namedPicker);
+    const nextCSS=document.querySelector('#theme-styles').textContent;assert.notEqual(nextCSS,namedCSS);namedCSS=nextCSS;
+    assert.equal(document.documentElement.style.colorScheme,'light');
+  }
+  themePicker.value=PUBLIC_THEME_IDS.at(-1);fire(themePicker,'change');title=app.querySelector('#workspace-title-control');
   const originalTitle = title, modePicker = document.querySelector('#example-color-mode-control');
   const themeCSS = document.querySelector('#theme-styles');
   for (const mode of ['light', 'dark', 'system']) {

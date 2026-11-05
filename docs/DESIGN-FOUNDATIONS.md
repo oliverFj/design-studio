@@ -1,5 +1,7 @@
 # Designgrundlag
 
+[Designgrundloven](DESIGN-PRINCIPLES.md) beskriver den fælles æstetiske og funktionelle retning med kildegrundlag og konkrete beslutningsregler. Den er også indholdskilden til siden **Principper**. Dette dokument beskriver bibliotekets tekniske anvendelse og gældende kontrakt; grundloven ændrer ikke kontrakten af sig selv.
+
 Design Studio har et projektagnostisk komponentbibliotek. En komponent navngives efter sin funktion og opbygning. Temaer giver den et visuelt udtryk; produktet leverer indhold og adfærd. Et startsæts oprindelse bestemmer aldrig bibliotekets anvendelse.
 
 Bibliotek 3.5.0 dækker de 61 roller i det aftalte katalog. Målet er robuste fælles byggesten, forskellige temaudtryk og en standard, som agenter kan videreføre mellem sessioner. Kataloget er afgrænset; nye produktbehov kan stadig kræve nye fælles roller.
@@ -127,7 +129,7 @@ Studios komponentkatalog holder rækkens korttoppe synlige og lader den aktive t
 
 ## Paletter, farvetilstande og brugerpræferencer
 
-Primitive paletter ligger under `palette.*` og semantiske roller under `color.*`. Paletten definerer værdier; komponenten anvender den semantiske rolle. Et brand kan have særskilte primære farver og accentfarver. Lys/mørk tilstand er sammenhørende fremtoninger inden for samme temaidentitet; det er ikke et skift til et andet brand. De offentlige temaer gemmer begge tilstande, mens ældre enkeltstående temaer beholder deres eksisterende værdier.
+Primitive paletter ligger under `palette.*` og semantiske roller under `color.*`. Paletten definerer værdier; komponenten anvender den semantiske rolle. Et brand kan have særskilte primære farver og accentfarver. Et tema kan leveres alene som lyst eller mørkt; begge farvetilstande er valgfrit. Når begge leveres, er de sammenhørende fremtoninger inden for samme temaidentitet, ikke et skift til et andet brand. Enkeltstående temaer beholder deres værdier uanset farvepræference.
 
 `core/scales.mjs` samler primitive afstande, elevation, dokumentlag og ikonstørrelser. Positive semantiske komponentafstande bevares. Indholdsbaseret layout og containerregler findes i referenceeksemplerne; fælles viewportgrænser til genereret shell-CSS findes i `BREAKPOINTS`. Valget af produktets kolonner tilhører fortsat produktet.
 

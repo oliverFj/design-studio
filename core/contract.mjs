@@ -1,6 +1,6 @@
 /** Stable visual vocabulary shared by Design Studio packages and products. */
 export const PACKAGE_SCHEMA_VERSION = 2;
-export const TOKEN_TYPES = Object.freeze(['color', 'dimension', 'fontFamily', 'fontWeight', 'number', 'duration', 'shadow']);
+export const TOKEN_TYPES = Object.freeze(['color', 'dimension', 'fontFamily', 'fontWeight', 'number', 'duration', 'shadow', 'gradient']);
 export const REQUIRED_TOKENS = Object.freeze({
   'color.background.canvas': 'color', 'color.background.surface': 'color',
   'color.text.primary': 'color', 'color.text.secondary': 'color',

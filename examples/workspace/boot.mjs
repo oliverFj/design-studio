@@ -2,7 +2,7 @@ import themes from './bundled-themes.mjs';
 import { generateCSS } from '../../core/engine.mjs';
 import { createComponentFactory } from '../../core/components.mjs';
 import { createProjectFile } from '../../core/files.mjs';
-import { resolveThemeMode, createColorModePreference } from '../../core/theme-modes.mjs';
+import { resolveThemeMode, resolveThemeModeId, themeModeOptions, hasNamedThemeModes, createColorModePreference } from '../../core/theme-modes.mjs';
 import { mountWorkspace } from './app.mjs';
 import { createWorkspaceState, validateWorkspaceData, workspaceData, workspaceHasDrafts } from './data.mjs';
 
@@ -13,11 +13,16 @@ const colorMode = createColorModePreference({ key: 'design-studio.workspace.colo
 const projectFile = createProjectFile({ format: 'design-studio.workspace', version: 1, validate: validateWorkspaceData });
 const announce = message => { controls.querySelector('#example-message').textContent = message; };
 
-function resolvedTheme() { return resolveThemeMode(themes.find(item => item.key === themeKey).package, colorMode.value, colorMode.resolved); }
+const namedModes=new Map();
+const sourceTheme=()=>themes.find(item=>item.key===themeKey).package;
+const modeChoice=()=>hasNamedThemeModes(sourceTheme())?namedModes.get(themeKey)??sourceTheme().defaultMode:colorMode.value;
+function resolvedTheme() { return resolveThemeMode(sourceTheme(), modeChoice(), colorMode.resolved); }
 function applyColorMode() {
   style.textContent = generateCSS(resolvedTheme());
   const picker = controls.querySelector('#example-color-mode-control');
-  if (picker) picker.value = colorMode.value;
+  if (picker) picker.value = modeChoice();
+  const selected=resolveThemeModeId(sourceTheme(),modeChoice(),colorMode.resolved);
+  document.documentElement.style.colorScheme=sourceTheme().modes?.[selected]?.colorScheme??(sourceTheme().modes?selected:'normal');
 }
 
 function render({ preserveScroll = true } = {}) {
@@ -33,12 +38,14 @@ function render({ preserveScroll = true } = {}) {
   const actions = document.createElement('div'); actions.className = 'example-actions';
   const themeField = c('field', { idPrefix: 'example-theme', label: 'Tema', value: themeKey, hint: '', controlVariant: 'desktop', slots: { control: { tag: 'select', children: themes.map(item => ({ tag: 'option', attrs: { value: item.key }, text: item.package.name })) } } }); themeField.className += ' example-theme';
   themeField.querySelector('select').addEventListener('change', event => { themeKey = event.target.value; render(); controls.querySelector('select').focus(); });
-  const modeField = c('field', { idPrefix: 'example-color-mode', label: 'Farvetilstand', value: colorMode.value, hint: '', controlVariant: 'desktop', slots: { control: { tag: 'select', children: [['system', 'System'], ['light', 'Lys'], ['dark', 'Mørk']].map(([value, text]) => ({ tag: 'option', attrs: { value }, text })) } } }); modeField.className += ' example-theme';
-  modeField.querySelector('select').addEventListener('change', event => { colorMode.set(event.target.value); announce('Farvetilstanden er skiftet. Dine kladder er bevaret.'); });
+  const modeField = c('field', { idPrefix: 'example-color-mode', label: 'Farvetilstand', value: modeChoice(), hint: '', controlVariant: 'desktop', slots: { control: { tag: 'select', children: themeModeOptions(sourceTheme()).map(({value,label}) => ({ tag: 'option', attrs: { value }, text:label })) } } }); modeField.className += ' example-theme';
+  modeField.querySelector('select').disabled=!sourceTheme().modes;
+  modeField.querySelector('select').addEventListener('change', event => { if(hasNamedThemeModes(sourceTheme())){namedModes.set(themeKey,event.target.value);applyColorMode();}else colorMode.set(event.target.value); announce('Farvetilstanden er skiftet. Dine kladder er bevaret.'); });
   const open = c('button', { text: 'Åbn arbejdsrum', variant: 'tertiary', size:'small' });
   const save = c('button', { text: 'Hent arbejdsrum', variant: 'tertiary', size:'small' });
   const message = c('text', { text: 'Prøv et tema, vælg et projekt, eller arbejd videre med eksemplet.', variant: 'small', attrs: { id: 'example-message', role: 'status', 'aria-live': 'polite' } }); message.className += ' example-message';
   actions.append(themeField, modeField, open, save); controls.replaceChildren(title, actions, message);
+  applyColorMode();
   mounted?.destroy(); mounted = mountWorkspace(theme, { state, onChange: () => { dirty = true; } }); root.replaceChildren(mounted.element);
   for (const { selector, top, left } of positions) {
     const node = root.querySelector(selector); if (node) { node.scrollTop = top; node.scrollLeft = left; }

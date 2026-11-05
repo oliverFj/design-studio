@@ -1,11 +1,25 @@
 import {canonicalizeTokenSet} from './scales.mjs';
+export const hasNamedThemeModes = theme => Boolean(theme?.modes && Object.values(theme.modes).some(mode => mode?.name));
+
+/** Existing light/dark preferences fall back to the authored default when a
+ * theme offers named colourways instead. Never invent a dark counterpart. */
+export function resolveThemeModeId(theme, mode = 'system', systemMode = 'light') {
+ if(!['light','dark'].includes(systemMode)||(!['system','light','dark'].includes(mode)&&!Object.hasOwn(theme?.modes??{},mode)))throw new Error('Unknown color mode.');
+ const preferred=mode==='system'?systemMode:mode;
+ return theme?.modes&&!Object.hasOwn(theme.modes,preferred)?theme.defaultMode:preferred;
+}
+
+export function themeModeOptions(theme) {
+ if(!theme?.modes)return [];
+ if(hasNamedThemeModes(theme))return Object.entries(theme.modes).map(([value,mode])=>({value,label:mode.name}));
+ return [{value:'system',label:'Automatisk'},{value:'light',label:'Lys'},{value:'dark',label:'Mørk'}];
+}
 /** Resolve an optional light/dark pair without mutating the editable source.
  * A resolved snapshot deliberately omits modes so it can be validated/rendered
  * independently. Old single-mode themes retain their original values.
  */
 export function resolveThemeMode(theme, mode = 'system', systemMode = 'light') {
- if(!['system','light','dark'].includes(mode)||!['light','dark'].includes(systemMode))throw new Error('Unknown color mode.');
- const copy=structuredClone(theme),selected=mode==='system'?systemMode:mode;
+ const selected=resolveThemeModeId(theme,mode,systemMode),copy=structuredClone(theme);
  if(copy.modes){copy.tokens=copy.schemaVersion===2?{...canonicalizeTokenSet(copy.tokens),...canonicalizeTokenSet(copy.modes[selected]?.tokens)}:{...copy.tokens,...copy.modes[selected]?.tokens};delete copy.modes;delete copy.defaultMode;}
  return copy;
 }

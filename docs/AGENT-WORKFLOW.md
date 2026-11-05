@@ -8,6 +8,8 @@ Bibliotek 3.5.0 leverer de 61 roller i det aftalte katalog på tværs af de medf
 
 Læs systemets [README](../README.md), [AGENTS.md](../AGENTS.md) og [designgrundlag](DESIGN-FOUNDATIONS.md) samt produktets egne anvisninger før UI-arbejde.
 
+Ved tema- og designarbejde bruges [designgrundloven](DESIGN-PRINCIPLES.md) som fælles beslutningsgrundlag fra tokens til produkter. Genbrug allerede læste principper; gennemgå især de berørte afsnit ved ændringer.
+
 Find `design-studio.project.json`. Brug dens faktiske filstier, scope, tema og registrerede adaptere; standardstierne er `design/design.json`, `design/design.css` og `design/runtime/components.mjs`. Bevar produktets brand. Læs relevante brandprincipper, sektionsregler og logobrug; genbrug godkendte originaler og licenser.
 
 | Kilde | Ansvar |

@@ -13,14 +13,18 @@ Format 2 er ét tema i en JSON-fil. Komponentdefinitioner ligger i det fælles c
 | appearance | Valgfrie overrides af godkendte visuelle egenskaber på eksisterende dele, varianter og tilstande. |
 | brand | Valgfri brandguide og originalressourcer; se BRANDGUIDE.md. |
 | history | Dato og beskrivelse af temabeslutninger. |
-| modes | Valgfrit par med `light` og `dark`; hver indeholder alene `tokens` som overrides over temaets grundtokens. |
-| defaultMode | `light` eller `dark`, påkrævet sammen med `modes`; angiver grundtemaets tilsigtede farvetilstand. |
+| modes | Valgfrie farvetilstande: et `light`/`dark`-par eller navngivne farvevariationer med `name`, `colorScheme` og `tokens`. |
+| defaultMode | Id på temaets standardtilstand, påkrævet sammen med `modes`. |
 
 components er ikke tilladt i format 2. Tilføj komponenter til det fælles bibliotek.
 
 ## Tokens og defaults
 
-Typerne er color, dimension, fontFamily, fontWeight, number, duration og shadow. Et alias er hele værdien, eksempelvis {color.action.primary}; det skal referere til et token med samme type. Ukendte eller cirkulære aliases afvises.
+Typerne er color, dimension, fontFamily, fontWeight, number, duration, shadow og gradient. Et alias er hele værdien, eksempelvis {color.action.primary}; det skal referere til et token med samme type. Ukendte eller cirkulære aliases afvises.
+
+`gradient` er en CSS-streng med `linear-gradient` eller `radial-gradient`, 2–8 opake, målbare farvestop og stigende procentpositioner fra 0% til 100%. Lineær retning angives som vinkel eller `to right`/`to bottom` med eventuel vandret hjørneretning; radial form er `circle`/`ellipse`, eventuelt `at 50% 50%`. Eksempel: `{"$type":"gradient","$value":"linear-gradient(135deg, {palette.brand.700} 0%, {palette.accent.700} 100%)","description":"Brandets farveovergang."}`. Farvestop kan referere til color-tokens; hele værdien kan referere til et gradient-token. Det er Design Studios CSS-orienterede repræsentation, ikke DTCG's sammensatte gradientformat. Farvestop er begrænset til opake hex-, rgb-, hsl- og målbare navngivne sRGB-farver; oklab/oklch/color()-stop afvises. CSS-eksporten angiver eksplicit `in srgb`, så interpolation og kontrastberegning følger samme farverum. Editoren viser en farveprøve og et flerlinjetekstfelt.
+
+Gradienter bruges gennem `background` i tilladte appearance-overrides eller via deres CSS-variabler i produktets komposition. Grundfladernes color-tokens forbliver opake enkeltfarver. Kontrastkontrollen af komponentopskrifter bruger konservative sRGB-kanalgrænser for hele gradientens lyshedsspænd, også mellem farvestoppene. Den kan afvise en brugbar gradient; den godkender ikke blot ud fra endepunkterne. Den dokumenterer ikke automatisk kontrast på billeder, lokale produktflader eller vilkårlig CSS.
 
 core/contract.mjs beskriver grundvokabularet. core/library.mjs indeholder DEFAULT_TOKENS med dokumenterede værdier/aliases for alle bibliotekets roller. Temaet overskriver værdier uden at ændre tokenets type. getComponents og materializePackage giver en afledt læsemodel; gem altid det oprindelige tema, ikke læsemodellen.
 
@@ -32,11 +36,11 @@ space.component.padding, paddingLarge, paddingCompact, gap og gapLarge skal efte
 
 Format 2 validerer semantiske kontrastpar, målbare eksplicitte farvepar i varianter/tilstande og grundlæggende tekst-/kontrolmål gennem core/quality.mjs. Feltgrænser har mindst 3:1 mod kontrol-, indholds- og grundflader; også input/select/field/choice-field-opskrifter og deres varianter kontrolleres, så svage appearance-overrides ikke kan omgå tokenkravet. Disabled er undtaget; dekorative kortkanter er ikke feltgrænser. Se DESIGN-FOUNDATIONS.md for kontrollens rækkevidde. Native tastaturfokus fastholdes af CSS-generatoren uanset temaets udtryk.
 
-## Parrede farvetilstande
+## Farvetilstande og navngivne farvevariationer
 
-En format 2-pakke kan have `modes: {light: {tokens: {...}}, dark: {tokens: {...}}}` og `defaultMode`. Begge tilstande skal være til stede og være gyldige som grundtokens plus egne overrides. De samme tokenregler, typer, aliaser, kontrastkrav og positive komponentafstande gælder i begge. Ukendte modefelter eller mode-id'er afvises; `defaultMode` uden parret definition er ugyldigt. Brand, appearance, struktur og komponentdefinitioner gentages ikke i modes.
+En format 2-pakke kan have et valgfrit `modes: {light: {tokens: {...}}, dark: {tokens: {...}}}`-par eller navngivne variationer som `modes: {solgul: {name: "Solgul", colorScheme: "light", tokens: {...}}, kalk: {name: "Kalk", colorScheme: "light", tokens: {...}}}`. `defaultMode` skal referere til en deklareret tilstand. Navngivne variationer kræver et læsbart `name` og `colorScheme: "light"` eller `"dark"` til native kontroller; de kræver ikke et lys/mørk-par. Id'er bruger små bogstaver, tal og bindestreger; `system` er reserveret. Alle leverede tilstande valideres som grundtokens plus egne overrides. De samme tokenregler, typer, aliaser, kontrastkrav og positive komponentafstande gælder. Brand, appearance, struktur og komponentdefinitioner gentages ikke i modes.
 
-`resolveThemeMode(source, preference, systemMode)` fra `theme-modes.mjs` returnerer et selvstændigt, klonet tema uden `modes`/`defaultMode`. Preference er `system`, `light` eller `dark`; systemMode er `light` eller `dark`. Kilden ændres ikke. Den valgte læsemodel kan valideres og bruges af den eksisterende CSS-generator og komponentruntime. En gammel enkeltstående pakke beholder sine værdier ved alle præferencer; nye modes tilføjes ikke stiltiende.
+`resolveThemeMode(source, preference, systemMode)` fra `theme-modes.mjs` returnerer et selvstændigt, klonet tema uden `modes`/`defaultMode`. Preference er et deklareret tilstands-id eller `system`, `light`, `dark`; systemMode er `light` eller `dark`. Hvis den ønskede lys/mørk-tilstand ikke findes, bruges temaets `defaultMode`. Kilden ændres ikke. `themeModeOptions(source)` leverer pickerens værdier og labels, og `resolveThemeModeId` leverer det valgte id. En enkeltstående pakke uden modes beholder sine værdier; nye modes tilføjes ikke stiltiende.
 
 Gem den oprindelige kilde med alle modeoverrides. CSS-eksporten af en resolved læsemodel er én fremtoning. Produktet vælger selv, hvordan det anvender brugerens præference; se [runtimeintegration](INTEGRATION.md#lyse-og-mørke-farvetilstande).
 

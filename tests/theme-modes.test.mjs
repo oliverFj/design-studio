@@ -2,27 +2,44 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {validatePackage,resolveTokens,materializePackage} from '../core/engine.mjs';
-import {resolveThemeMode,createColorModePreference} from '../core/theme-modes.mjs';
+import {resolveThemeMode,resolveThemeModeId,themeModeOptions,createColorModePreference} from '../core/theme-modes.mjs';
 import {PUBLIC_THEME_IDS} from '../tools/public-themes.mjs';
 
 const theme=id=>JSON.parse(readFileSync(new URL('../packages/'+id+'.json',import.meta.url),'utf8'));
 const color=value=>({$type:'color',$value:value,description:'A deliberate mode-quality regression.'});
 
-test('all authored mode pairs resolve to independent valid snapshots and preserve editable sources',()=>{
+test('all authored appearances resolve to independent valid snapshots and preserve editable sources',()=>{
  for(const id of PUBLIC_THEME_IDS){
   const pack=theme(id),before=structuredClone(pack);
   assert.deepEqual(validatePackage(pack),{valid:true,errors:[]},id);
-  const light=resolveThemeMode(pack,'light'),dark=resolveThemeMode(pack,'system','dark');
-  for(const snapshot of [light,dark]){
+  const snapshots=Object.keys(pack.modes??{}).map(id=>resolveThemeMode(pack,id));
+  for(const snapshot of snapshots){
    assert.equal(snapshot.modes,undefined);assert.equal(snapshot.defaultMode,undefined);
    assert.deepEqual(validatePackage(snapshot),{valid:true,errors:[]},id);
    assert.equal(snapshot.id,pack.id);assert.deepEqual(snapshot.brand,pack.brand);
   }
-  assert.notEqual(resolveTokens(light)['color.background.canvas'],resolveTokens(dark)['color.background.canvas'],id+' has two actual appearances');
+  const [light,dark]=snapshots;
+  if(dark)assert.notEqual(resolveTokens(light)['color.background.canvas'],resolveTokens(dark)['color.background.canvas'],id+' has distinct authored appearances');
   light.tokens['color.background.canvas'].$value='#abcdef';
   if(light.brand?.principles?.length)light.brand.principles[0]='A changed snapshot';
   assert.deepEqual(pack,before,id+' remains an editable source, including its mode overrides');
  }
+});
+
+test('named colorways use their own labels and native schemes without inventing a dark appearance',()=>{
+ const pack=theme('bauhaus'),before=structuredClone(pack);
+ assert.deepEqual(themeModeOptions(pack),[{value:'solgul',label:'Solgul'},{value:'kalk',label:'Kalk'},{value:'signalroed',label:'Signalrød'}]);
+ assert.equal(pack.modes.dark,undefined);
+ assert.equal(resolveThemeModeId(pack,'system','dark'),'solgul');
+ assert.equal(resolveThemeModeId(pack,'dark'),'solgul');
+ assert.equal(resolveTokens(resolveThemeMode(pack,'kalk'))['color.background.canvas'],'#fffbea');
+ assert.notEqual(resolveTokens(resolveThemeMode(pack,'signalroed'))['color.action.primary.rest.surface'],resolveTokens(resolveThemeMode(pack,'solgul'))['color.action.primary.rest.surface']);
+ assert.deepEqual(pack,before);
+ for(const mutate of [
+  p=>{p.defaultMode='missing';},p=>{delete p.modes.kalk.name;},p=>{p.modes.kalk.colorScheme='sepia';},
+  p=>{p.modes.system=p.modes.kalk;},p=>{p.modes.kalk.appearance={};},
+  p=>{p.modes.kalk.tokens['color.text.primary']=color('{color.background.canvas}');}
+ ]){const invalid=structuredClone(pack);mutate(invalid);assert.equal(validatePackage(invalid).valid,false);}
 });
 
 test('single-mode and legacy themes are not silently converted by color preference',()=>{

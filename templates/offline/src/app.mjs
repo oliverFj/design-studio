@@ -2,17 +2,21 @@ import theme from '../design/design.json';
 import { createComponent } from '../design/runtime/components.mjs';
 import { createProjectFile } from '../design/runtime/files.mjs';
 import { generateCSS } from '../design/runtime/engine.mjs';
-import { resolveThemeMode, createColorModePreference } from '../design/runtime/theme-modes.mjs';
+import { resolveThemeMode, resolveThemeModeId, themeModeOptions, hasNamedThemeModes, createColorModePreference } from '../design/runtime/theme-modes.mjs';
 
 const root = document.querySelector('#app');
 const modeStyle = document.createElement('style');
 document.head.append(modeStyle);
 let activeTheme, modeField;
+let namedMode=theme.defaultMode;
+const modeChoice=()=>hasNamedThemeModes(theme)?namedMode:colorMode.value;
 const colorMode = createColorModePreference({ key: 'design-studio.project.' + theme.id + '.color-mode', onChange: applyColorMode });
 function applyColorMode() {
-  activeTheme = resolveThemeMode(theme, colorMode.value, colorMode.resolved);
+  activeTheme = resolveThemeMode(theme, modeChoice(), colorMode.resolved);
   modeStyle.textContent = generateCSS(activeTheme);
-  if (modeField) modeField.querySelector('select').value = colorMode.value;
+  if (modeField) modeField.querySelector('select').value = modeChoice();
+  const selected=resolveThemeModeId(theme,modeChoice(),colorMode.resolved);
+  document.documentElement.style.colorScheme=theme.modes?.[selected]?.colorScheme??(theme.modes?selected:'normal');
 }
 applyColorMode();
 const heading = document.createElement('h1');
@@ -33,10 +37,11 @@ const card = createComponent(activeTheme, 'card', {
   },
 });
 modeField = createComponent(activeTheme, 'field', {
-  idPrefix: 'project-color-mode', label: 'Farvetilstand', value: colorMode.value, hint: '',
-  slots: { control: { tag: 'select', children: [['system', 'System'], ['light', 'Lys'], ['dark', 'Mørk']].map(([value, text]) => ({ tag: 'option', attrs: { value }, text })) } },
+  idPrefix: 'project-color-mode', label: 'Farvetilstand', value: modeChoice(), hint: '',
+  slots: { control: { tag: 'select', children: themeModeOptions(theme).map(({value,label}) => ({ tag: 'option', attrs: { value }, text:label })) } },
 });
-modeField.querySelector('select').addEventListener('change', event => colorMode.set(event.target.value));
+modeField.querySelector('select').disabled=!theme.modes;
+modeField.querySelector('select').addEventListener('change', event => {if(hasNamedThemeModes(theme)){namedMode=event.target.value;applyColorMode();}else colorMode.set(event.target.value);});
 root.append(heading, modeField, card, status);
 let clicks = 0;
 let dirty = false;

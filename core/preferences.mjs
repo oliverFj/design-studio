@@ -37,7 +37,7 @@ export function generatePreferenceCSS(scope = '.ds-scope') {
     '}',
     '@media (forced-colors: active) {',
     rule(scope, 'color: CanvasText !important; background-color: Canvas !important;'),
-    rule(within(surfaces), 'color: CanvasText !important; background-color: Canvas !important; border-color: CanvasText !important; box-shadow: none !important;'),
+    rule(within(surfaces), 'color: CanvasText !important; background-color: Canvas !important; background-image: none !important; border-color: CanvasText !important; box-shadow: none !important;'),
     rule(within(buttons), 'color: ButtonText !important; background-color: ButtonFace !important; border-color: ButtonBorder !important; box-shadow: none !important;'),
     rule(within(nativeFields), 'color: FieldText !important; background-color: Field !important; border-color: FieldText !important;'),
     rule(within('.ds-file-upload__control::file-selector-button'), 'color: ButtonText !important; background-color: ButtonFace !important; border-color: ButtonBorder !important;'),

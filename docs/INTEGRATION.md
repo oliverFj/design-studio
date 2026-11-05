@@ -184,6 +184,8 @@ Det er referencekode, ikke et pluginsystem eller et krav til produktets struktur
 
 ## Lyse og mørke farvetilstande
 
+Temaer kan også tilbyde navngivne farvevariationer uden et lys/mørk-par. Byg da pickerens valg med `themeModeOptions(source)` fra komponentruntime eller `theme-modes.mjs`, og send det valgte id til `resolveThemeMode`. `hasNamedThemeModes(source)` skelner navngivne variationer fra det traditionelle lys/mørk-valg. Produktet ejer og bevarer det valgte id; `createColorModePreference` gælder fortsat OS-valget mellem lys og mørk. Brug tilstandens `colorScheme` til native kontroller. Bauhaus demonstrerer tre lyse variationer, som aldrig automatisk bliver mørke. Se [temaformatet](PACKAGE-FORMAT.md#farvetilstande-og-navngivne-farvevariationer).
+
 Parrede temaer bruger det valgfrie format 2-felt `modes` med light/dark-tokenoverrides og `defaultMode`. Gem hele kilden. Opret en valgt læsemodel med `resolveThemeMode`, og brug den samme model til både CSS og komponenter:
 
 ```js

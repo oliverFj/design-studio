@@ -1,6 +1,6 @@
 /** Project-agnostic component anatomy and semantic defaults. Visual themes own appearance. */
 import {DEFAULT_SCALE_TOKENS,TOKEN_NAME_ALIASES} from './scales.mjs';
-export const LIBRARY_VERSION='3.5.0';
+export const LIBRARY_VERSION='3.7.0';
 export { LAYOUT_PROFILES } from './layout.mjs';
 function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
 // Keep one-line desktop controls at 32px without clipping larger type or wrapped labels.
@@ -188,6 +188,14 @@ export const LEGACY_SELECTORS=freeze({
 const SCALE_ALIASES={'shadow.selected':'elevation.level1','shadow.card':'elevation.level2','shadow.floating':'elevation.level3'};
 function scaleDefaults(tokens){for(const [id,target]of Object.entries(SCALE_ALIASES))tokens[id].$value='{'+target+'}';for(const [oldId,id]of Object.entries(TOKEN_NAME_ALIASES))tokens[oldId]={$type:tokens[id].$type,$value:'{'+id+'}',description:'Compatibility alias for '+id+'. Use the canonical token in new integrations.'};return tokens;}
 export const DEFAULT_TOKENS=freeze(scaleDefaults({
+  'gradient.material': {$type:'gradient',$value:'linear-gradient(135deg, {color.background.surface} 0%, {color.background.surface} 100%)',description:'Opak materialeflade på kortets material-variant. Tekstkontrast måles over hele gradienten.'},
+  'radius.feature': {$type:'dimension',$value:'2rem',description:'Det fremhævede hjørne på asymmetriske kort; øvrige hjørner følger radius.card.'},
+  'shadow.embossed': {$type:'shadow',$value:'inset 0 2px 0 #00000018, inset 0 -2px 0 #ffffff44',description:'Indvendigt relief uden ændret geometri, tekstgennemsigtighed eller fokus.'},
+  'duration.expressive': {$type:'duration',$value:'240ms',description:'Varighed for valgfri temabevægelse gennem animateThemed; standardanimationen ændres ikke.'},
+  'motion.curve.x1': {$type:'number',$value:0.2,description:'Første kontrolpunkts x i temaets valgfrie cubic-bezier-kurve, mellem 0 og 1.'},
+  'motion.curve.y1': {$type:'number',$value:0.7,description:'Første kontrolpunkts y i temaets valgfrie bevægelseskurve.'},
+  'motion.curve.x2': {$type:'number',$value:0.2,description:'Andet kontrolpunkts x i temaets valgfrie cubic-bezier-kurve, mellem 0 og 1.'},
+  'motion.curve.y2': {$type:'number',$value:1,description:'Andet kontrolpunkts y; let oversving bruges kun i produktets dekorative bevægelse.'},
   ...DEFAULT_SCALE_TOKENS,
   "color.action.secondary.hover.surface": {"$type":"color","$value":"#3d4253","description":"Central neutral secondary hover surface; themes may override the complete surface/text pair."},
   "color.action.secondary.hover.text": {"$type":"color","$value":"#ffffff","description":"Readable text on the neutral secondary hover surface."},
@@ -2361,6 +2369,18 @@ export const COMPONENT_LIBRARY=freeze({
         "styles": {
           "boxShadow": "{shadow.card}"
         }
+      },
+      "material": {
+        "description": "Opak, kontrastmålt materialeflade. Temaets gradient giver eksempelvis papir eller satin; ingen billeder, gennemsigtighed eller ændret layout.",
+        "styles": {"background":"{gradient.material}"}
+      },
+      "embossed": {
+        "description": "Indvendigt relief til en taktil indholdsflade. Bevarer læsbar grundfarve, native indhold og synligt fokus.",
+        "styles": {"boxShadow":"{shadow.embossed}"}
+      },
+      "asymmetric": {
+        "description": "Et fremhævet øvre højre og nedre venstre hjørne. Til særprægede indholdskort; ændrer hverken placering, klikflader eller indre afstande.",
+        "styles": {"borderTopRightRadius":"{radius.feature}","borderBottomLeftRadius":"{radius.feature}"}
       },
       "outlined": {
         "description": "Flade med synlig kant.",

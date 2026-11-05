@@ -20,6 +20,7 @@ if(!providedThemes)for (const file of (await readdir(path.join(root, 'packages')
 const bundle = await build({
   entryPoints: [path.join(root, 'studio/app.mjs')], bundle: true, write: false,
   format: 'iife', target: 'es2022', minify: true, legalComments: 'none',
+  loader: { '.md': 'text' },
   define:{__STUDIO_SHOWCASE__:JSON.stringify(showcase)},
   plugins: [{
     name: 'offline-studio',
@@ -29,7 +30,7 @@ const bundle = await build({
   }],
 });
 let html = await readFile(path.join(root, 'studio/index.html'), 'utf8');
-for (const file of ['styles.css', 'project-overview.css', 'component-catalog.css']) {
+for (const file of ['styles.css', 'project-overview.css', 'component-catalog.css', 'principles.css']) {
   const css = (await transform(await readFile(path.join(root, 'studio', file), 'utf8'), {loader:'css',minify:true,legalComments:'none'})).code;
   html = html.replace('<link rel="stylesheet" href="./' + file + '">', () => '<style>' + css.replace(/<\/style/gi, '<\\/style') + '</style>');
 }

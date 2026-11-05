@@ -4,13 +4,14 @@ Læs [README.md](README.md), [docs/AGENT-WORKFLOW.md](docs/AGENT-WORKFLOW.md) og
 
 - **Arbejdsgang:** AGENT-WORKFLOW er den fælles vej fra nyt projekt til færdig skærm, opdatering og kontrol.
 - **API og eksempler:** [docs/INTEGRATION.md](docs/INTEGRATION.md).
-- **Designprincipper:** DESIGN-FOUNDATIONS og [docs/BRANDGUIDE.md](docs/BRANDGUIDE.md).
+- **Designprincipper:** [Designgrundloven](docs/DESIGN-PRINCIPLES.md) gælder temaer, komponenter, mønstre og produkter. DESIGN-FOUNDATIONS beskriver den tekniske anvendelse, og [docs/BRANDGUIDE.md](docs/BRANDGUIDE.md) beskriver branddelen.
 - **Format og levering:** [docs/PACKAGE-FORMAT.md](docs/PACKAGE-FORMAT.md) og [docs/PRODUCTION.md](docs/PRODUCTION.md).
 
 ## Faste grænser
 
 - `core/library.mjs` er den fælles kilde til roller, dele, layout, varianter, tilstande og deklarative previews. `core/components.mjs` leverer markup, native DOM og indgangen til fælles interaktionshjælpere. Bevar framework-uafhængigheden.
 - `packages/*.json` og produktets tema er format 2-temaer med tokens, afgrænsede appearance-overrides, brandguide og historik. De indeholder ikke komponentdefinitioner og må ikke ændre struktur, display, padding, gap, positionering eller fokusmekanik. Brug positive semantiske spacingtokens til tæthed.
+- Temaer kan være lyse, mørke eller have begge farvetilstande. Vælg efter udtrykket og produktets behov; en modsat variation er ikke et krav. Kontrollér alle farvetilstande, som faktisk leveres.
 - Produktet ejer indhold, navigation, data, kommandoer, lagring og skærmkomposition. Brug fælles runtime eller tynde adaptere, aldrig en konkurrerende lokal udgave af en eksisterende rolle. Registrér faktiske frameworkadaptere med verificerede `file` og `export`; direkte runtimebrug kræver ingen lokal adapter.
 - Genbrug en eksisterende rolle før udvidelse. Nye varianter og genbrugelige roller udvikles centralt med projektagnostiske navne, beskrivelser og eksempler. Roller skal have navn, formål, anvendelse, parts, variants, states, composes og preview samt semantiske tokens eller dokumenterede defaults, der virker i alle temaer.
 - Ved hele skærme: undersøg `patterns/catalog.mjs` og referenceeksemplerne. `tools/cli.mjs examples PROJECT_DIR` kopierer uden overskrivning; kopierne er valgfri produktkode. Bevar ophav og licenser.

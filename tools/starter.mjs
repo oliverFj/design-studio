@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 
 // Bump when the starter templates change; separate from the component library.
-export const STARTER_VERSION = '1.2.1';
+export const STARTER_VERSION = '1.3.0';
 export const STARTER_FILES = ['package.json', '.gitignore', 'src/index.html', 'src/app.mjs', 'src/styles.css', 'tools/build.mjs'];
 export const PACKAGE_FIELDS = ['type', 'private', 'engines.node', 'scripts.build', 'scripts.doctor', 'devDependencies.esbuild'];
 export const contentHash = content => createHash('sha256').update(content).digest('hex');

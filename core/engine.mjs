@@ -2,7 +2,7 @@ import {canonicalizeTokenSet,canonicalTokenReferences,canonicalTokenId} from './
 import { PACKAGE_SCHEMA_VERSION, TOKEN_TYPES, REQUIRED_TOKENS, COMPONENT_CONTRACTS, TOKEN_REFERENCE_PATTERN, cssVariableName } from './contract.mjs';
 import {COMPONENT_LIBRARY, DEFAULT_TOKENS, APPEARANCE_PROPERTIES, POSITIVE_SPACING_TOKENS, LIBRARY_VERSION, COMPONENT_ALIASES, VARIANT_ALIASES, STATE_ALIASES, PART_ALIASES, TOKEN_ALIASES, LEGACY_SELECTORS, canonicalComponentId, canonicalVariantId, canonicalStateId, canonicalPartId} from './library.mjs';
 export {LIBRARY_VERSION, canonicalComponentId, canonicalVariantId, canonicalPartId, canonicalStateId} from './library.mjs';
-import {validateThemeQuality, contrastRatio} from './quality.mjs';
+import {validateThemeQuality, contrastRatio, parseGradient} from './quality.mjs';
 import { generateLayoutCSS, generateScrollbarCSS } from './layout.mjs';
 import { BUTTON_COMPATIBILITY_VARIANTS, BUTTON_SIZES, BUTTON_DANGER_VARIANTS } from './library.mjs';
 import { generateIconCSS, ICON_NAMES } from './icons.mjs';
@@ -87,6 +87,7 @@ function tokenValueValid(type, value) {
     case 'number': return typeof value === 'number' && Number.isFinite(value);
     case 'duration': return typeof value === 'string' && /^(?:\d*\.)?\d+(?:ms|s)$/.test(string);
     case 'shadow': return typeof value === 'string' && (string === 'none' || /(?:^|\s)-?(?:\d*\.)?\d+(?:px|rem|em|\b)/.test(string));
+    case 'gradient': return typeof value === 'string' && parseGradient(string)!==null;
     default: return false;
   }
 }
@@ -146,6 +147,12 @@ function resolveUnchecked(tokens, errors) {
     if (alias) {
       if (own(tokens, alias) && record(tokens[alias]) && token.$type !== tokens[alias].$type) errors.push(`tokens.${id}: alias ${alias} has type ${tokens[alias].$type}, expected ${token.$type}.`);
       value = resolve(alias);
+    } else if(token.$type==='gradient'&&typeof value==='string') {
+      value=value.replace(new RegExp(TOKEN_REFERENCE_PATTERN.source,'g'),(_,dependency)=>{
+        if(tokens[dependency]?.$type!=='color')errors.push(`tokens.${id}: gradient stop ${dependency} must reference a color token.`);
+        return String(resolve(dependency)??'');
+      });
+      value=parseGradient(value)?.css??value;
     }
     visiting.delete(id);
     resolved[id] = value;
@@ -449,13 +456,14 @@ function validateLegacyPackage(pack) {
     if (!TOKEN_TYPES.includes(token.$type)) errors.push(`${path}.$type: unsupported type.`);
     textField(token.description, `${path}.description`, errors);
     if (!own(token, '$value')) errors.push(`${path}.$value: is required.`);
-    else if (!exactReference(token.$value) && !tokenValueValid(token.$type, token.$value)) errors.push(`${path}.$value: invalid ${token.$type} value; token aliases must be a single {token.id}.`);
+    else if (token.$type!=='gradient' && !exactReference(token.$value) && !tokenValueValid(token.$type, token.$value)) errors.push(`${path}.$value: invalid ${token.$type} value; token aliases must be a single {token.id}.`);
   }
   for (const [id, type] of Object.entries(REQUIRED_TOKENS)) {
     if (!own(pack.tokens, id)) errors.push(`tokens.${id}: required foundation token is missing.`);
     else if (pack.tokens[id]?.$type !== type) errors.push(`tokens.${id}: foundation token must have type ${type}.`);
   }
   const resolved = resolveUnchecked(pack.tokens, errors);
+  for(const [id,token]of Object.entries(pack.tokens))if(token?.$type==='gradient'&&!tokenValueValid('gradient',resolved[id]))errors.push(`tokens.${id}.$value: expected a linear/radial gradient with 2–8 opaque color stops, ordered from 0% to 100%.`);
   for (const [id, component] of Object.entries(pack.components)) {
     const path = `components.${id}`;
     if (!localIdPattern.test(id)) errors.push(`${path}: invalid component name.`);
@@ -795,21 +803,30 @@ export function validatePackage(pack) {
   if(!errors.length)errors.push(...validateThemeQuality(model,resolved));
   const baseValid=errors.length===0;
   if(own(pack,'modes')){
-    if(!record(pack.modes))errors.push('modes: must be an object with light and dark token overrides.');
+    if(!record(pack.modes))errors.push('modes: must be an object with color mode token overrides.');
     else {
-      allowedKeys(pack.modes,['light','dark'],'modes',errors);
-      if(!['light','dark'].includes(pack.defaultMode))errors.push('defaultMode: expected light or dark for a paired theme.');
-      for(const mode of ['light','dark']){
+      const ids=Object.keys(pack.modes);
+      const named=ids.some(id=>!['light','dark'].includes(id)||own(pack.modes[id]??{},'name')||own(pack.modes[id]??{},'colorScheme'));
+      if(!ids.length)errors.push('modes: must contain at least one color mode.');
+      if(named){
+        for(const id of ids)if(!/^[a-z][a-z0-9-]*$/.test(id)||id==='system')errors.push('modes.'+id+': invalid or reserved color mode ID.');
+        if(!ids.includes(pack.defaultMode))errors.push('defaultMode: must reference a declared color mode.');
+      }else if(!['light','dark'].includes(pack.defaultMode))errors.push('defaultMode: expected light or dark for a paired theme.');
+      for(const mode of named?ids:['light','dark']){
         const override=pack.modes[mode];
         if(!record(override)||!record(override.tokens)){errors.push('modes.'+mode+': expected an object with tokens.');continue;}
-        allowedKeys(override,['tokens'],'modes.'+mode,errors);
+        allowedKeys(override,named?['name','colorScheme','tokens']:['tokens'],'modes.'+mode,errors);
+        if(named){
+          if(typeof override.name!=='string'||!override.name.trim())errors.push('modes.'+mode+'.name: must be a non-empty string.');
+          if(!['light','dark'].includes(override.colorScheme))errors.push('modes.'+mode+'.colorScheme: expected light or dark for native controls.');
+        }
         // The authored default mode often repeats the already validated base.
         if(baseValid&&Object.entries(override.tokens).every(([id,token])=>own(pack.tokens,id)&&JSON.stringify(token)===JSON.stringify(pack.tokens[id])))continue;
         const candidate={...pack,tokens:{...canonicalizeTokenSet(pack.tokens),...canonicalizeTokenSet(override.tokens)}};delete candidate.modes;delete candidate.defaultMode;
         errors.push(...validatePackage(candidate).errors.map(error=>'modes.'+mode+'.'+error));
       }
     }
-  }else if(own(pack,'defaultMode'))errors.push('defaultMode requires a paired modes definition.');
+  }else if(own(pack,'defaultMode'))errors.push('defaultMode requires a modes definition.');
   return {valid:errors.length===0,errors:[...new Set(errors)]};
 }
 /** Get the effective catalog without mutating the source theme. */

@@ -1,5 +1,6 @@
 /** Hard limits for uncompressed UTF-8 delivery files, with room for normal growth. */
-export const DELIVERY_SIZE_LIMITS=Object.freeze({studio:1_500_000,workspace:1_250_000,themes:800_000});
+// Eleven paired themes and gradient validation; font and logo bytes remain pooled.
+export const DELIVERY_SIZE_LIMITS=Object.freeze({studio:1_600_000,workspace:1_250_000,themes:800_000});
 
 export function assertDeliverySize(delivery,content){
  const limit=DELIVERY_SIZE_LIMITS[delivery];
