@@ -4,6 +4,15 @@ import {tokenUsageReport} from '../core/token-usage.mjs';
 
 const token=$value=>({$type:'dimension',$value});
 
+test('illustration roles and their palette aliases are active without inventing component roles',()=>{
+  const model={tokens:{'color.illustration.subject':{$type:'color',$value:'{palette.pigment}'},'palette.pigment':{$type:'color',$value:'#3157cf'}},components:{}};
+  const report=tokenUsageReport(model);
+  assert.equal(report['color.illustration.subject'].status,'active');
+  assert.equal(report['color.illustration.subject'].direct[0].domain,'graphics');
+  assert.equal(report['palette.pigment'].status,'active');
+  assert.deepEqual(report['palette.pigment'].indirect[0].via,['color.illustration.subject']);
+});
+
 test('token usage records exact recipe locations without counting prose or previews',()=>{
   const model={tokens:{'space.gap':token('6px'),'space.unused':token('10px')},components:{card:{
     description:'Use {space.unused} for a product-specific layout.',

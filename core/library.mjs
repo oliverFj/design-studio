@@ -1,5 +1,6 @@
 /** Project-agnostic component anatomy and semantic defaults. Visual themes own appearance. */
 import {DEFAULT_SCALE_TOKENS,TOKEN_NAME_ALIASES} from './scales.mjs';
+import {GRAPHIC_TOKEN_DEFAULTS} from './graphic-tokens.mjs';
 export const LIBRARY_VERSION='3.7.0';
 export { LAYOUT_PROFILES } from './layout.mjs';
 function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
@@ -188,6 +189,7 @@ export const LEGACY_SELECTORS=freeze({
 const SCALE_ALIASES={'shadow.selected':'elevation.level1','shadow.card':'elevation.level2','shadow.floating':'elevation.level3'};
 function scaleDefaults(tokens){for(const [id,target]of Object.entries(SCALE_ALIASES))tokens[id].$value='{'+target+'}';for(const [oldId,id]of Object.entries(TOKEN_NAME_ALIASES))tokens[oldId]={$type:tokens[id].$type,$value:'{'+id+'}',description:'Compatibility alias for '+id+'. Use the canonical token in new integrations.'};return tokens;}
 export const DEFAULT_TOKENS=freeze(scaleDefaults({
+  ...GRAPHIC_TOKEN_DEFAULTS,
   'gradient.material': {$type:'gradient',$value:'linear-gradient(135deg, {color.background.surface} 0%, {color.background.surface} 100%)',description:'Opak materialeflade på kortets material-variant. Tekstkontrast måles over hele gradienten.'},
   'radius.feature': {$type:'dimension',$value:'2rem',description:'Det fremhævede hjørne på asymmetriske kort; øvrige hjørner følger radius.card.'},
   'shadow.embossed': {$type:'shadow',$value:'inset 0 2px 0 #00000018, inset 0 -2px 0 #ffffff44',description:'Indvendigt relief uden ændret geometri, tekstgennemsigtighed eller fokus.'},

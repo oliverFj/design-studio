@@ -5,6 +5,7 @@ import {COMPONENT_LIBRARY} from '../core/library.mjs';
 import {CATALOG_CATEGORIES,filterCatalog,renderCatalogBrowser} from '../studio/catalog-browser.mjs';
 import {createCatalogState} from '../studio/component-catalog.mjs';
 import {CATALOG_ARTWORK_IDS,renderCatalogArtwork} from '../studio/catalog-artwork.mjs';
+import {createGraphicRenderer} from '../core/graphics.mjs';
 
 test('categories cover every role once and search combines category and words',()=>{
  const ids=CATALOG_CATEGORIES.flatMap(([, ,ids])=>ids);
@@ -17,13 +18,33 @@ test('categories cover every role once and search combines category and words',(
 
 test('every shared role has decorative artwork without nested controls or duplicate identities',()=>{
  assert.deepEqual([...CATALOG_ARTWORK_IDS].sort(),Object.keys(COMPONENT_LIBRARY).sort());
+ const theme=JSON.parse(readFileSync(new URL('../packages/studio-light.json',import.meta.url),'utf8')),renderer=createGraphicRenderer(theme);
  for(const id of Object.keys(COMPONENT_LIBRARY)){
-  const artwork=renderCatalogArtwork(id);
+  const artwork=renderCatalogArtwork(id,theme,renderer);
   assert.match(artwork,/aria-hidden="true"/);
-  assert.doesNotMatch(artwork,/undefined|\sid=|<(?:button|input|select|textarea|a)\b/);
+  assert.doesNotMatch(artwork,/undefined|<(?:button|input|select|textarea|a)\b/);
  }
  assert.equal(renderCatalogArtwork('custom-legacy-role'),'');
  assert.equal(renderCatalogArtwork('__proto__'),'');
+});
+
+test('all sixty-one catalog illustrations follow the selected family without legacy artwork fallbacks',()=>{
+ const theme=JSON.parse(readFileSync(new URL('../packages/studio-light.json',import.meta.url),'utf8'));
+ for(const family of ['anatomy','lightroom','passage','fieldlines']){
+  const pack={...theme,graphics:{family}},renderer=createGraphicRenderer(pack);
+  const illustrations=CATALOG_ARTWORK_IDS.map(id=>{
+   const html=renderCatalogArtwork(id,pack,renderer);
+   assert.match(html,new RegExp('data-family="'+family+'"'));
+   assert.match(html,new RegExp('data-motif="'+id+'"'));
+   assert.match(html,/data-graphic-decoration/);
+   assert.doesNotMatch(html,/<(?:button|input|select|textarea|a)\b|tabindex=/);
+   return html;
+  }).join('');
+  const ids=[...illustrations.matchAll(/\sid="([^"]+)"/g)].map(match=>match[1]);
+  assert.equal(new Set(ids).size,ids.length);
+  assert.equal((illustrations.match(/data-graphic-decoration/g)||[]).length,61);
+  assert.doesNotMatch(illustrations,/catalog-art-[\w-]+/);
+ }
 });
 
 test('catalog uses Danish name order and a list expands the same component details inline',()=>{

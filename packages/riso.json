@@ -858,6 +858,66 @@
       "$type": "number",
       "$value": 1,
       "description": "Kontrolpunkt for temaets valgfrie bevægelseskurve."
+    },
+    "color.illustration.ground": {
+      "$type": "color",
+      "$value": "#f1e4ca",
+      "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
+    },
+    "color.illustration.plane": {
+      "$type": "color",
+      "$value": "#f7ecd3",
+      "description": "Et selvstændigt materialeplan i illustrationen."
+    },
+    "color.illustration.ink": {
+      "$type": "color",
+      "$value": "#3a2e27",
+      "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
+    },
+    "color.illustration.subject": {
+      "$type": "color",
+      "$value": "#bb5c42",
+      "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
+    },
+    "color.illustration.counterpoint": {
+      "$type": "color",
+      "$value": "#527d87",
+      "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
+    },
+    "color.illustration.context": {
+      "$type": "color",
+      "$value": "#e6c7ad",
+      "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
+    },
+    "color.illustration.edge": {
+      "$type": "color",
+      "$value": "#897c6d",
+      "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
+    },
+    "color.illustration.light": {
+      "$type": "color",
+      "$value": "#fff6de",
+      "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
+    },
+    "color.illustration.depth": {
+      "$type": "color",
+      "$value": "#beb19c",
+      "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+    },
+    "illustration.material.lineWidth": {
+      "$type": "number",
+      "$value": 2.1,
+      "description": "Positiv stregvægt i illustrationens SVG-enheder."
+    },
+    "illustration.material.depthOpacity": {
+      "$type": "number",
+      "$value": 0.17,
+      "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
+    },
+    "duration.illustration": {
+      "$type": "duration",
+      "$value": "3200ms",
+      "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
     }
   },
   "history": [
@@ -868,6 +928,10 @@
     {
       "date": "2026-11-05",
       "note": "Tilføjet farvevariationerne Kobolt, Skovtryk, Fuchsia. De oprindelige lyse og mørke fremtoninger bevares som navngivne valg; variationerne tilpasser palette, fladelag, materialer og skygger uden at ændre komponenternes struktur."
+    },
+    {
+      "date": "2026-11-06",
+      "note": "Dedikeret illustrationsregister med kuraterede billedfarver og materialer i alle temaets farvevariationer. Passage er valgt som grafisk udgangspunkt; alle fire billedfamilier kan fortsat vælges. Illustrationsforløb bruger en særskilt varighed på 3200 ms."
     }
   ],
   "appearance": {
@@ -1108,7 +1172,68 @@
   "defaultMode": "light",
   "modes": {
     "light": {
-      "tokens": {},
+      "tokens": {
+        "color.illustration.ground": {
+          "$type": "color",
+          "$value": "#f1e4ca",
+          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
+        },
+        "color.illustration.plane": {
+          "$type": "color",
+          "$value": "#f7ecd3",
+          "description": "Et selvstændigt materialeplan i illustrationen."
+        },
+        "color.illustration.ink": {
+          "$type": "color",
+          "$value": "#3a2e27",
+          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
+        },
+        "color.illustration.subject": {
+          "$type": "color",
+          "$value": "#bb5c42",
+          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
+        },
+        "color.illustration.counterpoint": {
+          "$type": "color",
+          "$value": "#527d87",
+          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
+        },
+        "color.illustration.context": {
+          "$type": "color",
+          "$value": "#e6c7ad",
+          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
+        },
+        "color.illustration.edge": {
+          "$type": "color",
+          "$value": "#897c6d",
+          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
+        },
+        "color.illustration.light": {
+          "$type": "color",
+          "$value": "#fff6de",
+          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
+        },
+        "color.illustration.depth": {
+          "$type": "color",
+          "$value": "#beb19c",
+          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+        },
+        "illustration.material.lineWidth": {
+          "$type": "number",
+          "$value": 2.1,
+          "description": "Positiv stregvægt i illustrationens SVG-enheder."
+        },
+        "illustration.material.depthOpacity": {
+          "$type": "number",
+          "$value": 0.17,
+          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
+        },
+        "duration.illustration": {
+          "$type": "duration",
+          "$value": "3200ms",
+          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
+        }
+      },
       "name": "Vermilion",
       "colorScheme": "light"
     },
@@ -1408,6 +1533,66 @@
           "$type": "shadow",
           "$value": "inset 0 2px 0 #756750, inset 0 -2px 0 #1a1813",
           "description": "Relief tilpasset mørke flader."
+        },
+        "color.illustration.ground": {
+          "$type": "color",
+          "$value": "#2b251d",
+          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
+        },
+        "color.illustration.plane": {
+          "$type": "color",
+          "$value": "#423b31",
+          "description": "Et selvstændigt materialeplan i illustrationen."
+        },
+        "color.illustration.ink": {
+          "$type": "color",
+          "$value": "#f0e4cf",
+          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
+        },
+        "color.illustration.subject": {
+          "$type": "color",
+          "$value": "#d39c83",
+          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
+        },
+        "color.illustration.counterpoint": {
+          "$type": "color",
+          "$value": "#9aafa3",
+          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
+        },
+        "color.illustration.context": {
+          "$type": "color",
+          "$value": "#574438",
+          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
+        },
+        "color.illustration.edge": {
+          "$type": "color",
+          "$value": "#9b9282",
+          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
+        },
+        "color.illustration.light": {
+          "$type": "color",
+          "$value": "#fff0d1",
+          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
+        },
+        "color.illustration.depth": {
+          "$type": "color",
+          "$value": "#13110d",
+          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+        },
+        "illustration.material.lineWidth": {
+          "$type": "number",
+          "$value": 2.1,
+          "description": "Positiv stregvægt i illustrationens SVG-enheder."
+        },
+        "illustration.material.depthOpacity": {
+          "$type": "number",
+          "$value": 0.16,
+          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
+        },
+        "duration.illustration": {
+          "$type": "duration",
+          "$value": "3200ms",
+          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
         }
       },
       "name": "Nattetryk",
@@ -1516,6 +1701,66 @@
           "$type": "shadow",
           "$value": "5px 5px 0 #1e2842",
           "description": "Forskudt trykskygge i variationens mørke trykfarve."
+        },
+        "color.illustration.ground": {
+          "$type": "color",
+          "$value": "#e8e3d1",
+          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
+        },
+        "color.illustration.plane": {
+          "$type": "color",
+          "$value": "#f3edd7",
+          "description": "Et selvstændigt materialeplan i illustrationen."
+        },
+        "color.illustration.ink": {
+          "$type": "color",
+          "$value": "#303747",
+          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
+        },
+        "color.illustration.subject": {
+          "$type": "color",
+          "$value": "#4b69a8",
+          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
+        },
+        "color.illustration.counterpoint": {
+          "$type": "color",
+          "$value": "#ba7055",
+          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
+        },
+        "color.illustration.context": {
+          "$type": "color",
+          "$value": "#c7c9c8",
+          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
+        },
+        "color.illustration.edge": {
+          "$type": "color",
+          "$value": "#7f8182",
+          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
+        },
+        "color.illustration.light": {
+          "$type": "color",
+          "$value": "#fff8df",
+          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
+        },
+        "color.illustration.depth": {
+          "$type": "color",
+          "$value": "#b4b3aa",
+          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+        },
+        "illustration.material.lineWidth": {
+          "$type": "number",
+          "$value": 2.1,
+          "description": "Positiv stregvægt i illustrationens SVG-enheder."
+        },
+        "illustration.material.depthOpacity": {
+          "$type": "number",
+          "$value": 0.17,
+          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
+        },
+        "duration.illustration": {
+          "$type": "duration",
+          "$value": "3200ms",
+          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
         }
       }
     },
@@ -1622,6 +1867,66 @@
           "$type": "shadow",
           "$value": "5px 5px 0 #223429",
           "description": "Forskudt trykskygge i variationens mørke trykfarve."
+        },
+        "color.illustration.ground": {
+          "$type": "color",
+          "$value": "#e7e0c8",
+          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
+        },
+        "color.illustration.plane": {
+          "$type": "color",
+          "$value": "#f2e9cb",
+          "description": "Et selvstændigt materialeplan i illustrationen."
+        },
+        "color.illustration.ink": {
+          "$type": "color",
+          "$value": "#2b443a",
+          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
+        },
+        "color.illustration.subject": {
+          "$type": "color",
+          "$value": "#3d8065",
+          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
+        },
+        "color.illustration.counterpoint": {
+          "$type": "color",
+          "$value": "#b16b4e",
+          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
+        },
+        "color.illustration.context": {
+          "$type": "color",
+          "$value": "#c3ccb3",
+          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
+        },
+        "color.illustration.edge": {
+          "$type": "color",
+          "$value": "#7c8777",
+          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
+        },
+        "color.illustration.light": {
+          "$type": "color",
+          "$value": "#fff3ce",
+          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
+        },
+        "color.illustration.depth": {
+          "$type": "color",
+          "$value": "#b2b4a0",
+          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+        },
+        "illustration.material.lineWidth": {
+          "$type": "number",
+          "$value": 2.1,
+          "description": "Positiv stregvægt i illustrationens SVG-enheder."
+        },
+        "illustration.material.depthOpacity": {
+          "$type": "number",
+          "$value": 0.17,
+          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
+        },
+        "duration.illustration": {
+          "$type": "duration",
+          "$value": "3200ms",
+          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
         }
       }
     },
@@ -1728,6 +2033,66 @@
           "$type": "shadow",
           "$value": "5px 5px 0 #3c2334",
           "description": "Forskudt trykskygge i variationens mørke trykfarve."
+        },
+        "color.illustration.ground": {
+          "$type": "color",
+          "$value": "#f1dfdb",
+          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
+        },
+        "color.illustration.plane": {
+          "$type": "color",
+          "$value": "#f7e8dd",
+          "description": "Et selvstændigt materialeplan i illustrationen."
+        },
+        "color.illustration.ink": {
+          "$type": "color",
+          "$value": "#493044",
+          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
+        },
+        "color.illustration.subject": {
+          "$type": "color",
+          "$value": "#a65383",
+          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
+        },
+        "color.illustration.counterpoint": {
+          "$type": "color",
+          "$value": "#5775a9",
+          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
+        },
+        "color.illustration.context": {
+          "$type": "color",
+          "$value": "#e1c2c9",
+          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
+        },
+        "color.illustration.edge": {
+          "$type": "color",
+          "$value": "#917b85",
+          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
+        },
+        "color.illustration.light": {
+          "$type": "color",
+          "$value": "#fff2df",
+          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
+        },
+        "color.illustration.depth": {
+          "$type": "color",
+          "$value": "#c2aeb1",
+          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+        },
+        "illustration.material.lineWidth": {
+          "$type": "number",
+          "$value": 2.1,
+          "description": "Positiv stregvægt i illustrationens SVG-enheder."
+        },
+        "illustration.material.depthOpacity": {
+          "$type": "number",
+          "$value": 0.17,
+          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
+        },
+        "duration.illustration": {
+          "$type": "duration",
+          "$value": "3200ms",
+          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
         }
       }
     }

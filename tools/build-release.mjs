@@ -7,7 +7,7 @@ import { LIBRARY_VERSION } from '../core/library.mjs';
 import { offlineIssues } from './offline-checks.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const rootFiles = new Set(['AGENTS.md', 'README.md', '.gitignore', 'package.json', 'package-lock.json']);
+const rootFiles = new Set(['AGENTS.md', 'README.md', '.gitignore', '.gitattributes', 'package.json', 'package-lock.json']);
 const sourceTypes = new Map([
   ['core', ['.mjs']], ['studio', ['.mjs', '.css', '.html']], ['showcase', ['.mjs', '.css', '.html']], ['packages', ['.json']],
   ['schema', ['.json']], ['patterns', ['.mjs', '.css']], ['tools', ['.mjs']],

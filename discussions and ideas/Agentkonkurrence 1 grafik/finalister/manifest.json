@@ -1,0 +1,2307 @@
+{
+  "schemaVersion": 1,
+  "status": "motion-study",
+  "name": "Design Studio · Fire grafiske finalister med animation",
+  "viewBox": "0 0 600 420",
+  "defaultExport": {
+    "theme": "signal",
+    "mode": "light"
+  },
+  "motion": {
+    "playback": "finite, reversible, seekable",
+    "interaction": "pointer and arrow keys",
+    "reducedMotion": "static approved form",
+    "loop": "explicit opt-in"
+  },
+  "tokens": [
+    {
+      "key": "ground",
+      "name": "color.illustration.ground",
+      "purpose": "Billedets eget underlag"
+    },
+    {
+      "key": "plane",
+      "name": "color.illustration.plane",
+      "purpose": "Et selvstændigt materialeplan"
+    },
+    {
+      "key": "ink",
+      "name": "color.illustration.ink",
+      "purpose": "Bærende kontur og grafisk tyngde"
+    },
+    {
+      "key": "subject",
+      "name": "color.illustration.subject",
+      "purpose": "Motivets første tyngdepunkt"
+    },
+    {
+      "key": "counter",
+      "name": "color.illustration.counterpoint",
+      "purpose": "En selvstændig modstemme"
+    },
+    {
+      "key": "context",
+      "name": "color.illustration.context",
+      "purpose": "Tilbagetrukne dele og sekundær masse"
+    },
+    {
+      "key": "edge",
+      "name": "color.illustration.edge",
+      "purpose": "Samlinger og illustrative hjælpelinjer"
+    },
+    {
+      "key": "light",
+      "name": "color.illustration.light",
+      "purpose": "Lyskant og lyskilde"
+    },
+    {
+      "key": "depth",
+      "name": "color.illustration.depth",
+      "purpose": "Indsnit og afgrænset dybde"
+    },
+    {
+      "key": "lineWidth",
+      "name": "illustration.material.lineWidth",
+      "purpose": "Stregvægt i SVG-enheder"
+    },
+    {
+      "key": "depthOpacity",
+      "name": "illustration.material.depthOpacity",
+      "purpose": "Dybdefarvens styrke"
+    }
+  ],
+  "themes": {
+    "signal": {
+      "name": "Signal",
+      "note": "Præcis kobolt, kontrolleret rav og et køligt billedfelt. Et teknisk register med glatte materialer.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lys",
+          "ground": "#eaf0fa",
+          "plane": "#f2f6fc",
+          "ink": "#192735",
+          "subject": "#3157cf",
+          "counter": "#d3a142",
+          "context": "#c3d0f1",
+          "edge": "#737d8a",
+          "light": "#fcfdff",
+          "depth": "#afb8c3",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.12
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Mørk",
+          "ground": "#142337",
+          "plane": "#2e3b4d",
+          "ink": "#e7edf9",
+          "subject": "#8da8e0",
+          "counter": "#c69c55",
+          "context": "#334663",
+          "edge": "#8c96a6",
+          "light": "#fcfdff",
+          "depth": "#091019",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.13
+        }
+      }
+    },
+    "prisme": {
+      "name": "Prisme",
+      "note": "Syren og rosa deler vægten. Varmt lys giver de store billedflader en blødere farveovergang.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lys",
+          "ground": "#e5dff3",
+          "plane": "#f1e8ee",
+          "ink": "#42354f",
+          "subject": "#ac7296",
+          "counter": "#8583b6",
+          "context": "#d9c8df",
+          "edge": "#887e96",
+          "light": "#fff3e9",
+          "depth": "#b7afc5",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.17
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Mørk",
+          "ground": "#201e33",
+          "plane": "#393546",
+          "ink": "#eee5fb",
+          "subject": "#d5a6c1",
+          "counter": "#aaa5d6",
+          "context": "#4f4158",
+          "edge": "#958fa5",
+          "light": "#fff0df",
+          "depth": "#0e0d17",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.18
+        }
+      }
+    },
+    "fjordside": {
+      "name": "Fjordside",
+      "note": "Papir, jord og tryksværte. Oliven får sin egen rolle som grafisk modvægt til terracotta.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lys",
+          "ground": "#eae2d5",
+          "plane": "#f4edde",
+          "ink": "#342e26",
+          "subject": "#b16d4d",
+          "counter": "#748777",
+          "context": "#dec9b8",
+          "edge": "#827b71",
+          "light": "#fff9e9",
+          "depth": "#b7b0a4",
+          "lineWidth": 2,
+          "depthOpacity": 0.18
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Mørk",
+          "ground": "#26251f",
+          "plane": "#3e3c34",
+          "ink": "#eee5d4",
+          "subject": "#c9a18a",
+          "counter": "#96aa95",
+          "context": "#50453b",
+          "edge": "#989286",
+          "light": "#fff5dc",
+          "depth": "#11110e",
+          "lineWidth": 2,
+          "depthOpacity": 0.16
+        }
+      }
+    },
+    "castle-studio": {
+      "name": "Castle Studio",
+      "note": "Grøn mineralfarve, kalk og kobber. Materialet er mildt, mens konturen holder konstruktionen tydelig.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lys",
+          "ground": "#e6ece3",
+          "plane": "#f2f2e0",
+          "ink": "#243a37",
+          "subject": "#396e65",
+          "counter": "#c38c6e",
+          "context": "#c2d2c9",
+          "edge": "#778781",
+          "light": "#fff8dd",
+          "depth": "#b0bab3",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.15
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Mørk",
+          "ground": "#1c302c",
+          "plane": "#35453e",
+          "ink": "#e5eade",
+          "subject": "#90b6a4",
+          "counter": "#bf9176",
+          "context": "#3a534b",
+          "edge": "#8f9a91",
+          "light": "#fff2d4",
+          "depth": "#0d1614",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.16
+        }
+      }
+    },
+    "castle-studio-v2": {
+      "name": "Castle Studio v2",
+      "note": "En roligere teal og en mere afgrænset kobberfarve. Tæt beslægtet med Castle, med mindre pigmentkontrast.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lys",
+          "ground": "#e8ece5",
+          "plane": "#f3f2e6",
+          "ink": "#273b38",
+          "subject": "#507c70",
+          "counter": "#b68b70",
+          "context": "#c8d4cc",
+          "edge": "#7a8782",
+          "light": "#fff8e7",
+          "depth": "#b2bab5",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.13
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Mørk",
+          "ground": "#20312d",
+          "plane": "#394640",
+          "ink": "#e5ebe1",
+          "subject": "#9ab7aa",
+          "counter": "#bc9b86",
+          "context": "#40544e",
+          "edge": "#909b94",
+          "light": "#fff4dc",
+          "depth": "#0e1614",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.14
+        }
+      }
+    },
+    "atelier": {
+      "name": "Atelier",
+      "note": "Vinrødt tryk møder okker på varmt papir. Billedets pigmenter har mere krop end appens neutraler.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lys",
+          "ground": "#f2eadb",
+          "plane": "#f8f0e1",
+          "ink": "#352c29",
+          "subject": "#8a4646",
+          "counter": "#b9904d",
+          "context": "#dcc8bc",
+          "edge": "#867e76",
+          "light": "#fff8e7",
+          "depth": "#bdb5a9",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.15
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Mørk",
+          "ground": "#2b2420",
+          "plane": "#423b35",
+          "ink": "#f0e5d3",
+          "subject": "#d6aca0",
+          "counter": "#ba9b6e",
+          "context": "#574741",
+          "edge": "#9b9286",
+          "light": "#fff2dc",
+          "depth": "#13100e",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.14
+        }
+      }
+    },
+    "midnight-editorial": {
+      "name": "Midnight Editorial",
+      "note": "Oxidblæk og afdæmpet oliven. Mørk udgave bruger blommebrunt papir og nedtonede pigmenter.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lys",
+          "ground": "#f1e9df",
+          "plane": "#f7f0e5",
+          "ink": "#342b33",
+          "subject": "#9a5942",
+          "counter": "#a0ad91",
+          "context": "#dfcbbe",
+          "edge": "#857d7d",
+          "light": "#fff8ed",
+          "depth": "#bcb4af",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.16
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Mørk",
+          "ground": "#251e26",
+          "plane": "#3d353a",
+          "ink": "#eee5dc",
+          "subject": "#c69780",
+          "counter": "#84957d",
+          "context": "#4f3d3d",
+          "edge": "#988f8e",
+          "light": "#fff1df",
+          "depth": "#110d11",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.15
+        }
+      }
+    },
+    "kyst": {
+      "name": "Kyst",
+      "note": "Petrol og sandfarvet okker på køligt mineralpapir. De lyse kanter har en svag grøn temperatur.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lys",
+          "ground": "#e6efeb",
+          "plane": "#eff6ef",
+          "ink": "#193b3a",
+          "subject": "#2c7373",
+          "counter": "#b28d4e",
+          "context": "#bfd5d2",
+          "edge": "#718886",
+          "light": "#f9fff4",
+          "depth": "#adbdb9",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.14
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Mørk",
+          "ground": "#172b2a",
+          "plane": "#2f423f",
+          "ink": "#e0eee4",
+          "subject": "#8fbeb6",
+          "counter": "#c2aa72",
+          "context": "#36514e",
+          "edge": "#8a9a94",
+          "light": "#f0ffe6",
+          "depth": "#0a1313",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.15
+        }
+      }
+    },
+    "nocturne": {
+      "name": "Nocturne",
+      "note": "Blomme og støvet lavendel får en varm rosafarvet ledsager. Store farveflader er bevidst afdæmpede.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lys",
+          "ground": "#ece5f1",
+          "plane": "#f5ebee",
+          "ink": "#392b45",
+          "subject": "#8e6aad",
+          "counter": "#bd899e",
+          "context": "#d8cbe3",
+          "edge": "#867b8f",
+          "light": "#fff2eb",
+          "depth": "#bab1c1",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.17
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Mørk",
+          "ground": "#221b2d",
+          "plane": "#3a3242",
+          "ink": "#eee3f5",
+          "subject": "#bca5d3",
+          "counter": "#bd92a7",
+          "context": "#4a3f58",
+          "edge": "#968d9f",
+          "light": "#fff0e9",
+          "depth": "#0f0c14",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.17
+        }
+      }
+    },
+    "studio-light": {
+      "name": "Studio Light",
+      "note": "Rolig indigo og blågrøn som en grafisk modstemme. Klar form og begrænset materialedybde.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lys",
+          "ground": "#ececf6",
+          "plane": "#f5f4f5",
+          "ink": "#2e314b",
+          "subject": "#6862b8",
+          "counter": "#72a09c",
+          "context": "#d0cfe9",
+          "edge": "#808195",
+          "light": "#fffdf4",
+          "depth": "#b7b8c6",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.12
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Mørk",
+          "ground": "#222536",
+          "plane": "#3a3c49",
+          "ink": "#e8e9f6",
+          "subject": "#b1aedf",
+          "counter": "#92b6ac",
+          "context": "#474962",
+          "edge": "#9395a3",
+          "light": "#fff9e7",
+          "depth": "#0f1118",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.13
+        }
+      }
+    },
+    "vaerk": {
+      "name": "Værk",
+      "note": "Varmt papir, vinrødt pigment og brændt ler. Lyset er mat og samlingerne præcise.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lys",
+          "ground": "#eee3d3",
+          "plane": "#f6ecd9",
+          "ink": "#3b2a2b",
+          "subject": "#874858",
+          "counter": "#bb855a",
+          "context": "#d8c2b9",
+          "edge": "#887a73",
+          "light": "#fff6df",
+          "depth": "#bcafa4",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.17
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Mørk",
+          "ground": "#292119",
+          "plane": "#41382e",
+          "ink": "#f1e2d1",
+          "subject": "#d1a0ab",
+          "counter": "#c5a17e",
+          "context": "#55423f",
+          "edge": "#9b8f82",
+          "light": "#fff0d5",
+          "depth": "#120f0b",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.16
+        }
+      }
+    },
+    "bauhaus": {
+      "name": "Bauhaus",
+      "note": "Tre lyse farvevariationer med hver sin hovedvægt. Klar geometri og høj kontrast uden ekstra glans.",
+      "modes": {
+        "solgul": {
+          "id": "solgul",
+          "name": "Solgul",
+          "ground": "#f2d462",
+          "plane": "#f8e599",
+          "ink": "#25272a",
+          "subject": "#3155b0",
+          "counter": "#b94433",
+          "context": "#c9b972",
+          "edge": "#7d7142",
+          "light": "#fff8da",
+          "depth": "#b9a452",
+          "lineWidth": 2.2,
+          "depthOpacity": 0.1
+        },
+        "kalk": {
+          "id": "kalk",
+          "name": "Kalk",
+          "ground": "#f6f0dd",
+          "plane": "#faf6e5",
+          "ink": "#25272a",
+          "subject": "#3155b0",
+          "counter": "#c54d37",
+          "context": "#cdcfd4",
+          "edge": "#7f7d77",
+          "light": "#fffdef",
+          "depth": "#bbb8ab",
+          "lineWidth": 2.2,
+          "depthOpacity": 0.1
+        },
+        "signalroed": {
+          "id": "signalroed",
+          "name": "Signalrød",
+          "ground": "#f1e5d5",
+          "plane": "#f7edda",
+          "ink": "#2e2925",
+          "subject": "#b64232",
+          "counter": "#3655a7",
+          "context": "#e5c3b3",
+          "edge": "#827a71",
+          "light": "#fff6e0",
+          "depth": "#bab0a4",
+          "lineWidth": 2.2,
+          "depthOpacity": 0.1
+        }
+      }
+    },
+    "porcelaen": {
+      "name": "Porcelæn",
+      "note": "Bløde glasurpigmenter og et lyst, varmt genskin. Hver navngiven farvevariation har sit eget billedpar.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Lavendel",
+          "ground": "#e8e5f2",
+          "plane": "#f3eef1",
+          "ink": "#44394e",
+          "subject": "#9382b2",
+          "counter": "#bc98b2",
+          "context": "#d6d0e5",
+          "edge": "#8b8395",
+          "light": "#fff9ef",
+          "depth": "#bab5c4",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.16
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Natglasur",
+          "ground": "#29233b",
+          "plane": "#413a4e",
+          "ink": "#f0e7f4",
+          "subject": "#bd9fcf",
+          "counter": "#b19fbf",
+          "context": "#4f4361",
+          "edge": "#9a93a4",
+          "light": "#fff0e6",
+          "depth": "#12101b",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.18
+        },
+        "celadon": {
+          "id": "celadon",
+          "name": "Celadon",
+          "ground": "#e4efe5",
+          "plane": "#f0f6e9",
+          "ink": "#2d4843",
+          "subject": "#5b9282",
+          "counter": "#be936c",
+          "context": "#c7dbd0",
+          "edge": "#7c9089",
+          "light": "#ffffed",
+          "depth": "#b1c0b8",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.16
+        },
+        "rosenkvarts": {
+          "id": "rosenkvarts",
+          "name": "Rosenkvarts",
+          "ground": "#f1e1df",
+          "plane": "#f7ebe3",
+          "ink": "#543b47",
+          "subject": "#b67c94",
+          "counter": "#8098ae",
+          "context": "#e5cccf",
+          "edge": "#988288",
+          "light": "#fff6e7",
+          "depth": "#c5b3b4",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.16
+        },
+        "maaneblaa": {
+          "id": "maaneblaa",
+          "name": "Måneblå",
+          "ground": "#1b2940",
+          "plane": "#343f51",
+          "ink": "#e8eef7",
+          "subject": "#93b2d4",
+          "counter": "#bca4cd",
+          "context": "#3a4d66",
+          "edge": "#9099a8",
+          "light": "#fff2df",
+          "depth": "#0c121d",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.17
+        }
+      }
+    },
+    "riso": {
+      "name": "Riso",
+      "note": "Trykfarver afstemt til større arealer. Billedets anden farve er et selvstændigt pigment, ikke en status.",
+      "modes": {
+        "light": {
+          "id": "light",
+          "name": "Vermilion",
+          "ground": "#f1e4ca",
+          "plane": "#f7ecd3",
+          "ink": "#3a2e27",
+          "subject": "#bb5c42",
+          "counter": "#527d87",
+          "context": "#e6c7ad",
+          "edge": "#897c6d",
+          "light": "#fff6de",
+          "depth": "#beb19c",
+          "lineWidth": 2.1,
+          "depthOpacity": 0.17
+        },
+        "dark": {
+          "id": "dark",
+          "name": "Nattetryk",
+          "ground": "#2b251d",
+          "plane": "#423b31",
+          "ink": "#f0e4cf",
+          "subject": "#d39c83",
+          "counter": "#9aafa3",
+          "context": "#574438",
+          "edge": "#9b9282",
+          "light": "#fff0d1",
+          "depth": "#13110d",
+          "lineWidth": 2.1,
+          "depthOpacity": 0.16
+        },
+        "kobolt": {
+          "id": "kobolt",
+          "name": "Kobolt",
+          "ground": "#e8e3d1",
+          "plane": "#f3edd7",
+          "ink": "#303747",
+          "subject": "#4b69a8",
+          "counter": "#ba7055",
+          "context": "#c7c9c8",
+          "edge": "#7f8182",
+          "light": "#fff8df",
+          "depth": "#b4b3aa",
+          "lineWidth": 2.1,
+          "depthOpacity": 0.17
+        },
+        "skovtryk": {
+          "id": "skovtryk",
+          "name": "Skovtryk",
+          "ground": "#e7e0c8",
+          "plane": "#f2e9cb",
+          "ink": "#2b443a",
+          "subject": "#3d8065",
+          "counter": "#b16b4e",
+          "context": "#c3ccb3",
+          "edge": "#7c8777",
+          "light": "#fff3ce",
+          "depth": "#b2b4a0",
+          "lineWidth": 2.1,
+          "depthOpacity": 0.17
+        },
+        "fuchsia": {
+          "id": "fuchsia",
+          "name": "Fuchsia",
+          "ground": "#f1dfdb",
+          "plane": "#f7e8dd",
+          "ink": "#493044",
+          "subject": "#a65383",
+          "counter": "#5775a9",
+          "context": "#e1c2c9",
+          "edge": "#917b85",
+          "light": "#fff2df",
+          "depth": "#c2aeb1",
+          "lineWidth": 2.1,
+          "depthOpacity": 0.17
+        }
+      }
+    },
+    "terminal": {
+      "name": "Terminal",
+      "note": "Signalpræcision med kontrollerede fosforflader. Lyset er afstemt til hver skærmfarve, uden automatisk glød.",
+      "modes": {
+        "dark": {
+          "id": "dark",
+          "name": "Fosfor",
+          "ground": "#14251f",
+          "plane": "#2c3d33",
+          "ink": "#e1efc8",
+          "subject": "#a7c877",
+          "counter": "#6eaa9b",
+          "context": "#3a4f36",
+          "edge": "#89987f",
+          "light": "#f1ffd7",
+          "depth": "#09110e",
+          "lineWidth": 2,
+          "depthOpacity": 0.1
+        },
+        "light": {
+          "id": "light",
+          "name": "Dagslys",
+          "ground": "#e8f0df",
+          "plane": "#f3f7e5",
+          "ink": "#2d412b",
+          "subject": "#6b8b42",
+          "counter": "#5b8b7f",
+          "context": "#cedbbe",
+          "edge": "#7d8c78",
+          "light": "#ffffeb",
+          "depth": "#b4bfad",
+          "lineWidth": 2,
+          "depthOpacity": 0.1
+        },
+        "rav": {
+          "id": "rav",
+          "name": "Rav",
+          "ground": "#2b2117",
+          "plane": "#42382b",
+          "ink": "#f1e1c6",
+          "subject": "#d6b169",
+          "counter": "#b7816b",
+          "context": "#57462c",
+          "edge": "#9c8e7b",
+          "light": "#fff1cd",
+          "depth": "#130f0a",
+          "lineWidth": 2,
+          "depthOpacity": 0.1
+        },
+        "isblaa": {
+          "id": "isblaa",
+          "name": "Isblå",
+          "ground": "#182b3a",
+          "plane": "#304250",
+          "ink": "#dfedf4",
+          "subject": "#7bb7cd",
+          "counter": "#a69cc9",
+          "context": "#324f60",
+          "edge": "#899aa4",
+          "light": "#f4fcff",
+          "depth": "#0b131a",
+          "lineWidth": 2,
+          "depthOpacity": 0.1
+        },
+        "ultraviolet": {
+          "id": "ultraviolet",
+          "name": "Ultraviolet",
+          "ground": "#2a1e39",
+          "plane": "#41354f",
+          "ink": "#eee0f6",
+          "subject": "#bb92d0",
+          "counter": "#7fb6a9",
+          "context": "#503c60",
+          "edge": "#9a8da5",
+          "light": "#fff0ff",
+          "depth": "#130d1a",
+          "lineWidth": 2,
+          "depthOpacity": 0.1
+        }
+      }
+    }
+  },
+  "families": [
+    {
+      "id": "fieldlines",
+      "name": "Feltlinjer",
+      "author": "Agent 3",
+      "description": "Præcise kurver og meningsfulde knudepunkter forbinder kilder, beslutninger og destinationer. Et organisk og matematisk billedsprog med én tydelig rute.",
+      "qualities": [
+        "Organisk",
+        "Matematisk",
+        "Flydende"
+      ],
+      "changes": [
+        "Plakatens fanekurver og dens kraftige hovedspor er bevaret som familiens centrale signatur.",
+        "Accordionens tre grene er samlet på en ubrudt stamme; den kolliderende bundlinje er fjernet.",
+        "Progress har nu en tydelig ventende bane, og den fremhævede knude står præcis ved den udfyldte rutes slutning.",
+        "Afkrydsning bruger samme 112×112 kvadrat og 13 enheders afrunding i valgt og ikke-valgt tilstand.",
+        "Familien er udvidet til ti motiver. Alle forbindelser og markører har navngivne grupper til senere interaktion."
+      ],
+      "animation": [
+        "Accordion: følg hovedstammen ind i de tre grene ved udfoldning; lad indholdet forblive statisk under reduceret bevægelse.",
+        "Progress: tegn den aktive strækning frem til den faktisk nåede knude, og flyt den aktuelle markør sammen med den.",
+        "Relation: lad et kort signal bevæge sig fra kilde til destination langs den eksisterende kurve ved en reel delingshandling."
+      ],
+      "motion": {
+        "title": "Feltlinjer · Et signal finder vej",
+        "description": "Organiske kurver tegnes med matematisk kontinuitet. Forbindelsen kommer først; knuder og destinationer svarer, når forløbet når dem. Fremdriftsmarkøren følger den tegnede banes faktiske geometri.",
+        "interactionHint": "Før markøren tæt på en kurve. En lille sonde finder det nærmeste punkt på selve forløbet, så du kan undersøge dets form og forbindelser.",
+        "duration": 3200
+      },
+      "motifs": [
+        {
+          "id": "poster",
+          "name": "Principplakat",
+          "meaning": "En større komposition om hensigt og form.",
+          "label": "Otte organiske baner samles omkring et knudepunkt. Et tydeligt hovedspor forbinder dem med en fælles destination.",
+          "file": "svg/fieldlines/poster.svg",
+          "animatedFile": "animated/fieldlines/poster.html",
+          "parts": [
+            {
+              "key": "field",
+              "name": "Ledsagende feltlinjer",
+              "purpose": "Faneformede kurver skaber en matematisk disciplineret, organisk omgivelse."
+            },
+            {
+              "key": "route",
+              "name": "Fælles retning",
+              "purpose": "Et ubrudt hovedspor får visuel vægt blandt de mange mulige forløb."
+            },
+            {
+              "key": "decision",
+              "name": "Samlende knude",
+              "purpose": "Et klart knudepunkt giver de mange baner et fælles tyngdepunkt."
+            },
+            {
+              "key": "destination",
+              "name": "Rutens destination",
+              "purpose": "En særskilt destinationsmarkør er faktisk placeret på hovedsporet."
+            },
+            {
+              "key": "guides",
+              "name": "Konstruktionsspor",
+              "purpose": "Tilbagetrukne hjælpelinjer understøtter kurvernes præcision."
+            }
+          ]
+        },
+        {
+          "id": "focus",
+          "name": "Fokus",
+          "meaning": "Ét tydeligt tyngdepunkt får plads.",
+          "label": "Et flydende forløb samles i ét klart knudepunkt. Koncentriske markeringer afgrænser fokus uden at afbryde forbindelsen.",
+          "file": "svg/fieldlines/focus.svg",
+          "animatedFile": "animated/fieldlines/focus.html",
+          "parts": [
+            {
+              "key": "field",
+              "name": "Omgivende forløb",
+              "purpose": "Tre afstemte kurver skaber plads omkring det vigtige punkt."
+            },
+            {
+              "key": "route",
+              "name": "Opmærksomhedens vej",
+              "purpose": "Et klart spor leder ind til fokus og videre derfra."
+            },
+            {
+              "key": "focus-ring",
+              "name": "Fokusets afgrænsning",
+              "purpose": "En rolig ring giver det centrale motiv et selvstændigt felt."
+            },
+            {
+              "key": "subject",
+              "name": "Fokuspunkt",
+              "purpose": "Ét fyldt punkt er motivets klare tyngdepunkt."
+            },
+            {
+              "key": "guides",
+              "name": "Optisk registrering",
+              "purpose": "Korte markeringer gør skala og centrum mærkbare uden ekstra rammer."
+            }
+          ]
+        },
+        {
+          "id": "relation",
+          "name": "Relation",
+          "meaning": "Selvstændige dele har en synlig forbindelse.",
+          "label": "To selvstændige knuder forbindes af to komplementære kurver. Relationens fælles rum opstår mellem dem.",
+          "file": "svg/fieldlines/relation.svg",
+          "animatedFile": "animated/fieldlines/relation.html",
+          "parts": [
+            {
+              "key": "outbound",
+              "name": "Første forbindelse",
+              "purpose": "Et præcist, organisk forløb forbinder de to enheder."
+            },
+            {
+              "key": "return",
+              "name": "Komplementær forbindelse",
+              "purpose": "Den anden bane gør mødet gensidigt og afgrænser et fælles rum."
+            },
+            {
+              "key": "source",
+              "name": "Første enhed",
+              "purpose": "En selvstændig, afgrænset enhed forbliver genkendelig i relationen."
+            },
+            {
+              "key": "destination",
+              "name": "Anden enhed",
+              "purpose": "Den anden enhed har samme vægt og samme adgang til forbindelsen."
+            },
+            {
+              "key": "shared-space",
+              "name": "Fælles rum",
+              "purpose": "Et lille kryds og to korte forbindelsesstreger afmærker midten som en relation, ikke en tredje person."
+            }
+          ]
+        },
+        {
+          "id": "rhythm",
+          "name": "Rytme",
+          "meaning": "Gentagelse med en begrundet variation.",
+          "label": "En kurve gentager tre jævne bølger. Parallelle ledsagespor og afstemte knudepunkter gør rytmen synlig.",
+          "file": "svg/fieldlines/rhythm.svg",
+          "animatedFile": "animated/fieldlines/rhythm.html",
+          "parts": [
+            {
+              "key": "echo-1",
+              "name": "Første ledsagespor",
+              "purpose": "En parallel gentagelse tilfører rytmen dybde uden at ændre dens takt."
+            },
+            {
+              "key": "echo-2",
+              "name": "Andet ledsagespor",
+              "purpose": "Endnu et kontrolleret interval gør gentagelsen til et samlet felt."
+            },
+            {
+              "key": "rhythm",
+              "name": "Bærende bølge",
+              "purpose": "En ubrudt kurve viser gentagelse som forløb frem for søjler."
+            },
+            {
+              "key": "beats",
+              "name": "Rytmens punkter",
+              "purpose": "Tre ligeværdige knuder gør de tilbagevendende højdepunkter aflæselige."
+            },
+            {
+              "key": "intervals",
+              "name": "Intervalmål",
+              "purpose": "Et enkelt mål viser, at gentagelsen er bevidst afstemt."
+            }
+          ]
+        },
+        {
+          "id": "accordion",
+          "name": "Accordion",
+          "meaning": "Skjult og åbent indhold kan skelnes.",
+          "label": "En hovedrække folder sig ud i tre forbundne indholdslinjer. Alle grene sidder på den samme ubrudte stamme.",
+          "file": "svg/fieldlines/accordion.svg",
+          "animatedFile": "animated/fieldlines/accordion.html",
+          "parts": [
+            {
+              "key": "header",
+              "name": "Åben hovedrække",
+              "purpose": "En markør og en stærk linje viser den overskrift, der er udfoldet."
+            },
+            {
+              "key": "stem",
+              "name": "Ubrudt stamme",
+              "purpose": "Alle tre indholdslinjer har samme fysiske oprindelse."
+            },
+            {
+              "key": "branch-1",
+              "name": "Første indholdsgren",
+              "purpose": "En selvstændig gren forbinder første indhold med hovedrækken."
+            },
+            {
+              "key": "branch-2",
+              "name": "Anden indholdsgren",
+              "purpose": "Den midterste gren fortsætter den samme forgreningslogik."
+            },
+            {
+              "key": "branch-3",
+              "name": "Tredje indholdsgren",
+              "purpose": "Stammen rundes ind i den sidste gren uden et løst stykke linje."
+            },
+            {
+              "key": "guides",
+              "name": "Sekundært konstruktionsspor",
+              "purpose": "En diskret hjælpelinje står fri af indholdsgrenenes ender."
+            }
+          ]
+        },
+        {
+          "id": "avatar-group",
+          "name": "Avatargruppe",
+          "meaning": "Personer hører sammen uden at miste deres identitet.",
+          "label": "Tre personmarkører har hver deres plads på én ubrudt forbindelseskurve.",
+          "file": "svg/fieldlines/avatar-group.svg",
+          "animatedFile": "animated/fieldlines/avatar-group.html",
+          "parts": [
+            {
+              "key": "relation",
+              "name": "Gruppens relation",
+              "purpose": "Et ubrudt bånd gør personernes fællesskab synligt."
+            },
+            {
+              "key": "person-1",
+              "name": "Første person",
+              "purpose": "En selvstændig personmarkør bevarer sin egen identitet."
+            },
+            {
+              "key": "person-2",
+              "name": "Midterste person",
+              "purpose": "En tydelig personmarkør ligger på gruppens fælles forbindelsespunkt."
+            },
+            {
+              "key": "person-3",
+              "name": "Tredje person",
+              "purpose": "Den sidste person har samme vægt og samme forbindelse som den første."
+            },
+            {
+              "key": "nodes",
+              "name": "Relationspunkter",
+              "purpose": "To diskrete knuder viser, hvor personerne bliver del af den fælles kurve."
+            }
+          ]
+        },
+        {
+          "id": "progress",
+          "name": "Fremdrift",
+          "meaning": "Passeret, aktuelt og ventende er forskellige tilstande.",
+          "label": "En tydelig rute passerer to milepæle og slutter ved den aktuelle knude. Den resterende bane fører videre til en åben destination.",
+          "file": "svg/fieldlines/progress.svg",
+          "animatedFile": "animated/fieldlines/progress.html",
+          "parts": [
+            {
+              "key": "remaining-route",
+              "name": "Ventende bane",
+              "purpose": "Samme bevidste banebredde viser den endnu ikke gennemførte del af forløbet."
+            },
+            {
+              "key": "completed-route",
+              "name": "Gennemført bane",
+              "purpose": "Den fyldte rute afsluttes nøjagtigt ved den senest nåede markør."
+            },
+            {
+              "key": "milestones",
+              "name": "Passerede milepæle",
+              "purpose": "To mindre punkter viser passerede skridt og forveksles ikke med den aktuelle position."
+            },
+            {
+              "key": "current-node",
+              "name": "Aktuel position",
+              "purpose": "En markant knude står på den udfyldte rutes faktiske slutpunkt."
+            },
+            {
+              "key": "destination",
+              "name": "Åben destination",
+              "purpose": "En tom markør viser, at der stadig er et mål længere fremme."
+            },
+            {
+              "key": "guides",
+              "name": "Forløbets mål",
+              "purpose": "Diskrete lodrette spor giver milepælene plads uden at ligne ekstra data."
+            }
+          ]
+        },
+        {
+          "id": "image",
+          "name": "Billede",
+          "meaning": "En afgrænset åbning til et motiv.",
+          "label": "Et let indrammet billede rummer en sol og tre sammenhængende landskabskurver.",
+          "file": "svg/fieldlines/image.svg",
+          "animatedFile": "animated/fieldlines/image.html",
+          "parts": [
+            {
+              "key": "frame",
+              "name": "Billedets afgrænsning",
+              "purpose": "En let ramme giver landskabets linjer en præcis lokal sammenhæng."
+            },
+            {
+              "key": "landscape",
+              "name": "Landskabsforløb",
+              "purpose": "Kontinuerlige kurver antyder et landskab med dybde, ikke endnu en brugerflade."
+            },
+            {
+              "key": "sun",
+              "name": "Landskabets tyngdepunkt",
+              "purpose": "En afgrænset solmarkør gør motivet genkendeligt som billede."
+            },
+            {
+              "key": "guides",
+              "name": "Registrering",
+              "purpose": "En enkelt optisk markering fastholder familiens præcise håndværk."
+            }
+          ]
+        },
+        {
+          "id": "caption",
+          "name": "Billedtekst",
+          "meaning": "Tekst er knyttet til et bestemt billede.",
+          "label": "Et landskab har et tydeligt forbindelsespunkt til to billedtekstlinjer nedenunder.",
+          "file": "svg/fieldlines/caption.svg",
+          "animatedFile": "animated/fieldlines/caption.html",
+          "parts": [
+            {
+              "key": "frame",
+              "name": "Billedets afgrænsning",
+              "purpose": "En let ramme giver landskabets linjer en præcis lokal sammenhæng."
+            },
+            {
+              "key": "landscape",
+              "name": "Landskabsforløb",
+              "purpose": "Kontinuerlige kurver antyder et landskab med dybde, ikke endnu en brugerflade."
+            },
+            {
+              "key": "sun",
+              "name": "Landskabets tyngdepunkt",
+              "purpose": "En afgrænset solmarkør gør motivet genkendeligt som billede."
+            },
+            {
+              "key": "caption-link",
+              "name": "Billedtekstens forbindelse",
+              "purpose": "Et faktisk ankerpunkt knytter den tilhørende tekst til billedet."
+            },
+            {
+              "key": "caption",
+              "name": "Billedtekst",
+              "purpose": "To rolige tekstlinjer understøtter sammenhængen uden at ligne endnu et forløb."
+            }
+          ]
+        },
+        {
+          "id": "checkbox",
+          "name": "Afkrydsning",
+          "meaning": "Samme kontrolform viser valgt og ikke valgt.",
+          "label": "Et sammenhængende flueben ender i en tydelig knude inde i det markerede felt. Det tomme felt nedenunder viser det alternative valg.",
+          "file": "svg/fieldlines/checkbox.svg",
+          "animatedFile": "animated/fieldlines/checkbox.html",
+          "parts": [
+            {
+              "key": "selected-field",
+              "name": "Markeret felt",
+              "purpose": "Et roligt, afgrænset felt giver det valgte tegn plads."
+            },
+            {
+              "key": "check-route",
+              "name": "Afkrydsningens forløb",
+              "purpose": "En præcis knækket linje bærer den genkendelige afkrydsningsbetydning."
+            },
+            {
+              "key": "unselected-field",
+              "name": "Umærket felt",
+              "purpose": "En tom form viser den alternative tilstand gennem geometri."
+            },
+            {
+              "key": "labels",
+              "name": "Tilhørende tekstspor",
+              "purpose": "Tekstspor knytter valgsymbolerne til deres indhold."
+            },
+            {
+              "key": "guides",
+              "name": "Feltets konstruktionsspor",
+              "purpose": "Et diskret hjørnemål holder materialet let og teknisk præcist."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "passage",
+      "name": "Passage",
+      "author": "Agent 3",
+      "description": "Udskårne flader og aktive åbninger gør adgang, indhold og sammenhæng håndgribelige. En solid, arkitektonisk billedgrammatik med en legende modfarve.",
+      "qualities": [
+        "Solid",
+        "Autoritativ",
+        "Legende"
+      ],
+      "changes": [
+        "Originalens port og afstemte materialelag er bevaret; billedtekster og målelinjer er holdt fri af motivernes konturer.",
+        "Progress er gjort til fire lige store etaper, så fremdrift læses som et forløb frem for et søjlediagram.",
+        "Avatargruppens mellemrum er nu symmetriske. Den højere midte og de udskårne silhuetter er bevaret.",
+        "Accordionens lukkede rækker har fået egne højrevendte markører, så de ikke ligner løse skyggespor.",
+        "Afkrydsning viser samme 122×122 udskårne kontrolform i valgt og ikke-valgt tilstand.",
+        "Familien er udvidet til ti motiver med navngivne SVG-dele og fælles, dedikerede grafikfarver."
+      ],
+      "animation": [
+        "Accordion: lad den indre indholdsgruppe blive afsløret gennem åbningen, mens rammen står stille.",
+        "Progress: forbind den aktuelle etape med den næste, og fyld kun det felt, som faktisk er gennemført.",
+        "Plakat: forskyd de to bagplaner ganske lidt ved aktiv udforskning, så portens dybde kan mærkes; statisk ved reduceret bevægelse."
+      ],
+      "motion": {
+        "title": "Passage · Planer finder deres plads",
+        "description": "Tunge, udskårne planer registreres præcist mod hinanden. Åbningerne afslører indholdet, før de små forbindelser bekræfter helheden. Bevægelsen lander roligt og bevarer motivernes solide karakter.",
+        "interactionHint": "Bevæg markøren over motivet og undersøg materialedybden. Bagplanerne flytter sig ganske lidt, mens den bærende forgrund bliver stående.",
+        "duration": 3200
+      },
+      "motifs": [
+        {
+          "id": "poster",
+          "name": "Principplakat",
+          "meaning": "En større komposition om hensigt og form.",
+          "label": "En massiv port med en udskåret åbning afslører et indre rum. En ubrudt vej fører gennem åbningen.",
+          "file": "svg/passage/poster.svg",
+          "animatedFile": "animated/passage/poster.html",
+          "parts": [
+            {
+              "key": "floor",
+              "name": "Grundplan",
+              "purpose": "Forankrer de opretstående planer og gør adgangsvejen læselig."
+            },
+            {
+              "key": "rear-planes",
+              "name": "Bagplaner",
+              "purpose": "To forskudte materialeflader viser, at porten har dybde."
+            },
+            {
+              "key": "inner-room",
+              "name": "Indre rum",
+              "purpose": "Det udskårne hul afslører et selvstændigt rum bag forgrunden."
+            },
+            {
+              "key": "threshold",
+              "name": "Portens forgrund",
+              "purpose": "Den tunge silhuet og det aktive hulrum bærer familiens grundidé."
+            },
+            {
+              "key": "route",
+              "name": "Adgangsvej",
+              "purpose": "En tydelig vej fortsætter fra åbningen ud på det fælles grundplan."
+            },
+            {
+              "key": "guides",
+              "name": "Konstruktionsspor",
+              "purpose": "Diskrete mål og registreringer understøtter det arkitektoniske udtryk."
+            }
+          ]
+        },
+        {
+          "id": "focus",
+          "name": "Fokus",
+          "meaning": "Ét tydeligt tyngdepunkt får plads.",
+          "label": "En enkelt cirkel får et afgrænset rum i en tung, udskåret ramme. Åbningen samler opmærksomheden.",
+          "file": "svg/passage/focus.svg",
+          "animatedFile": "animated/passage/focus.html",
+          "parts": [
+            {
+              "key": "rear-plane",
+              "name": "Bagplan",
+              "purpose": "En rolig materialeforskydning giver forgrunden fysisk vægt."
+            },
+            {
+              "key": "inner-field",
+              "name": "Indre felt",
+              "purpose": "En selvstændig farve omslutter det centrale motiv."
+            },
+            {
+              "key": "frame",
+              "name": "Udskåret ramme",
+              "purpose": "Det tunge rektangel gør tomrummet omkring motivet aktivt."
+            },
+            {
+              "key": "subject",
+              "name": "Tyngdepunkt",
+              "purpose": "En enkelt samlet form bevarer et klart visuelt fokus."
+            },
+            {
+              "key": "guides",
+              "name": "Optiske mål",
+              "purpose": "Et par korte mållinjer viser rummets kontrollerede proportioner."
+            }
+          ]
+        },
+        {
+          "id": "relation",
+          "name": "Relation",
+          "meaning": "Selvstændige dele har en synlig forbindelse.",
+          "label": "To selvstændige plader har komplementære udskæringer. Deres fælles åbning giver en forbindelse plads.",
+          "file": "svg/passage/relation.svg",
+          "animatedFile": "animated/passage/relation.html",
+          "parts": [
+            {
+              "key": "rear-plane",
+              "name": "Fælles bagplan",
+              "purpose": "Et roligt bagplan binder delene sammen uden at gøre dem identiske."
+            },
+            {
+              "key": "left-form",
+              "name": "Første modform",
+              "purpose": "Den ene halvdel afgiver plads til det fælles rum."
+            },
+            {
+              "key": "right-form",
+              "name": "Anden modform",
+              "purpose": "Den anden halvdel danner en komplementær åbning."
+            },
+            {
+              "key": "connection",
+              "name": "Fælles forbindelse",
+              "purpose": "To selvstændige punkter deler en ubrudt vej gennem modformernes åbning."
+            },
+            {
+              "key": "guides",
+              "name": "Fælles grundlinje",
+              "purpose": "Et fælles mål beskriver helheden frem for at indramme hver del igen."
+            }
+          ]
+        },
+        {
+          "id": "rhythm",
+          "name": "Rytme",
+          "meaning": "Gentagelse med en begrundet variation.",
+          "label": "Fire udskårne buer gentager samme åbning. Et skiftevis løft i højden skaber en rolig, bevidst rytme.",
+          "file": "svg/passage/rhythm.svg",
+          "animatedFile": "animated/passage/rhythm.html",
+          "parts": [
+            {
+              "key": "base",
+              "name": "Fælles sokkel",
+              "purpose": "Holder gentagelserne sammen som én komposition."
+            },
+            {
+              "key": "beat-1",
+              "name": "Gentagelse 1",
+              "purpose": "En genkendelig åbning gentages med et kontrolleret skift i højde og pigment."
+            },
+            {
+              "key": "beat-2",
+              "name": "Gentagelse 2",
+              "purpose": "En genkendelig åbning gentages med et kontrolleret skift i højde og pigment."
+            },
+            {
+              "key": "beat-3",
+              "name": "Gentagelse 3",
+              "purpose": "En genkendelig åbning gentages med et kontrolleret skift i højde og pigment."
+            },
+            {
+              "key": "beat-4",
+              "name": "Gentagelse 4",
+              "purpose": "En genkendelig åbning gentages med et kontrolleret skift i højde og pigment."
+            },
+            {
+              "key": "intervals",
+              "name": "Mellemrum",
+              "purpose": "Ens intervaller fremhæver gentagelsen uden at gøre den til et datadiagram."
+            }
+          ]
+        },
+        {
+          "id": "accordion",
+          "name": "Accordion",
+          "meaning": "Skjult og åbent indhold kan skelnes.",
+          "label": "En åben overskrift afslører indhold gennem et indrammet hulrum. To smallere, lukkede rækker bliver nedenunder.",
+          "file": "svg/passage/accordion.svg",
+          "animatedFile": "animated/passage/accordion.html",
+          "parts": [
+            {
+              "key": "rear-planes",
+              "name": "Skjulte lag",
+              "purpose": "Forskudte bagplaner giver indtrykket af indhold bag overskriften."
+            },
+            {
+              "key": "opening",
+              "name": "Åben indholdsramme",
+              "purpose": "Udskæringen giver indholdet et synligt sted at træde frem."
+            },
+            {
+              "key": "content",
+              "name": "Afsløret indhold",
+              "purpose": "Tre korte linjer beskriver det indhold, som folden giver adgang til."
+            },
+            {
+              "key": "header",
+              "name": "Åben overskrift",
+              "purpose": "En nedadrettet markør peger på det indhold, der faktisk er åbnet."
+            },
+            {
+              "key": "closed-rows",
+              "name": "Lukkede rækker",
+              "purpose": "To højrevendte markører skelner de lukkede rækker fra den åbne."
+            },
+            {
+              "key": "guides",
+              "name": "Registrering",
+              "purpose": "En enkel markering afstemmer motivets konstruktive karakter."
+            }
+          ]
+        },
+        {
+          "id": "avatar-group",
+          "name": "Avatargruppe",
+          "meaning": "Personer hører sammen uden at miste deres identitet.",
+          "label": "Tre personudskæringer med ens mellemrum deler en samlet sokkel. Den højere midte giver kompositionen et tyngdepunkt.",
+          "file": "svg/passage/avatar-group.svg",
+          "animatedFile": "animated/passage/avatar-group.html",
+          "parts": [
+            {
+              "key": "base",
+              "name": "Fælles sokkel",
+              "purpose": "En samlet fysisk base gør de tre individer til én gruppe."
+            },
+            {
+              "key": "person-1",
+              "name": "Person 1",
+              "purpose": "En selvstændig silhuet bevarer sin egen plads i den fælles struktur."
+            },
+            {
+              "key": "person-2",
+              "name": "Person 2",
+              "purpose": "En selvstændig silhuet bevarer sin egen plads i den fælles struktur."
+            },
+            {
+              "key": "person-3",
+              "name": "Person 3",
+              "purpose": "En selvstændig silhuet bevarer sin egen plads i den fælles struktur."
+            },
+            {
+              "key": "connection",
+              "name": "Gruppens grundlinje",
+              "purpose": "En ubrudt linje og fælles mål holder personerne sammen."
+            }
+          ]
+        },
+        {
+          "id": "progress",
+          "name": "Fremdrift",
+          "meaning": "Passeret, aktuelt og ventende er forskellige tilstande.",
+          "label": "Fire lige store etaper følger en fælles rute. De første tre er udfyldt, den sidste står åben og venter.",
+          "file": "svg/passage/progress.svg",
+          "animatedFile": "animated/passage/progress.html",
+          "parts": [
+            {
+              "key": "route",
+              "name": "Etapernes forbindelse",
+              "purpose": "En ubrudt forbindelse viser rækkefølgen uafhængigt af farve."
+            },
+            {
+              "key": "stage-1",
+              "name": "Etape 1",
+              "purpose": "En udfyldt etape viser gennemført fremdrift."
+            },
+            {
+              "key": "stage-2",
+              "name": "Etape 2",
+              "purpose": "En udfyldt etape viser gennemført fremdrift."
+            },
+            {
+              "key": "stage-3",
+              "name": "Etape 3",
+              "purpose": "En udfyldt etape viser gennemført fremdrift."
+            },
+            {
+              "key": "stage-4",
+              "name": "Etape 4",
+              "purpose": "En åben kontur viser den ventende destination."
+            },
+            {
+              "key": "base",
+              "name": "Fælles mål",
+              "purpose": "Den fælles bundlinje understøtter, at alle etaper måles som lige store enheder."
+            }
+          ]
+        },
+        {
+          "id": "image",
+          "name": "Billede",
+          "meaning": "En afgrænset åbning til et motiv.",
+          "label": "Et landskab ses gennem en solid, udskåret billedramme med et forskudt bagplan.",
+          "file": "svg/passage/image.svg",
+          "animatedFile": "animated/passage/image.html",
+          "parts": [
+            {
+              "key": "rear-plane",
+              "name": "Bagplan",
+              "purpose": "Et forskudt materialeplan giver billedrammen fysisk nærvær."
+            },
+            {
+              "key": "landscape",
+              "name": "Billedindhold",
+              "purpose": "En horisont og en sol skelner motivet fra en tom komponentflade."
+            },
+            {
+              "key": "frame",
+              "name": "Udskåret billedramme",
+              "purpose": "En tydelig åbning adskiller selve billedet fra omgivelserne."
+            },
+            {
+              "key": "guides",
+              "name": "Billedets fod",
+              "purpose": "En diskret bundmarkering forankrer rammen."
+            }
+          ]
+        },
+        {
+          "id": "caption",
+          "name": "Billedtekst",
+          "meaning": "Tekst er knyttet til et bestemt billede.",
+          "label": "Et indrammet landskab har et tydeligt ankerpunkt til en billedtekst nedenunder.",
+          "file": "svg/passage/caption.svg",
+          "animatedFile": "animated/passage/caption.html",
+          "parts": [
+            {
+              "key": "rear-plane",
+              "name": "Bagplan",
+              "purpose": "Et forskudt materialeplan giver billedrammen fysisk nærvær."
+            },
+            {
+              "key": "landscape",
+              "name": "Billedindhold",
+              "purpose": "En horisont og en sol skelner motivet fra en tom komponentflade."
+            },
+            {
+              "key": "frame",
+              "name": "Udskåret billedramme",
+              "purpose": "En tydelig åbning adskiller selve billedet fra omgivelserne."
+            },
+            {
+              "key": "caption-link",
+              "name": "Billedtekstens anker",
+              "purpose": "Et faktisk fæstnet forbindelsespunkt gør tekstens tilhørighed entydig."
+            },
+            {
+              "key": "caption",
+              "name": "Tilhørende billedtekst",
+              "purpose": "To rolige linjer står som tekst, der er knyttet til billedet."
+            }
+          ]
+        },
+        {
+          "id": "checkbox",
+          "name": "Afkrydsning",
+          "meaning": "Samme kontrolform viser valgt og ikke valgt.",
+          "label": "Et flueben ligger i en tydelig indfældning. Et åbent felt nedenunder viser den alternative, umarkerede tilstand.",
+          "file": "svg/passage/checkbox.svg",
+          "animatedFile": "animated/passage/checkbox.html",
+          "parts": [
+            {
+              "key": "rear-plane",
+              "name": "Felternes bagplaner",
+              "purpose": "Samme beskedne forskydning understøtter, at begge felter er den samme indfældede kontrolform."
+            },
+            {
+              "key": "selected-field",
+              "name": "Markeret indfældning",
+              "purpose": "Et hulrum i forgrunden giver afkrydsningen et afgrænset sted."
+            },
+            {
+              "key": "check",
+              "name": "Afkrydsning",
+              "purpose": "Det genkendelige flueben bærer valgets betydning."
+            },
+            {
+              "key": "unselected-field",
+              "name": "Umærket indfældning",
+              "purpose": "En tom udskæring skelner den alternative tilstand uden at kræve farve."
+            },
+            {
+              "key": "labels",
+              "name": "Tilhørende tekst",
+              "purpose": "Korte tekstspor gør motivets feltrelation genkendelig."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lightroom",
+      "name": "Lysrum",
+      "author": "Agent 2",
+      "description": "Milde rum, afstemte lyskanter og åbninger, der inviterer blikket ind. Formen forklarer relationen; lyset giver den nærvær.",
+      "qualities": [
+        "Mild",
+        "Inviterende",
+        "Sanselig"
+      ],
+      "changes": [
+        "Lysbuen er afgrænset til den indre åbning, så den ses gennem rammen og ikke oven på den.",
+        "Valgt og uvalgt afkrydsning har samme kvadratiske form; kontur og materiale deler afrunding.",
+        "Familien er samlet i samme billedformat med én konsekvent retning for lys og dybde.",
+        "Alle ti motiver har selvstændig, navngiven anatomi; farver og materiale kommer fra dedikerede grafikvariabler.",
+        "Fremdrift vises som ligeværdige milepæle, og avatargruppen giver alle tre personer samme plads."
+      ],
+      "animation": [
+        "Accordion: flyt kun den navngivne afdækning, så indholdsrummet afsløres fra samme hængsel.",
+        "Fokus: før lysfeltet roligt ind i åbningen uden at flytte rammen eller motivets tyngdepunkt.",
+        "Fremdrift: lad lyset nå næste milepæl, mens den øvrige rute og alle stedmarkører bliver stående."
+      ],
+      "motion": {
+        "title": "Dagslys i bevægelse",
+        "description": "Lyset ankommer før detaljen. Rolige afsløringer, milde forskydninger og en diskret rumlig reaktion bevarer Lysrums inviterende karakter.",
+        "interactionHint": "Flyt markøren over motivet: lyset følger dig diskret, mens rammen holder sin plads.",
+        "duration": 3200
+      },
+      "motifs": [
+        {
+          "id": "poster",
+          "name": "Principplakat",
+          "meaning": "En større komposition om hensigt og form.",
+          "label": "Et mildt lysfelt ses gennem to afstemte rammer. Åbningen giver plads til ét roligt tyngdepunkt.",
+          "file": "svg/lightroom/poster.svg",
+          "animatedFile": "animated/lightroom/poster.html",
+          "parts": [
+            {
+              "key": "ground",
+              "name": "Billedfelt",
+              "purpose": "Et roligt, selvstændigt underlag omkring hele rummet."
+            },
+            {
+              "key": "outer-frame",
+              "name": "Ydre rum",
+              "purpose": "Den første brede ramme inviterer blikket ind og fastlægger lysets retning."
+            },
+            {
+              "key": "inner-frame",
+              "name": "Indre rum",
+              "purpose": "Et andet plan skaber dybde uden at gentage en fuld mørk ramme."
+            },
+            {
+              "key": "light-field",
+              "name": "Lysfelt",
+              "purpose": "En blød, afgrænset lyskilde samler opmærksomheden nederst i åbningen."
+            },
+            {
+              "key": "sill",
+              "name": "Lyskant og bund",
+              "purpose": "Den lyse forkant gør forgrund og baggrund forståelige uden skygge alene."
+            }
+          ]
+        },
+        {
+          "id": "focus",
+          "name": "Fokus",
+          "meaning": "Ét tydeligt tyngdepunkt får plads.",
+          "label": "Et enkelt lysende felt har god plads i en rolig åbning. Rummet omkring viser, hvad der er vigtigt.",
+          "file": "svg/lightroom/focus.svg",
+          "animatedFile": "animated/lightroom/focus.html",
+          "parts": [
+            {
+              "key": "ground",
+              "name": "Billedfelt",
+              "purpose": "En rolig bund uden konkurrerende markeringer."
+            },
+            {
+              "key": "recess",
+              "name": "Afgrænset rum",
+              "purpose": "En indrammet åbning holder motivet samlet."
+            },
+            {
+              "key": "depth",
+              "name": "Indre dybde",
+              "purpose": "En diskret forskydning gør åbningen fysisk læselig."
+            },
+            {
+              "key": "light-field",
+              "name": "Fokuseret lys",
+              "purpose": "Et enkelt tyngdepunkt med klart afgrænset silhuet."
+            },
+            {
+              "key": "sill",
+              "name": "Forkant",
+              "purpose": "En fin lyskant fastholder den fysiske relation omkring fokusfeltet."
+            }
+          ]
+        },
+        {
+          "id": "relation",
+          "name": "Relation",
+          "meaning": "Selvstændige dele har en synlig forbindelse.",
+          "label": "To selvstændige, gennemlyste planer deler et lyst fælles areal. Overlappet viser en relation uden at opløse delene.",
+          "file": "svg/lightroom/relation.svg",
+          "animatedFile": "animated/lightroom/relation.html",
+          "parts": [
+            {
+              "key": "ground",
+              "name": "Billedfelt",
+              "purpose": "Fælles roligt rum til begge planer."
+            },
+            {
+              "key": "first-plane",
+              "name": "Første plan",
+              "purpose": "Den første selvstændige del af relationen."
+            },
+            {
+              "key": "second-plane",
+              "name": "Andet plan",
+              "purpose": "Den anden del møder den første med sin egen farve og placering."
+            },
+            {
+              "key": "shared-field",
+              "name": "Fælles areal",
+              "purpose": "Et oplyst overlap viser, hvor de selvstændige planer bliver forbundne."
+            },
+            {
+              "key": "edges",
+              "name": "Lys og samling",
+              "purpose": "Kanter bevarer begge deles form; ingen betydning afhænger kun af farven."
+            }
+          ]
+        },
+        {
+          "id": "rhythm",
+          "name": "Rytme",
+          "meaning": "Gentagelse med en begrundet variation.",
+          "label": "Fire ligeværdige lysåbninger gentager samme form i en rolig, skiftende rytme.",
+          "file": "svg/lightroom/rhythm.svg",
+          "animatedFile": "animated/lightroom/rhythm.html",
+          "parts": [
+            {
+              "key": "ground",
+              "name": "Billedfelt",
+              "purpose": "En fælles bund gør mellemrum og gentagelse tydelige."
+            },
+            {
+              "key": "first-window",
+              "name": "Lysåbning 1",
+              "purpose": "Et selvstændigt gentaget modul med samme form og areal som de øvrige."
+            },
+            {
+              "key": "second-window",
+              "name": "Lysåbning 2",
+              "purpose": "Et selvstændigt gentaget modul med samme form og areal som de øvrige."
+            },
+            {
+              "key": "third-window",
+              "name": "Lysåbning 3",
+              "purpose": "Et selvstændigt gentaget modul med samme form og areal som de øvrige."
+            },
+            {
+              "key": "fourth-window",
+              "name": "Lysåbning 4",
+              "purpose": "Et selvstændigt gentaget modul med samme form og areal som de øvrige."
+            }
+          ]
+        },
+        {
+          "id": "accordion",
+          "name": "Accordion",
+          "meaning": "Skjult og åbent indhold kan skelnes.",
+          "label": "En afdækning løftes fra en bred åbning og afslører et roligt indholdsrum. To lukkede rækker bliver stående nedenunder.",
+          "file": "svg/lightroom/accordion.svg",
+          "animatedFile": "animated/lightroom/accordion.html",
+          "parts": [
+            {
+              "key": "ground",
+              "name": "Billedfelt",
+              "purpose": "Selvstændigt underlag for den illustrerede udfoldning."
+            },
+            {
+              "key": "recess",
+              "name": "Åbent indholdsrum",
+              "purpose": "Et indfældet felt gør pladsen til afsløret indhold fysisk læselig."
+            },
+            {
+              "key": "content",
+              "name": "Afsløret indhold",
+              "purpose": "Tre rolige tekstspor viser, hvad åbningen giver adgang til."
+            },
+            {
+              "key": "cover",
+              "name": "Løftet afdækning",
+              "purpose": "Et samlet låg med fast hængsel er et naturligt mål for senere animation."
+            },
+            {
+              "key": "closed-rows",
+              "name": "Lukkede rækker",
+              "purpose": "To slanke, lukkede rækker gør det åbne felt let at skelne fra resten."
+            },
+            {
+              "key": "sill",
+              "name": "Lysende forkant",
+              "purpose": "En fin lyskant adskiller åbning og forgrund."
+            }
+          ]
+        },
+        {
+          "id": "avatar-group",
+          "name": "Avatargruppe",
+          "meaning": "Personer hører sammen uden at miste deres identitet.",
+          "label": "Tre ligeværdige portrætter deler samme lyse rum. Hver person har en tydelig, selvstændig plads.",
+          "file": "svg/lightroom/avatar-group.svg",
+          "animatedFile": "animated/lightroom/avatar-group.html",
+          "parts": [
+            {
+              "key": "ground",
+              "name": "Billedfelt",
+              "purpose": "Rolig fælles bund for hele gruppen."
+            },
+            {
+              "key": "shared-room",
+              "name": "Fælles rum",
+              "purpose": "Ét samlet, blødt afgrænset rum viser gruppetilhørsforhold."
+            },
+            {
+              "key": "first-person",
+              "name": "Person 1",
+              "purpose": "En selvstændig person med samme størrelse, dybde og visuelle plads som de øvrige."
+            },
+            {
+              "key": "second-person",
+              "name": "Person 2",
+              "purpose": "En selvstændig person med samme størrelse, dybde og visuelle plads som de øvrige."
+            },
+            {
+              "key": "third-person",
+              "name": "Person 3",
+              "purpose": "En selvstændig person med samme størrelse, dybde og visuelle plads som de øvrige."
+            },
+            {
+              "key": "shared-edge",
+              "name": "Fælles forkant",
+              "purpose": "En diskret kant fastholder rummets sammenhæng under de tre portrætter."
+            }
+          ]
+        },
+        {
+          "id": "progress",
+          "name": "Fremdrift",
+          "meaning": "Passeret, aktuelt og ventende er forskellige tilstande.",
+          "label": "En fælles rute forbinder fire ligeværdige milepæle. Tre har en oplyst kerne; den sidste er stadig åben.",
+          "file": "svg/lightroom/progress.svg",
+          "animatedFile": "animated/lightroom/progress.html",
+          "parts": [
+            {
+              "key": "ground",
+              "name": "Billedfelt",
+              "purpose": "Rolig bund uden en konkurrerende grafakse."
+            },
+            {
+              "key": "route",
+              "name": "Fælles rute",
+              "purpose": "En konstant bredde og ens milepæle viser forløb frem for stigende dataværdier."
+            },
+            {
+              "key": "milestone-1",
+              "name": "Milepæl 1",
+              "purpose": "En passeret milepæl med oplyst kerne og formmarkør."
+            },
+            {
+              "key": "milestone-2",
+              "name": "Milepæl 2",
+              "purpose": "En passeret milepæl med oplyst kerne og formmarkør."
+            },
+            {
+              "key": "milestone-3",
+              "name": "Milepæl 3",
+              "purpose": "En passeret milepæl med oplyst kerne og formmarkør."
+            },
+            {
+              "key": "milestone-4",
+              "name": "Milepæl 4",
+              "purpose": "En ventende milepæl med åben kerne og tydelig kant."
+            },
+            {
+              "key": "destination",
+              "name": "Retning",
+              "purpose": "En lille, separat pil viser læseretningen uden at erstatte milepælenes egne signaler."
+            }
+          ]
+        },
+        {
+          "id": "image",
+          "name": "Billede",
+          "meaning": "En afgrænset åbning til et motiv.",
+          "label": "En lys ramme åbner mod et roligt landskab med to terrænplaner og en afgrænset lyskilde.",
+          "file": "svg/lightroom/image.svg",
+          "animatedFile": "animated/lightroom/image.html",
+          "parts": [
+            {
+              "key": "ground",
+              "name": "Billedfelt",
+              "purpose": "Et roligt underlag omkring den illustrerede billedramme."
+            },
+            {
+              "key": "frame-depth",
+              "name": "Rammens dybde",
+              "purpose": "En afgrænset forskydning giver billedet et fysisk plan."
+            },
+            {
+              "key": "frame",
+              "name": "Billedramme",
+              "purpose": "En lys, mild ramme afgrænser motivet og bliver stående ved fremtidig bevægelse."
+            },
+            {
+              "key": "sky",
+              "name": "Baggrund og lys",
+              "purpose": "En særskilt horisont og lyskilde skaber rolig afstand til forgrunden."
+            },
+            {
+              "key": "landscape",
+              "name": "Forgrund",
+              "purpose": "To afstemte, bølgende terrænplaner er et sted at se ind i, uden at konkurrere med en billedtekst."
+            },
+            {
+              "key": "light-edge",
+              "name": "Lyskant",
+              "purpose": "Den øvre kant viser rammens materiale i samme lysretning som resten af familien."
+            }
+          ]
+        },
+        {
+          "id": "caption",
+          "name": "Billedtekst",
+          "meaning": "Tekst er knyttet til et bestemt billede.",
+          "label": "Et indrammet landskab og dets billedtekst er fysisk forbundet som ét samlet objekt.",
+          "file": "svg/lightroom/caption.svg",
+          "animatedFile": "animated/lightroom/caption.html",
+          "parts": [
+            {
+              "key": "ground",
+              "name": "Billedfelt",
+              "purpose": "Et roligt underlag omkring den illustrerede billedramme."
+            },
+            {
+              "key": "frame-depth",
+              "name": "Rammens dybde",
+              "purpose": "En afgrænset forskydning giver billedet et fysisk plan."
+            },
+            {
+              "key": "frame",
+              "name": "Billedramme",
+              "purpose": "En lys, mild ramme afgrænser motivet og bliver stående ved fremtidig bevægelse."
+            },
+            {
+              "key": "sky",
+              "name": "Baggrund og lys",
+              "purpose": "En særskilt horisont og lyskilde skaber rolig afstand til forgrunden."
+            },
+            {
+              "key": "landscape",
+              "name": "Forgrund",
+              "purpose": "To afstemte, bølgende terrænplaner er et sted at se ind i, uden at konkurrere med en billedtekst."
+            },
+            {
+              "key": "light-edge",
+              "name": "Lyskant",
+              "purpose": "Den øvre kant viser rammens materiale i samme lysretning som resten af familien."
+            },
+            {
+              "key": "caption-connection",
+              "name": "Tilhørsforhold",
+              "purpose": "En kort, fysisk forbindelse samler billede og billedtekst til ét objekt."
+            },
+            {
+              "key": "caption",
+              "name": "Billedtekst",
+              "purpose": "En stabil tekstflade med to rolige spor har plads under billedet."
+            }
+          ]
+        },
+        {
+          "id": "checkbox",
+          "name": "Afkrydsning",
+          "meaning": "Samme kontrolform viser valgt og ikke valgt.",
+          "label": "Et indfældet, oplyst felt viser ét tydeligt flueben. Et åbent felt nedenunder viser den uvalgte mulighed.",
+          "file": "svg/lightroom/checkbox.svg",
+          "animatedFile": "animated/lightroom/checkbox.html",
+          "parts": [
+            {
+              "key": "ground",
+              "name": "Billedfelt",
+              "purpose": "Et roligt fælles underlag for to forskellige valgtilstande."
+            },
+            {
+              "key": "checked-frame",
+              "name": "Valgt feltramme",
+              "purpose": "Et mildt, tydeligt afgrænset indfældet rum."
+            },
+            {
+              "key": "selected-field",
+              "name": "Valgt indre",
+              "purpose": "En solid kerne samler valgets visuelle tyngde."
+            },
+            {
+              "key": "checkmark",
+              "name": "Flueben",
+              "purpose": "Den egentlige betydningsbærende markør er forståelig uden farve."
+            },
+            {
+              "key": "unchecked-field",
+              "name": "Åbent felt",
+              "purpose": "Samme form med tom kerne gør den uvalgte mulighed tydelig."
+            },
+            {
+              "key": "labels",
+              "name": "Beskrivende spor",
+              "purpose": "Tekstspor med rolig vægt understøtter de to felter uden at ligne flere valg."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anatomy",
+      "name": "Tegnets anatomi",
+      "author": "Agent 1",
+      "description": "Præcise konturer, aktive mellemrum og et enkelt tyngdepunkt. Klammer, målelinjer og forbindelser gør grafikkens betydning synlig.",
+      "qualities": [
+        "Skarp",
+        "Ren",
+        "Teknisk"
+      ],
+      "changes": [
+        "Lukkede accordionfelter har nu højrevendte chevrons; det åbne felt peger ned.",
+        "Plakatens label er flyttet fri af den diagonale konstruktionslinje.",
+        "Billedtekstens knækleder er forbundet direkte med tekstblokkens første streg.",
+        "Seks supplerende motiver er tegnet i samme præcise billedgrammatik.",
+        "Motiverne er opdelt i navngivne grupper med præfiksede ID’er og eksplicitte SVG-attributter."
+      ],
+      "animation": [
+        "Accordion: Lad det åbne felt udvide sig fra overskriften, mens chevronen følger åbningen og måleklammen følger højden.",
+        "Avatargruppe: Tegn den fælles klamme fra personerne mod samlingspunktet, så forbindelsen forklarer gruppen.",
+        "Billedtekst: Tegn lederen fra billedets anker til tekstblokken, og vis derefter teksten. Alle motiver har en fuld statisk sluttilstand."
+      ],
+      "motion": {
+        "title": "En tegning bliver til",
+        "description": "Referencer, konturer og mål falder på plads i en præcis byggeorden. Farven kommer, når dens betydning er etableret. Bevægelsen standser i den godkendte tegning.",
+        "interactionHint": "Bevæg markøren nær en form: en lille måleprobe finder det nærmeste anker og viser forbindelsen.",
+        "duration": 3200
+      },
+      "motifs": [
+        {
+          "id": "poster",
+          "name": "Principplakat",
+          "meaning": "En større komposition om hensigt og form.",
+          "label": "En præcis rumlig konstruktion leder blikket mod en farvet ring. Målelinjer viser forholdet mellem ramme og fokus.",
+          "file": "svg/anatomy/poster.svg",
+          "animatedFile": "animated/anatomy/poster.html",
+          "parts": [
+            {
+              "key": "construction",
+              "name": "Konstruktionsnet",
+              "purpose": "Et tilbagetrukket koordinatnet viser det fælles tegningsrum."
+            },
+            {
+              "key": "structure",
+              "name": "Rumlig ramme",
+              "purpose": "Konturer og diagonaler beskriver det ydre rum og dets indre felt."
+            },
+            {
+              "key": "subject",
+              "name": "Tyngdepunkt",
+              "purpose": "En enkelt ring er den aktive form, som strukturen giver plads."
+            },
+            {
+              "key": "annotations",
+              "name": "Mål og betegnelser",
+              "purpose": "Måleklammer og fritstående labels forklarer konstruktionens hensigt."
+            }
+          ]
+        },
+        {
+          "id": "focus",
+          "name": "Fokus",
+          "meaning": "Ét tydeligt tyngdepunkt får plads.",
+          "label": "Et isoleret tyngdepunkt får plads i en præcis ramme. Hjørnemarkører og mål understøtter ét klart centrum.",
+          "file": "svg/anatomy/focus.svg",
+          "animatedFile": "animated/anatomy/focus.html",
+          "parts": [
+            {
+              "key": "field",
+              "name": "Afgrænset felt",
+              "purpose": "En enkel ramme giver tyngdepunktet et aktivt mellemrum."
+            },
+            {
+              "key": "subject",
+              "name": "Fokus",
+              "purpose": "En farvet ring er det eneste visuelle tyngdepunkt."
+            },
+            {
+              "key": "guides",
+              "name": "Centrering og mål",
+              "purpose": "Små centreringsspor og ét mål viser et overvejet forhold."
+            }
+          ]
+        },
+        {
+          "id": "relation",
+          "name": "Relation",
+          "meaning": "Selvstændige dele har en synlig forbindelse.",
+          "label": "To selvstændige felter mødes i et afgrænset fælles areal. En klamme viser deres samlede relation.",
+          "file": "svg/anatomy/relation.svg",
+          "animatedFile": "animated/anatomy/relation.html",
+          "parts": [
+            {
+              "key": "first-field",
+              "name": "Første felt",
+              "purpose": "Det første felt bevarer sin egen udstrækning."
+            },
+            {
+              "key": "second-field",
+              "name": "Andet felt",
+              "purpose": "Det andet felt forskydes, så deres fælles område bliver en bestemt form."
+            },
+            {
+              "key": "intersection",
+              "name": "Fælles areal",
+              "purpose": "Et synligt fælles areal forklarer relationen gennem både flade og kontur."
+            },
+            {
+              "key": "connection",
+              "name": "Fælles klamme",
+              "purpose": "Klammen samler felterne, mens et enkelt punkt angiver deres fælles forhold."
+            }
+          ]
+        },
+        {
+          "id": "rhythm",
+          "name": "Rytme",
+          "meaning": "Gentagelse med en begrundet variation.",
+          "label": "Fire ens moduler gentager en rolig A–B-rytme. Faste intervaller og skift mellem fuld og åben form bærer gentagelsen.",
+          "file": "svg/anatomy/rhythm.svg",
+          "animatedFile": "animated/anatomy/rhythm.html",
+          "parts": [
+            {
+              "key": "repeated-frames",
+              "name": "Gentagne moduler",
+              "purpose": "Fire lige store rammer etablerer gentagelsen med samme vægt og afstand."
+            },
+            {
+              "key": "cadence",
+              "name": "A–B-rytme",
+              "purpose": "To ens fyldte indsatser gentages i de ulige moduler; de lige forbliver åbne."
+            },
+            {
+              "key": "intervals",
+              "name": "Faste intervaller",
+              "purpose": "En fælles grundlinje og lige lange mål viser rytmens regelmæssighed."
+            }
+          ]
+        },
+        {
+          "id": "accordion",
+          "name": "Accordion",
+          "meaning": "Skjult og åbent indhold kan skelnes.",
+          "label": "En accordion med to lukkede felter og et åbent midterfelt. Højre- og nedadvendte chevrons skelner tilstandene.",
+          "file": "svg/anatomy/accordion.svg",
+          "animatedFile": "animated/anatomy/accordion.html",
+          "parts": [
+            {
+              "key": "collapsed-first",
+              "name": "Øverste lukkede felt",
+              "purpose": "Den lukkede række har højrevendt chevron og en kort titel."
+            },
+            {
+              "key": "expanded",
+              "name": "Åbent felt",
+              "purpose": "Det åbne felt rummer overskrift og indhold samt en entydig nedadvendt chevron."
+            },
+            {
+              "key": "active-edge",
+              "name": "Åbningens accent",
+              "purpose": "En smal kant binder farven til den aktuelle åbning."
+            },
+            {
+              "key": "collapsed-last",
+              "name": "Nederste lukkede felt",
+              "purpose": "Den lukkede række gentager den første rækkes signal."
+            },
+            {
+              "key": "extent",
+              "name": "Indholdets udstrækning",
+              "purpose": "En diskret måleklamme viser, hvor meget indhold der er åbnet."
+            }
+          ]
+        },
+        {
+          "id": "avatar-group",
+          "name": "Avatargruppe",
+          "meaning": "Personer hører sammen uden at miste deres identitet.",
+          "label": "Tre personer bevarer hver deres ramme og samles af én præcis klamme. Midterpersonen fremhæves uden at skjule de andre.",
+          "file": "svg/anatomy/avatar-group.svg",
+          "animatedFile": "animated/anatomy/avatar-group.html",
+          "parts": [
+            {
+              "key": "person-left",
+              "name": "Venstre person",
+              "purpose": "Et selvstændigt portræt med hoved, skuldre og egen ramme."
+            },
+            {
+              "key": "person-center",
+              "name": "Midterperson",
+              "purpose": "Et fremhævet, højere portræt med samme grundgeometri."
+            },
+            {
+              "key": "person-right",
+              "name": "Højre person",
+              "purpose": "Et ligeværdigt sideportræt med samme afstand som på venstre side."
+            },
+            {
+              "key": "shared-bracket",
+              "name": "Fælles klamme",
+              "purpose": "En klamme og et samlet punkt gør fællesskabet konkret."
+            }
+          ]
+        },
+        {
+          "id": "progress",
+          "name": "Fremdrift",
+          "meaning": "Passeret, aktuelt og ventende er forskellige tilstande.",
+          "label": "Fire lige store trin følger én rute. Tre er passeret; det tredje er aktuelt, og det sidste står åbent.",
+          "file": "svg/anatomy/progress.svg",
+          "animatedFile": "animated/anatomy/progress.html",
+          "parts": [
+            {
+              "key": "stages",
+              "name": "Fire ens trin",
+              "purpose": "Ens modulstørrelse viser et trinforløb frem for en voksende datamængde."
+            },
+            {
+              "key": "route",
+              "name": "Fremdriftens rute",
+              "purpose": "Den udfyldte rute slutter præcis ved det aktuelle trin; resten står åbent."
+            },
+            {
+              "key": "completed",
+              "name": "Passerede trin",
+              "purpose": "De to første trin er tonede og har små afsluttende markører."
+            },
+            {
+              "key": "current",
+              "name": "Aktuelt trin",
+              "purpose": "Det tredje trin bærer accenten; samme accent afslutter den passerede rute."
+            },
+            {
+              "key": "remaining",
+              "name": "Åben destination",
+              "purpose": "Et åbent trin og en kontureret slutknude viser det næste."
+            },
+            {
+              "key": "guides",
+              "name": "Trin og interval",
+              "purpose": "Lodrette ledere forbinder modulerne til ruten og et enkelt fælles mål."
+            }
+          ]
+        },
+        {
+          "id": "image",
+          "name": "Billede",
+          "meaning": "En afgrænset åbning til et motiv.",
+          "label": "Et billedfelt med sol og sammenhængende landskab. En præcis ramme holder motivet samlet.",
+          "file": "svg/anatomy/image.svg",
+          "animatedFile": "animated/anatomy/image.html",
+          "parts": [
+            {
+              "key": "frame",
+              "name": "Billedramme",
+              "purpose": "En enkelt kontur afgrænser hele billedets areal."
+            },
+            {
+              "key": "landscape",
+              "name": "Landskab",
+              "purpose": "En kontrolleret linjerytme og en rolig flade skaber billedets landskab."
+            },
+            {
+              "key": "sun",
+              "name": "Sol",
+              "purpose": "En enkelt farvet skive er motivets visuelle tyngdepunkt."
+            },
+            {
+              "key": "registration",
+              "name": "Billedets hjørner",
+              "purpose": "To beskedne hjørnespor fremhæver beskæringen uden at tilføje en ekstra ramme."
+            }
+          ]
+        },
+        {
+          "id": "caption",
+          "name": "Billedtekst",
+          "meaning": "Tekst er knyttet til et bestemt billede.",
+          "label": "En billedtekst er fysisk forbundet med billedets nederste kant. Knæklederen ender direkte i tekstblokkens første linje.",
+          "file": "svg/anatomy/caption.svg",
+          "animatedFile": "animated/anatomy/caption.html",
+          "parts": [
+            {
+              "key": "frame",
+              "name": "Billedramme",
+              "purpose": "En præcis billedramme ejer det tilhørende anker."
+            },
+            {
+              "key": "landscape",
+              "name": "Billedmotiv",
+              "purpose": "Landskab og sol giver billedfeltet et genkendeligt indhold."
+            },
+            {
+              "key": "connector",
+              "name": "Billedtekstens forbindelse",
+              "purpose": "Et markeret anker og en knækleder forbinder billedet direkte med tekstens begyndelse."
+            },
+            {
+              "key": "caption-lines",
+              "name": "Billedtekst",
+              "purpose": "Tekstblokken begynder præcis der, hvor lederen ender."
+            }
+          ]
+        },
+        {
+          "id": "checkbox",
+          "name": "Afkrydsning",
+          "meaning": "Samme kontrolform viser valgt og ikke valgt.",
+          "label": "To lige store afkrydsningsfelter med tilhørende tekst. Det øverste er markeret med et tydeligt flueben; det nederste står tomt.",
+          "file": "svg/anatomy/checkbox.svg",
+          "animatedFile": "animated/anatomy/checkbox.html",
+          "parts": [
+            {
+              "key": "checked",
+              "name": "Markeret felt",
+              "purpose": "Et indrammet kvadrat med indsat pigment og et lyst flueben viser det aktive valg."
+            },
+            {
+              "key": "unchecked",
+              "name": "Umarkeret felt",
+              "purpose": "Samme kvadratiske geometri bevares uden pigment eller flueben."
+            },
+            {
+              "key": "labels",
+              "name": "Tilhørende tekst",
+              "purpose": "Korte tekststreger og ens indbyrdes placering binder hver label til sit felt."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

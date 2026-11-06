@@ -10,6 +10,7 @@ import { TABLER_LICENSE } from '../core/icons.mjs';
 import { PUBLIC_THEME_IDS } from './public-themes.mjs';
 import { COMPOSITIONS, PATTERN_FILES } from '../patterns/catalog.mjs';
 import {buildStudio} from './build-studio.mjs';
+import {PROJECT_RUNTIME} from './doctor.mjs';
 
 const studio = fileURLToPath(new URL('../', import.meta.url));
 const outputIndex = process.argv.indexOf('--out');
@@ -43,8 +44,10 @@ for (const name of PATTERN_FILES) {
   await writeFile(join(output, 'patterns', name.replace('.mjs', '.js')), name.endsWith('.mjs')?await compactJS(browserImports(source)):await compactCSS(source), 'utf8');
 }
 await mkdir(join(output, 'core'), { recursive: true });
-for (const name of ['contract.mjs', 'library.mjs', 'quality.mjs', 'geometry.mjs', 'token-usage.mjs', 'engine.mjs', 'components.mjs', 'signature-assets.mjs', 'layout.mjs', 'panels.mjs', 'motion.mjs', 'menus.mjs','icons.mjs','scales.mjs','preferences.mjs','theme-modes.mjs','navigation.mjs','overlays.mjs','input-choices.mjs','feedback.mjs','uploads.mjs','data-table.mjs','data-grid.mjs']) {
+for (const [sourceFile] of PROJECT_RUNTIME.filter(([source])=>source.startsWith('core/'))) {
+  const name=sourceFile.slice('core/'.length);
   const source = await readFile(join(studio, 'core', name), 'utf8');
+  await mkdir(join(output,'core',name,'..'),{recursive:true});
   await writeFile(join(output, 'core', name.replace('.mjs', '.js')), await compactJS(browserImports(source)), 'utf8');
   await rm(join(output, 'core', name), { force: true });
 }

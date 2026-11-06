@@ -1,4 +1,5 @@
 import {TOKEN_REFERENCE_PATTERN} from './contract.mjs';
+import {GRAPHIC_TOKEN_DEFAULTS} from './graphic-tokens.mjs';
 
 const references=value=>typeof value==='string'
   ? [...new Set([...value.matchAll(new RegExp(TOKEN_REFERENCE_PATTERN.source,'g'))].map(match=>match[1]))]
@@ -27,6 +28,9 @@ export function tokenUsageReport(model,{compatibilityTokens=[]}={}){
       styles(treatment.styles,location);
       for(const [part,treatmentPart]of Object.entries(treatment.parts??{}))styles(treatmentPart.styles,{...location,part});
     }
+  }
+  for(const id of Object.keys(GRAPHIC_TOKEN_DEFAULTS)){
+    reports.get(id)?.direct.push({component:'@graphics',part:'illustration',variant:null,state:null,property:id,domain:'graphics'});
   }
 
   for(const [origin,report]of reports){

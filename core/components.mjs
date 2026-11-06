@@ -23,6 +23,8 @@ import {FJORDSIDE_SIGNATURE} from './signature-assets.mjs';
 import {contrastRatio} from './quality.mjs';
 import { iconModel, createIcon } from './icons.mjs';
 export { createIcon, renderIcon, ICON_NAMES, TABLER_VERSION } from './icons.mjs';
+import { renderGraphic, createGraphicRenderer } from './graphics.mjs';
+export { GRAPHIC_FAMILIES, GRAPHIC_MOTIFS, GRAPHIC_MOTION, getGraphicFamily, getGraphicParts, renderGraphic, createGraphic, createGraphicRenderer, mountGraphicMotion } from './graphics.mjs';
 
 const tags=new Set(['a','nav','figure','figcaption','div','span','p','strong','label','button','input','select','option','h1','h2','h3','h4','h5','h6','hr','section','article','header','footer','dialog','textarea','ul','ol','li','img','dl','dt','dd','fieldset','legend','output','details','summary','table','caption','thead','tbody','tr','th','td','progress']);
 const inputTypes=new Set(['button','submit','reset','text','email','number','password','checkbox','radio','search','tel','url','range','color','date','time','file']);
@@ -40,14 +42,13 @@ function safeURL(value, image=false){
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /** Offline sample illustrations using the selected theme's resolved palette. */
 export function createImageExamples(pack){
- const tokens=resolveTokens(pack),color=id=>escape(tokens[id]);
- const primary=color('color.action.primary.rest.surface'),accent=color('color.brand.accent');
+ const graphics=createGraphicRenderer(pack);
  return [
-  ['Cirkel','En cirkel på en ensfarvet flade.',color('color.background.subtle'),`<circle cx="300" cy="200" r="110" fill="${primary}"/>`],
-  ['Bue','En bue over en cirkel.',color('color.background.subtle'),`<circle cx="300" cy="210" r="105" fill="${accent}"/><path fill="${primary}" d="M130 300V190a170 170 0 0 1 340 0v110h-55V190a115 115 0 0 0-230 0v110z"/>`],
-  ['Balance','En cirkel balancerer over to forskudte flader.',color('color.background.surface'),`<circle cx="300" cy="120" r="65" fill="${accent}"/><path fill="${primary}" d="M100 220h280v60H100zM250 290h250v55H250z"/>`],
-  ['Rytme','Fire lodrette former med forskellig højde.',color('color.action.selected.rest.surface'),`<path fill="${primary}" d="M100 320V170h65v150zM320 320V130h65v190z"/><path fill="${accent}" d="M210 320V80h65v240zM430 320V210h65v110z"/>`],
- ].map(([title,alt,background,shapes])=>({title,alt,src:'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400"><rect width="600" height="400" fill="${background}"/>${shapes}</svg>`)}));
+  ['focus','Fokus','Ét tydeligt tyngdepunkt får plads.'],
+  ['poster','Form og hensigt','En større komposition om hensigt og form.'],
+  ['relation','Relation','Selvstændige dele har en synlig forbindelse.'],
+  ['rhythm','Rytme','Gentagelse med en begrundet variation.']
+ ].map(([motif,title,alt])=>({title,alt,src:'data:image/svg+xml,'+encodeURIComponent(graphics.render(motif,{resolved:true,idPrefix:'ds-image-example-'+motif}))}));
 }
 let sequence=0;
 function attributes(attrs={}){
@@ -221,7 +222,7 @@ function model(pack,id,options,components,depth=0){
    }
   }
   if(id==='image'&&part==='media'){
-   attrs.src=safeURL(options.src??attrs.src??createImageExamples(pack)[0].src,true);
+   attrs.src=safeURL(options.src??attrs.src??('data:image/svg+xml,'+encodeURIComponent(renderGraphic(pack,'focus',{resolved:true,idPrefix:'ds-image-example-focus'}))),true);
    if(options.alt!==undefined)attrs.alt=String(options.alt);
    if(options.src!==undefined&&options.alt===undefined)throw new Error('Image source requires an explicit alt text (empty for decoration).');
   }

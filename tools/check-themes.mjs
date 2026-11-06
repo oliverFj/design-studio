@@ -3,17 +3,22 @@ import { PUBLIC_THEME_IDS } from './public-themes.mjs';
 import {readFile} from 'node:fs/promises';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {materializePackage,resolveTokens,generateCSS} from '../core/engine.mjs';
+import {materializePackage,resolveTokens,generateCSS,validateCompatibility} from '../core/engine.mjs';
+import {createSharedLibraryContract} from './theme-contract.mjs';
 import {resolveThemeMode} from '../core/theme-modes.mjs';
 import {componentGeometryReport} from '../core/geometry.mjs';
 import {controlBoundaryReport} from '../core/quality.mjs';
 
+let libraryContract;
 for (const id of PUBLIC_THEME_IDS) {
   await runCLI(['validate', `packages/${id}.json`]);
-  if (id !== PUBLIC_THEME_IDS[0]) {
-    await runCLI(['compare', `packages/${PUBLIC_THEME_IDS[0]}.json`, `packages/${id}.json`]);
-  }
   const theme=JSON.parse(await readFile(new URL('../packages/'+id+'.json',import.meta.url),'utf8'));
+  if(!libraryContract)libraryContract=createSharedLibraryContract(theme);
+  else{
+    const comparison=validateCompatibility(libraryContract,theme);
+    if(!comparison.compatible)throw new Error(id+' · fælles bibliotekskontrakt:\n'+comparison.errors.join('\n'));
+    console.log('Fælles bibliotekskontrakt: '+id+' består.');
+  }
   for(const mode of theme.modes?Object.keys(theme.modes):[null]){
     const snapshot=mode?resolveThemeMode(theme,mode):theme;
     // Build both actual appearances; validating only the base would miss export

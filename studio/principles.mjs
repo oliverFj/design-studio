@@ -1,7 +1,9 @@
 import constitution from '../docs/DESIGN-PRINCIPLES.md';
 import { renderComponent } from '../core/components.mjs';
 import { animateStandard } from '../core/motion.mjs';
+import { createGraphicRenderer } from '../core/graphics.mjs';
 import { parsePrinciples, renderPrincipleText } from './principles-document.mjs';
+import { bindDecorativeGraphics } from './graphic-decorations.mjs';
 
 const document = parsePrinciples(constitution);
 
@@ -12,12 +14,12 @@ function comparison({ label, beforeTitle, before, beforeNote, afterTitle, after,
     </div><figcaption>${caption} Skitserne er illustrationer, ikke betjening.</figcaption></figure>`;
 }
 
-function illustration(id, theme) {
+function illustration(id, theme, graphics) {
   if (id === 'opgaven') return `<figure class="principles-example principles-inspiration"><p class="principles-study-label">Visuel hensigt / få præcise greb</p><div class="principles-poster-series">
-    <div><div class="principles-poster principles-poster-focus" aria-hidden="true"><i class="principles-paper"></i><i class="principles-ink"></i></div><p><span>01 / Fokus</span>Giv én form plads.</p></div>
-    <div><div class="principles-poster principles-poster-relation" aria-hidden="true"><i class="principles-paper"></i><i class="principles-ink"></i></div><p><span>02 / Relation</span>Lad lagene tale sammen.</p></div>
-    <div><div class="principles-poster principles-poster-rhythm" aria-hidden="true"><i></i><i></i><i></i><i></i></div><p><span>03 / Rytme</span>Gentag med en hensigt.</p></div>
-    </div><figcaption>Tre studier i samme formsprog: luft, fine kanter og en afgrænset accent. Karakteren kommer fra kompositionen; farverne følger dit tema.</figcaption></figure>`;
+    <div><div class="principles-poster" data-graphic-decoration tabindex="0" role="img" aria-label="Fokus: Giv én form plads.">${graphics.render('focus',{idPrefix:'principles-focus',decorative:true})}</div><p><span>01 / Fokus</span>Giv én form plads.</p></div>
+    <div><div class="principles-poster" data-graphic-decoration tabindex="0" role="img" aria-label="Relation: Lad lagene tale sammen.">${graphics.render('relation',{idPrefix:'principles-relation',decorative:true})}</div><p><span>02 / Relation</span>Lad lagene tale sammen.</p></div>
+    <div><div class="principles-poster" data-graphic-decoration tabindex="0" role="img" aria-label="Rytme: Gentag med en hensigt.">${graphics.render('rhythm',{idPrefix:'principles-rhythm',decorative:true})}</div><p><span>03 / Rytme</span>Gentag med en hensigt.</p></div>
+    </div><figcaption>Tre studier i temaets grafiske formsprog. Kompositionen giver hvert motiv en hensigt; illustrationernes egne farver og materialer følger dit tema.</figcaption></figure>`;
   if (id === 'hierarki') return comparison({
     label: '02 / Opmærksomhed', beforeTitle: 'Alt beder om opmærksomhed', afterTitle: 'Indholdet får et tyngdepunkt',
     before: '<div class="principles-type-sample principles-type-equal"><span>Din samling</span><strong>En ny begyndelse</strong><small>12 noter · Opdateret i dag</small></div>',
@@ -79,16 +81,17 @@ function illustration(id, theme) {
 }
 
 export function renderPrinciples(theme) {
+  const graphics = createGraphicRenderer(theme);
   const chapters = document.sections.filter(section => section.id !== 'kilder');
   return `<div class="principles ds-layout" data-layout="workspace">
     <header class="principles-hero">
       <div class="principles-hero-copy"><p class="principles-kicker">Design Studios designgrundlov · 1.0</p><h2>Karakter.<br>Klarhed.<br><em>Omhu.</em></h2><p class="principles-lead">${document.description}</p><a class="principles-start" href="#principle-opgaven">Læs grundloven <span aria-hidden="true">↘</span></a></div>
-      <div class="principles-cover" aria-hidden="true"><div class="principles-cover-frame"></div><div class="principles-cover-sheet"></div><div class="principles-cover-disc"></div><span>Form følger<br>en hensigt.</span><small>DS / 01—12</small></div>
+      <figure class="principles-cover" tabindex="0" aria-label="Form følger en hensigt · animeret illustration"><div class="principles-cover-art" data-graphic-decoration>${graphics.render('poster',{idPrefix:'principles-cover',decorative:true})}</div><figcaption><span>Form følger<br>en hensigt.</span><small>DS / 01—12</small></figcaption></figure>
     </header>
     <div class="principles-overview"><p>Én fælles retning.<br><strong>Mange selvstændige udtryk.</strong></p><div><span>12 principper</span><span>17 kildereferencer</span><span>Fra tokens til produkter</span></div></div>
     <div class="principles-reading-layout"><nav class="principles-index" aria-label="Indhold i Principper"><p class="principles-kicker">I grundloven</p><ol>${chapters.map(section => `<li><a href="#principle-${section.id}"><span>${section.number}</span>${section.shortTitle}</a></li>`).join('')}</ol><a class="principles-sources-link" href="#principle-kilder">Kilder og evidens <span aria-hidden="true">↗</span></a></nav>
     <article class="principles-article" aria-label="Design Studios designgrundlov"><section class="principles-introduction" aria-labelledby="principles-intro-title"><p class="principles-kicker">Sådan bruges grundloven</p><h2 id="principles-intro-title">Et grundlag for at vælge.</h2>${renderPrincipleText(document.introduction)}<div class="principles-evidence-key"><span>Forskningsfund</span><span>Faglig praksis</span><span>Vores beslutning</span></div><p>Læs begrundelsen, anvend reglerne, og prøv dem på et konkret produkt. Kildetype og begrænsninger står ved hvert princip og i kildelisten.</p></section>
-    ${document.sections.map(section => `<section class="principles-chapter${section.id === 'kilder' ? ' principles-references' : ''}" id="principle-${section.id}" tabindex="-1" aria-labelledby="principle-heading-${section.id}"><header class="principles-chapter-heading"><span class="principles-number">${section.number || '↗'}</span><h2 id="principle-heading-${section.id}">${section.title}</h2></header>${illustration(section.id, theme)}${renderPrincipleText(section.body)}</section>`).join('')}
+    ${document.sections.map(section => `<section class="principles-chapter${section.id === 'kilder' ? ' principles-references' : ''}" id="principle-${section.id}" tabindex="-1" aria-labelledby="principle-heading-${section.id}"><header class="principles-chapter-heading"><span class="principles-number">${section.number || '↗'}</span><h2 id="principle-heading-${section.id}">${section.title}</h2></header>${illustration(section.id, theme, graphics)}${renderPrincipleText(section.body)}</section>`).join('')}
     <footer class="principles-colophon"><span>Design Studio</span><p>Et levende grundlag for bevidste valg.<br>Version 1.0 · 5. november 2026</p><a href="#principle-opgaven">Til første princip ↑</a></footer></article></div></div>`;
 }
 
@@ -96,12 +99,14 @@ export function bindPrinciples(root) {
   const replay = root.querySelector('.principles-replay-control button');
   const marker = root.querySelector('.principles-motion-marker');
   const status = root.querySelector('.principles-motion-status');
+  const graphics = bindDecorativeGraphics(root,{triggerSelector:'.principles-cover,.principles-poster'});
   let animation;
-  replay?.addEventListener('click', () => {
+  const replayMotion = () => {
     animation?.cancel();
     marker.style.transform = 'translateX(120px)';
     animation = animateStandard(marker, [{ transform: 'translateX(0)' }, { transform: 'translateX(120px)' }]);
     status.textContent = animation ? 'Afspillet med fælles timing · 240 ms' : 'Slutposition vist uden bevægelse';
-  });
-  return { destroy() { animation?.cancel(); } };
+  };
+  replay?.addEventListener('click', replayMotion);
+  return { destroy() { animation?.cancel();graphics.destroy();replay?.removeEventListener('click', replayMotion); } };
 }

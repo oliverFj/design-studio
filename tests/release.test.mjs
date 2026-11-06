@@ -19,7 +19,7 @@ async function fixture(t) {
     await rm(directory, { recursive: true, force: true });
   });
   const put = async (relative, value) => { await mkdir(path.dirname(path.join(directory, relative)), { recursive: true }); await writeFile(path.join(directory, relative), value); };
-  for (const filename of ['AGENTS.md', 'README.md', '.gitignore', 'package.json', 'package-lock.json']) await put(filename, filename.endsWith('.json') ? '{}' : 'Source');
+  for (const filename of ['AGENTS.md', 'README.md', '.gitignore', '.gitattributes', 'package.json', 'package-lock.json']) await put(filename, filename.endsWith('.json') ? '{}' : 'Source');
   await put('index.html', '<!doctype html><html><head><title>Offline</title></head><body><button>Open</button><script>/* no external resources */</script></body></html>');
   await put('core/runtime.mjs', 'export const example = true;');
   await put('showcase/index.html', '<!doctype html><title>Showcase</title>');
@@ -62,7 +62,7 @@ test('release archives preserve bytes, readable licenses, checksums and determin
       assert.deepEqual([...files.keys()], ['index.html', 'licenses/example/OFL.txt', 'licenses/tabler-icons-MIT.txt']);
       assert.deepEqual(files.get('index.html'), await readFile(path.join(directory, 'index.html')));
     } else {
-      assert.ok(files.has('core/runtime.mjs')); assert.ok(files.has('templates/offline/.gitignore')); assert.ok(files.has('assets/fonts/test.woff2'));
+      assert.ok(files.has('core/runtime.mjs')); assert.ok(files.has('templates/offline/.gitignore')); assert.ok(files.has('assets/fonts/test.woff2')); assert.ok(files.has('.gitattributes'));
       assert.ok(files.has('showcase/index.html')); assert.ok(files.has('showcase/showcase.mjs'));
       assert.equal(files.has('index.html'), false);
     }

@@ -2,7 +2,10 @@ import { validatePackage } from '../core/engine.mjs';
 
 /** Keep independent theme copies in this session and download edited files. */
 export function createThemeStorage(themes, { download } = {}) {
-  const entries = new Map(themes.map(({ key, package: pack }) => [key, { key, package: structuredClone(pack), file: key + '.json' }]));
+  // Earlier Studio exports included this UI choice. Read them without carrying
+  // the obsolete field into editable theme data or subsequent downloads.
+  const themeCopy=pack=>{const copy=structuredClone(pack);delete copy.graphics;return copy;};
+  const entries = new Map(themes.map(({ key, package: pack }) => [key, { key, package: themeCopy(pack), file: key + '.json' }]));
   let nextKey = 0;
   const checked = pack => {
     const result = validatePackage(pack);
@@ -20,11 +23,12 @@ export function createThemeStorage(themes, { download } = {}) {
     async open(pack, filename) {
       checked(pack);
       const key = '@file-' + ++nextKey;
-      entries.set(key, { key, package: structuredClone(pack), file: filename || pack.id + '.json' });
+      entries.set(key, { key, package: themeCopy(pack), file: filename || pack.id + '.json' });
       return { key };
     },
     async save(key, pack) {
       checked(pack);
+      pack=themeCopy(pack);
       const entry = read(key);
       download(entry.file, JSON.stringify(pack, null, 2) + '\n', 'application/json');
       entry.package = structuredClone(pack);

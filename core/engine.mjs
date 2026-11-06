@@ -8,6 +8,7 @@ import { BUTTON_COMPATIBILITY_VARIANTS, BUTTON_SIZES, BUTTON_DANGER_VARIANTS } f
 import { generateIconCSS, ICON_NAMES } from './icons.mjs';
 import { generatePreferenceCSS } from './preferences.mjs';
 import {SIGNATURE_FONT_CSS} from './signature-assets.mjs';
+import {GRAPHIC_FAMILY_IDS,DEFAULT_GRAPHIC_FAMILY} from './graphic-tokens.mjs';
 
 const own = (object, key) => Object.hasOwn(object, key);
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -434,7 +435,8 @@ function validateLegacyPackage(pack) {
   preflight(pack, errors);
   if (errors.length) return {valid: false, errors};
   if (!record(pack)) return {valid: false, errors: ['package: must be an object.']};
-  allowedKeys(pack, ['schemaVersion', 'id', 'name', 'description', 'tokens', 'components', 'history', 'brand'], 'package', errors);
+  allowedKeys(pack, ['schemaVersion', 'id', 'name', 'description', 'tokens', 'components', 'history', 'brand', 'graphics'], 'package', errors);
+  if (own(pack,'graphics')) validateGraphics(pack.graphics,errors);
   if (pack.schemaVersion !== 1) errors.push('schemaVersion: expected 1.');
   if (typeof pack.id !== 'string' || !/^[a-z][a-z0-9-]*$/.test(pack.id)) errors.push('id: must be a lowercase slug.');
   textField(pack.name, 'name', errors);
@@ -572,11 +574,12 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
   assertValid(pack);
   if (typeof scope !== 'string' || !/^[.#][a-zA-Z_][a-zA-Z0-9_-]*$/.test(scope)) throw new Error('CSS scope must be a single class or ID selector.');
   const sourceVersion=pack.schemaVersion;
+  const graphicFamily=pack.graphics?.family??DEFAULT_GRAPHIC_FAMILY;
   pack=effectivePackage(pack);
   const resolved = resolveUnchecked(pack.tokens, []);
   const fontRules = [...fontFaceRules(pack),...(sourceVersion===2?[SIGNATURE_FONT_CSS]:[])];
   const rules = [`/* Design Studio: ${pack.id}, schema ${sourceVersion}${sourceVersion===2?' / library '+LIBRARY_VERSION:''} */`, ...fontRules, `${scope} {`,
-    ...Object.entries(resolved).map(([id, value]) => `  ${cssVariableName(id)}: ${value};`), ...(sourceVersion===2 ? ['  color-scheme: '+(contrastRatio('#ffffff', resolved['color.background.canvas']) > contrastRatio('#000000', resolved['color.background.canvas']) ? 'dark' : 'light')+';'] : []), '}'];
+    ...Object.entries(resolved).map(([id, value]) => `  ${cssVariableName(id)}: ${value};`), ...(sourceVersion===2 ? ['  --ds-illustration-family: '+graphicFamily+';', '  color-scheme: '+(contrastRatio('#ffffff', resolved['color.background.canvas']) > contrastRatio('#000000', resolved['color.background.canvas']) ? 'dark' : 'light')+';'] : []), '}'];
   function emit(selector, styles) {
     if (!styles || Object.keys(styles).length === 0) return;
     const selectors=sourceVersion===2?expandLegacySelectors(selector):[selector];
@@ -727,6 +730,11 @@ export function validateCompatibility(base, candidate) {
 
 
 const appearanceAllowed = new Set(APPEARANCE_PROPERTIES);
+function validateGraphics(graphics,errors){
+  if(!record(graphics)){errors.push('graphics: must be an object.');return;}
+  allowedKeys(graphics,['family'],'graphics',errors);
+  if(!GRAPHIC_FAMILY_IDS.includes(graphics.family))errors.push('graphics.family: expected one of '+GRAPHIC_FAMILY_IDS.join(', ')+'.');
+}
 function applyAppearance(components, appearance) {
   for (const [id, override] of Object.entries(appearance ?? {})) {
     const component=components[id];
@@ -788,7 +796,7 @@ export function validatePackage(pack) {
   if(!record(pack))return {valid:false,errors:['package: must be an object.']};
   if(pack.schemaVersion===1)return validateLegacyPackage(pack);
   if(pack.schemaVersion!==2)return {valid:false,errors:['schemaVersion: expected 1 or 2.']};
-  allowedKeys(pack,['schemaVersion','id','name','description','tokens','appearance','history','brand','modes','defaultMode'],'package',errors);
+  allowedKeys(pack,['schemaVersion','id','name','description','tokens','appearance','history','brand','modes','defaultMode','graphics'],'package',errors);
   if(!record(pack.tokens))errors.push('tokens: must be an object.');
   if(own(pack,'appearance'))validateAppearance(normalizeAppearance(pack.appearance),errors);
   if(errors.length)return {valid:false,errors};
@@ -796,6 +804,10 @@ export function validatePackage(pack) {
   const model=effectivePackage(pack), result=validateLegacyPackage(model);
   errors.push(...result.errors);
   const resolved=resolveUnchecked(model.tokens,[]);
+  const lineWidth=resolved['illustration.material.lineWidth'],depthOpacity=resolved['illustration.material.depthOpacity'],illustrationDuration=resolved['duration.illustration'];
+  if(typeof lineWidth!=='number'||!Number.isFinite(lineWidth)||lineWidth<=0)errors.push('tokens.illustration.material.lineWidth: must resolve to a positive number of SVG units.');
+  if(typeof depthOpacity!=='number'||!Number.isFinite(depthOpacity)||depthOpacity<0||depthOpacity>1)errors.push('tokens.illustration.material.depthOpacity: must resolve to a number from 0 to 1.');
+  if(!tokenValueValid('duration',illustrationDuration)||parseFloat(illustrationDuration)<=0)errors.push('tokens.duration.illustration: must resolve to a positive duration.');
   for(const id of POSITIVE_SPACING_TOKENS){
     const value=resolved[id];
     if(typeof value!=='string'||!lengthPattern.test(value)||parseFloat(value)<=0||value.endsWith('%'))errors.push('tokens.'+id+': shared component spacing must resolve to a positive absolute or font-relative dimension.');

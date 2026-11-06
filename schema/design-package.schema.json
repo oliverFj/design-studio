@@ -2940,6 +2940,199 @@
               }
             }
           ]
+        },
+        "color.illustration.ground": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "color"
+                }
+              }
+            }
+          ]
+        },
+        "color.illustration.plane": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "color"
+                }
+              }
+            }
+          ]
+        },
+        "color.illustration.ink": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "color"
+                }
+              }
+            }
+          ]
+        },
+        "color.illustration.subject": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "color"
+                }
+              }
+            }
+          ]
+        },
+        "color.illustration.counterpoint": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "color"
+                }
+              }
+            }
+          ]
+        },
+        "color.illustration.context": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "color"
+                }
+              }
+            }
+          ]
+        },
+        "color.illustration.edge": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "color"
+                }
+              }
+            }
+          ]
+        },
+        "color.illustration.light": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "color"
+                }
+              }
+            }
+          ]
+        },
+        "color.illustration.depth": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "color"
+                }
+              }
+            }
+          ]
+        },
+        "illustration.material.lineWidth": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "number"
+                },
+                "$value": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^\\{[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*\\}$"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "illustration.material.depthOpacity": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "number"
+                },
+                "$value": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^\\{[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*\\}$"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "duration.illustration": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/token"
+            },
+            {
+              "properties": {
+                "$type": {
+                  "const": "duration"
+                }
+              }
+            }
+          ]
         }
       },
       "additionalProperties": {
@@ -8722,6 +8915,201 @@
                   },
                   "additionalProperties": {
                     "$ref": "#/$defs/token"
+                  },
+                  "properties": {
+                    "color.illustration.ground": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.plane": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.ink": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.subject": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.counterpoint": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.context": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.edge": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.light": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.depth": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "illustration.material.lineWidth": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "number"
+                            },
+                            "$value": {
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "string",
+                                  "pattern": "^\\{[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*\\}$"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "illustration.material.depthOpacity": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "number"
+                            },
+                            "$value": {
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1
+                                },
+                                {
+                                  "type": "string",
+                                  "pattern": "^\\{[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*\\}$"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "duration.illustration": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "duration"
+                            }
+                          }
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -8740,6 +9128,201 @@
                   },
                   "additionalProperties": {
                     "$ref": "#/$defs/token"
+                  },
+                  "properties": {
+                    "color.illustration.ground": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.plane": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.ink": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.subject": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.counterpoint": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.context": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.edge": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.light": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "color.illustration.depth": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "color"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "illustration.material.lineWidth": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "number"
+                            },
+                            "$value": {
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                {
+                                  "type": "string",
+                                  "pattern": "^\\{[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*\\}$"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "illustration.material.depthOpacity": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "number"
+                            },
+                            "$value": {
+                              "anyOf": [
+                                {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1
+                                },
+                                {
+                                  "type": "string",
+                                  "pattern": "^\\{[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*\\}$"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "duration.illustration": {
+                      "allOf": [
+                        {
+                          "$ref": "#/$defs/token"
+                        },
+                        {
+                          "properties": {
+                            "$type": {
+                              "const": "duration"
+                            }
+                          }
+                        }
+                      ]
+                    }
                   }
                 }
               }
@@ -8781,12 +9364,210 @@
                 },
                 "additionalProperties": {
                   "$ref": "#/$defs/token"
+                },
+                "properties": {
+                  "color.illustration.ground": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "color"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "color.illustration.plane": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "color"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "color.illustration.ink": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "color"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "color.illustration.subject": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "color"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "color.illustration.counterpoint": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "color"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "color.illustration.context": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "color"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "color.illustration.edge": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "color"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "color.illustration.light": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "color"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "color.illustration.depth": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "color"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "illustration.material.lineWidth": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "number"
+                          },
+                          "$value": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^\\{[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*\\}$"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "illustration.material.depthOpacity": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "number"
+                          },
+                          "$value": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 1
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^\\{[a-z][a-zA-Z0-9-]*(?:\\.[a-zA-Z0-9-]+)*\\}$"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "duration.illustration": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/token"
+                      },
+                      {
+                        "properties": {
+                          "$type": {
+                            "const": "duration"
+                          }
+                        }
+                      }
+                    ]
+                  }
                 }
               }
             }
           }
         }
       ]
+    },
+    "graphics": {
+      "$ref": "#/$defs/graphics"
     }
   },
   "$defs": {
@@ -9760,6 +10541,24 @@
         }
       },
       "additionalProperties": false
+    },
+    "graphics": {
+      "type": "object",
+      "required": [
+        "family"
+      ],
+      "properties": {
+        "family": {
+          "enum": [
+            "anatomy",
+            "lightroom",
+            "passage",
+            "fieldlines"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Optional illustration-family metadata for format 2 and passive metadata on derived legacy read models. Older packages remain valid without it."
     }
   },
   "allOf": [
