@@ -124,4 +124,4 @@ export const COMPOSITIONS = Object.freeze({
   }),
 });
 
-export const PATTERN_FILES = Object.freeze(['catalog.mjs', 'compositions.mjs', 'web.mjs', 'form.mjs', 'list-detail.mjs', 'object-workbench.mjs', 'parameter-workbench.mjs', 'recipe-editor.mjs', 'resource-library.mjs', 'history.mjs', 'history-editor.mjs', 'gallery.mjs', 'quality.mjs', 'styles.css']);
+export const PATTERN_FILES = Object.freeze(['catalog.mjs', 'compositions.mjs', 'web.mjs', 'form.mjs', 'list-detail.mjs', 'object-workbench.mjs', 'parameter-workbench.mjs', 'recipe-editor.mjs', 'resource-library.mjs', 'history.mjs', 'history-editor.mjs', 'gallery.mjs', 'illustrations.mjs', 'illustrations-primitives.mjs', 'illustrations-anatomy.mjs', 'illustrations-lightroom.mjs', 'illustrations-passage.mjs', 'illustrations-fieldlines.mjs', 'quality.mjs', 'styles.css']);

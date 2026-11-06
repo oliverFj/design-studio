@@ -24,12 +24,14 @@ export function mountGraphicMotion(svg, {
   reduced = false,
   duration: durationOverride,
   hintId,
+  createPlan,
   onUpdate = () => {},
   beforePlay = () => {}
 } = {}) {
   if (!svg?.ownerDocument?.defaultView || !svg.querySelector) throw new Error('Graphic motion requires a native SVG element.');
   if (!Object.hasOwn(modules, family)) throw new Error('Unknown graphic motion family: ' + String(family));
-  if (!motifs.has(motif)) throw new Error('Unknown graphic motion motif: ' + String(motif));
+  if (createPlan !== undefined && typeof createPlan !== 'function') throw new TypeError('Graphic motion createPlan must be a function.');
+  if (!motifs.has(motif) && !createPlan) throw new Error('Unknown graphic motion motif: ' + String(motif));
   if (durationOverride !== undefined && graphicDuration(durationOverride) === null) throw new Error('Graphic motion duration must be a positive time.');
   const module = modules[family], document = svg.ownerDocument, view = document.defaultView;
   const preference = view.matchMedia?.('(prefers-reduced-motion: reduce)') ?? { matches: false };
@@ -64,7 +66,8 @@ export function mountGraphicMotion(svg, {
   }
   function prepare() {
     if (plan || isReduced() || destroyed) return;
-    plan = module.create(svg, motif);
+    // Trusted authoring recipes share the same timing, accessibility and cleanup.
+    plan = (createPlan ?? module.create)(svg, motif);
     try {
       for (const { target, frames, start = 0, end = 1, easing = 'cubic-bezier(.2,.7,.2,1)' } of plan.tracks.filter(Boolean)) {
         if (!target || !svg.contains(target) || !(start >= 0 && end > start && end <= 1) || typeof target.animate !== 'function') throw new Error(`Invalid graphic motion track: ${family}/${motif}`);

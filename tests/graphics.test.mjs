@@ -290,3 +290,23 @@ test('graphic renderer validates once and retains an isolated theme snapshot for
   assert.match(fresh, /data-family="fieldlines"/); assert.match(fresh, /stroke="#123456"/);
   assert.equal(renderGraphic(pack, 'focus', options), fresh);
 });
+
+test('trusted concept plans reuse the finite player without registering a catalog motif',()=>{
+ const fixture=nativeDocument(),svg=createGraphic(theme(),'focus',{family:'passage'},{document:fixture.document});
+ fixture.document.body.append(svg);svg.setAttribute('data-motif','house');
+ assert.throws(()=>mountGraphicMotion(svg),/Unknown graphic motion motif/);
+ assert.throws(()=>mountGraphicMotion(svg,{createPlan:{code:'not executable'}}),/must be a function/);
+ let created=0,cleaned=0;
+ const controller=mountGraphicMotion(svg,{createPlan:(element,motif)=>{
+  assert.equal(element,svg);assert.equal(motif,'house');created++;
+  return {tracks:[{target:element.querySelector('path'),frames:[{opacity:0},{opacity:1}],start:.2,end:.6}],destroy(){cleaned++;}};
+ }});
+ assert.equal(created,0,'mount remains passive');
+ controller.seek(.5);assert.equal(created,1);assert.equal(fixture.effects[0].currentTime,1600);
+ controller.setReduced(true);assert.equal(cleaned,1);assert.equal(controller.state.progress,1);
+ controller.play();assert.equal(created,1,'reduced motion never invokes the custom factory');
+ controller.setReduced(false);controller.play(true);assert.equal(created,2);
+ controller.destroy();assert.equal(cleaned,2);assert.equal(fixture.scheduled.size,0);
+ assert.equal(svg.getAttribute('tabindex'),null);
+ assert.equal(GRAPHIC_MOTIFS.some(item=>item.id==='house'),false);
+});

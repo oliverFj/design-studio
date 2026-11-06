@@ -34,7 +34,7 @@ class Element {
   getBoundingClientRect() { return { top: 0, height: 32 }; }
 }
 export function dom() {
-  const document = { createElement(tag) { return new Element(tag, document); }, createTextNode(text) { const node = new Element('#text', document); node.textContent = text; return node; } };
+  const document = { createElement(tag) { return new Element(tag, document); }, createElementNS(namespace, tag) { const node = new Element(tag, document); node.namespaceURI = namespace; return node; }, createTextNode(text) { const node = new Element('#text', document); node.textContent = text; return node; } };
   document.body = document.createElement('body'); document.activeElement = document.body; return document;
 }
 export function fire(target, type, values = {}) {

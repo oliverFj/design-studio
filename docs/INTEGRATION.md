@@ -145,6 +145,8 @@ Før referencekode udledes af eller indføres i et eksisterende produkt, læses 
 
 Offline-editorens Designsystem → Designmønstre og web-showcasen viser samme elleve eksempler: objekteditor med kontekstpanel, parametrisk værksted, opskriftseditor med lag, formular med validering, liste med detaljevisning, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. De bruger bibliotekets eksisterende roller og det valgte tema. Kilde, version, formål, komponenter og interaktioner findes i patterns/catalog.mjs; implementering og layout findes i patterns/compositions.mjs, de enkelte mønstermoduler og patterns/styles.css. PATTERN_FILES i kataloget er den fælles liste til referenceeksport og showcase.
 
+`mountCompositionGallery` viser en vandret kortbjælke med native knapper og et fælles `scroll-area`. Pilene ruller bjælken; valg opdaterer eksemplet nedenunder og bevarer kladder, fokus på udløseren og scrollpositionen ved kortskift. `createPatternIllustrator` i `patterns/illustrations.mjs` bygger dekorative, statiske SVG'er fra fire lokale familiemoduler. De deler kun native SVG-primitiver; hver familie ejer sin geometri og materialebehandling. Illustrationsstilen vælges gennem `theme.graphics.family`, mens det opløste tema leverer grafikfarver og materialeværdier. Hele sæt af illustrationsmoduler følger med `examples`-eksporten. Se [grafikstandarden](GRAPHICS-AUTHORING.md).
+
 Katalogets layoutprofil vælger en af bibliotekets fælles breddeprofiler. Profilerne vælges efter indholdets rolle og kan tilpasses i produktet. Objektkort og handlinger strækkes ikke med en bredere arbejdsflade. Se [retningslinjerne for indholdsbredde](DESIGN-FOUNDATIONS.md#indholdsbredde-og-fuld-bredde).
 
 Objekteditoren er tilpasset fra FormLabs object-panel.js, ui.js og ui.css, gennemgået 27. oktober 2026. Den genbruger hierarkisk søgning med midlertidig åbning af matchende forældre, multivalg, gruppehandlinger for synlighed/låsning, kontekst, faner og bevarede foldesektioner. Gruppens lås beskytter også underobjekter; rækkehandlinger bevarer valget. Flytning er tilgængelig gennem Handlinger, så træk ikke er nødvendigt. Ved forskellige mål viser panelet en tom blandet værdi; tomt input bevarer de enkelte mål, mens en indtastet værdi gælder hele udvalget. Native faneroller har piletaster, Home/End og én tabstop-position.
@@ -510,6 +512,8 @@ function reveal(panel) {
 ~~~
 
 Funktionen returnerer en native Animation eller null ved reduceret bevægelse eller manglende browserstøtte. Sæt derfor den anvendelige sluttilstand før kaldet. Produktet annullerer eventuelle effekter, når en visning afmonteres. Fanen Animation og effekter demonstrerer den faktiske standard; i komponentkataloget vender kortene tilbage samtidig med, at variantpanelet lukker.
+
+Illustrationsforløb er en særskilt rolle med `duration.illustration` og den fælles `mountGraphicMotion`. En betroet `createPlan(svg, motif)`-funktion kan levere et nyt begrebs forløb uden at registrere en komponentrolle; playeren ejer stadig afspilning, reduceret bevægelse og oprydning. Planen er almindelig kildekode, ikke JavaScript i temadata. Se [authoring-API'et og familieprofilerne](GRAPHICS-AUTHORING.md#en-plan-på-den-fælles-afspiller).
 
 ## Hierarkisk indhold med tree
 

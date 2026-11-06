@@ -73,9 +73,11 @@ test('release archives preserve bytes, readable licenses, checksums and determin
 
 test('source allowlist excludes installed binaries, local configuration, outputs and unrelated files', async t => {
   const { directory, put } = await fixture(t);
+  await put('docs/graphics/style-contract.json', '{"contractVersion":1}');
   for (const file of ['node_modules/@esbuild/win32-x64/esbuild.exe', 'tools/node_modules/example/index.mjs', '.git/config', '.env', '.env.local', 'artifacts/private.json', 'docs/.env.md', 'studio/local.log', 'examples/workspace/index.html', 'private.json']) await put(file, 'Must not ship');
   const names = (await sourceEntries(directory)).map(entry => entry.name);
   assert.ok(names.includes('package-lock.json'));
+  assert.ok(names.includes('docs/graphics/style-contract.json'), 'the machine-readable authoring contract travels with its guides');
   assert.equal(names.some(name => /(?:node_modules|esbuild\.exe|\.env|artifacts|private\.json|\.git\/|local\.log|workspace\/index\.html)/.test(name)), false);
 });
 

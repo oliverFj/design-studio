@@ -1,0 +1,1156 @@
+{
+  "contractVersion": 1,
+  "status": "authoring-baseline",
+  "language": "da",
+  "auditedOn": "2026-11-06",
+  "pathBase": "repository-root",
+  "purpose": "Dokumenteret, maskinlæsbart authoringgrundlag for stilbevarende grafik og senere MCP-integration.",
+  "authority": {
+    "humanGuide": "docs/GRAPHICS-AUTHORING.md",
+    "materialSource": "core/graphic-tokens.mjs",
+    "geometrySource": "core/graphics/families/",
+    "renderer": "core/graphics.mjs",
+    "catalogPresentation": "studio/catalog-artwork.mjs",
+    "catalogCSS": "studio/component-catalog.css",
+    "motifRegistry": "core/graphics/catalog.mjs",
+    "componentMotifCountAtAudit": 62,
+    "notes": [
+      "Denne fil indlæses ikke af runtime eller værksted.",
+      "Code-observation er en kildeaflæsning; authoring-requirement er en regel for nyt arbejde.",
+      "Observerede intervaller er ikke tokenbegrænsninger eller automatisk stilgodkendelse.",
+      "Komponentkataloget er primær stilreference; godkendt afledt produktgrafik fastlægger ikke nye normalværdier.",
+      "Begrebsstudier og storyboards er ikke kanoniske stilreferencer."
+    ]
+  },
+  "derivedProductGraphics": {
+    "status": "approved-derived-product-graphics",
+    "definesFamilyDefaults": false,
+    "entryPoint": {
+      "file": "patterns/illustrations.mjs",
+      "export": "createPatternIllustrator"
+    },
+    "familyExport": "draw",
+    "familyModules": {
+      "anatomy": "patterns/illustrations-anatomy.mjs",
+      "lightroom": "patterns/illustrations-lightroom.mjs",
+      "passage": "patterns/illustrations-passage.mjs",
+      "fieldlines": "patterns/illustrations-fieldlines.mjs"
+    },
+    "primitives": "patterns/illustrations-primitives.mjs",
+    "notes": [
+      "Statiske produktkompositioner med semantiske parts og eventuelle SVG-definitioner; ingen animationsplan.",
+      "EntryPoint bygger native inline-SVG; familiemodulerne registrerer ikke nye komponentmotiver."
+    ]
+  },
+  "shared": {
+    "viewBox": [
+      0,
+      0,
+      600,
+      420
+    ],
+    "geometryUnit": "svg",
+    "presentationUnit": "css-px",
+    "uniformScaling": true,
+    "baseStrokeMultiplier": 1,
+    "defaultLineCap": "round",
+    "defaultLineJoin": "round",
+    "wrapperFontFamily": "Arial,sans-serif",
+    "catalogImageHeight": 154,
+    "catalogCardMinHeight": 232,
+    "catalogCardPadding": 12,
+    "catalogCardGap": 12,
+    "universalSafeArea": null,
+    "universalFillRatio": null,
+    "notes": [
+      "Null betyder, at der ikke er påvist en fælles norm for denne egenskab.",
+      "SVG-enheder skaleres med min(W/600,H/420); de er ikke CSS-pixel.",
+      "Kortets ydre radius bliver ikke motivets radius."
+    ]
+  },
+  "materials": {
+    "kind": "code-observation",
+    "source": "core/graphic-tokens.mjs",
+    "bindings": {
+      "ground": {
+        "token": "color.illustration.ground",
+        "defaultValue": "#ececf6"
+      },
+      "plane": {
+        "token": "color.illustration.plane",
+        "defaultValue": "#f5f4f5"
+      },
+      "ink": {
+        "token": "color.illustration.ink",
+        "defaultValue": "#2e314b"
+      },
+      "subject": {
+        "token": "color.illustration.subject",
+        "defaultValue": "#6862b8"
+      },
+      "counter": {
+        "token": "color.illustration.counterpoint",
+        "defaultValue": "#72a09c"
+      },
+      "context": {
+        "token": "color.illustration.context",
+        "defaultValue": "#d0cfe9"
+      },
+      "edge": {
+        "token": "color.illustration.edge",
+        "defaultValue": "#808195"
+      },
+      "light": {
+        "token": "color.illustration.light",
+        "defaultValue": "#fffdf4"
+      },
+      "depth": {
+        "token": "color.illustration.depth",
+        "defaultValue": "#b7b8c6"
+      },
+      "lineWidth": {
+        "token": "illustration.material.lineWidth",
+        "defaultValue": 1.8
+      },
+      "depthOpacity": {
+        "token": "illustration.material.depthOpacity",
+        "defaultValue": 0.12
+      }
+    },
+    "themeSnapshot": {
+      "kind": "code-observation",
+      "source": "packages/*.json resolved through core/theme-modes.mjs and core/engine.mjs",
+      "themeCount": 15,
+      "modeCount": 40,
+      "lineWidthRange": [
+        1.6,
+        2.2
+      ],
+      "depthOpacityRange": [
+        0.1,
+        0.18
+      ],
+      "durationValues": [
+        "3200ms"
+      ],
+      "resolvedModes": [
+        {
+          "theme": "atelier",
+          "mode": "light",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.15,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "atelier",
+          "mode": "dark",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.14,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "bauhaus",
+          "mode": "solgul",
+          "lineWidth": 2.2,
+          "depthOpacity": 0.1,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "bauhaus",
+          "mode": "kalk",
+          "lineWidth": 2.2,
+          "depthOpacity": 0.1,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "bauhaus",
+          "mode": "signalroed",
+          "lineWidth": 2.2,
+          "depthOpacity": 0.1,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "castle-studio-v2",
+          "mode": "light",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.13,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "castle-studio-v2",
+          "mode": "dark",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.14,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "castle-studio",
+          "mode": "light",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.15,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "castle-studio",
+          "mode": "dark",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.16,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "fjordside",
+          "mode": "light",
+          "lineWidth": 2,
+          "depthOpacity": 0.18,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "fjordside",
+          "mode": "dark",
+          "lineWidth": 2,
+          "depthOpacity": 0.16,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "kyst",
+          "mode": "light",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.14,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "kyst",
+          "mode": "dark",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.15,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "midnight-editorial",
+          "mode": "light",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.16,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "midnight-editorial",
+          "mode": "dark",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.15,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "nocturne",
+          "mode": "light",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.17,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "nocturne",
+          "mode": "dark",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.17,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "porcelaen",
+          "mode": "light",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.16,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "porcelaen",
+          "mode": "dark",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.18,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "porcelaen",
+          "mode": "celadon",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.16,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "porcelaen",
+          "mode": "rosenkvarts",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.16,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "porcelaen",
+          "mode": "maaneblaa",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.17,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "prisme",
+          "mode": "light",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.17,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "prisme",
+          "mode": "dark",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.18,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "riso",
+          "mode": "light",
+          "lineWidth": 2.1,
+          "depthOpacity": 0.17,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "riso",
+          "mode": "dark",
+          "lineWidth": 2.1,
+          "depthOpacity": 0.16,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "riso",
+          "mode": "kobolt",
+          "lineWidth": 2.1,
+          "depthOpacity": 0.17,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "riso",
+          "mode": "skovtryk",
+          "lineWidth": 2.1,
+          "depthOpacity": 0.17,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "riso",
+          "mode": "fuchsia",
+          "lineWidth": 2.1,
+          "depthOpacity": 0.17,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "signal",
+          "mode": "light",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.12,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "signal",
+          "mode": "dark",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.13,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "studio-light",
+          "mode": "light",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.12,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "studio-light",
+          "mode": "dark",
+          "lineWidth": 1.8,
+          "depthOpacity": 0.13,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "terminal",
+          "mode": "dark",
+          "lineWidth": 2,
+          "depthOpacity": 0.1,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "terminal",
+          "mode": "light",
+          "lineWidth": 2,
+          "depthOpacity": 0.1,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "terminal",
+          "mode": "rav",
+          "lineWidth": 2,
+          "depthOpacity": 0.1,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "terminal",
+          "mode": "isblaa",
+          "lineWidth": 2,
+          "depthOpacity": 0.1,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "terminal",
+          "mode": "ultraviolet",
+          "lineWidth": 2,
+          "depthOpacity": 0.1,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "vaerk",
+          "mode": "light",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.17,
+          "duration": "3200ms"
+        },
+        {
+          "theme": "vaerk",
+          "mode": "dark",
+          "lineWidth": 1.6,
+          "depthOpacity": 0.16,
+          "duration": "3200ms"
+        }
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "G-01",
+      "key": "reference-first",
+      "kind": "authoring-requirement",
+      "requirement": "Vælg mindst tre registrerede motiver fra samme familie og angiv det konkrete træk, der videreføres.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    },
+    {
+      "id": "G-02",
+      "key": "coordinate-system",
+      "kind": "authoring-requirement",
+      "requirement": "Brug 600 × 420, proportional skalering og billedfelt i ground; ingen automatisk beskæring eller non-scaling-stroke som kompensation.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    },
+    {
+      "id": "G-03",
+      "key": "stroke-hierarchy",
+      "kind": "authoring-requirement",
+      "requirement": "Adskil kontur, tekstspor, guides, markører og materiale; ingen global stregmultiplikator.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    },
+    {
+      "id": "G-04",
+      "key": "family-materials",
+      "kind": "authoring-requirement",
+      "requirement": "Brug semantiske grafikbindings efter familiens opskrift; brug ikke alle roller automatisk.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    },
+    {
+      "id": "G-05",
+      "key": "text-hierarchy",
+      "kind": "authoring-requirement",
+      "requirement": "Fine varierede tekstspor og familiens glyph-skrift; ingen generel erstatning med massive tekstkapsler.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    },
+    {
+      "id": "G-06",
+      "key": "semantic-geometry",
+      "kind": "authoring-requirement",
+      "requirement": "Form, hjørner, lys, landskab og perspektiv bestemmes af familie og betydning; ingen fælles motivskabelon på tværs af familier.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    },
+    {
+      "id": "G-07",
+      "key": "exact-connections",
+      "kind": "authoring-requirement",
+      "requirement": "Del koordinater mellem relaterede former; kontrollér synlige kanter, åbninger og lagorden.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    },
+    {
+      "id": "G-08",
+      "key": "scale-preservation",
+      "kind": "authoring-requirement",
+      "requirement": "Brug samme motiv stort og i produktstørrelse; en mikrovariant er et særskilt vurderet arbejde.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    },
+    {
+      "id": "G-09",
+      "key": "static-final-state",
+      "kind": "authoring-requirement",
+      "requirement": "Slutgeometrien forklarer motivet uden afspilning; navngiv parts efter betydning.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    },
+    {
+      "id": "G-10",
+      "key": "family-motion",
+      "kind": "authoring-requirement",
+      "requirement": "Følg familiens koreografi og fælles player; ingen egen tidsmotor eller automatisk loop.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    },
+    {
+      "id": "G-11",
+      "key": "matched-comparison",
+      "kind": "authoring-requirement",
+      "requirement": "Sammenlign kandidat og referencer ved samme størrelse, tema, farvetilstand og færdige pose.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    },
+    {
+      "id": "G-12",
+      "key": "explicit-deviations",
+      "kind": "authoring-requirement",
+      "requirement": "Registrér regel-id, ændring, begrundelse og reference ved afvigelser; teknisk gyldighed er ikke stilgodkendelse.",
+      "source": "docs/GRAPHICS-AUTHORING.md#fælles-regler-for-gentaget-arbejde"
+    }
+  ],
+  "families": {
+    "anatomy": {
+      "name": "Tegnets anatomi",
+      "guide": "docs/graphics/TEGNETS-ANATOMI.md",
+      "geometrySources": [
+        "core/graphics/families/anatomy.mjs",
+        "core/graphics/families/anatomy-catalog.mjs"
+      ],
+      "motionSource": "core/graphics/motion/anatomy.mjs",
+      "identity": "Kontur og aktivt tomrum med få pigmenttyngdepunkter, tekniske mål og præcise ankre.",
+      "observedDefaults": {
+        "kind": "code-observation",
+        "source": "core/graphics/families/anatomy-catalog.mjs",
+        "contour": {
+          "color": "ink",
+          "width": "var(--g-line-width)"
+        },
+        "writing": {
+          "width": 1,
+          "gap": 23,
+          "color": "ink"
+        },
+        "dimension": {
+          "width": 1,
+          "tickHalfLength": 6,
+          "color": "edge"
+        },
+        "bracket": {
+          "width": 1,
+          "height": 10
+        },
+        "dot": {
+          "radius": 4,
+          "color": "subject"
+        },
+        "rectangleRadius": 0,
+        "glyphs": {
+          "fontFamily": "ui-monospace,monospace",
+          "helperFontSize": 20
+        },
+        "paletteUsedByComponentMotifs": [
+          "ground",
+          "plane",
+          "ink",
+          "subject",
+          "context",
+          "edge",
+          "light"
+        ]
+      },
+      "referenceMotifs": [
+        {
+          "motif": "button",
+          "reason": "Enkel kontur og lokal handlingsaccent.",
+          "use": "normal"
+        },
+        {
+          "motif": "field",
+          "reason": "Label, felt og hjælp med fine vægtforskelle.",
+          "use": "normal"
+        },
+        {
+          "motif": "inspector",
+          "reason": "Objekt, panel og præcis forbindelse.",
+          "use": "normal"
+        },
+        {
+          "motif": "caption",
+          "reason": "Billede og fæstnet tekstforbindelse.",
+          "use": "normal"
+        },
+        {
+          "motif": "spinner",
+          "reason": "Bred aktivitetssilhuet, ikke normal kontur.",
+          "use": "semantic-exception"
+        }
+      ],
+      "semanticExceptions": [
+        {
+          "motif": "switch",
+          "property": "rectangleRadius",
+          "value": 28,
+          "unit": "svg",
+          "reason": "Kontaktens kapselgeometri."
+        },
+        {
+          "motif": "spinner",
+          "property": "activityArcStroke",
+          "value": 7,
+          "unit": "svg",
+          "reason": "Aktivitetsbuen er selve motivet."
+        },
+        {
+          "motif": "poster",
+          "property": "annotationFontSize",
+          "value": 9,
+          "unit": "svg",
+          "reason": "Små monospaced konstruktionsannotationer, letterSpacing 1.2."
+        }
+      ],
+      "authoringConstraints": [
+        "AN-01..AN-08 i familieguiden gælder.",
+        "Kontur før masse; ingen gradienter eller generel skygge.",
+        "Almindelige tekst-/målstreger starter ved 1; lokale accenter 2–4 kræver en opgave.",
+        "counter og depth indføres ikke som nye normalmaterialer.",
+        "Ingen global 6× kontur, 14-høje tekstpiller eller overstore hjælpeankre."
+      ],
+      "observedMotion": {
+        "kind": "code-observation",
+        "source": "core/graphics/motion/anatomy.mjs",
+        "durationToken": "duration.illustration",
+        "easing": {
+          "drawing": "cubic-bezier(.2,.7,.2,1)",
+          "linear": "linear"
+        },
+        "catalogScheduling": {
+          "startBase": 0.025,
+          "partOffset": 0.145,
+          "endBase": 0.31,
+          "endCap": 0.96
+        },
+        "notes": [
+          "Catalogpartorden følger betydningen. Oprindelige motiver har egne tidsforløb."
+        ]
+      }
+    },
+    "lightroom": {
+      "name": "Lysrum",
+      "guide": "docs/graphics/LYSRUM.md",
+      "geometrySources": [
+        "core/graphics/families/lightroom.mjs",
+        "core/graphics/families/lightroom-catalog.mjs"
+      ],
+      "motionSource": "core/graphics/motion/lightroom.mjs",
+      "identity": "Milde, præcist konstruerede indfældninger og løftede planer med lokalt lys og beskeden materialedybde.",
+      "observedDefaults": {
+        "kind": "code-observation",
+        "source": "core/graphics/families/lightroom-catalog.mjs",
+        "contour": {
+          "color": "edge",
+          "width": "var(--g-line-width)"
+        },
+        "ledge": {
+          "shadowOffset": [
+            4,
+            7
+          ],
+          "inset": 10,
+          "outerRadius": 7,
+          "innerRadiusFormula": "max(2,r-4)",
+          "lightEdgeStroke": 1.8
+        },
+        "well": {
+          "inset": 7,
+          "outerRadius": 5,
+          "innerRadiusFormula": "max(1,r-3)"
+        },
+        "depth": {
+          "color": "depth",
+          "opacity": "var(--g-depth-opacity)"
+        },
+        "wallGradient": {
+          "type": "linear",
+          "from": [
+            0,
+            0
+          ],
+          "to": [
+            1,
+            1
+          ],
+          "stops": [
+            {
+              "offset": 0,
+              "color": "light"
+            },
+            {
+              "offset": 1,
+              "color": "context"
+            }
+          ]
+        },
+        "glowGradient": {
+          "type": "radial",
+          "center": [
+            0.45,
+            0.38
+          ],
+          "radius": 0.7,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "light"
+            },
+            {
+              "offset": 0.68,
+              "color": "subject"
+            },
+            {
+              "offset": 1,
+              "color": "counter"
+            }
+          ]
+        },
+        "skyGradient": {
+          "type": "linear",
+          "from": [
+            0,
+            0
+          ],
+          "to": [
+            0,
+            1
+          ],
+          "stops": [
+            {
+              "offset": 0,
+              "color": "counter"
+            },
+            {
+              "offset": 1,
+              "color": "context"
+            }
+          ],
+          "source": "core/graphics/families/lightroom.mjs"
+        },
+        "glyphs": {
+          "fontFamily": "Arial,sans-serif"
+        },
+        "notes": [
+          "Gradientkoordinater er normaliserede i objektets boks.",
+          "Defineret gradient er ikke ensbetydende med, at motivet faktisk bruger den.",
+          "Radialglød er ikke et krav til alle motiver; almindelige tekstspor er typisk 2–3, titler ofte 3–4."
+        ]
+      },
+      "referenceMotifs": [
+        {
+          "motif": "input",
+          "reason": "Indfældet well-materiale.",
+          "use": "normal"
+        },
+        {
+          "motif": "card",
+          "reason": "Løftet ledge-materiale og afgrænset lys.",
+          "use": "normal"
+        },
+        {
+          "motif": "inspector",
+          "reason": "Fine egenskaber, stabilt panel og præcis relation.",
+          "use": "normal"
+        },
+        {
+          "motif": "image",
+          "reason": "Gradienthimmel, bølgende terræn og clipping.",
+          "use": "normal"
+        },
+        {
+          "motif": "spinner",
+          "reason": "Bred aktivitetsform som semantisk undtagelse.",
+          "use": "semantic-exception"
+        }
+      ],
+      "semanticExceptions": [
+        {
+          "motif": "button",
+          "property": "largeRadius",
+          "reason": "Trykfladens genstandsform; ikke radiusstandard for paneler."
+        },
+        {
+          "motif": "spinner",
+          "property": "wideTrack",
+          "reason": "Aktivitetsbanen er materiale, ikke normal kontur."
+        }
+      ],
+      "authoringConstraints": [
+        "Skeln ledge fra well og bevar opskriftens finhed og insetforhold.",
+        "Lysretning øvre/venstre; ydre aftryk ned/højre. well har egen afgrænset indre øvre/højre skygge.",
+        "Ingen opak depth-blok som erstatning for den transparente skygge.",
+        "Ingen obligatorisk radialglød eller generel radius22.",
+        "Ingen global konturforstærkning eller fælles polygonlandskab på tværs af familier."
+      ],
+      "observedMotion": {
+        "kind": "code-observation",
+        "source": "core/graphics/motion/lightroom.mjs",
+        "durationToken": "duration.illustration",
+        "easing": {
+          "reveal": "cubic-bezier(.22,.68,.28,1)",
+          "settle": "cubic-bezier(.18,.68,.24,1)"
+        },
+        "catalogScheduling": {
+          "startBase": 0.025,
+          "partOffset": 0.065,
+          "endBase": 0.6,
+          "endOffset": 0.075,
+          "endCap": 0.9
+        },
+        "catalogPoses": {
+          "riseOffset": 7,
+          "slideOffset": 6,
+          "lightScaleFrom": 0.96,
+          "turnDegreesFrom": -18
+        },
+        "notes": [
+          "Poserne er opskrifter til markerede semantiske grupper; turn er ikke en generel rotation af alt materiale.",
+          "Komponentkort deaktiverer SVG-pointerinteraktion."
+        ]
+      }
+    },
+    "passage": {
+      "name": "Passage",
+      "guide": "docs/graphics/PASSAGE-OG-FELTLINJER.md",
+      "geometrySources": [
+        "core/graphics/families/passage.mjs",
+        "core/graphics/families/passage-catalog.mjs"
+      ],
+      "motionSource": "core/graphics/motion/passage.mjs",
+      "identity": "Massive materialeplaner, præcise modformer og forskudte lag; fine konturer og indholdsspor.",
+      "observedDefaults": {
+        "kind": "code-observation",
+        "source": "core/graphics/families/passage-catalog.mjs",
+        "contour": {
+          "color": "edge",
+          "width": "var(--g-line-width)"
+        },
+        "rectFill": "plane",
+        "pathFill": "subject",
+        "rectangleRadius": 0,
+        "windowFrame": {
+          "thickness": 15,
+          "fillRule": "evenodd"
+        },
+        "ring": {
+          "thickness": 14,
+          "fillRule": "evenodd"
+        },
+        "writing": {
+          "width": 2,
+          "gap": 25,
+          "color": "ink"
+        },
+        "glyphs": {
+          "fontFamily": "Arial,sans-serif",
+          "fontWeight": 600,
+          "helperFontSize": 20
+        },
+        "sideMeasure": {
+          "width": 1,
+          "opacity": 0.6,
+          "tickHalfLength": 6
+        }
+      },
+      "referenceMotifs": [
+        {
+          "motif": "button",
+          "reason": "Trykflade, forkant og fin målestreg.",
+          "use": "normal"
+        },
+        {
+          "motif": "input",
+          "reason": "Rektangulær materialeudskæring.",
+          "use": "normal"
+        },
+        {
+          "motif": "inspector",
+          "reason": "Objekt og separat panel med præcis forbindelse.",
+          "use": "normal"
+        },
+        {
+          "motif": "data-grid",
+          "reason": "Materialeramme og fint informationsnet.",
+          "use": "normal"
+        },
+        {
+          "motif": "spinner",
+          "reason": "Ringmateriale i store vægte.",
+          "use": "semantic-exception"
+        }
+      ],
+      "semanticExceptions": [
+        {
+          "motif": "switch",
+          "property": "rectangleRadius",
+          "value": 33,
+          "unit": "svg",
+          "reason": "66 høj kontaktkapsel."
+        },
+        {
+          "motif": "spinner",
+          "property": "materialStrokeWidths",
+          "values": [
+            36,
+            24
+          ],
+          "unit": "svg",
+          "reason": "Ringmasse og aktivitetsbane med butt-ender; ikke generelle konturer."
+        }
+      ],
+      "authoringConstraints": [
+        "Tyngde kommer fra masse og modform, ikke fra at gøre alle streger tykke.",
+        "Skarpe rektangulære materialeplaner er udgangspunkt; runde hulrum kan være betydningsbærende.",
+        "Brug reelle udskæringer, når et bagplan skal være synligt.",
+        "Ingen obligatorisk isometri eller generel pilletypografi.",
+        "Kontur, tekst, guides og materialetykkelse registreres som forskellige roller."
+      ],
+      "observedMotion": {
+        "kind": "code-observation",
+        "source": "core/graphics/motion/passage.mjs",
+        "durationToken": "duration.illustration",
+        "easing": {
+          "materialArrival": "cubic-bezier(.22,.78,.2,1)",
+          "registration": "cubic-bezier(.4,0,.2,1)"
+        },
+        "notes": [
+          "Katalogets catalogMotion registrerer delens start/end, forskydning, trace og pointerdybde. Genbrug referenceforløbet; opfind ikke én ens ankomst for alle dele."
+        ]
+      }
+    },
+    "fieldlines": {
+      "name": "Feltlinjer",
+      "guide": "docs/graphics/PASSAGE-OG-FELTLINJER.md",
+      "geometrySources": [
+        "core/graphics/families/fieldlines.mjs",
+        "core/graphics/families/fieldlines-catalog.mjs"
+      ],
+      "motionSource": "core/graphics/motion/fieldlines.mjs",
+      "identity": "Ét prioriteret, sammenhængende forløb omgivet af finere kurver, rolletegn og præcise destinationer.",
+      "observedDefaults": {
+        "kind": "code-observation",
+        "source": "core/graphics/families/fieldlines-catalog.mjs",
+        "contour": {
+          "color": "edge",
+          "width": "var(--g-line-width)"
+        },
+        "flow": {
+          "samePath": true,
+          "layers": [
+            {
+              "color": "ground",
+              "strokeWidth": 17
+            },
+            {
+              "color": "subject",
+              "strokeWidth": 10
+            },
+            {
+              "color": "ink",
+              "strokeWidth": 1.1
+            }
+          ]
+        },
+        "fan": {
+          "count": 5,
+          "indexes": [
+            -2,
+            -1,
+            0,
+            1,
+            2
+          ],
+          "startYStep": 15,
+          "endYStep": 25,
+          "controlXOffsets": [
+            90,
+            -90
+          ],
+          "color": "edge",
+          "width": 1,
+          "opacity": 0.45
+        },
+        "dot": {
+          "radius": 8,
+          "color": "counter"
+        },
+        "ring": {
+          "radius": 18,
+          "fill": "ground",
+          "stroke": "ink",
+          "strokeWidth": "var(--g-line-width)"
+        },
+        "plate": {
+          "radius": 14,
+          "fill": "plane",
+          "stroke": "edge",
+          "strokeWidth": "var(--g-line-width)"
+        },
+        "writing": {
+          "width": 2,
+          "gap": 24,
+          "length": 160,
+          "alternateLengthReduction": 35,
+          "count": 3,
+          "color": "ink"
+        },
+        "glyphs": {
+          "fontFamily": "ui-monospace,monospace",
+          "helperFontSize": 16
+        },
+        "registration": {
+          "width": 1,
+          "opacity": 0.45,
+          "armTotalLength": 14
+        }
+      },
+      "referenceMotifs": [
+        {
+          "motif": "button",
+          "reason": "Rute, ledsagefelt og selvstændig destination.",
+          "use": "normal"
+        },
+        {
+          "motif": "range-field",
+          "reason": "Faktisk overgang mellem passeret og mulig bane.",
+          "use": "normal"
+        },
+        {
+          "motif": "inspector",
+          "reason": "Forløb fra objekt til egenskabspanel.",
+          "use": "normal"
+        },
+        {
+          "motif": "data-grid",
+          "reason": "Rutens vægt over for cellenet og markør.",
+          "use": "normal"
+        },
+        {
+          "motif": "image",
+          "reason": "Kurvelandskab med fine ekkoer; original specialopskrift.",
+          "use": "normal"
+        }
+      ],
+      "semanticExceptions": [
+        {
+          "motif": "poster",
+          "routeStrokeWidths": [
+            22,
+            14,
+            1.3
+          ],
+          "reason": "Original plakat med større rutemasse."
+        },
+        {
+          "motif": "focus",
+          "routeStrokeWidths": [
+            10,
+            1.2
+          ],
+          "reason": "Original fokuskomposition uden ground-underlag."
+        },
+        {
+          "motif": "relation",
+          "routeStrokeWidths": [
+            11,
+            1.1
+          ],
+          "reason": "To selvstændige farveruter."
+        },
+        {
+          "motif": "rhythm",
+          "routeStrokeWidths": [
+            5
+          ],
+          "reason": "Rytmisk hovedbølge."
+        },
+        {
+          "motif": "progress",
+          "reason": "Passeret og ventende fremdriftsbane.",
+          "routes": {
+            "remaining-route": [
+              {
+                "color": "context",
+                "strokeWidth": 18
+              },
+              {
+                "color": "edge",
+                "strokeWidth": 1.2
+              }
+            ],
+            "completed-route": [
+              {
+                "color": "subject",
+                "strokeWidth": 18
+              }
+            ]
+          }
+        }
+      ],
+      "authoringConstraints": [
+        "Nye kataloglignende motiver starter ved flow: samme d i alle tre materialelag.",
+        "Sekundære baner forbliver fine; de må ikke få næsten samme vægt som hovedruten.",
+        "Knuder møder deres faktiske synlige rute; indholdsplaner må kun dække forbindelser bevidst.",
+        "Fan-helperens fem baner er et referencegreb, ikke et krav til alle kompositioner.",
+        "Originalmotiver normaliseres ikke automatisk til katalogets flow."
+      ],
+      "observedMotion": {
+        "kind": "code-observation",
+        "source": "core/graphics/motion/fieldlines.mjs",
+        "durationToken": "duration.illustration",
+        "easing": {
+          "route": "cubic-bezier(.35,0,.2,1)",
+          "node": "cubic-bezier(.2,.7,.2,1)"
+        },
+        "notes": [
+          "Rytmemotivet har lineær afsløring som begrundet undtagelse.",
+          "En markør og dens tegnede bane skal bruge samme geometri, tidsinterval og easing."
+        ]
+      }
+    }
+  },
+  "review": {
+    "requiredComparisonFields": [
+      "family",
+      "referenceMotifs",
+      "meaning",
+      "theme",
+      "mode",
+      "displaySize",
+      "parts",
+      "deviations",
+      "validationPerformed"
+    ],
+    "referenceMinimum": 3,
+    "requiredViews": [
+      "600x420",
+      "actual-product-size"
+    ],
+    "stillPose": 1,
+    "motionPosesWhenAnimated": [
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1
+    ],
+    "criteria": [
+      "Betydningen kan aflæses statisk.",
+      "Kontur, masse og tekstniveauer passer til referencepakken.",
+      "Lys, dybde, hjørner og kurver følger den valgte familie.",
+      "Samlinger, åbninger og lagorden er præcise.",
+      "Samme geometri fungerer i produktstørrelsen og de leverede farvetilstande.",
+      "Leveret bevægelse ender i samme statiske geometri og kan undværes."
+    ],
+    "technicalValidationDoesNotApproveStyle": true
+  },
+  "maintenance": {
+    "onApprovedStyleExtension": [
+      "Opdatér relevant familieguide og denne kontrakt i samme ændring.",
+      "Kontrollér fortsat referencekilderne; temaer og geometri indlæses fra deres faktiske registre."
+    ],
+    "onSourceChange": "Opdatér berørte snapshotværdier og referencevalg; auditdatoen dokumenterer aflæsningen, ikke automatisk overvågning."
+  }
+}

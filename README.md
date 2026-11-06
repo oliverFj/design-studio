@@ -35,13 +35,15 @@ Efter kode-, design- eller temaændringer køres `npm run build` igen. Brugeren 
 
 ## Ét bibliotek, flere temaer
 
-- **Komponenter:** Det samme katalog i alle temaer. Klik på kortets top for at se varianter og tilstande. Rækkens eksempler skjules, mens korttoppene bliver som klikbare faner med uændret bredde. Klik på den aktive top eller tryk Escape for at lukke.
+- **Komponenter:** Det samme katalog i alle temaer, med søgning, kategorier og valg mellem illustrationskort og liste. Vælg en komponent for at se varianter og tilstande i det fælles detaljeområde.
 - **Animation og effekter:** Afprøv den fælles standard for udfoldning og tilbagevenden: 240 ms i begge retninger, uden ekstra forsinkelse og med respekt for reduceret bevægelse.
 - **Tokens:** Redigér temaets værdier. Bibliotekets dokumenterede standardværdier dækker roller, som temaet ikke overskriver.
 - **Brandguide:** Principper, anvendelsesregler, godkendte logoer, skrifter og originalressourcer.
 - **Temaet:** Navn, beskrivelse, historik, JSON-eksport og genereret CSS.
 
 Under **Designsystem → Designmønstre** findes interaktive eksempler på en objekteditor med kontekstpanel inspireret af FormLab, et parametrisk værksted, en opskriftseditor med lag, en formular, en liste med detaljevisning, et ressourcebibliotek og fortryd/gentag med gemmepunkt samt header/navigation, hero, footer og billedgalleri. De samme eksempler indgår i web-showcasen og kan afprøves med alle temaer. `node tools/cli.mjs examples PROJECT_DIR` kopierer valgfri referencekode og den selvstændige historikhjælper til et tilknyttet projekt uden overskrivning. Se [genbrug af designmønstre](docs/INTEGRATION.md#valgfrie-sammensætningseksempler).
+
+Mønstrene vælges i en vandret kortbjælke over eksemplet. Rul sidelæns eller brug pilene; skift mellem kort bevarer kladder og bjælkens scrollposition. Hvert af de elleve mønstre har sin egen statiske illustration i Tegnets anatomi, Lysrum, Passage og Feltlinjer — 44 motiver, som følger temaets grafikmaterialer og Studios illustrationsvalg.
 
 Komponentstruktur redigeres i det fælles bibliotek, ikke i hvert tema. Padding og gap kommer fra biblioteket. De semantiske spacingtokens skal være positive; temaet kan hverken udelade grundlayoutet eller erstatte det med nul-padding.
 
@@ -56,6 +58,12 @@ Farver har primitive `palette.*`-værdier med semantiske referencer. Fælles ska
 Feltgrænser mod kontrol-, indholds- og grundflader har et bindende minimum på 3:1. Valideringen kontrollerer også effektive feltopskrifter og begge farvetilstande. CSS indeholder tilpasninger til mere kontrast, reduceret bevægelse og forced colors. Native kalender-/tidsvælgere, filvælger og progress-tegning afhænger desuden af browser og operativsystem.
 
 `tree`, `stack`, `scroll-area` og programmenuerne bevarer deres eksisterende roller. Historiske knapvarianter understøttes til kompatibilitet, mens ny kode bruger den fælles knapfamilie. Se [integrationsguiden](docs/INTEGRATION.md) for API og sammensætning og [temaformatet](docs/PACKAGE-FORMAT.md) for kontrakten. Biblioteksversionen er særskilt fra editorens versionsnummer.
+
+## Grafik og animation
+
+[Grafikguiden](docs/GRAPHICS-AUTHORING.md) beskriver stilstandarden for Tegnets anatomi, Lysrum, Passage og Feltlinjer. Komponentkortenes registrerede motiver er den primære reference. Familieguiderne angiver konkrete materialer, proportioner, stregvægte, referencepakker og undtagelser; [stilkontrakten](docs/graphics/style-contract.json) registrerer samme arbejdsgrundlag maskinlæsbart til senere MCP-integration.
+
+`node tools/graphic-lab.mjs` bygger et selvstændigt grafikværksted i `artifacts/graphic-lab/index.html` med hus og musik i alle fire stilarter. Opskrifterne kan udvides af kommende agenter; prøvevisningen har tidslinje, reduceret bevægelse og SVG-eksport. Se guiden for temavalg og nye begreber.
 
 ## Brug i et produkt
 

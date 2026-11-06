@@ -15,7 +15,7 @@ npm run check
 npm run build
 ```
 
-`npm ci` installerer udviklingsafhængigheder fra låsefilen. Testene kontrollerer runtime, værktøjer og relevante brugerforløb; `check` validerer de medfølgende temaer. Buildet indlejrer programkode, CSS og alle otte temaer i rodens `index.html`. Kildekoden ligger i Git; den genererede fil er Git-ignoreret og skal bygges efter et nyt checkout.
+`npm ci` installerer udviklingsafhængigheder fra låsefilen. Testene kontrollerer runtime, værktøjer og relevante brugerforløb; `check` validerer de medfølgende temaer. Buildet indlejrer programkode, CSS og alle medfølgende temaer i rodens `index.html`. Kildekoden ligger i Git; den genererede fil er Git-ignoreret og skal bygges efter et nyt checkout.
 
 Agenten kontrollerer den byggede fil over lokal HTTP og bruger relevante statiske offlineprøver efter [agentarbejdsgangen](AGENT-WORKFLOW.md#kontrollér-den-berørte-funktion). Kontrollér det berørte brugerforløb, og ved ændringer i filhåndtering også åbning og download af et tema. Ved en samlet offlineleverance indgår desuden en særskilt direkte filkontrol; hvis browserværktøjet kun tillader HTTP/HTTPS, aftales den manuelle kontrol med brugeren. Forsøg ikke den kendt ikke-understøttede protokol, og omgå ikke en URL-afvisning. HTTP- og statisk kontrol må ikke kaldes direkte filkontrol. Rene dokumentationsændringer kræver hverken nyt build eller gentagelse af kodekontroller.
 
@@ -28,7 +28,7 @@ Efter build kan `npm run release` samle to ZIP-filer i `artifacts/release/`:
 - `design-studio-offline.zip` indeholder den byggede `index.html` og læsbare ikon-/skriftlicenser. Pak den ud, og åbn `index.html`.
 - `design-studio-source.zip` indeholder de nødvendige kilder, temaer, ressourcer, tests, værktøjer og låsefil. Pak den ud på Windows, macOS eller Linux, og kør `npm ci` før udvikling eller build.
 
-`manifest.json` angiver filnavne, byteantal og SHA-256 for arkiver og indhold. Pakningen bruger en afgrænset liste af kildemapper og filtyper; installerede `node_modules`, platformbinærer, `.git`, miljøfiler, logs og byggeoutput kopieres ikke til kildepakken. Kopiér derfor aldrig hele arbejdsmappen som installationspakke. `node tools/build-release.mjs --out DIRECTORY` vælger en anden outputmappe. Kommandoen pakker det eksisterende offlinebuild og bygger det ikke automatisk igen.
+`manifest.json` angiver filnavne, byteantal og SHA-256 for arkiver og indhold. Pakningen bruger en afgrænset liste af kildemapper og filtyper; Markdown og JSON under `docs/`, herunder grafikstandardens `style-contract.json`, følger med. Installerede `node_modules`, platformbinærer, `.git`, miljøfiler, logs og byggeoutput kopieres ikke til kildepakken. Kopiér derfor aldrig hele arbejdsmappen som installationspakke. `node tools/build-release.mjs --out DIRECTORY` vælger en anden outputmappe. Kommandoen pakker det eksisterende offlinebuild og bygger det ikke automatisk igen.
 
 Installer altid udviklingsafhængigheder fra låsefilen på den aktuelle platform med `npm ci`. En anden platforms `node_modules` skal ikke medbringes. `npm test` finder testfiler gennem Node, så kommandoen ikke afhænger af shellens udvidelse af jokertegn. Testprojekter bruger en separat midlertidig mappe under `artifacts/test-runs/`, som fjernes efter kørslen; brugerens globale miljøindstillinger ændres ikke.
 
@@ -36,7 +36,7 @@ Repositoryets CI er sat op til installation, tests, temakontrol, offlinebuild, s
 
 De lokale WOFF2-filer, originale licenser og fontmanifest følger kildepakken. Et almindeligt build kræver hverken fontdownload eller Python. Ved vedligeholdelse af fontressourcer regenererer `node tools/build-fonts.mjs` temaernes indlejrede fontdata fra de indcheckede filer og kontrollerer dem mod manifestets SHA-256. Bevar Platypis oprindelige TTF-filer som kildegrundlag. Offline- og showcasebuild håndhæver desuden størrelsesbudgetter før skrivning.
 
-[Størrelsesgrænserne](../tools/delivery-size.mjs) gælder ukomprimerede UTF-8-filer: 1.500.000 bytes for editoren, 1.250.000 for arbejdsrumseksemplet og 800.000 for showcasens temamodul. En overskridelse stopper buildet; undersøg dublering og ressourcer, før en eventuel ny grænse besluttes.
+[Størrelsesgrænserne](../tools/delivery-size.mjs) gælder ukomprimerede UTF-8-filer: 2.025.000 bytes for editoren, 1.650.000 for arbejdsrumseksemplet og 850.000 for showcasens temamodul. Editorens ramme omfatter også de 44 fulde mønsterillustrationer; skrifter og logoer deles fortsat ved pakning. En overskridelse stopper buildet; undersøg dublering og ressourcer, før en eventuel ny grænse besluttes.
 
 ## Gemning og opdatering
 
@@ -54,7 +54,7 @@ Efter tema- eller biblioteksændringer køres `node tools/cli.mjs sync PROJECT_D
 
 ## Designmønstre og fælles layout
 
-Editor og showcase indeholder ni afprøvbare referenceeksempler: objekteditor, formular, liste med detaljer, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. `node tools/cli.mjs examples PROJECT_DIR` kopierer referencekoden uden overskrivning. Produktet ejer derefter tilpasning, data og lagring. Eksemplernes handlinger og gemmepunkter gælder kun hukommelsen; ressourcebiblioteket indlæser ikke i sig selv produktfiler.
+Editor og showcase indeholder elleve afprøvbare referenceeksempler: objekteditor, parametrisk værksted, opskriftseditor med lag, formular, liste med detaljer, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. Kortbjælken viser familiespecifikke illustrationer og kan rulles vandret. `node tools/cli.mjs examples PROJECT_DIR` kopierer referencekoden og illustrationsmodulerne uden overskrivning. Produktet ejer derefter tilpasning, data og lagring. Eksemplernes handlinger og gemmepunkter gælder kun hukommelsen; ressourcebiblioteket indlæser ikke i sig selv produktfiler.
 
 Breddeprofilerne `prose`, `form`, `panel`, `split`, `workspace` og `fluid` følger med fælles CSS og runtime. De giver indholdsbestemte standarder og kan tilpasses lokalt; produktet ejer kolonner og placering. Se [designgrundlaget](DESIGN-FOUNDATIONS.md) og [API og designmønstre](INTEGRATION.md).
 

@@ -1,15 +1,16 @@
-import { createComponentFactory, createLayout } from '../core/components.mjs';
+import { createComponentFactory, createLayout, createIcon } from '../core/components.mjs';
 import { COMPOSITIONS, COMPOSITION_KINDS } from './catalog.mjs';
 import { LAYOUT_PROFILES } from '../core/layout.mjs';
 import { mountComposition, createCompositionState } from './compositions.mjs';
+import { createPatternIllustrator } from './illustrations.mjs';
 
 export const createGalleryState = () => ({ selected: 'editor', drafts: {} });
-const thumbnails = { editor: 'workspace', 'parameter-workbench': 'parameters', 'recipe-editor': 'layers', form: 'form', 'list-detail': 'list', 'resource-library': 'grid', history: 'history', 'site-header': 'header', hero: 'hero', 'site-footer': 'footer', 'image-gallery': 'grid' };
 
 export function mountCompositionGallery(theme, {
   document = globalThis.document, state = createGalleryState(), announce = () => {}, idPrefix = 'patterns',
 } = {}) {
   const c = createComponentFactory(theme, { document });
+  const illustrate = createPatternIllustrator(theme, { document });
   const el = (tag, className = '', text) => {
     const node = document.createElement(tag); node.className = className;
     if (text !== undefined) node.textContent = text;
@@ -25,31 +26,42 @@ export function mountCompositionGallery(theme, {
   title.append(el('p', 'composition-eyebrow', 'Fra opgave til oplevelse'),
     c('heading', { variant: 'title', slots: { root: { tag: 'h2', text: 'Mønstre til rigtigt arbejde' } } }),
     c('text', { text: 'Sammenhængende forløb med fælles komponenter. Vælg et mønster, og prøv det i dit tema.' }));
-  header.append(title, el('p', 'composition-gallery-count', Object.keys(COMPOSITIONS).length + ' interaktive eksempler'));
-  const picker = c('field', { idPrefix: prefix + '-picker', label: 'Vælg et designmønster', value: state.selected, hint: '', controlVariant: 'desktop',
-    slots: { control: { tag: 'select', children: Object.entries(COMPOSITION_KINDS).map(([kind, group]) => ({ tag: 'optgroup', attrs: { label: group.name }, children: Object.entries(COMPOSITIONS).filter(([, item]) => item.kind === kind).map(([id, item]) => ({ tag: 'option', attrs: { value: id }, text: item.name })) })) } },
-  });
-  picker.className += ' composition-gallery-picker';
-  const select = picker.querySelector('select');
+  const controls = el('div', 'composition-gallery-controls');
+  controls.append(el('p', 'composition-gallery-count', Object.keys(COMPOSITIONS).length + ' interaktive eksempler'));
+  header.append(title, controls);
   const layout = el('div', 'composition-gallery-layout');
+  const rail = c('scroll-area', { variant: 'body', slots: { content: '' } });
+  rail.className += ' composition-pattern-rail';
+  const viewport = rail.querySelector('.ds-scroll-area__viewport');
+  viewport.setAttribute('id', prefix + '-rail');
+  viewport.setAttribute('aria-label', 'Gennemse designmønstre vandret');
+  for (const [direction, icon, label] of [[-1, 'arrow-left', 'Rul mod venstre'], [1, 'arrow-right', 'Rul mod højre']]) {
+    const button = c('button', { variant: 'secondary', size: 'small', attrs: { 'aria-label': label, 'aria-controls': prefix + '-rail', 'data-pattern-scroll': String(direction) } });
+    button.replaceChildren(createIcon(icon, { decorative: true }, { document }));
+    button.addEventListener('click', () => viewport.scrollBy?.({ left: direction * Math.max(240, viewport.clientWidth * .8), behavior: 'instant' }));
+    controls.append(button);
+  }
   const navigation = el('nav', 'composition-pattern-navigation'); navigation.setAttribute('aria-label', 'Designmønstre');
   const navButtons = new Map();
   for (const [kind, group] of Object.entries(COMPOSITION_KINDS).reverse()) {
     const section = el('section', 'composition-pattern-group');
     section.append(el('h3', 'composition-eyebrow', group.name));
+    const cards = el('div', 'composition-pattern-cards');
     for (const [id, item] of Object.entries(COMPOSITIONS).filter(([, item]) => item.kind === kind)) {
       const button = c('button', { text: item.name, variant: 'ghost', size: 'small', attrs: { 'data-pattern-nav': id } });
       button.className += ' composition-pattern-link';
-      const drawing = el('span', 'composition-pattern-thumbnail'); drawing.setAttribute('data-drawing', thumbnails[id]); drawing.setAttribute('aria-hidden', 'true');
-      for (let index = 0; index < 4; index++) drawing.append(el('i'));
-      button.insertBefore(drawing, button.firstChild);
+      const drawing = el('span', 'composition-pattern-thumbnail'); drawing.setAttribute('aria-hidden', 'true');
+      drawing.append(illustrate(id));
+      button.replaceChildren(drawing, el('span', 'composition-pattern-label', item.name));
       button.addEventListener('click', () => choose(id, 'navigation'));
-      navButtons.set(id, button); section.append(button);
+      navButtons.set(id, button); cards.append(button);
     }
+    section.append(cards);
     navigation.append(section);
   }
+  rail.querySelector('.ds-scroll-area__content').append(navigation);
   const content = el('article', 'composition-pattern-content');
-  layout.append(navigation, content); root.append(header, picker, layout);
+  layout.append(rail, content); root.append(header, layout);
   let mounted;
   function render() {
     mounted?.destroy();
@@ -110,14 +122,17 @@ export function mountCompositionGallery(theme, {
   }
   function choose(id, origin) {
     if (!COMPOSITIONS[id] || state.selected === id) return;
-    state.selected = id; select.value = id; render();
+    state.selected = id; render();
     if (origin === 'related') {
       const title = content.querySelector('#' + prefix + '-active-title'); title.setAttribute('tabindex', '-1'); title.focus();
     }
-    if (origin === 'navigation' || origin === 'related') content.scrollIntoView?.({ block: 'start', behavior: 'instant' });
+    if (origin === 'related') {
+      const card = navButtons.get(id).getBoundingClientRect(), frame = viewport.getBoundingClientRect();
+      const left = card.left < frame.left ? card.left - frame.left : card.right > frame.right ? card.right - frame.right : 0;
+      if (left) viewport.scrollBy?.({ left, behavior: 'instant' });
+    }
     announce(COMPOSITIONS[id].name + ' vises.');
   }
-  select.addEventListener('change', () => choose(select.value, 'picker'));
   render();
   return { element: root, state, destroy() { mounted?.destroy(); root.remove(); } };
 }

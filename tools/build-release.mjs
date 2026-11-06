@@ -11,7 +11,7 @@ const rootFiles = new Set(['AGENTS.md', 'README.md', '.gitignore', '.gitattribut
 const sourceTypes = new Map([
   ['core', ['.mjs']], ['studio', ['.mjs', '.css', '.html']], ['showcase', ['.mjs', '.css', '.html']], ['packages', ['.json']],
   ['schema', ['.json']], ['patterns', ['.mjs', '.css']], ['tools', ['.mjs']],
-  ['docs', ['.md']], ['tests', ['.mjs']], ['licenses', ['.txt', '.md']],
+  ['docs', ['.md', '.json']], ['tests', ['.mjs']], ['licenses', ['.txt', '.md']],
   ['assets', ['.css', '.ttf', '.woff', '.woff2', '.svg', '.txt', '.json']],
   ['.github', ['.yml', '.yaml']], ['examples', ['.mjs', '.css', '.html']],
   ['templates', ['.mjs', '.css', '.html', '.json']],
