@@ -37,7 +37,7 @@ Produktet ejer redigerbare mediekilder og optageopskrifter. Hjemmesiden ejer kop
 
 Følg hjemmesidens kontrakt: ét kvadratisk `cover` først, derefter screenshots som `image`. Desktopgalleriet er 400 CSS-px højt med billedets egne proportioner. På mobil vises hele motivet i et kvadratisk felt. Produktkortet åbner Om projektet; screenshots kan forstørres. Fjern `placeholder: true`, når et medie er godkendt. Andre projekters placeholders bevares, indtil de har deres egne godkendte medier.
 
-Kontrollér den berørte projektpost efter hjemmesidebuild: kortets kvadratiske format, billedrækkefølge, proportioner, Om projektet, forstørrelse, navigation og Escape samt bred og smal visning. Kontrollér også den selvstændige fil ved offlinelevering. Kør hjemmesidens `npm run check`. Efter bestilt udgivelse kontrolleres udgiverens bekræftelse og de offentlige filer. Tilpas yderligere kontrol til faktiske ændringer.
+Kontrollér den berørte projektpost efter hjemmesidebuild: kortets kvadratiske format, billedrækkefølge, proportioner, Om projektet, forstørrelse, navigation og Escape samt bred og smal visning. Agentens standard er lokal HTTP-kontrol og relevante statiske offlineprøver; særskilt direkte filkontrol ved en samlet offlineleverance følger [agentarbejdsgangen](AGENT-WORKFLOW.md#kontrollér-den-berørte-funktion). Optageopskriften foretager HTTP-kontrol og registrerer direkte filkontrol som ikke udført. Kør hjemmesidens `npm run check`. Efter bestilt udgivelse kontrolleres udgiverens bekræftelse og de offentlige filer. Tilpas yderligere kontrol til faktiske ændringer.
 
 ## Design Studio som reference
 

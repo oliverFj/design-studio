@@ -4,7 +4,7 @@
 
 Design Studio har et projektagnostisk komponentbibliotek. En komponent navngives efter sin funktion og opbygning. Temaer giver den et visuelt udtryk; produktet leverer indhold og adfærd. Et startsæts oprindelse bestemmer aldrig bibliotekets anvendelse.
 
-Bibliotek 3.5.0 dækker de 61 roller i det aftalte katalog. Målet er robuste fælles byggesten, forskellige temaudtryk og en standard, som agenter kan videreføre mellem sessioner. Kataloget er afgrænset; nye produktbehov kan stadig kræve nye fælles roller.
+Bibliotek 3.9.1 dækker de 62 roller i det aftalte katalog. Målet er robuste fælles byggesten, forskellige temaudtryk og en standard, som agenter kan videreføre mellem sessioner. Kataloget er afgrænset; nye produktbehov kan stadig kræve nye fælles roller.
 
 ## Faglige kilder
 
@@ -15,7 +15,7 @@ Biblioteket bruger Microsoft Fluent 2 og IBM Carbon som designfaglige referencer
 | Knap, handlingsknap, handlingslinje | [Fluent 2 Button](https://fluent2.microsoft.design/components/web/react/core/button/usage), [Carbon Button](https://www.carbondesignsystem.com/building-blocks/core/components/button/guidelines) | Beskriv den konkrete handling. Skeln mellem handling og navigation. Brug et tydeligt hierarki mellem primær og sekundær handling. Toggleadfærd har både synlig og maskinlæsbar tilstand. |
 | Formularfelt, input og valg | [Fluent 2 Field](https://fluent2.microsoft.design/components/web/react/core/field/usage) | Label, kontrol, hjælp og fejl hører sammen. En placeholder erstatter ikke en label. Fejl forklarer, hvad brugeren skal gøre. |
 | Segmentkontrol | [Carbon Content switcher](https://www.carbondesignsystem.com/building-blocks/core/components/content-switcher/guidelines) | Korte, beslægtede valg i en samlet gruppe. Brug ikke segmenter som erstatning for navigation eller en tænd/sluk-kontakt. |
-| Skyder | [Carbon Slider](https://www.carbondesignsystem.com/building-blocks/core/components/slider/guidelines) | Vis label, aktuel værdi og relevant enhed. Interval og trin skal passe til opgaven; præcis indtastning kan supplere skyderen. |
+| Skyder | [Carbon Slider](https://www.carbondesignsystem.com/building-blocks/core/components/slider/guidelines) | Vis label, aktuel værdi og relevant enhed. Interval og trin skal passe til opgaven. Brug som udgangspunkt skyder med præcis talindtastning til parameterpaneler. |
 | Kort og informationspanel | [Fluent 2 Card](https://fluent2.microsoft.design/components/web/react/core/card/usage) | Saml relateret indhold med klart hierarki. Containeren bliver ikke automatisk en handling, når indholdet allerede har knapper. |
 | Dialog | [Fluent 2 Dialog](https://fluent2.microsoft.design/components/web/react/core/dialog/usage) | Tydelig titel, kort indhold og få relevante handlinger. Modaladfærd skal håndtere fokus, afslutning og retur til udløseren. |
 | Besked og vejledning | [Carbon Notification](https://www.carbondesignsystem.com/building-blocks/core/components/notification/guidelines) | Skeln mellem orientering og en fejl, der kræver handling. Giv beskeden kontekst; afbryd kun brugerens arbejde, når det er nødvendigt. |
@@ -36,6 +36,8 @@ Vælg bredde efter indholdets opgave, ikke efter den ledige skærmplads. En bred
 Breddeprofilerne er fælles layoutprimitiver i core/layout.mjs og eksporteres også fra core/library.mjs. De medfølger automatisk i format 2-CSS og kopieres med init/sync. Brug ds-layout med data-layout eller createLayout fra components.mjs. Profilerne prose, form, panel, split, workspace og fluid giver standardgrænser på henholdsvis 70ch, 44rem, 23rem, 72rem, 84rem og ingen grænse. En konkret ramme kan tilpasses med --ds-layout-max-width i produktets CSS. Indlejrede rammer nulstiller denne lokale tilpasning, så en bred arbejdsflade ikke gør dens paneler brede.
 
 Breddevalg og kolonner tilhører fortsat produktet. Komponentbiblioteket ejer komponenternes indvendige afstande, anatomi og tilstande; temaerne skal ikke indføre layoutregler. patterns/catalog.mjs vælger en fælles profil for hvert eksempel, mens patterns/styles.css alene styrer eksemplets sammensætning. Profilen er en god standard, ikke et krav til produktets arkitektur.
+
+Parameterpaneler bruger normalt `range-field` med `with-input` og den fælles `mountRangeField`. Gyldige ændringer opdaterer prøven live; produktet bevarer seneste gyldige visning under ugyldige kladder og adskiller forhåndsvisning fra lagring. Talfeltet har centrerede cifre, symmetrisk luft og stabil bredde efter interval og trin. Se [skyderkontrakten](INTEGRATION.md#skyder-med-præcis-talindtastning).
 
 ## Hvad biblioteket fastholder
 
@@ -141,7 +143,7 @@ Disse regler og automatiske prøver er afgrænset understøttelse. De er ikke en
 
 Tabler Icons 3.50.0 er den fælles SVG-standard. Outline bruger samme geometri og stregtykkelse; farven følger den aktuelle tekstfarve. Et ikon bestemmer ikke klikfladen, og ikonknapper har et forståeligt tilgængeligt navn. Kun registret med det anvendte udvalg distribueres sammen med MIT-licensen. Brandoriginaler erstattes ikke af generiske symboler.
 
-`COMPONENT_COVERAGE` beskriver de 61 implementerede roller i 3.5.0 uden resterende planlagte roller i det aftalte katalog. Den skelner mellem statisk indhold/layout, native adfærd og fælles controllere med deres faktiske indgange. Metadata beskriver denne leverance; de er ikke en tilgængelighedsgodkendelse eller dækning af enhver tænkelig komponenttype.
+`COMPONENT_COVERAGE` beskriver de 62 implementerede roller i 3.9.1 uden resterende planlagte roller i det aftalte katalog. Den skelner mellem statisk indhold/layout, native adfærd og fælles controllere med deres faktiske indgange. Metadata beskriver denne leverance; de er ikke en tilgængelighedsgodkendelse eller dækning af enhver tænkelig komponenttype.
 
 ## Indhold, formularer og overlays
 

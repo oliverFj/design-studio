@@ -24,6 +24,12 @@ function scene(label,{context='',routes='',content='',markers='',guides=''}={}){
 }
 
 const motifs={
+ 'list-item':()=>scene('Tre parallelle poster deler en fælles samling. Den aktuelle rute standser ved en fremhævet post med titel og beskrivelse.',{
+  context:plate(191,76,303,72,'plane',12)+plate(191,171,303,78,'context',12)+plate(191,274,303,72,'plane',12),
+  routes:line('M121 112V310M121 112H191M121 310H191','edge',2)+flow('M91 210H191'),
+  content:line('M218 99h176M218 124h222M218 195h203M218 225h163M218 297h161M218 322h203','ink',2),
+  markers:ring(121,112,7,'edge')+dot(121,210,9,'ink')+ring(121,310,7,'edge')+line('M192 185v50','subject',4)
+ }),
  button:()=>scene('Et hovedspor samler sig i én tydelig handlingsflade. En udgående pil viser, at trykket sætter noget i gang.',{
   context:fan(85,206,300,206),routes:flow('M85 206C160 206 166 206 226 206'),
   content:plate(226,158,264,96,'subject',48)+line('M270 206h122','ground',3)+line('m414 194 13 12-13 12','ground',3),markers:dot(226,206,6,'ink')

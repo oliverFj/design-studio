@@ -19,6 +19,11 @@ const part=(key,name,purpose,body)=>({key,name,purpose,body});
 const S=(label,anchors,parts)=>({label,anchors,parts});
 
 const scenes={
+  'list-item':S('Tre poster har hver en titel og en kort beskrivelse. Den midterste er aktuel og beholder sin plads i samlingen.',[[165,108],[165,210],[165,312]],[
+    part('collection','Samlingens rytme','Tre ligeværdige poster følger samme akse og afstand.',L(135,151,465,151,C.edge)+L(135,269,465,269,C.edge)+bracket(135,358,330)),
+    part('current','Aktuel post','En afgrænset flade og lodret markør udpeger én post.',R(125,165,350,90,C.context,C.edge)+L(125,165,125,255,C.subject,4)),
+    part('titles','Posternes titler','Den første linje bærer hver posts navn.',L(157,96,369,96,C.ink,2.5)+L(157,195,397,195,C.ink,2.5)+L(157,300,350,300,C.ink,2.5)),
+    part('descriptions','Supplerende indhold','En kortere linje under titlen beskriver posten.',L(157,123,418,123,C.edge)+L(157,225,365,225,C.ink)+L(157,327,402,327,C.edge))]),
   input:S('En enkelt tekstlinje indtastes i en præcis kontrol. En synlig indsætningsmarkør viser, hvor teksten fortsætter.',[[165,206],[365,206],[300,286]],[
     part('control','Tekstkontrol','Konturen viser ét afgrænset felt til kort tekst.',R(125,150,350,110,C.plane)),
     part('entry','Indtastning','En tekststreg afsluttes af en entydig indsætningsmarkør.',L(160,206,345,206)+P('M365 184v44', 'none',C.subject,3)),

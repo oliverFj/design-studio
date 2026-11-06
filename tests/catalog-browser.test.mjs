@@ -42,7 +42,7 @@ test('all sixty-one catalog illustrations follow the selected family without leg
   }).join('');
   const ids=[...illustrations.matchAll(/\sid="([^"]+)"/g)].map(match=>match[1]);
   assert.equal(new Set(ids).size,ids.length);
-  assert.equal((illustrations.match(/data-graphic-decoration/g)||[]).length,61);
+  assert.equal((illustrations.match(/data-graphic-decoration/g)||[]).length,Object.keys(COMPONENT_LIBRARY).length);
   assert.doesNotMatch(illustrations,/catalog-art-[\w-]+/);
  }
 });

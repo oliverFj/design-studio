@@ -4,6 +4,7 @@ Læs [README.md](README.md), [docs/AGENT-WORKFLOW.md](docs/AGENT-WORKFLOW.md) og
 
 - **Arbejdsgang:** AGENT-WORKFLOW er den fælles vej fra nyt projekt til færdig skærm, opdatering og kontrol.
 - **API og eksempler:** [docs/INTEGRATION.md](docs/INTEGRATION.md).
+- **Eksisterende produkter:** [docs/PRODUCT-PATTERNS.md](docs/PRODUCT-PATTERNS.md) beskriver udtræk fra FormLab, Tonerum, Hjemmesiden og Watchman samt skånsom indføring af fælles mønstre. Læs de relevante dele før mønsterudtræk eller udskiftning af produktets eksisterende løsninger.
 - **Designprincipper:** [Designgrundloven](docs/DESIGN-PRINCIPLES.md) gælder temaer, komponenter, mønstre og produkter. DESIGN-FOUNDATIONS beskriver den tekniske anvendelse, og [docs/BRANDGUIDE.md](docs/BRANDGUIDE.md) beskriver branddelen.
 - **Format og levering:** [docs/PACKAGE-FORMAT.md](docs/PACKAGE-FORMAT.md) og [docs/PRODUCTION.md](docs/PRODUCTION.md).
 
@@ -31,7 +32,9 @@ Læs [README.md](README.md), [docs/AGENT-WORKFLOW.md](docs/AGENT-WORKFLOW.md) og
 
 Arbejd proportionelt. Små rettelser kræver højst én hurtig relevant kontrol. Nye skærme, nye temaer og væsentlige ændringer i layout, materialer, bevægelse eller interaktion skal inspiceres i browseren med relevante brugerforløb.
 
-Brug den byggede fil over lokal HTTP til agentens browserkontrol. Forhåndsvisningen må kun lytte på loopback og udstille nødvendigt testindhold. Genbrug den og genindlæs efter build. Almindelig lokal kontrol kræver ikke særskilt bekræftelse. HTTP-kontrol erstatter ikke direkte `file://`-kontrol. Respektér URL-politikkens afvisninger og rapportér præcist, hvad der ikke er kontrolleret; omgå ikke værktøjets sikkerhedspolitik.
+Agentens standard er browserkontrol af den byggede fil over lokal HTTP samt relevante statiske offlineprøver eller produktets doctor. Forhåndsvisningen må kun lytte på loopback og udstille nødvendigt testindhold. Genbrug den og genindlæs efter build. Almindelig lokal kontrol kræver ikke særskilt bekræftelse. Brugerens leverance er fortsat den selvstændige fil, som åbnes ved dobbeltklik.
+
+Kontrollér browserværktøjets dokumenterede URL-understøttelse før navigation. Hvis det kun tillader HTTP/HTTPS, skal agenten ikke forsøge `file://`. En kendt begrænsning skal ikke genafprøves i hver opgave. Omgå ikke en afvisning gennem andre værktøjer, browserflader eller scripts. HTTP- og statisk kontrol må ikke beskrives som afprøvning af direkte filåbning. Ved ændrede offlineafhængigheder, filhåndtering eller en bestilt samlet offlineleverance aftales en særskilt manuel filkontrol, hvis ingen tilladt kontrolvej findes. Rapportér en udestående filkontrol, når den er relevant for opgaven; gentag ikke den kendte værktøjsbegrænsning som standardforbehold efter almindelige UI-rettelser. Se [kontrolvejen](docs/AGENT-WORKFLOW.md#kontrollér-den-berørte-funktion).
 
 Ved format-, runtime- eller værktøjsændringer køres `npm test` og `npm run check`. Efter kode-, design- eller temaændringer køres `npm run build`. Bevar sammenhæng mellem contract, library, components, quality, skema, temaer og interface. Hæv `STARTER_VERSION` i `tools/starter.mjs` ved ændringer i startskabelonerne.
 

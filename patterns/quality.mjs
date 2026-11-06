@@ -8,7 +8,7 @@ const LIMITATIONS = Object.freeze([
 const nodes = root => [root, ...Array.from(root.children ?? []).flatMap(nodes)];
 const hasClass = (node, name) => (node.getAttribute?.('class') ?? '').split(/\s+/).includes(name);
 const controls = root => nodes(root).filter(node => ['INPUT', 'SELECT', 'TEXTAREA'].includes(node.tagName));
-const textControls = root => controls(root).filter(node => !['checkbox', 'radio', 'hidden'].includes(node.getAttribute('type')));
+const textControls = root => controls(root).filter(node => !['checkbox', 'radio', 'range', 'hidden'].includes(node.getAttribute('type')) && !hasClass(node, 'ds-range-field__number'));
 const heading = node => /^H[1-6]$/.test(node.tagName);
 const check = (composition, scenario, id, label, passed, details = '') => ({
   id: composition + ':' + scenario + ':' + id, composition, scenario, label,
@@ -108,6 +108,8 @@ export async function compositionQualityReport(theme, { document = globalThis.do
         continue;
       }
       if (composition === 'editor') {
+        send(root.querySelector('[data-object="detail"]'), 'click');
+        add('selection', 'surface-selection', 'Direkte fladevalg følger træ og egenskaber', state.selected === 'detail' && root.querySelector('#' + prefix + '-object-name-control')?.value === 'Detalje');
         send(root.querySelector('[data-tab="relations"]'), 'click');
         const active = root.querySelector('[data-tab="relations"]'), panel = root.querySelector('#' + active.getAttribute('aria-controls'));
         add('tabs', 'selection', 'Fanevalg og synligt panel følger samme tilstand', state.tab === 'relations' && active.getAttribute('aria-selected') === 'true' && panel.hidden === false);
@@ -134,6 +136,28 @@ export async function compositionQualityReport(theme, { document = globalThis.do
         const search = root.querySelector('#' + prefix + '-search-control'); search.value = '__quality_no_matches__'; send(search, 'input');
         add('empty', 'empty-result', 'Tomt bibliotekssøg har ingen forældet brugshandling', state.selected === null && !root.querySelector('[data-action="use-resource"]'));
         checks.push(...compositionStructureReport(root, { composition, scenario: 'empty' }));
+      } else if (composition === 'parameter-workbench') {
+        const previous = state.result;
+        const input = root.querySelector('#' + prefix + '-spacing-number'); input.value = '7'; send(input, 'input');
+        add('calculation', 'draft', 'Ugyldigt input bevarer sidste gyldige prøve og spærrer for brug', state.result === previous && root.querySelector('[data-action="use"]').disabled);
+        input.value = '32'; send(input, 'input'); await mounted.whenSettled();
+        add('calculation', 'current', 'Gyldige parametre opdaterer prøven live', state.result.input.spacing === 32 && state.result.revision === state.revision);
+        send(root.querySelector('[data-action="save"]'), 'click');
+        send(root.querySelector('[data-action="save-copy"]'), 'click');
+        add('copy', 'identity', 'Gem som kopi opretter en selvstændig post', state.records.length === 2 && state.records[0].id !== state.records[1].id);
+        checks.push(...compositionStructureReport(root, { composition, scenario: 'copy' }));
+      } else if (composition === 'recipe-editor') {
+        send(root.querySelector('[data-recipe-view="front"]').querySelector('[data-layer="base"]'), 'click');
+        add('selection', 'direct-selection', 'Direkte fladevalg opdaterer aktivt lag og udvalget', state.activeLayer === 'base' && state.selectedIds.length === 1 && state.selectedIds[0] === 'base');
+        const original = mounted.history.value.layers.find(layer => layer.id === state.activeLayer).thickness;
+        const number = root.querySelector('#' + prefix + '-thickness-number'); number.value = String(original + 1); send(number, 'input');
+        add('edit', 'live', 'Begge visninger følger den gyldige ændring live', Array.from(root.querySelectorAll('[data-recipe-view]')).every(view => view.querySelector('[data-layer="base"]').getAttribute('data-thickness') === String(original + 1)));
+        send(number, 'change');
+        add('edit', 'one-step', 'Afsluttet parameterændring danner ét fortrydtrin og bevarer den placerede kopi', state.history.past.length === 1 && mounted.history.value.layers.find(layer => layer.id === state.activeLayer).thickness === original + 1
+          && state.placed.recipe.layers.find(layer => layer.id === state.activeLayer).thickness === original);
+        send(root.querySelector('[data-action="undo"]'), 'click');
+        add('undo', 'restore', 'Fortryd gendanner den validerede opskrift', mounted.history.value.layers.find(layer => layer.id === state.activeLayer).thickness === original && !mounted.history.dirty);
+        checks.push(...compositionStructureReport(root, { composition, scenario: 'undo' }));
       } else if (composition === 'history') {
         const original = state.history.present.title, input = root.querySelector('input'); input.value = 'Kvalitetsprøve'; send(input, 'input'); send(input, 'change');
         add('edit', 'one-step', 'Afsluttet navneændring bliver ét historiktrin', state.history.present.title === 'Kvalitetsprøve' && state.history.past.length === 1);

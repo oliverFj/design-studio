@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { getComponents } from '../core/engine.mjs';
-import { COMPOSITIONS } from '../patterns/catalog.mjs';
+import { COMPOSITIONS, COMPOSITION_KINDS } from '../patterns/catalog.mjs';
 import { mountComposition, createCompositionState } from '../patterns/compositions.mjs';
 import { mountCompositionGallery, createGalleryState } from '../patterns/gallery.mjs';
 import { dom, fire } from './support/dom.mjs';
@@ -27,7 +27,7 @@ test('all compositions mount with shared components and unique field IDs in ever
         if (target) assert.ok(mounted.element.querySelector('#' + target));
       }
       const controls = [...mounted.element.querySelectorAll('input'), ...mounted.element.querySelectorAll('select')]
-        .filter(node => node.getAttribute('type') !== 'checkbox');
+        .filter(node => !['checkbox', 'range'].includes(node.getAttribute('type')) && !node.className.split(' ').includes('ds-range-field__number'));
       for (const control of controls) assert.equal(control.getAttribute('data-variant'), id === 'form' ? null : 'desktop', id + ': density follows the task');
       if (id === 'editor') {
         const workspace = mounted.element.querySelector('.composition-workbench');
@@ -66,7 +66,7 @@ test('FormLab pattern search preserves hierarchy, selection and the original fol
   search.value = 'Detalje'; fire(search, 'input');
   assert.ok(element.querySelector('[data-tree-id="collection"]'));
   assert.ok(element.querySelector('[data-tree-id="detail"]'));
-  assert.equal(element.querySelector('[data-tree-id="panel"]'), null);
+  assert.ok(element.querySelector('[data-tree-id="panel"]'), 'the detail search retains its owning object');
   assert.deepEqual(state.selectedIds, ['panel']);
   assert.deepEqual(state.expanded, []);
   assert.equal(element.querySelector('#composition-editor-object-name-control'), name);
@@ -113,7 +113,8 @@ test('FormLab multiselection preserves mixed values, and inspector tabs and move
   assert.equal(element.querySelector('[data-tab="actions"]').getAttribute('aria-selected'), 'true');
   const select = element.querySelector('#composition-editor-move-target-control'); select.value = 'archive'; fire(select, 'change');
   fire(element.querySelector('[data-action="move-objects"]'), 'click');
-  assert.ok(state.objects.filter(item => ['panel', 'detail'].includes(item.id)).every(item => item.parent === 'archive'));
+  assert.equal(state.objects.find(item => item.id === 'panel').groupId, 'archive');
+  assert.equal(state.objects.find(item => item.id === 'detail').parent, 'panel', 'moving a collection member preserves physical ownership');
   assert.ok(state.expanded.includes('archive'));
   assert.deepEqual(state.selectedIds, ['panel', 'detail']);
   assert.equal(state.tab, 'actions');
@@ -149,7 +150,7 @@ test('list filtering, empty state and review action keep selection and detail co
   const search = element.querySelector('input'); search.value = 'ingen træffere'; fire(search, 'input');
   assert.equal(state.selected, null); assert.match(element.textContent, /Ingen poster matcher/);
   assert.equal(element.querySelector('[data-action="review"]'), null);
-  search.value = 'Reference'; fire(search, 'input'); assert.equal(state.selected, 'reference');
+  search.value = state.items.find(item => item.id === 'reference').title; fire(search, 'input'); assert.equal(state.selected, 'reference');
 });
 
 test('gallery retains independent example state across selection and theme remount', () => {
@@ -163,15 +164,70 @@ test('gallery retains independent example state across selection and theme remou
   gallery.destroy();
 });
 
-test('gallery keeps a short compact introduction and preserves usage and attribution in reuse details', () => {
+test('pattern choice metadata is complete and related choices preserve drafts', () => {
+  for (const [id, item] of Object.entries(COMPOSITIONS)) {
+    assert.ok(COMPOSITION_KINDS[item.kind], id);
+    assert.ok(item.useWhen.length > 30, id);
+    for (const related of item.related) {
+      assert.ok(COMPOSITIONS[related], id + '/' + related);
+      assert.notEqual(related, id);
+    }
+  }
+  const state = createGalleryState(), document = dom();
+  state.selected = 'form';
+  const gallery = mountCompositionGallery(theme('studio-light'), { document, state });
+  document.body.append(gallery.element);
+  const input = gallery.element.querySelector('#patterns-form-name-control');
+  input.value = 'Min ufærdige kladde'; fire(input, 'input');
+  const related = gallery.element.querySelector('[data-pattern]');
+  const destination = related.getAttribute('data-pattern');
+  fire(related, 'click');
+  assert.equal(state.selected, destination);
+  const picker = gallery.element.querySelector('select');
+  assert.equal(picker.value, destination);
+  assert.equal(document.activeElement, gallery.element.querySelector('#patterns-active-title'));
+  picker.value = 'form'; fire(picker, 'change');
+  assert.equal(gallery.element.querySelector('#patterns-form-name-control').value, 'Min ufærdige kladde');
+  gallery.destroy();
+});
+
+test('list filters restore the preferred selection and keep count, review and empty recovery coherent', () => {
+  const { element, state, document, destroy } = fixture('list-detail');
+  fire(element.querySelector('[data-item="practice"]'), 'click');
+  const search = element.querySelector('input');
+  search.focus(); search.value = '__no_results__'; fire(search, 'input');
+  assert.equal(state.selected, null);
+  assert.equal(document.activeElement, search);
+  assert.equal(element.querySelector('[data-action="review"]'), null);
+  fire(element.querySelector('[data-action="clear-empty"]'), 'click');
+  assert.equal(state.selected, 'practice');
+  assert.equal(document.activeElement, search);
+  const current = element.querySelectorAll('[data-item]').filter(row => row.getAttribute('aria-current') === 'true');
+  assert.equal(current.length, 1);
+  assert.equal(current[0].getAttribute('data-item'), 'practice');
+  const filter = element.querySelector('#composition-list-detail-review-filter-control');
+  filter.value = 'pending'; fire(filter, 'change');
+  fire(element.querySelector('[data-action="review"]'), 'click');
+  assert.equal(state.items.find(item => item.id === 'practice').reviewed, true);
+  assert.notEqual(state.selected, 'practice');
+  assert.equal(element.querySelector('[data-item="practice"]'), null);
+  filter.value = 'all'; fire(filter, 'change');
+  assert.equal(state.selected, 'practice');
+  assert.match(element.querySelector('[data-list-count]').textContent, /4 af 4/);
+  destroy();
+});
+
+test('gallery leads with the example and presents guidance and attribution as readable content', () => {
   const gallery = mountCompositionGallery(theme('fjordside'), { document: dom() });
-  const content = gallery.element.querySelector('.composition-heading').nextSibling, intro = content.children[0];
-  assert.equal(intro.getAttribute('data-variant'), 'compact');
-  assert.equal(intro.children.length, 2, 'only title and short description sit above the demonstration');
-  const notes = gallery.element.querySelector('pre').textContent;
-  assert.match(notes, /Anvendelse:/);
-  assert.match(notes, /Breddeprofil:/);
-  assert.match(notes, /Ophav: FormLab/);
+  const content = gallery.element.querySelector('.composition-pattern-content'), intro = content.children[0];
+  assert.ok(intro.textContent.includes(COMPOSITIONS.editor.description));
+  assert.ok(content.children[1].querySelector('.composition-workbench'), 'the live example precedes detailed guidance');
+  assert.ok(content.querySelector('[data-pattern]'), 'related patterns can be chosen directly');
+  assert.equal(intro.querySelector('input'), null, 'guidance never leaks the stack demonstration controls');
+  assert.ok(content.querySelector('.composition-pattern-guide').textContent.includes(COMPOSITIONS.editor.useWhen));
+  const notes = gallery.element.querySelector('.composition-reuse').textContent;
+  assert.match(notes, /Reference og ophav/);
+  assert.match(notes, /FormLab/);
   assert.match(notes, /object-panel.js/);
   gallery.destroy();
 });
@@ -247,4 +303,35 @@ test('invalid history drafts preserve document and can be canceled without creat
   assert.equal(state.history.present.title, 'Min samling'); assert.equal(state.history.past.length, 0);
   fire(element.querySelector('[data-action="cancel-draft"]'), 'click'); assert.equal(input.value, 'Min samling'); assert.equal(input.getAttribute('aria-invalid'), null);
   assert.equal(state.history.past.length, 0);
+});
+
+test('list detail respects host selection on remount and remembers selection through filtered fallback', () => {
+  const state = createCompositionState('list-detail'), document = dom(), changes = [];
+  state.selected = 'notes';
+  const mount = () => {
+    const instance = mountComposition(theme('studio-light'), 'list-detail', { document, state, onChange: value => changes.push(value) });
+    document.body.append(instance.element); return instance;
+  };
+  let mounted = mount();
+  assert.equal(state.selected, 'notes', 'the host can choose the initial selection');
+  assert.equal(state.preferredSelection, 'notes');
+  assert.equal(changes.length, 0, 'mounting does not emit a change');
+  fire(mounted.element.querySelector('[data-item="practice"]'), 'click');
+  assert.equal(changes.length, 1);
+  state.selected = 'notes'; mounted.destroy(); mounted = mount();
+  assert.equal(state.selected, 'notes', 'an explicit host selection replaces the remembered choice');
+  assert.equal(state.preferredSelection, 'notes');
+  assert.equal(changes.length, 1, 'remounting does not repeat the selection callback');
+  let search = mounted.element.querySelector('input'); search.value = 'reference'; fire(search, 'input');
+  assert.equal(state.selected, 'reference');
+  assert.equal(state.preferredSelection, 'notes');
+  assert.equal(changes.length, 2);
+  mounted.destroy(); mounted = mount();
+  assert.equal(state.selected, 'reference');
+  assert.equal(state.preferredSelection, 'notes', 'a filtered fallback is not mistaken for a host override');
+  assert.equal(changes.length, 2);
+  search = mounted.element.querySelector('input'); search.value = ''; fire(search, 'input');
+  assert.equal(state.selected, 'notes', 'clearing the search restores the original preferred item');
+  assert.equal(changes.length, 3, 'each user interaction emits exactly one callback');
+  mounted.destroy();
 });

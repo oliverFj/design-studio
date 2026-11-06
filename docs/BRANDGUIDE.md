@@ -31,7 +31,7 @@ Et kompakt tema justerer `typography.size.body`, `typography.size.label`, `typog
 
 ## Interfacet
 
-Åbn Design Studios `index.html` direkte i browseren. Brandguide-siden viser principper, anvendelsesregler, relaterede farve- og skriftprøver og logoer på deres angivne baggrunde. Vælg et princip, afsnit eller logo for at redigere det i egenskabspanelet. Tilføj logo indlæser en original billedfil i pakken; Udskift originalfil erstatter en eksisterende ressource i den aktuelle kladde. Hent original og Hent fil downloader de uændrede bytes. **Gem tema** henter guiden sammen med tokens, historik og alle indlejrede ressourcer i én JSON-fil. Browseren håndterer placeringen; den åbnede temafil overskrives ikke automatisk. Gem før genindlæsning eller lukning, og placér den hentede fil som projektets tema, hvis ændringen skal bruges i produktet.
+Brugeren kan åbne Design Studios `index.html` direkte i browseren. Agentens browseradgang følger HTTP-kontrolvejen i [agentarbejdsgangen](AGENT-WORKFLOW.md#kontrollér-den-berørte-funktion). Brandguide-siden viser principper, anvendelsesregler, relaterede farve- og skriftprøver og logoer på deres angivne baggrunde. Vælg et princip, afsnit eller logo for at redigere det i egenskabspanelet. Tilføj logo indlæser en original billedfil i pakken; Udskift originalfil erstatter en eksisterende ressource i den aktuelle kladde. Hent original og Hent fil downloader de uændrede bytes. **Gem tema** henter guiden sammen med tokens, historik og alle indlejrede ressourcer i én JSON-fil. Browseren håndterer placeringen; den åbnede temafil overskrives ikke automatisk. Gem før genindlæsning eller lukning, og placér den hentede fil som projektets tema, hvis ændringen skal bruges i produktet.
 
 ## Brug for agenter
 

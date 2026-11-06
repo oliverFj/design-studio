@@ -47,7 +47,7 @@ const enumProperties = {
   overflow: ['visible', 'hidden', 'clip', 'scroll', 'auto'], overflowX: ['visible', 'hidden', 'clip', 'scroll', 'auto'], overflowY: ['visible', 'hidden', 'clip', 'scroll', 'auto'],
   overscrollBehavior: ['auto', 'contain', 'none'], scrollbarWidth: ['auto', 'thin', 'none'], scrollbarGutter: ['auto', 'stable', 'stable both-edges'],
   position: ['static', 'relative', 'absolute', 'fixed', 'sticky'], userSelect: ['auto', 'none', 'text', 'all'],
-  pointerEvents: ['auto', 'none'], appearance: ['none', 'auto'],
+  pointerEvents: ['auto', 'none'], appearance: ['none', 'auto', 'textfield'], fontVariantNumeric: ['normal', 'tabular-nums'],
   verticalAlign: ['baseline', 'top', 'middle', 'bottom', 'text-top', 'text-bottom', 'sub', 'super'],
   objectFit: ['fill', 'contain', 'cover', 'none', 'scale-down'], resize: ['none', 'both', 'horizontal', 'vertical'],
   listStyleType: ['none', 'disc', 'circle', 'square', 'decimal'],
@@ -192,7 +192,7 @@ function validateTreatment(treatment, path, parts, tokens, resolved, errors, req
     }
   }
 }
-const previewTags = new Set(['a', 'nav', 'figure', 'figcaption', 'img', 'div', 'span', 'p', 'strong', 'label', 'button', 'input', 'select', 'option', 'textarea', 'h2', 'h3', 'hr', 'section', 'article', 'header', 'footer', 'dl', 'dt', 'dd', 'ul', 'ol', 'li', 'fieldset', 'legend', 'output', 'details', 'summary', 'table', 'caption', 'thead', 'tbody', 'tr', 'th', 'td', 'progress']);
+const previewTags = new Set(['a', 'nav', 'figure', 'figcaption', 'img', 'div', 'span', 'p', 'strong', 'label', 'button', 'input', 'select', 'optgroup', 'option', 'textarea', 'h2', 'h3', 'hr', 'section', 'article', 'header', 'footer', 'dl', 'dt', 'dd', 'ul', 'ol', 'li', 'fieldset', 'legend', 'output', 'details', 'summary', 'table', 'caption', 'thead', 'tbody', 'tr', 'th', 'td', 'progress']);
 const previewInputTypes = new Set(['button', 'submit', 'reset', 'text', 'email', 'number', 'password', 'checkbox', 'radio', 'search', 'tel', 'url', 'range', 'color', 'date', 'time', 'file']);
 function validatePreview(tree, component, path, errors, catalog) {
   let count = 0;
@@ -221,7 +221,7 @@ function validatePreview(tree, component, path, errors, catalog) {
           if (typeof value !== 'boolean') errors.push(nodePath + '.attrs.' + attribute + ': must be boolean.');
         } else if (attribute === 'tabindex') {
           if (!['0','-1'].includes(value)) errors.push(nodePath + '.attrs.tabindex: must be 0 or -1.');
-        } else if (['href', 'src', 'alt', 'id', 'for', 'name', 'type', 'value', 'placeholder', 'role', 'min', 'max', 'step', 'rows', 'cols', 'inputmode', 'minlength', 'maxlength', 'autocomplete', 'accept', 'scope', 'colspan', 'rowspan'].includes(attribute)||/^aria-[a-z-]+$/.test(attribute)||/^data-[a-z-]+$/.test(attribute)) {
+        } else if (['href', 'src', 'alt', 'id', 'for', 'name', 'label', 'type', 'value', 'placeholder', 'role', 'min', 'max', 'step', 'rows', 'cols', 'inputmode', 'minlength', 'maxlength', 'autocomplete', 'accept', 'scope', 'colspan', 'rowspan'].includes(attribute)||/^aria-[a-z-]+$/.test(attribute)||/^data-[a-z-]+$/.test(attribute)) {
           if (typeof value !== 'string' || value.length > 1000) errors.push(nodePath + '.attrs.' + attribute + ': expected a string of at most 1000 characters.');
           else if (attribute === 'type' && !previewInputTypes.has(value)) errors.push(nodePath + '.attrs.type: unsupported input type.');
         } else errors.push(nodePath + '.attrs.' + attribute + ': unsupported preview attribute.');
@@ -600,6 +600,7 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
       emit('.ds-'+id+'__option[aria-disabled="true"]',{color:'{color.disabled.text}',cursor:'not-allowed'});
     }
     emit('.ds-file-upload[data-drag-state="over"]',{outline:'max(3px, var(--ds-border-width-focus)) solid {color.focus}',outlineOffset:'2px'});
+    emit('.ds-range-field__number::-webkit-inner-spin-button, '+scope+' .ds-range-field__number::-webkit-outer-spin-button',{'-webkit-appearance':'none',margin:'0'});
     emit('.ds-spinner__indicator',{animation:'ds-feedback-spin .8s linear infinite'});
     emit('.ds-skeleton',{animation:'ds-skeleton-pulse 1.6s ease-in-out infinite'});
     rules.push('@keyframes ds-feedback-spin { to { transform: rotate(360deg); } }','@keyframes ds-skeleton-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }');
@@ -655,6 +656,17 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
     const interactivePart=partId=>{let found=false;const visit=node=>{if(node?.part===partId&&['button','input','select','textarea'].includes(node.tag))found=true;for(const child of node?.children??[])visit(child);};visit(component.preview);return found;};
     const disabledGuard=':not(:is(:disabled, [aria-disabled="true"], [data-state~="disabled"]))';
     for (const [stateId, state] of Object.entries(component.states).sort(([a],[b])=>Number(transientState(a))-Number(transientState(b)))) {
+      if(sourceVersion===2&&componentId==='range-field'&&stateId==='focus'){
+        const stateRoot=root+':is(:focus-within, [data-state~="focus"])';
+        emit(stateRoot,state.styles);
+        for(const [partId,part]of Object.entries(state.parts??{})){
+          if(['control','number'].includes(partId)){
+            emit(partSelector(root,partId)+':focus-visible',part.styles);
+            emit(partSelector(root+'[data-state~="focus"]',partId),part.styles);
+          }else emit(partSelector(stateRoot,partId),part.styles);
+        }
+        continue;
+      }
       if(sourceVersion===2&&['tabs','accordion','breadcrumb','pagination','data-table','data-grid'].includes(componentId)){
         for(const [partId,part]of Object.entries(state.parts??{})){
           const native=stateId==='focus'?':focus-visible':componentId==='data-table'&&stateId==='selected'?'[data-state~="selected"]':stateSelector(stateId,{parts:{root:component.parts[partId]}});

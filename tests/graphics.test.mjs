@@ -65,7 +65,7 @@ function nativeDocument({ reduced = false, cssDuration = '' } = {}) {
 test('shared graphics cover every component role and all four editorial motifs in every family', () => {
   const pack = theme(), before = JSON.stringify(pack);
   const renderer=createGraphicRenderer(pack);
-  assert.equal(GRAPHIC_FAMILIES.length, 4); assert.equal(GRAPHIC_MOTIFS.length, 65);
+  assert.equal(GRAPHIC_FAMILIES.length, 4); assert.equal(GRAPHIC_MOTIFS.length, Object.keys(COMPONENT_LIBRARY).length + 4);
   assert.deepEqual(GRAPHIC_MOTIFS.slice(4).map(item=>item.id).sort(),Object.keys(COMPONENT_LIBRARY).sort());
   assert.doesNotMatch(JSON.stringify(GRAPHIC_FAMILIES), /Agent|konkurrence|review/i);
   for (const family of GRAPHIC_FAMILIES) {

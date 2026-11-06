@@ -15,6 +15,8 @@ export {mountFileUpload,validateFileSelection} from './uploads.mjs';
 import {normalizeDataTablePreview} from './data-table.mjs';
 export {mountDataTable} from './data-table.mjs';
 import {normalizeInputChoicePreview} from './input-choices.mjs';
+import {normalizeRangeFieldPreview,rangeNumberCharacters} from './range-field.mjs';
+export {mountRangeField} from './range-field.mjs';
 export {mountCombobox,mountMultiselect} from './input-choices.mjs';
 export { animateStandard, animateThemed, STANDARD_MOTION } from './motion.mjs';
 import {COMPONENT_LIBRARY, canonicalComponentId, canonicalVariantId, canonicalStateId, canonicalPartId} from './library.mjs';
@@ -26,11 +28,11 @@ export { createIcon, renderIcon, ICON_NAMES, TABLER_VERSION } from './icons.mjs'
 import { renderGraphic, createGraphicRenderer } from './graphics.mjs';
 export { GRAPHIC_FAMILIES, GRAPHIC_MOTIFS, GRAPHIC_MOTION, getGraphicFamily, getGraphicParts, renderGraphic, createGraphic, createGraphicRenderer, mountGraphicMotion } from './graphics.mjs';
 
-const tags=new Set(['a','nav','figure','figcaption','div','span','p','strong','label','button','input','select','option','h1','h2','h3','h4','h5','h6','hr','section','article','header','footer','dialog','textarea','ul','ol','li','img','dl','dt','dd','fieldset','legend','output','details','summary','table','caption','thead','tbody','tr','th','td','progress']);
+const tags=new Set(['a','nav','figure','figcaption','div','span','p','strong','label','button','input','select','optgroup','option','h1','h2','h3','h4','h5','h6','hr','section','article','header','footer','dialog','textarea','ul','ol','li','img','dl','dt','dd','fieldset','legend','output','details','summary','table','caption','thead','tbody','tr','th','td','progress']);
 const inputTypes=new Set(['button','submit','reset','text','email','number','password','checkbox','radio','search','tel','url','range','color','date','time','file']);
 const booleans=new Set(['disabled','checked','selected','multiple','required','readOnly','readonly','hidden','open']);
 const voidTags=new Set(['input','hr','img']);
-const safeAttribute=name=>booleans.has(name)||['href','src','alt','id','for','name','type','value','placeholder','min','max','step','rows','cols','inputmode','minlength','maxlength','autocomplete','role','title','tabindex','draggable','accept','scope','colspan','rowspan'].includes(name)||/^aria-[a-z-]+$/.test(name)||/^data-[a-z-]+$/.test(name);
+const safeAttribute=name=>booleans.has(name)||['href','src','alt','id','for','name','label','type','value','placeholder','min','max','step','rows','cols','inputmode','minlength','maxlength','autocomplete','role','title','tabindex','draggable','accept','scope','colspan','rowspan'].includes(name)||/^aria-[a-z-]+$/.test(name)||/^data-[a-z-]+$/.test(name);
 // URLs are checked before either HTML serialization or native DOM construction.
 function safeURL(value, image=false){
  const url=String(value).trim();
@@ -81,12 +83,19 @@ function model(pack,id,options,components,depth=0){
  if(options.controlVariant!==undefined&&(!['field','choice-field'].includes(id)||options.controlVariant!=='desktop'))throw new Error('Unsupported control variant: '+options.controlVariant);
  let iconAsset;
  if(options.iconName!==undefined){
-  if(!['button','action-button','menu-item','tag','segmented-option'].includes(id))throw new Error('iconName is only supported by button, action-button, menu-item, tag and segmented-option.');
+  if(!['button','list-item','action-button','menu-item','tag','segmented-option'].includes(id))throw new Error('iconName is only supported by button, list-item, action-button, menu-item, tag and segmented-option.');
   iconModel(options.iconName);
   if(options.icon!==undefined||options.iconAssetId!==undefined)throw new Error('Choose one icon source: iconName, icon or iconAssetId.');
  }
  if(id==='action-button'&&options.iconAssetId!==undefined){iconAsset=pack.brand?.assets?.find(asset=>asset.id===options.iconAssetId);if(!iconAsset||!iconAsset.mimeType.startsWith('image/'))throw new Error('Unknown approved icon image asset: '+options.iconAssetId);}
  const identifier=prefix(options), slots=Object.fromEntries(Object.entries(options.slots??{}).map(([key,value])=>[pack.schemaVersion===2?canonicalPartId(id,key):key,value]));
+ if(id==='list-item'){
+  if(options.current!==undefined&&typeof options.current!=='boolean')throw new Error('List item current must be a boolean.');
+  if(options.iconName!==undefined&&Object.hasOwn(slots,'leading'))throw new Error('Choose one list item leading source: iconName or slots.leading.');
+  if(options.text!==undefined||options.label!==undefined)slots.heading??=String(options.text??options.label);
+  if(options.description!==undefined)slots.description??=String(options.description);
+  else if(Object.hasOwn(slots,'heading'))slots.description??='';
+ }
  if(id==='action-button'){if(options.icon!==undefined)slots.icon=options.icon;if(options.shortcut!==undefined)slots.shortcut=String(options.shortcut);}
  if(id==='brand-mark'&&pack.brand?.logos?.length){
   const logo=options.logoId?pack.brand.logos.find(logo=>logo.id===options.logoId):pack.brand.logos[0];
@@ -111,11 +120,14 @@ function model(pack,id,options,components,depth=0){
  if(id==='button'&&options.iconOnly&&!String(options.label??options.attrs?.['aria-label']??options.text??'').trim())throw new Error('Icon-only button requires an accessible name.');
  if(id==='button'&&options.iconOnly&&options.icon===undefined&&options.iconName===undefined&&!slots.icon)throw new Error('Icon-only button requires an icon.');
  const formField=['field','choice-field','range-field'].includes(id)||newFormComponent&&['textarea','number-input'].includes(id)||inputChoiceComponent;
+ const sharedRange=id==='range-field'&&(pack.schemaVersion===2||Object.entries(COMPONENT_LIBRARY[id].parts).every(([partId,part])=>component.parts[partId]?.selector===part.selector));
+ if(sharedRange&&options.type!==undefined&&options.type!=='range')throw new Error('Range field requires native type=range.');
+ const preciseRange=sharedRange&&variant==='with-input';
  const formChoice=['checkbox','radio','switch'].includes(id);
  const fieldGroup=newFormComponent&&id==='field-group';
  const describedForm=formField||formChoice||fieldGroup;
- if(options.error&&describedForm)variant='invalid';
- const invalid=describedForm&&(Boolean(options.error)||variant==='invalid');
+ if(options.error&&describedForm&&!preciseRange)variant='invalid';
+ const invalid=describedForm&&(Boolean(options.error)||variant==='invalid'||stateList.includes('invalid'));
  const findPreviewPart=(node,part)=>node?.part===part?node:(node?.children??[]).map(child=>findPreviewPart(child,part)).find(Boolean);
  const error=options.error??slots.error??findPreviewPart(component.preview,'error')?.text;
  const hasError=invalid&&(typeof error==='string'?Boolean(error.trim()):error!==undefined);
@@ -143,7 +155,7 @@ function model(pack,id,options,components,depth=0){
    else throw new Error('Expected text or declarative nodes in component slot '+part);
   }
   if(!tags.has(node.tag))throw new Error('Unsupported component tag: '+node.tag);
-  if(root&&options.text!==undefined&&id!=='action-button'&&id!=='signature'&&!(id==='button'&&(options.icon!==undefined||options.iconName!==undefined||slots.icon!==undefined||options.iconOnly||loading))&&!(['tag','segmented-option'].includes(id)&&options.iconName!==undefined)){node.text=String(options.text);delete node.children;}
+  if(root&&options.text!==undefined&&!['action-button','signature','list-item'].includes(id)&&!(id==='button'&&(options.icon!==undefined||options.iconName!==undefined||slots.icon!==undefined||options.iconOnly||loading))&&!(['tag','segmented-option'].includes(id)&&options.iconName!==undefined)){node.text=String(options.text);delete node.children;}
   const suppliedAttrs={...node.attrs,...(root&&!dialogLike?options.attrs:{})};
   if(id==='action-button'&&Object.hasOwn(suppliedAttrs,'src'))throw new Error('Unsupported component attribute: src');
   const attrs=attributes(suppliedAttrs);
@@ -198,6 +210,21 @@ function model(pack,id,options,components,depth=0){
    if(part==='icon'&&((options.icon===undefined&&options.iconName===undefined&&slots.icon===undefined)||loading))attrs.hidden=true;
    if(part==='progress'&&!loading)attrs.hidden=true;
   }
+  if(id==='list-item'){
+   if(root){
+    const href=options.href??attrs.href;
+    if(href!==undefined){node.tag='a';delete attrs.type;if(unavailable){delete attrs.href;attrs.role='link';attrs['aria-disabled']='true';attrs.tabindex='-1';}else attrs.href=safeURL(href);}
+    if(!attrs['aria-label'])attrs['aria-labelledby']??=identifier+'-heading';
+    const described=new Set((attrs['aria-describedby']??'').split(/\s+/).filter(Boolean));
+    if((slots.description??findPreviewPart(component.preview,'description')?.text)!=='')described.add(identifier+'-description');
+    if(Object.hasOwn(slots,'trailing')&&slots.trailing!=='')described.add(identifier+'-trailing');
+    if(described.size)attrs['aria-describedby']=[...described].join(' ');
+   }
+   if(part==='heading')attrs.id=identifier+'-heading';
+   if(part==='description'){attrs.id=identifier+'-description';if(slots.description==='')attrs.hidden=true;}
+   if(part==='leading'){if(options.iconName!==undefined)node.iconName=options.iconName;else if(!Object.hasOwn(slots,'leading')||slots.leading==='')attrs.hidden=true;}
+   if(part==='trailing'){attrs.id=identifier+'-trailing';if(!Object.hasOwn(slots,'trailing')||slots.trailing==='')attrs.hidden=true;}
+  }
   if(root&&id==='link'&&options.href!==undefined)attrs.href=safeURL(options.href);
   if(id==='signature'){
    const identity=options.identity===undefined?null:options.identity==='fjordside'?FJORDSIDE_SIGNATURE:null;
@@ -229,6 +256,23 @@ function model(pack,id,options,components,depth=0){
   if(id==='image'&&part==='caption'&&options.caption!==undefined){node.text=String(options.caption);if(options.caption==='')attrs.hidden=true;}
   if(!root&&node.variant)attrs['data-variant']=node.variant;
   if(root&&options.state){const states=(Array.isArray(options.state)?options.state:[options.state]).map(state=>pack.schemaVersion===2?canonicalStateId(id,state):state);for(const state of states)if(!Object.hasOwn(component.states,state))throw new Error('Unknown component state: '+state);if(id!=='tree'){attrs['data-state']=states.join(' ');if(states.includes('selected'))attrs['aria-selected']='true';if(states.includes('pressed'))attrs['aria-pressed']='true';if(states.includes('expanded'))attrs['aria-expanded']='true';if(states.includes('loading'))attrs['aria-busy']='true';}}
+  if(sharedRange){
+   const readonly=Boolean(options.readOnly??options.readonly)||stateList.includes('readOnly');
+   if(root&&preciseRange){if(invalid)attrs['data-state']=[...new Set((attrs['data-state']??'').split(/\s+/).filter(Boolean).concat('invalid'))].join(' ');if(readonly)attrs['data-readonly']='true';}
+   if(part==='label')attrs.id=identifier+'-label';
+   if(part==='control'||part==='number'){
+    if(node.tag!=='input')throw new Error('Range field controls require native inputs.');
+    attrs.type=part==='control'?'range':'number';
+    attrs.id=identifier+(part==='number'?'-number':'-control');attrs['aria-labelledby']=identifier+'-label';
+    if(part==='number'){delete attrs.name;if(readonly)attrs.readonly=true;}
+    if(preciseRange&&readonly&&part==='control'){attrs.disabled=true;delete attrs.readonly;}
+   }
+  }
+  if(root&&id==='list-item'&&(options.current!==undefined||stateList.includes('current'))){
+   const current=options.current??true;attrs['aria-current']=String(current);
+   const states=new Set((attrs['data-state']??'').split(/\s+/).filter(Boolean));if(current)states.add('current');else states.delete('current');
+   if(states.size)attrs['data-state']=[...states].join(' ');else delete attrs['data-state'];
+  }
   if(newFormComponent&&part==='control'&&id==='textarea'&&node.tag!=='textarea')throw new Error('textarea requires a native textarea control.');
   if(newFormComponent&&part==='control'&&id==='number-input'&&node.tag!=='input')throw new Error('number-input requires a native input control.');
   if(inputChoiceComponent&&part==='control'&&node.tag!=='input')throw new Error(id+' requires a native input control.');
@@ -255,6 +299,7 @@ function model(pack,id,options,components,depth=0){
     if(id==='combobox'||id==='multiselect')Object.assign(attrs,{role:'combobox','aria-autocomplete':'list','aria-haspopup':'listbox','aria-expanded':'false','aria-controls':identifier+'-listbox'});
    }
   }
+  if(sharedRange&&(part==='control'||part==='number')){attrs.type=part==='control'?'range':'number';if(part==='number')delete attrs.name;}
   if(node.tag==='button'){
    attrs.type??='button';
    if(options.disabled!==undefined){if(options.disabled)attrs.disabled=true;else delete attrs.disabled;}
@@ -280,8 +325,8 @@ function model(pack,id,options,components,depth=0){
    if(part==='label'){attrs.for=identifier+'-control';if(options.label!==undefined)node.text=String(options.label);}
    if(formChoice&&part==='label'){delete attrs.for;attrs.id=identifier+'-label';}
    if(fieldGroup&&part==='legend'){attrs.id=identifier+'-legend';if(options.label!==undefined)node.text=String(options.label);}
-   if(part==='control'||fieldGroup&&root){
-    attrs.id=identifier+'-control';
+   if(part==='control'||sharedRange&&part==='number'||fieldGroup&&root){
+    attrs.id=identifier+(sharedRange&&part==='number'?'-number':'-control');
     if(formChoice)attrs['aria-labelledby']=identifier+'-label';
     if(fieldGroup){attrs['aria-labelledby']=identifier+'-legend';if(options.disabled||stateList.includes('disabled'))attrs.disabled=true;}
     if(options.controlVariant){
@@ -302,15 +347,21 @@ function model(pack,id,options,components,depth=0){
   if(id==='tooltip'&&root){attrs.role='tooltip';attrs.id=identifier+'-tooltip';}
   if(id==='switch'&&part==='control')attrs.role='switch';
   if(node.tag==='textarea'&&options.value!==undefined){node.text=String(options.value);delete attrs.value;}
+  // Only a bounded, computed integer reaches this internal variable; public style attributes stay rejected.
+  if(preciseRange&&part==='number')attrs.style='--ds-range-number-chars:'+rangeNumberCharacters(attrs);
   let children=(node.children??[]).map(child=>visit(child,false,false,nodeDepth+1));
   if(node.iconName!==undefined){if(node.tag!=='span')throw new Error('Declarative icons require a span container.');delete node.text;children=[iconModel(node.iconName,{size:id==='action-button'?'medium':'small'})];}
   if(options.iconName!==undefined&&part===(id==='menu-item'?'symbol':'icon')){delete node.text;children=[iconModel(options.iconName,{size:options.iconSize??(id==='menu-item'?'small':'medium')})];}
   if(id==='action-button'&&part==='icon'&&iconAsset){delete node.text;children=[{tag:'img',attrs:{class:'ds-action-button__asset',src:brandAssetDataURL(iconAsset),alt:''},children:[]}];}
-  if(node.tag==='select'&&options.value!==undefined)for(const child of children)if(child.tag==='option'){delete child.attrs.selected;if((child.attrs.value??child.text)===String(options.value))child.attrs.selected=true;}
+  if(node.tag==='select'&&options.value!==undefined){
+   const selectOptions=nodes=>{for(const child of nodes){if(child.tag==='option'){delete child.attrs.selected;if((child.attrs.value??child.text)===String(options.value))child.attrs.selected=true;}else if(child.tag==='optgroup')selectOptions(child.children??[]);}};
+   selectOptions(children);
+  }
   if(voidTags.has(node.tag)&&(node.text!==undefined||children.length))throw new Error('Native void control cannot have children.');
   return {tag:node.tag,attrs,text:node.text,children};
  }
  let preview=component.preview??COMPONENT_LIBRARY[canonicalComponentId(id)]?.preview;
+ if(sharedRange)preview=normalizeRangeFieldPreview(preview,options,preciseRange);
  // Shared input-choice preview normalization.
  if(inputChoiceComponent)preview=normalizeInputChoicePreview(id,preview,options,identifier);
  // Shared feedback and file-choice preview normalization.
@@ -377,7 +428,8 @@ function serialize(node){
 /** Safe HTML from the same shared declarative implementation used by createComponent.
  * options: variant, state, idPrefix, text, slots, attrs and native control values.
  * button: size (small/medium/large), intent (normal/danger), href, iconName (Tabler), legacy icon, iconOnly,
- * label and loading. action-button accepts size, intent, emphasis and loading independently
+ * label and loading. list-item accepts text/label, description, iconName, href and current;
+ * its leading/trailing slots contain non-interactive content. action-button accepts size, intent, emphasis and loading independently
  * of its orientation variant. tag/segmented-option accept iconName and pressed.
  * avatar accepts name, src and initials; avatar-group accepts label and items.
  * Native avatars bind image fallbacks automatically; HTML uses mountAvatarFallbacks.

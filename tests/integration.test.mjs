@@ -30,6 +30,10 @@ test('init supplies a real shared runtime and sync preserves the project theme',
   assert.match(guidance, /projektets egen index\.html.*file:\/\//);
   assert.match(guidance, /npm run build.*offlinebrug/);
   assert.match(guidance, /Agenten.*genbygger.*Brugeren skal blot genindlæse browseren/);
+  assert.match(guidance, /Agentens standard.*lokal HTTP.*statiske offlineprøver/);
+  assert.match(guidance, /file:\/\/ ikke forsøges/);
+  assert.match(guidance, /særskilt manuel filkontrol/);
+  assert.match(guidance, /Brugeren kan åbne.*index\.html.*Åbn tema/);
   const themeFile = path.join(project, 'design/design.json');
   const theme = JSON.parse(await fs.readFile(themeFile, 'utf8'));
   assert.equal(theme.schemaVersion, 2);
@@ -109,9 +113,21 @@ test('examples exports optional reference code using the project runtime and nev
   await runCLI(['examples', project], { log: silent });
   const entry = path.join(project, 'design/patterns/compositions.mjs');
   const content = await fs.readFile(entry, 'utf8');
-  assert.match(content, /\.\.\/runtime\/components\.mjs/);
+  assert.match(content, /\.\/form\.mjs/);
+  const formSource = await fs.readFile(path.join(project, 'design/patterns/form.mjs'), 'utf8');
+  assert.match(formSource, /\.\.\/runtime\/components\.mjs/);
+  assert.doesNotMatch(formSource, /\.\.\/core\//);
   const reference = await import(pathToFileURL(entry).href);
   assert.equal(reference.createCompositionState('editor').selected, 'panel');
+  const exportedTheme = JSON.parse(await fs.readFile(path.join(project, 'design/design.json'), 'utf8'));
+  const form = reference.mountComposition(exportedTheme, 'form', { document: dom() });
+  assert.equal(form.element.querySelector('#composition-form-name-control').value, 'Mit arbejdsområde');
+  form.destroy();
+  for (const id of ['parameter-workbench', 'recipe-editor']) {
+    const pattern = reference.mountComposition(exportedTheme, id, { document: dom() });
+    assert.ok(pattern.element.querySelector('input'), id + ': copied reference mounts with the project runtime');
+    pattern.destroy();
+  }
   assert.ok(await fs.stat(path.join(project, 'design/patterns/object-workbench.mjs')));
   const history = await import(pathToFileURL(path.join(project, 'design/patterns/history.mjs')).href);
   assert.equal(history.createHistory(history.createHistoryState({ count: 0 })).dirty, false);

@@ -38,7 +38,7 @@ export function createQualityStudio(state,{escape,validation,getTheme=()=>state.
       '<div class="quality-overview"><span><strong>'+totals.pass+'</strong> bestået</span><span><strong>'+totals.warning+'</strong> advarsler</span><span><strong>'+totals.unmeasurable+'</strong> kan ikke måles</span></div>'+
       group('Semantiske tekst- og fokuspar',foundations)+group('Komponenternes tekst og tilstande',components,{summaryOnly:true})+
       group('Interaktive feltkanter',boundaries)+group('Beregnet kontrolgeometri',geometry)+
-      '<section class="quality-patterns"><h3>Fem faste designmønstre</h3><p class="help">Prøverne bruger de samme eksempler som Designmønstre: objekteditor, formular, liste/detaljer, ressourcebibliotek og fortryd/gentag. De afprøver struktur, valg, fejl og feedback i en isoleret DOM.</p>'+
+      '<section class="quality-patterns"><h3>Designmønstre i brug</h3><p class="help">Prøverne bruger katalogets interaktive eksempler. De undersøger fælles struktur og udvalgte forløb for valg, fejl og feedback i en isoleret DOM.</p>'+
       '<button type="button" class="studio-button" id="run-pattern-quality"'+(running?' disabled':'')+'>'+(running?'Kontrollerer…':'Kontrollér designmønstre')+'</button><p id="pattern-quality-progress" class="help" role="status" aria-live="polite">'+(running?'Kontrollen er i gang.':patternResult?'Resultatet gælder den aktuelle kladde.':'Ikke kørt for denne kladde.')+'</p>'+
       (patternResult?group('Struktur og udvalgte forløb',patternResult.checks)+'<ul class="help">'+patternResult.limitations.map(text=>'<li>'+escape(text)+'</li>').join('')+'</ul>':'')+'</section>';
   }

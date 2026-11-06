@@ -17,7 +17,7 @@ npm run build
 
 `npm ci` installerer udviklingsafhængigheder fra låsefilen. Testene kontrollerer runtime, værktøjer og relevante brugerforløb; `check` validerer de medfølgende temaer. Buildet indlejrer programkode, CSS og alle otte temaer i rodens `index.html`. Kildekoden ligger i Git; den genererede fil er Git-ignoreret og skal bygges efter et nyt checkout.
 
-Åbn den byggede fil direkte i browseren før levering. Kontrollér det berørte brugerforløb, og ved ændringer i filhåndtering også åbning og download af et tema. Automatiske kontroller erstatter ikke denne konkrete browserkontrol. Rene dokumentationsændringer kræver hverken nyt build eller gentagelse af kodekontroller.
+Agenten kontrollerer den byggede fil over lokal HTTP og bruger relevante statiske offlineprøver efter [agentarbejdsgangen](AGENT-WORKFLOW.md#kontrollér-den-berørte-funktion). Kontrollér det berørte brugerforløb, og ved ændringer i filhåndtering også åbning og download af et tema. Ved en samlet offlineleverance indgår desuden en særskilt direkte filkontrol; hvis browserværktøjet kun tillader HTTP/HTTPS, aftales den manuelle kontrol med brugeren. Forsøg ikke den kendt ikke-understøttede protokol, og omgå ikke en URL-afvisning. HTTP- og statisk kontrol må ikke kaldes direkte filkontrol. Rene dokumentationsændringer kræver hverken nyt build eller gentagelse af kodekontroller.
 
 Kopiér den færdige `index.html` til modtageren. Notér det anvendte Git-commit sammen med leverancen, så kildegrundlaget kan findes igen. Der er ingen separat installation eller serveropsætning hos modtageren.
 

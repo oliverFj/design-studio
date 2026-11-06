@@ -4228,6 +4228,321 @@
           },
           "additionalProperties": false
         },
+        "list-item": {
+          "type": "object",
+          "properties": {
+            "parts": {
+              "type": "object",
+              "properties": {
+                "root": {
+                  "$ref": "#/$defs/appearancePart"
+                },
+                "leading": {
+                  "$ref": "#/$defs/appearancePart"
+                },
+                "content": {
+                  "$ref": "#/$defs/appearancePart"
+                },
+                "heading": {
+                  "$ref": "#/$defs/appearancePart"
+                },
+                "description": {
+                  "$ref": "#/$defs/appearancePart"
+                },
+                "trailing": {
+                  "$ref": "#/$defs/appearancePart"
+                }
+              },
+              "additionalProperties": false
+            },
+            "variants": {
+              "type": "object",
+              "properties": {
+                "default": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "leading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "content": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "heading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "description": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "trailing": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "compact": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "leading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "content": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "heading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "description": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "trailing": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "states": {
+              "type": "object",
+              "properties": {
+                "current": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "leading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "content": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "heading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "description": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "trailing": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "hover": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "leading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "content": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "heading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "description": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "trailing": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "active": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "leading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "content": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "heading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "description": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "trailing": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "focus": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "leading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "content": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "heading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "description": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "trailing": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "disabled": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "leading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "content": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "heading": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "description": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "trailing": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
         "input": {
           "type": "object",
           "properties": {
@@ -7360,6 +7675,12 @@
                 "label": {
                   "$ref": "#/$defs/appearancePart"
                 },
+                "row": {
+                  "$ref": "#/$defs/appearancePart"
+                },
+                "number": {
+                  "$ref": "#/$defs/appearancePart"
+                },
                 "value": {
                   "$ref": "#/$defs/appearancePart"
                 },
@@ -7368,13 +7689,107 @@
                 },
                 "hint": {
                   "$ref": "#/$defs/appearancePart"
+                },
+                "error": {
+                  "$ref": "#/$defs/appearancePart"
                 }
               },
               "additionalProperties": false
             },
             "variants": {
               "type": "object",
-              "properties": {},
+              "properties": {
+                "invalid": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "label": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "row": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "number": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "value": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "control": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "hint": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "error": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "with-input": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "label": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "row": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "number": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "value": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "control": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "hint": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "error": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
               "additionalProperties": false
             },
             "states": {
@@ -7401,6 +7816,12 @@
                         "label": {
                           "$ref": "#/$defs/appearancePart"
                         },
+                        "row": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "number": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
                         "value": {
                           "$ref": "#/$defs/appearancePart"
                         },
@@ -7408,6 +7829,9 @@
                           "$ref": "#/$defs/appearancePart"
                         },
                         "hint": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "error": {
                           "$ref": "#/$defs/appearancePart"
                         }
                       },
@@ -7437,6 +7861,12 @@
                         "label": {
                           "$ref": "#/$defs/appearancePart"
                         },
+                        "row": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "number": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
                         "value": {
                           "$ref": "#/$defs/appearancePart"
                         },
@@ -7444,6 +7874,99 @@
                           "$ref": "#/$defs/appearancePart"
                         },
                         "hint": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "error": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "invalid": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "label": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "row": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "number": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "value": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "control": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "hint": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "error": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "readOnly": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "label": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "row": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "number": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "value": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "control": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "hint": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "error": {
                           "$ref": "#/$defs/appearancePart"
                         }
                       },
@@ -9854,6 +10377,7 @@
                 "button",
                 "input",
                 "select",
+                "optgroup",
                 "option",
                 "h2",
                 "h3",
@@ -10061,6 +10585,10 @@
                   "maxLength": 1000
                 },
                 "rowspan": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "label": {
                   "type": "string",
                   "maxLength": 1000
                 }

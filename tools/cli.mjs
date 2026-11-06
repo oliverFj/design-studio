@@ -386,8 +386,8 @@ Brug createProjectFile fra design/runtime/files.mjs med produktets format-id, ve
 
 Kør sync fra systemmappen ved ændret tema eller fælles runtime og genbyg derefter produktet. Rene produktændringer kræver ikke sync. Brug npm run doctor i offline-startprojektet til at finde konkrete fejl; kontrollen ændrer ikke filer.
 tools/cli.mjs update PROJECT_DIR viser valgfrie skabelonopdateringer. Gennemgå planen før --apply; lokale ændringer bevares. Opdatering erstatter ikke dette produkts AGENTS.md.
-Kontrollér den berørte funktion proportionelt. Nye skærme skal inspiceres i browseren med relevant tastatur, smal bredde og fejl-/tomtilstande. HTTP-kontrol beviser ikke file://; respekter værktøjets URL-politik og angiv manglende kontrol præcist.
-Åbn "${path.join(ROOT, 'index.html')}" direkte i browseren, og vælg Åbn tema for at indlæse "${packageFile}".
+Kontrollér den berørte funktion proportionelt. Agentens standard er browserkontrol af den byggede fil over lokal HTTP på loopback samt relevante statiske offlineprøver eller produktets doctor. Nye skærme kontrolleres med relevant tastatur, smal bredde og fejl-/tomtilstande. Hvis browserværktøjet kun tillader HTTP/HTTPS, skal file:// ikke forsøges; gentag ikke en kendt begrænsning, og omgå ikke URL-politikken med andre værktøjer eller scripts. HTTP- og statisk kontrol er ikke direkte filkontrol. Ved ændrede offlineafhængigheder, filhåndtering eller en bestilt samlet offlineleverance aftales særskilt manuel filkontrol, hvis ingen tilladt kontrolvej findes. Rapportér kun den udestående filkontrol, når den er relevant for opgaven. Følg systemets docs/AGENT-WORKFLOW.md.
+Brugeren kan åbne "${path.join(ROOT, 'index.html')}" direkte i browseren og vælge Åbn tema for at indlæse "${packageFile}". Agentens browseradgang bruger HTTP-kontrolvejen ovenfor.
 Gem tema henter en JSON-fil. Placér den som projektets design/design.json før sync; originalfilen overskrives ikke automatisk.
 `;
   const agentContent = agentsBefore?.includes(MARKER)

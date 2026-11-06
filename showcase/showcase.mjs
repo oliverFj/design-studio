@@ -1,5 +1,5 @@
 import { generateCSS, generateFontCSS, getComponents, resolveTokens } from './core/engine.mjs';
-import { createComponent, createIcon } from './core/components.mjs';
+import { createComponent, createIcon, mountRangeField } from './core/components.mjs';
 import { themes } from './themes.mjs';
 import { createProjectOverview, createProjectOverviewDraft } from './preview/project-overview.mjs';
 import { mountCompositionGallery, createGalleryState } from './patterns/gallery.mjs';
@@ -177,6 +177,7 @@ function renderCatalog() {
     $('#component-preview').innerHTML=renderDataGridExample(activeTheme,'showcase-grid');
     catalogExample=bindDataGridExamples($('#component-preview'));
   }
+  if(selectedComponent==='range-field')catalogExample=mountRangeField(preview);
   $('#component-parts').replaceChildren(...Object.keys(item.parts).map(part => element('span', '', [document.createTextNode(part)])));
   renderCatalogList();
 }

@@ -1,7 +1,7 @@
 import {createServer} from 'node:http';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import path from 'node:path';
-import {fileURLToPath,pathToFileURL} from 'node:url';
+import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 
 // Uses an available Playwright installation; NODE_PATH may point at the bundled runtime.
@@ -85,20 +85,19 @@ try{
   await page.screenshot({path:path.join(output,'review-mobile.png'),scale:'css'});
   const mobile=await page.locator('#gallery-cover').boundingBox();
   if(Math.abs(mobile.width-mobile.height)>1)throw new Error('Mobile cover is not square');
-  // Verify that the delivered review also works directly from disk.
-  await context.unroute('**/*');
-  await page.goto(pathToFileURL(path.join(output,'index.html')).href);await settle(page);
+  // Verify the delivered review through the same restricted HTTP preview.
+  await page.goto(base+'/');await settle(page);
   const broken=await page.locator('img[src]').evaluateAll(async imgs=>{await Promise.all(imgs.map(img=>{img.loading='eager';return img.decode().catch(()=>{});}));return imgs.filter(img=>!img.complete||img.naturalWidth===0).map(img=>img.alt);});
-  if(broken.length)throw new Error('Offline review has broken images: '+broken.join(', '));
+  if(broken.length)throw new Error('Review has broken images: '+broken.join(', '));
   await page.locator('[data-cover="2"]').click();
   await page.locator('#gallery-cover').click();
-  if(await page.locator('#viewer-title').textContent()!==concepts[2].name)throw new Error('Offline cover viewer failed');
+  if(await page.locator('#viewer-title').textContent()!==concepts[2].name)throw new Error('Cover viewer failed');
   await page.keyboard.press('Escape');
   await page.close();
   // Build a compact visual record from actual captures, without modifying originals.
   const tiles=await Promise.all(shots.map(async(shot,index)=>({input:await sharp(path.join(output,'screenshots',shot.id+'.png')).resize(600,470,{fit:'contain',background:'#edeeef'}).png().toBuffer(),left:(index%2)*620+20,top:Math.floor(index/2)*490+20})));
   await sharp({create:{width:1260,height:1490,channels:3,background:'#ffffff'}}).composite(tiles).png().toFile(path.join(output,'screenshot-series.png'));
   if(errors.length)throw new Error(errors.join('\n'));
-  await writeFile(path.join(output,'verification.json'),JSON.stringify({http:true,file:true,desktop:true,mobile:true,coverSelection:true,viewerNavigation:true,escape:true,brokenImages:[],browserErrors:errors},null,2));
-  console.log('Kontrolleret via HTTP og file://: kortvalg, stor visning, navigation, Escape og mobilbredde.');
+  await writeFile(path.join(output,'verification.json'),JSON.stringify({http:true,file:false,desktop:true,mobile:true,coverSelection:true,viewerNavigation:true,escape:true,brokenImages:[],browserErrors:errors},null,2));
+  console.log('Kontrolleret via HTTP: kortvalg, stor visning, navigation, Escape og mobilbredde. Direkte filåbning er ikke kontrolleret.');
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

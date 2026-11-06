@@ -10,7 +10,7 @@ Biblioteket bestemmer struktur, semantik og grundlayout. Temaet bestemmer farver
 
 Dobbeltklik på **[index.html](index.html)** i systemmappen. Design Studio åbner direkte i din normale browser og fungerer offline. Der kræves ingen server, Windows-app, terminal eller installeret Node.js for at bruge den færdige fil. Alle medfølgende temaer er indbygget.
 
-De medfølgende temaer har sammenhørende lyse og mørke farvetilstande. Farvetilstanden kan følge systemet eller vælges manuelt; det manuelle valg har forrang. Temafilen gemmer begge tilstande, mens en CSS-eksport gælder den valgte fremtoning. Ældre enkeltstående temaer bliver ikke automatisk konverteret.
+De medfølgende temaer har deres egne farvetilstande, herunder lyse, mørke og særlige farvevariationer. Farvetilstanden kan følge systemet eller vælges manuelt; det manuelle valg har forrang. Temafilen gemmer alle leverede tilstande, mens en CSS-eksport gælder den valgte fremtoning. Ældre enkeltstående temaer bliver ikke automatisk konverteret.
 
 **Åbn tema** læser en JSON-fil, du vælger, eksempelvis et projekts `design/design.json`. **Gem tema** henter det aktuelle tema som en JSON-fil med tokens, brandguide, originalressourcer og historik. Browseren håndterer placeringen; den oprindeligt åbnede fil overskrives ikke automatisk. Gem den hentede fil på den ønskede placering, og erstat projektets tema bevidst, hvis ændringen skal bruges dér.
 
@@ -41,13 +41,13 @@ Efter kode-, design- eller temaændringer køres `npm run build` igen. Brugeren 
 - **Brandguide:** Principper, anvendelsesregler, godkendte logoer, skrifter og originalressourcer.
 - **Temaet:** Navn, beskrivelse, historik, JSON-eksport og genereret CSS.
 
-Under **Designsystem → Designmønstre** findes interaktive eksempler på en objekteditor med kontekstpanel inspireret af FormLab, en formular, en liste med detaljevisning, et ressourcebibliotek og fortryd/gentag med gemmepunkt samt header/navigation, hero, footer og billedgalleri. De samme eksempler indgår i web-showcasen og kan afprøves med alle temaer. `node tools/cli.mjs examples PROJECT_DIR` kopierer valgfri referencekode og den selvstændige historikhjælper til et tilknyttet projekt uden overskrivning. Se [genbrug af designmønstre](docs/INTEGRATION.md#valgfrie-sammensætningseksempler).
+Under **Designsystem → Designmønstre** findes interaktive eksempler på en objekteditor med kontekstpanel inspireret af FormLab, et parametrisk værksted, en opskriftseditor med lag, en formular, en liste med detaljevisning, et ressourcebibliotek og fortryd/gentag med gemmepunkt samt header/navigation, hero, footer og billedgalleri. De samme eksempler indgår i web-showcasen og kan afprøves med alle temaer. `node tools/cli.mjs examples PROJECT_DIR` kopierer valgfri referencekode og den selvstændige historikhjælper til et tilknyttet projekt uden overskrivning. Se [genbrug af designmønstre](docs/INTEGRATION.md#valgfrie-sammensætningseksempler).
 
 Komponentstruktur redigeres i det fælles bibliotek, ikke i hvert tema. Padding og gap kommer fra biblioteket. De semantiske spacingtokens skal være positive; temaet kan hverken udelade grundlayoutet eller erstatte det med nul-padding.
 
 Temaet valideres før åbning og gemning. Ugyldige kladder kan redigeres, men ikke gemmes som gyldige temaer. **Hent CSS** under **Temaet** henter temaets genererede CSS. Når en hentet temafil er lagt tilbage i et produkt, opdateres produktets CSS og runtime med `sync`.
 
-Bibliotek 3.5.0 har 61 fælles roller og en samling offentlige temaer med lyse og mørke tilstande. Temasamlingen udvides løbende, blandt andet når nye produkter udvikles; der er ikke et fast antal temaer. Hele det aftalte katalog er implementeret; dækningsoversigten har ingen resterende planlagte roller. Den skelner mellem statisk indhold/layout, native adfærd og fælles controllere. Det er dækning af dette katalog, ikke et løfte om alle komponenttyper eller en tilgængelighedscertificering.
+Bibliotek 3.9.1 har 62 fælles roller og en samling offentlige temaer med lyse og mørke tilstande. Temasamlingen udvides løbende, blandt andet når nye produkter udvikles; der er ikke et fast antal temaer. Hele det aftalte katalog er implementeret; dækningsoversigten har ingen resterende planlagte roller. Den skelner mellem statisk indhold/layout, native adfærd og fælles controllere. Det er dækning af dette katalog, ikke et løfte om alle komponenttyper eller en tilgængelighedscertificering.
 
 Kataloget omfatter nu også combobox, multivalg, native dato/tid, spinner, progress, skeleton, toast, tom tilstand, lokalt filvalg, datatabel og redigerbart datagrid. Datatabellen bevarer native tabelnavigation; datagrid har særskilt cellenavigation, markering, kladder og atomisk indsættelse. Produktet ejer data, forespørgsler, kommandoer og lagring. Knapfamilien har fire fremhævelser med særskilt størrelse og betydning; historiske varianter bevares til kompatibilitet.
 

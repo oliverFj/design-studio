@@ -2,7 +2,7 @@
 
 Denne vejledning er den fælles arbejdsgang fra produktstart til kontrolleret leverance. Produktets egne anvisninger bestemmer indhold, funktioner og arkitektur. Genbrug viden fra den aktuelle session; genlæs kun ændrede eller relevante dele.
 
-Bibliotek 3.5.0 leverer de 61 roller i det aftalte katalog på tværs af de medfølgende temaer og deres lyse/mørke tilstande. Temasamlingen er åben for nye produkttemaer og har ikke et fast antal. Brug dækningsoversigten til at skelne mellem indhold, native adfærd og en controller, der skal forbindes. Katalogets dækning er ikke en tilgængelighedscertificering eller et universelt komponentløfte.
+Bibliotek 3.9.1 leverer de 62 roller i det aftalte katalog på tværs af de medfølgende temaer og deres lyse/mørke tilstande. Temasamlingen er åben for nye produkttemaer og har ikke et fast antal. Brug dækningsoversigten til at skelne mellem indhold, native adfærd og en controller, der skal forbindes. Katalogets dækning er ikke en tilgængelighedscertificering eller et universelt komponentløfte.
 
 ## Find grundlaget
 
@@ -37,6 +37,8 @@ npm run doctor
 ```
 
 **Eksisterende produkt:** Bevar dets arkitektur. Mangler designtilknytningen, bruges `init PROJECT_DIR --theme THEME_ID --design-only`. Dette etablerer ikke en ny app eller byggeopsætning. Find produktets faktiske build- og kontrolkommandoer.
+
+Ved udtræk af mønstre eller indføring af nyere DS-løsninger følges [produktbaserede mønstre og skånsom opdatering](PRODUCT-PATTERNS.md). Brug det relevante produkt som reference og pilot; vurder funktioner og tilstande før erstatning. Bevar produktets faktiske driftsmodel, brand og arbejdsmodel. En nyere DS-demo er ikke i sig selv en bestilling på at omlægge et eksisterende produkt.
 
 Lever som standard en selvstændig `index.html`, der kan åbnes via `file://` uden server, terminal eller installeret runtime. Pak kode, komponentruntime, CSS, skrifter og øvrige nødvendige ressourcer til offlinebrug. Undgå CDN'er, eksterne runtimeafhængigheder og lokale fetch-/modulkald. En anden driftsmodel kræver et udtrykkeligt brugerkrav eller konkret nødvendig funktionalitet; forklar behovet.
 
@@ -91,11 +93,20 @@ Tilpas kontrollen til ændringen. Små, reversible rettelser kræver højst én 
 
 Ved en ny skærm: afprøv normaltilstand og relevante lange tekster, feltfejl eller tomme resultater. Kontrollér tastatur, fokus og smal visning omkring 320 CSS-px. Ved temaændringer kontrolleres også relevante lyse, mørke og ekspressive temaer. Ved fælles biblioteksændringer kontrolleres alle medfølgende temaer. Kontrollér zoom, reduceret bevægelse, højkontrast og hjælpemidler, når de er relevante; angiv præcist, hvad der faktisk er afprøvet.
 
-Brug ved lokal browserkontrol en bygget fil over en loopback-server, der kun udstiller nødvendigt testindhold. Det kræver ikke særskilt bekræftelse ved almindelig lokal kontrol. HTTP-kontrol beviser ikke `file://`-funktion. Respektér afvisninger fra browserværktøjet; hvis direkte filåbning ikke kan kontrolleres, brug strukturelle offlineprøver og rapportér begrænsningen. Forsøg ikke at omgå sikkerhedspolitikken.
+Agentens standardkontrol kombinerer to forskellige prøver:
+
+- **Visning og brugerforløb:** Åbn den byggede fil over en loopback-server, der kun udstiller nødvendigt testindhold. Det kræver ikke særskilt bekræftelse ved almindelig lokal kontrol. Genbrug forhåndsvisningen og genindlæs efter build.
+- **Offlinepakning:** Brug produktets eksisterende doctor, buildkontrol eller `offlineIssues` fra `tools/offline-checks.mjs` til at undersøge indbygget kode, CSS, ressourcer og mulige netværksafhængigheder. Tilpas kontrollen til ændringen; gentag ikke uændrede prøver uden grund.
+
+Brugerens leverance er fortsat en selvstændig `index.html`, som kan åbnes ved dobbeltklik. HTTP-kontrol og statiske offlineprøver beviser ikke i sig selv alle direkte `file://`-forløb.
+
+Læs browserværktøjets dokumenterede URL-understøttelse, før det bruges. Et værktøj, der kun tillader HTTP/HTTPS, skal ikke have `file://`-adresser. En kendt begrænsning skal ikke genafprøves i hver opgave. Respektér en afvisning; skift ikke browserflade, værktøj eller script for at opnå samme blokerede filadgang. Ældre genererede DS-anvisninger om direkte åbning af editorens fil beskriver brugerens adgang til editoren, ikke et krav til agentens browserkontrol.
+
+Direkte filkontrol er en særskilt slutkontrol ved ændrede offlineafhængigheder, filhåndtering eller en bestilt samlet offlineleverance. Brug kun en dokumenteret, tilladt kontrolvej. Hvis den mangler, færdiggøres den øvrige kontrol, og den konkrete manuelle filkontrol aftales med brugeren. Rapportér den udestående kontrol, når den har betydning for opgaven; gentag ikke den kendte værktøjsbegrænsning som standardforbehold efter almindelige UI-rettelser. Beskriv altid den kontrol, der faktisk er udført.
 
 Ved ændret filhåndtering: afprøv gemning, genåbning og afvisning af en ugyldig fil uden datatab. Doctor skal acceptere produktets aktuelle build. Rapportér kort ændringen, de udførte kontroller og væsentlige begrænsninger. Dokumentation konsolideres, når brugeren bestiller det; opret ikke løbende sessionsrapporter.
 
-For 3.5.0 er reel Windows-højkontrast, operativsystemets filvælger og det samlede direkte `file://`-forløb fortsat uden manuel verifikation. Faktiske Mac-/Linux-kørsler er heller ikke dokumenteret. Angiv den udførte kontrol præcist; lokale WOFF2-filer og en konfigureret CI-matrix erstatter ikke platform- og hjælpemiddelkontrol. Ved en systemleverance bruges [leveringspakkerne](PRODUCTION.md#leveringspakker-og-portabel-opsætning), som holder installerede afhængigheder og lokale filer ude af kildepakken.
+Reel Windows-højkontrast, operativsystemets filvælger og det samlede direkte `file://`-forløb er fortsat uden manuel verifikation. Faktiske Mac-/Linux-kørsler er heller ikke dokumenteret. Angiv den udførte kontrol præcist; lokale WOFF2-filer og en konfigureret CI-matrix erstatter ikke platform- og hjælpemiddelkontrol. Ved en systemleverance bruges [leveringspakkerne](PRODUCTION.md#leveringspakker-og-portabel-opsætning), som holder installerede afhængigheder og lokale filer ude af kildepakken.
 
 ## Når selve systemet ændres
 

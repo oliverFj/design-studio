@@ -133,8 +133,8 @@ export function componentBoundaryReport(model,resolved) {
   const resolve=value=>typeof value==='string'?value.replace(/\{([^}]+)\}/g,(_,id)=>String(resolved[id]??'')):value;
   // The combobox wrapper and the grid cells are containers; the native control
   // and the grid's temporary editor own their actual input boundaries.
-  for(const [id,part]of [['input','root'],['select','root'],['field','control'],['choice-field','control'],['textarea','control'],['number-input','control'],['combobox','control'],['multiselect','control'],['date-picker','control'],['time-picker','control'],['file-upload','control'],['data-grid','editor']]){
-    const component=model.components?.[id];if(!component)continue;
+  for(const [id,part]of [['input','root'],['select','root'],['field','control'],['choice-field','control'],['textarea','control'],['number-input','control'],['range-field','number'],['combobox','control'],['multiselect','control'],['date-picker','control'],['time-picker','control'],['file-upload','control'],['data-grid','editor']]){
+    const component=model.components?.[id];if(!component?.parts?.[part])continue;
     const base={...(id==='field'?model.components.input?.parts.root?.styles:{}),...component.parts?.[part]?.styles};
     for(const [variant,treatment]of [['base',{}],...Object.entries(component.variants??{})]){
       for(const [state,condition]of [['idle',{}],...Object.entries(component.states??{}).filter(([state])=>state!=='disabled')]){

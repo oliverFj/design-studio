@@ -2,7 +2,7 @@
 
 Følg [agentarbejdsgangen](AGENT-WORKFLOW.md) for rækkefølge, valg af komponenter og proportional kontrol. Denne guide beskriver API og integration; produktets egne anvisninger ejer skærme og funktioner.
 
-API'et beskriver bibliotek 3.5.0 og de 61 implementerede roller i det aftalte katalog. `COMPONENT_COVERAGE` viser den relevante runtimeindgang; almindelig komponentmarkup forbinder ikke automatisk en kompleks controller. Brug produktets faktiske filstier fra `design-studio.project.json`.
+API'et beskriver bibliotek 3.9.1 og de 62 implementerede roller i det aftalte katalog. `COMPONENT_COVERAGE` viser den relevante runtimeindgang; almindelig komponentmarkup forbinder ikke automatisk en kompleks controller. Brug produktets faktiske filstier fra `design-studio.project.json`.
 
 Brug [den fælles signaturkomponent](SIGNATURE.md), når et produkt skal krediteres med Fjordside-logo og Oliver Fjordside i Platypi. [Onlinevejledningen](WEBSITE-SHOWCASE.md) beskriver opdatering og udgivelse af Design Studio på hjemmesiden.
 
@@ -64,7 +64,7 @@ Nye offlineprojekter får `npm run doctor`. Fra Design Studios mappe kan samme t
 
 Doctor kontrollerer tema, genereret CSS, kopieret runtime, adapterfiler og deres faktiske exports samt offlinefilen. Buildet indlejrer et fingeraftryk af sine faktiske inputfiler, så doctor kan opdage en forældet index.html uden at kræve faste src-filnavne eller en bestemt produktmappestruktur. Kør sync ved forældet runtime eller CSS og derefter npm run build. Ved manglende Design Studio-mappe vises en advarsel om, at sammenligning med den centrale kilde ikke er mulig; produktets lokale tjek kan stadig køre.
 
-Netværkskald og serverafhængigheder undersøges statisk og kan give advarsler. Doctor er ikke en garanti for alle brugerforløb eller en erstatning for relevant kontrol via file://. Ældre projekter uden byggestempel får en advarsel om, at buildets aktualitet ikke kan fastslås. Sync opdaterer fælles filer, men indsætter ikke scripts i eksisterende package.json eller erstatter produktets buildopsætning.
+Netværkskald og serverafhængigheder undersøges statisk og kan give advarsler. Doctor er ikke en garanti for alle brugerforløb. Agenten kombinerer relevant browserkontrol over lokal HTTP med statisk offlinekontrol; særskilt direkte filkontrol følger [agentarbejdsgangen](AGENT-WORKFLOW.md#kontrollér-den-berørte-funktion). Ældre projekter uden byggestempel får en advarsel om, at buildets aktualitet ikke kan fastslås. Sync opdaterer fælles filer, men indsætter ikke scripts i eksisterende package.json eller erstatter produktets buildopsætning.
 
 ## Fælles projektfiler
 
@@ -116,9 +116,34 @@ Alternativt: `const frame = createLayout('form')` fra design/runtime/components.
 
 Tilpas kun den konkrete ramme, eksempelvis `.my-form { --ds-layout-max-width: 50rem; }` i produktets stylesheet efter design.css. En indlejret ds-layout starter igen med sin egen profilgrænse. Produktet kan vælge fluid eller opbygge egne kolonner uden at ændre temaet eller biblioteket. Format 1 beholder sin eksisterende CSS og får ikke profilerne automatisk.
 
+## Skyder med præcis talindtastning
+
+Brug `range-field` med `variant: 'with-input'` til parametre, som både skal kunne justeres hurtigt og indtastes præcist. Variantens native skyder og talfelt deler label, hjælp og fejl; værdien gentages ikke ved siden af feltet. `default` bevarer skyderen med et separat output.
+
+```js
+import {createComponent, mountRangeField} from './design/runtime/components.mjs';
+const field = createComponent(theme, 'range-field', {
+  variant: 'with-input', idPrefix: 'spacing', label: 'Gentagelse',
+  value: 24, min: 8, max: 48, step: 1, hint: 'Afstand mellem båndene i px.',
+});
+host.append(field);
+const controller = mountRangeField(field, {
+  onInput: ({value, valid}) => { if (valid) updatePreview(value); },
+  onCommit: ({value}) => commitGesture(value),
+});
+```
+
+`onInput` og `onCommit` modtager `{value, draft, valid, error, source}`; `source` er `range` eller `number`. Gyldigt input opdaterer straks den anden kontrol. Ugyldige eller tomme kladder bevares, mens skyderen og prøven kan beholde seneste gyldige værdi. Commit samler gyldig afslutning ved change/blur uden dobbelt kald. Produktet ejer validering på tværs af felter, historik og lagring.
+
+Controlleren har `getState()`, tavs `update({value, draft, error, disabled, readOnly})` og `destroy()`. Montér én controller pr. felt, og kald `destroy()` ved afmontering. Bevar kontroller og fokus ved live opdatering af prøven.
+
+Talfeltet bruger centrerede cifre med fast cifferbredde og symmetrisk indvendig luft. Bredden beregnes fra min/max og decimalpræcisionen i grænser og step, med plads til fortegn. Den er stabil under redigering, har en kompakt minimumsbredde og reserverer højst 12 tegn; `step: 'any'` reserverer mindst seks. Meget lange værdier kan redigeres i feltet uden at udvide panelet. De native op/ned-pile skjules kun i denne kombination; piletaster og talfeltets semantik bevares. Almindelige `number-input` beholder deres betjening.
+
 ## Valgfrie sammensætningseksempler
 
-Offline-editorens Designsystem → Designmønstre og web-showcasen viser samme ni eksempler: objekteditor med kontekstpanel, formular med validering, liste med detaljevisning, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. De bruger bibliotekets eksisterende roller og det valgte tema. Kilde, version, formål, komponenter og interaktioner findes i patterns/catalog.mjs; implementering og layout findes i patterns/compositions.mjs, de enkelte mønstermoduler og patterns/styles.css. PATTERN_FILES i kataloget er den fælles liste til referenceeksport og showcase.
+Før referencekode udledes af eller indføres i et eksisterende produkt, læses de relevante dele af [produktbaserede mønstre og skånsom opdatering](PRODUCT-PATTERNS.md). Vejledningen beskriver referenceforløb fra de fire aktuelle produkter, herunder FormLabs Materialegenerator og Detaljeværksted, og grænserne for en gradvis overgang.
+
+Offline-editorens Designsystem → Designmønstre og web-showcasen viser samme elleve eksempler: objekteditor med kontekstpanel, parametrisk værksted, opskriftseditor med lag, formular med validering, liste med detaljevisning, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. De bruger bibliotekets eksisterende roller og det valgte tema. Kilde, version, formål, komponenter og interaktioner findes i patterns/catalog.mjs; implementering og layout findes i patterns/compositions.mjs, de enkelte mønstermoduler og patterns/styles.css. PATTERN_FILES i kataloget er den fælles liste til referenceeksport og showcase.
 
 Katalogets layoutprofil vælger en af bibliotekets fælles breddeprofiler. Profilerne vælges efter indholdets rolle og kan tilpasses i produktet. Objektkort og handlinger strækkes ikke med en bredere arbejdsflade. Se [retningslinjerne for indholdsbredde](DESIGN-FOUNDATIONS.md#indholdsbredde-og-fuld-bredde).
 
@@ -533,7 +558,7 @@ Træet ejer sin indrykning, rækkeanatomi og fokus. Brug eksisterende `scroll-ar
 
 Temaet indeholder tokens, brandguide, historik og eventuelt appearance. Det indeholder ikke komponentdefinitioner. Brug bibliotekets positive semantiske spacingtokens til tæthed. appearance kan ændre godkendte visuelle egenskaber, men ikke padding, gap eller struktur.
 
-Redigér temaet ved at åbne Design Studios `index.html` i browseren og vælge **Åbn tema**. **Gem tema** henter den redigerede JSON-fil; placér den som produktets `design/design.json`, før `node tools/cli.mjs sync PROJECT_DIR` køres fra Design Studios mappe. Editorens download ændrer ikke automatisk produktets tema, CSS eller runtime.
+Brugeren kan redigere temaet ved at åbne Design Studios `index.html` direkte i browseren og vælge **Åbn tema**. Agentens browseradgang følger HTTP-kontrolvejen i [agentarbejdsgangen](AGENT-WORKFLOW.md#kontrollér-den-berørte-funktion). **Gem tema** henter den redigerede JSON-fil; placér den som produktets `design/design.json`, før `node tools/cli.mjs sync PROJECT_DIR` køres fra Design Studios mappe. Editorens download ændrer ikke automatisk produktets tema, CSS eller runtime.
 
 Produktets sidelayout kan bruge CSS-variabler som --ds-space-6 og --ds-color-background-canvas. Token-id'ers punktummer bliver bindestreger; store bogstaver bevares. Biblioteket ejer komponenternes interne layout.
 

@@ -36,6 +36,12 @@ function scene(motif,prefix,parts,extraDefs=''){
 }
 
 const scenes={
+  'list-item':p=>[
+    part('collection','Samlingens rum','En samlet niche holder tre poster på samme lodrette akse.',ledge(p,121,58,358,304,10),'rise'),
+    part('neighbors','Øvrige poster','Naboposter har hver sin titel og en tilbagetrukket beskrivelse.',stroke('M153 102h195M153 129h240M153 289h183M153 316h220','edge',2.5)+stroke('M140 152h320M140 268h320','edge',1),'draw'),
+    part('current','Aktuel post','En farvet indlægning og lys kant fremhæver præcis én post.',well(137,169,326,79,5)+box(144,176,312,65,'subject',3)+stroke('M145 177v62','light',3),'light','300 210'),
+    part('content','Titel og beskrivelse','To linjer med forskellig vægt holder navn og forklaring sammen.',stroke('M163 196h223','light',3.5)+stroke('M163 222h180','light',1.7),'draw')
+  ],
   combobox:p=>[
     part('entry','Søgefelt','Skrivning afgrænser de synlige muligheder.',ledge(p,118,70,364,70)+stroke('M144 102h132','ink',3)+stroke('M282 90v25','subject',2)+chevron(451,104),'rise'),
     part('choices','Filtrerede muligheder','En udtrukket niche viser en kort liste, ikke en ny side.',ledge(p,126,156,348,184)+lines(161,194,[210,183,220],54),'rise'),

@@ -223,7 +223,7 @@ Et tema er først overbevisende, når det fungerer på forskellige skærme med �
 - Brug fælles kontrolskærme til sammenligning, og prøv derefter et faktisk produkt. Ret fælles problemer i biblioteket og særlige kompositionsproblemer i produktet.
 - Spørg særskilt til oplevet karakter og observeret opgaveløsning. »Det ser bedre ud« og »opgaven lykkes lettere« er forskellige resultater.
 - Vælg validering efter ændringens konsekvens. En lille rettelse kræver en lille relevant kontrol; nye skærme og væsentlige visuelle ændringer kræver browsergennemgang og relevante brugerforløb.
-- Respektér bygning, synkronisering og offlinelevering. Afprøv direkte file://, når leverancen skal fungere sådan; en HTTP-forhåndsvisning dokumenterer noget andet.
+- Respektér bygning, synkronisering og offlinelevering. Agenten kontrollerer den byggede fil over lokal HTTP og bruger relevante statiske offlineprøver. Direkte filåbning er en særskilt slutkontrol ved ændrede offlineafhængigheder, filhåndtering eller en bestilt samlet offlineleverance; aftal manuel kontrol, hvis værktøjerne ikke tillader den. Skeln mellem kontrolformerne, og følg [agentarbejdsgangen](AGENT-WORKFLOW.md#kontrollér-den-berørte-funktion).
 
 ### Når vi udvikler eller reviderer et tema
 

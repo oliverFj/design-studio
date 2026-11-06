@@ -29,6 +29,13 @@ function scene(label, groups, definitions = '') {
 }
 
 const drawings = {
+  'list-item': () => scene('Tre vandrette poster danner en samlet rækkefølge. Den midterste har en tydelig materialekant, mens navn og beskrivelse forbliver samlet.', [
+    back(R(136, 84, 340, 270, 'context')),
+    g('collection', 'Samlingens poster', 'Tre selvstændige flader følger den samme faste rytme.', R(120, 72, 340, 78, 'plane') + R(120, 270, 340, 78, 'plane') + L('M120 150H460M120 348H460', 'edge', 1)),
+    g('current', 'Aktuel post', 'En forskudt farvet flade og en mørk forkant udpeger præcis én post.', R(120, 181, 350, 78, 'ink') + R(120, 171, 350, 78, 'subject') + R(120, 171, 9, 78, 'counter'), { x: 12, y: -8, depth: [2, 1.2] }),
+    textPart(L('M148 99h205M148 126h255M148 297h182M148 324h232', 'ink', 2) + L('M148 195h226', 'ground', 4) + L('M148 225h188', 'ground', 2), 'Titler og beskrivelser', 'Hver post har en bærende titel og en kortere supplerende linje.'),
+    guide(sideMeasure(97, 72, 348))
+  ]),
   button: () => scene('En solid trykflade med centreret label og synlig materialekant. En kontaktmarkør viser, hvor handlingen udløses.', [
     back(R(164, 171, 280, 96, 'context') + R(150, 161, 280, 96, 'ink')),
     g('cap', 'Trykflade', 'En samlet fysisk flade gør handlingens udløser tydelig.', R(150, 145, 280, 96, 'subject') + L('M150 241H430', 'ink', 2), { y: -14, depth: [.7, .4] }),

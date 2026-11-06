@@ -11,7 +11,7 @@ const componentIcon=id=>renderIcon(componentIcons[id]??'components');
 export const CATALOG_CATEGORIES=[
  ['actions','Handlinger',['signature','button','action-button','toolbar','link','menu','menubar','menu-item']],
  ['forms','Formularer',['input','textarea','number-input','field','field-group','select','checkbox','radio','switch','choice-field','segmented-option','segmented-control','range-field','combobox','multiselect','date-picker','time-picker','file-upload','label']],
- ['navigation','Navigation',['navigation','tabs','breadcrumb','pagination','tree']],
+ ['navigation','Navigation',['navigation','list-item','tabs','breadcrumb','pagination','tree']],
  ['feedback','Feedback',['alert','toast','spinner','progress','skeleton','empty-state','badge','instruction-note','tooltip']],
  ['content','Indhold',['heading','text','image','caption','avatar','avatar-group','tag','metric-row','brand-mark','data-table','data-grid']],
  ['layout','Layout og paneler',['card','stack','divider','scroll-area','accordion','inspector','dialog','drawer','popover']],

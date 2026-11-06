@@ -9,7 +9,7 @@ import {dom,fire} from './support/dom.mjs';
 
 const theme=id=>JSON.parse(readFileSync(new URL('../packages/'+id+'.json',import.meta.url),'utf8'));
 
-test('the same five catalog patterns are representative quality samples in every theme',async()=>{
+test('catalog patterns are representative quality samples in every theme',async()=>{
  assert.ok(PATTERN_FILES.includes('quality.mjs'),'project exports carry the same composition checks');
  for(const id of PUBLIC_THEME_IDS){
   const pack=theme(id),original=JSON.stringify(pack),document=dom(),progress=[];

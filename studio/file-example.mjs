@@ -1,7 +1,8 @@
 import {createComponentRenderer,mountFileUpload} from '../core/components.mjs';
 
 export function renderFileExample(pack,idPrefix='file-example',render=createComponentRenderer(pack),variant='drop'){
- return '<div data-file-example>'+render('file-upload',{idPrefix,variant,label:'Vælg lokale tekstfiler',hint:'Vælg op til tre .txt- eller .json-filer på højst 1 MB hver. Du kan også slippe dem på fladen.',accept:'.txt,.json',multiple:true,maxSize:1048576,maxFiles:3,drop:true})+render('button',{text:'Ryd filvalget',variant:'tertiary',disabled:true,attrs:{'data-file-clear':''}})+'</div>';
+ const drop=variant==='drop';
+ return '<div data-file-example>'+render('file-upload',{idPrefix,variant,label:'Vælg lokale tekstfiler',hint:'Vælg op til tre .txt- eller .json-filer på højst 1 MB hver.'+(drop?' Du kan også slippe dem på fladen.':''),accept:'.txt,.json',multiple:true,maxSize:1048576,maxFiles:3,drop})+render('button',{text:'Ryd filvalget',variant:'tertiary',disabled:true,attrs:{'data-file-clear':''}})+'</div>';
 }
 
 export function bindFileExamples(root){

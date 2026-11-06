@@ -1,7 +1,7 @@
 /** Project-agnostic component anatomy and semantic defaults. Visual themes own appearance. */
 import {DEFAULT_SCALE_TOKENS,TOKEN_NAME_ALIASES} from './scales.mjs';
 import {GRAPHIC_TOKEN_DEFAULTS} from './graphic-tokens.mjs';
-export const LIBRARY_VERSION='3.7.0';
+export const LIBRARY_VERSION='3.9.1';
 export { LAYOUT_PROFILES } from './layout.mjs';
 function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
 // Keep one-line desktop controls at 32px without clipping larger type or wrapped labels.
@@ -1856,6 +1856,47 @@ export const COMPONENT_LIBRARY=freeze({
         }
       ]
     }
+  },
+  "list-item": {
+    name: 'Listepost',
+    description: 'En sammenhængende klikbar række med titel, beskrivelse og valgfri grafik eller metadata.',
+    usage: 'Brug i en native ul/ol til at åbne en posts detaljer. Uden href er rækken en native knap; href giver et native link. current markerer den aktuelle post med aria-current, adskilt fra tastaturfokus. Brug ikke aria-selected eller toggle-semantik til dette valg. Produktet ejer valg, filtrering og fokus. leading og trailing indeholder kun ikke-interaktivt indhold; selvstændige rækkehandlinger placeres uden for rækkens knap/link. compact er til tætte desktoplister.',
+    composes: [],
+    parts: {
+      root: { selector: '.ds-list-item', styles: {
+        display: 'flex', alignItems: 'center', gap: '{space.component.gapLarge}', width: '100%', minWidth: '0', maxWidth: '100%', minHeight: '44px', boxSizing: 'border-box',
+        padding: '{space.component.padding}', border: '{border.width.default} solid transparent', borderLeftWidth: '3px', borderRadius: '{radius.control}',
+        backgroundColor: '{color.background.surface}', color: '{color.text.primary}', fontFamily: '{typography.font.body}', fontSize: '{typography.size.control}', lineHeight: '{typography.lineHeight.control}', textAlign: 'start', textDecoration: 'none', cursor: 'pointer',
+        transition: 'background-color {duration.fast}, color {duration.fast}, border-color {duration.fast}',
+        '--ds-interaction-hover-surface': '{color.action.neutral.hover.surface}', '--ds-interaction-hover-text': '{color.action.neutral.hover.text}',
+        '--ds-interaction-active-surface': '{color.action.neutral.active.surface}', '--ds-interaction-active-text': '{color.action.neutral.active.text}',
+      } },
+      leading: { selector: '.ds-list-item__leading', styles: { display: 'inline-flex', alignItems: 'center', flexShrink: '0', color: 'inherit' } },
+      content: { selector: '.ds-list-item__content', styles: { display: 'flex', flexDirection: 'column', gap: '{space.scale.1}', flex: '1 1 auto', minWidth: '0', overflowWrap: 'anywhere' } },
+      heading: { selector: '.ds-list-item__heading', styles: { display: 'block', fontWeight: '{typography.weight.strong}', color: 'inherit' } },
+      description: { selector: '.ds-list-item__description', styles: { display: 'block', fontSize: '{typography.size.small}', fontWeight: '{typography.weight.body}', lineHeight: '{typography.lineHeight.body}', color: '{color.text.secondary}' } },
+      trailing: { selector: '.ds-list-item__trailing', styles: { display: 'inline-flex', flexShrink: '0', alignItems: 'center', fontSize: '{typography.size.small}', color: 'inherit' } },
+    },
+    variants: {
+      default: { description: 'Rummelig række til samlinger og detaljevisning.', styles: {} },
+      compact: { description: 'Tæt desktoprække med mindst 32 px klikflade og plads til ombrudte titler.', styles: { minHeight: '32px', padding: '{space.component.paddingCompact} {space.component.padding}' } },
+    },
+    states: {
+      current: { description: 'Den aktuelle post, vist med farvepar og en indre kant; fokus har sin egen outline.', styles: {
+        backgroundColor: '{color.action.selected.rest.surface}', color: '{color.action.selected.rest.text}', borderLeftColor: 'currentColor',
+        '--ds-interaction-hover-surface': '{color.action.selected.hover.surface}', '--ds-interaction-hover-text': '{color.action.selected.hover.text}',
+        '--ds-interaction-active-surface': '{color.action.selected.active.surface}', '--ds-interaction-active-text': '{color.action.selected.active.text}',
+      }, parts: { description: { styles: { color: 'inherit' } } } },
+      hover: { description: 'Feedback under pegemarkøren, med bevaret markering af den aktuelle post.', styles: { backgroundColor: 'var(--ds-interaction-hover-surface)', color: 'var(--ds-interaction-hover-text)' }, parts: { description: { styles: { color: 'inherit' } } } },
+      active: { description: 'Rækken under aktivering.', styles: { backgroundColor: 'var(--ds-interaction-active-surface)', color: 'var(--ds-interaction-active-text)' }, parts: { description: { styles: { color: 'inherit' } } } },
+      focus: { description: 'Synligt tastaturfokus, uafhængigt af den aktuelle post.', styles: { outline: '{border.width.focus} solid {color.focus}', outlineOffset: '{border.offset.focus}' } },
+      disabled: { description: 'En utilgængelig knap eller et link uden destination; produktet forklarer årsagen.', styles: { backgroundColor: '{color.disabled.surface}', color: '{color.disabled.text}', borderLeftColor: 'transparent', cursor: 'not-allowed' }, parts: { description: { styles: { color: 'inherit' } } } },
+    },
+    preview: { tag: 'button', part: 'root', attrs: { type: 'button' }, children: [
+      { tag: 'span', part: 'leading', attrs: { 'aria-hidden': 'true' } },
+      { tag: 'span', part: 'content', children: [ { tag: 'span', part: 'heading', text: 'En post i samlingen' }, { tag: 'span', part: 'description', text: 'Supplerende oplysninger om posten.' } ] },
+      { tag: 'span', part: 'trailing' },
+    ] },
   },
   "input": {
     "name": "Tekstinput",
@@ -4052,8 +4093,8 @@ export const COMPONENT_LIBRARY=freeze({
   },
   "range-field": {
     "name": "Skyderfelt",
-    "description": "Label, native skyder, synlig værdi og kort hjælp.",
-    "usage": "Forbind label og hjælp med kontrollens ID. Produktet angiver min, max, step og eventuel enhed og håndterer ændringer.",
+    "description": "En native skyder med fælles label, hjælp og valgfri præcis talindtastning.",
+    "usage": "with-input parrer skyder og talfelt via mountRangeField. Angiv value, min, max og step. Bredden følger grænser og trin; ugyldige kladder bevares. Produktet ejer validering og lagring.",
     "composes": [],
     "parts": {
       "root": {
@@ -4081,6 +4122,8 @@ export const COMPONENT_LIBRARY=freeze({
           "lineHeight": "{typography.lineHeight.label}"
         }
       },
+      "row": {"selector":".ds-range-field__row","styles":{"display":"flex","alignItems":"center","gap":"{space.component.gap}","minWidth":"0"}},
+      "number": {"selector":".ds-range-field__number","styles":{...FORM_CONTROL,"width":"max(3.5rem, calc((var(--ds-range-number-chars, 3) + .75) * 1ch + 2 * {space.component.paddingCompact} + 2 * {border.width.default}))","maxWidth":"100%","flexShrink":"0","minHeight":"32px","padding":"calc({space.component.paddingCompact} / 3) {space.component.paddingCompact}","textAlign":"center","fontVariantNumeric":"tabular-nums","appearance":"textfield","fontSize":"{typography.size.small}","lineHeight":"{typography.lineHeight.control}"}},
       "value": {
         "selector": ".ds-range-field__value",
         "styles": {
@@ -4115,7 +4158,7 @@ export const COMPONENT_LIBRARY=freeze({
       },
       "error":{"selector":".ds-range-field__error","styles":{...FORM_HINT,color:'{color.status.dangerText}',display:'none'}}
     },
-    "variants": {"invalid":CHOICE_INVALID},
+    "variants": {"invalid":CHOICE_INVALID,"with-input":{"description":"Skyder og præcist talfelt på én række med fælles label og feedback.","styles":{},"parts":{"value":{"styles":{"display":"none"}}}}},
     "states": {
       "focus": {
         "description": "Synligt tastaturfokus.",
@@ -4126,14 +4169,17 @@ export const COMPONENT_LIBRARY=freeze({
               "outline": "{border.width.focus} solid {color.focus}",
               "outlineOffset": "{border.offset.focus}"
             }
-          }
+          },
+          "number":{"styles":{"outline":"{border.width.focus} solid {color.focus}","outlineOffset":"{border.offset.focus}"}}
         }
       },
       "disabled": {
         "description": "Native deaktiveret kontrol.",
         "styles": {},
-        "parts":{"control":{"styles":{"cursor":"not-allowed"}},"label":{"styles":{"color":"{color.disabled.text}"}}}
-      }
+        "parts":{"control":{"styles":{"cursor":"not-allowed"}},"number":{"styles":{"backgroundColor":"{color.disabled.surface}","color":"{color.disabled.text}","cursor":"not-allowed"}},"label":{"styles":{"color":"{color.disabled.text}"}}}
+      },
+      "invalid":{"description":"Fælles fejl med bevaret skyder-/talfeltanatomi.","styles":{},"parts":{"error":{"styles":{"display":"block"}},"number":{"styles":{"borderColor":"{color.status.danger}"}}}},
+      "readOnly":{"description":"Talfeltet kan fokuseres og kopieres; skyderen ændrer ikke værdien.","styles":{},"parts":{"number":{"styles":{"backgroundColor":"{color.background.subtle}"}}}}
     },
     "preview": {
       "tag": "div",
@@ -4152,17 +4198,10 @@ export const COMPONENT_LIBRARY=freeze({
             }
           ]
         },
-        {
-          "tag": "input",
-          "part": "control",
-          "attrs": {
-            "type": "range",
-            "value": "50",
-            "min": "0",
-            "max": "100",
-            "step": "1"
-          }
-        },
+        {"tag":"div","part":"row","children":[
+          {"tag":"input","part":"control","attrs":{"type":"range","value":"50","min":"0","max":"100","step":"1"}},
+          {"tag":"input","part":"number","attrs":{"type":"number","value":"50","min":"0","max":"100","step":"1","hidden":true}}
+        ]},
         {
           "tag": "p",
           "part": "hint",
@@ -5197,8 +5236,8 @@ export const canonicalPartId=(id,key)=>PART_ALIASES[canonicalComponentId(id)]?.[
  * kept beside the canonical roles so planned work never becomes fake previews
  * or a separate component library. Update this contract with new runtime roles.
  */
-const NATIVE_COMPONENTS=new Set(['signature','link','navigation','button','input','field','select','checkbox','dialog','tag','radio','switch','choice-field','toolbar','action-button','segmented-option','segmented-control','range-field','scroll-area','textarea','number-input','field-group','accordion','breadcrumb','pagination','date-picker','time-picker','progress']);
-const COMPONENT_CONTROLLERS={tree:'mountTree',menubar:'mountMenuControls',menu:'mountMenuControls','menu-item':'mountMenuControls',tabs:'mountTabs',tooltip:'mountTooltip',popover:'mountPopover',drawer:'mountDrawer',dialog:'mountDialog',combobox:'mountCombobox',multiselect:'mountMultiselect',toast:'mountToast','file-upload':'mountFileUpload','data-table':'mountDataTable','data-grid':'mountDataGrid'};
+const NATIVE_COMPONENTS=new Set(['signature','link','navigation','button','list-item','input','field','select','checkbox','dialog','tag','radio','switch','choice-field','toolbar','action-button','segmented-option','segmented-control','range-field','scroll-area','textarea','number-input','field-group','accordion','breadcrumb','pagination','date-picker','time-picker','progress']);
+const COMPONENT_CONTROLLERS={tree:'mountTree',menubar:'mountMenuControls',menu:'mountMenuControls','menu-item':'mountMenuControls',tabs:'mountTabs',tooltip:'mountTooltip',popover:'mountPopover',drawer:'mountDrawer',dialog:'mountDialog',combobox:'mountCombobox',multiselect:'mountMultiselect','range-field':'mountRangeField',toast:'mountToast','file-upload':'mountFileUpload','data-table':'mountDataTable','data-grid':'mountDataGrid'};
 const PLANNED_COMPONENTS={};
 export const COMPONENT_COVERAGE=freeze({
   ...Object.fromEntries(Object.entries(COMPONENT_LIBRARY).map(([id,component])=>[id,{
@@ -5210,6 +5249,7 @@ export const COMPONENT_COVERAGE=freeze({
       :id==='dialog'?'Browserens native dialog med valgfri fælles åbning, lukning og fokusretur. Produktet ejer handlinger og kladder.'
       :id==='toolbar'?'Gruppering af native knapper; produktet forbinder kommandoer. Ingen sammensat ARIA-toolbar-navigation.'
       :id==='segmented-control'?'Native valgknapper i en gruppe. Produktet opdaterer valget; rollen erstatter ikke tabs.'
+      :id==='range-field'?'Native skyder med valgfrit præcist talfelt og fælles synkronisering, talkladde, feedback og afslutning af et greb. Produktet ejer øvrig validering og lagring.'
       :id==='toast'?'Fælles annoncering, lukning og tidsbegrænsning med pause ved hover og fokus. Produktet ejer kø, placering og meningsfuldt fokus efter lukning.'
       :id==='file-upload'?'Fælles lokalt filvalg, metadatavalidering, fjernelse og valgfrit drop. Produktet ejer filindhold, upload og lagring.'
       :id==='data-table'?'Native tabel med fælles valg, ekspansion og sorteringsanmodninger. Produktet ejer data, rækkefølge, pagination og lagring.'
