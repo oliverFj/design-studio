@@ -19,35 +19,19 @@
 .patterns-panel { padding: clamp(.75rem, 2vw, 1.5rem); }
 .patterns-content { grid-template-columns: minmax(0, 1fr); }
 .patterns-content > .inspector { display: none; }
-.patterns-view .page-heading { align-items: end; padding-block: 1rem; gap: 1rem; }
-.patterns-view .page-heading > div:first-child { flex: 0 0 auto; }
-.patterns-view .page-heading .eyebrow, .patterns-view .page-heading .page-description { display: none; }
-.patterns-view .page-heading h1 { font-size: 1.1rem; line-height: 1.4; margin: 0; }
-.patterns-view .theme-options { flex: 1 1 30rem; margin: 0; justify-content: end; }
-.patterns-view .package-picker { flex: 1 1 10rem; max-inline-size: 16rem; }
-.composition-gallery-heading { display: flex; align-items: end; justify-content: space-between; gap: var(--ds-space-component-gapLarge); margin-block-end: 1rem; }
-.composition-gallery-heading > div:first-child { max-inline-size: 65ch; display: grid; gap: var(--ds-space-component-gap); }
-.composition-gallery-controls { display: flex; align-items: center; flex-shrink: 0; gap: var(--ds-space-component-gap); }
-.ds-composition-gallery .composition-gallery-controls .ds-button[data-size] { min-inline-size: 2.75rem; min-block-size: 2.75rem; }
 .composition-eyebrow { margin: 0; color: var(--ds-color-text-secondary); font: 600 .75rem/1.5 var(--ds-typography-font-body); letter-spacing: .08em; text-transform: uppercase; }
-.composition-gallery-count { margin: 0; flex-shrink: 0; color: var(--ds-color-text-secondary); font-size: var(--ds-typography-size-small); }
-.composition-gallery-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; align-items: start; }
-.composition-pattern-rail { min-inline-size: 0; }
-.composition-pattern-rail .ds-scroll-area__viewport { overflow-x: auto; overflow-y: hidden; }
-.composition-pattern-navigation { display: flex; gap: 2rem; inline-size: max-content; }
-.composition-pattern-group { display: grid; gap: var(--ds-space-component-gap); flex: none; }
-.composition-pattern-cards { display: flex; gap: 1rem; }
+.composition-gallery-layout { --composition-focus-space: max(var(--ds-space-component-paddingCompact, 6px), calc(max(3px, var(--ds-border-width-focus, 3px)) + max(2px, var(--ds-border-offset-focus, 3px)))); display: grid; grid-template-columns: calc(14rem + 2 * var(--composition-focus-space) + 1.5rem) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.composition-pattern-rail { min-inline-size: 0; overflow: auto; max-block-size: min(40rem, 50dvh); overscroll-behavior: contain; scrollbar-gutter: stable; }
+.composition-pattern-navigation { display: grid; gap: 1.5rem; min-inline-size: 0; }
+.composition-pattern-group { min-inline-size: 0; display: grid; gap: var(--ds-space-component-gap); flex: none; }
+.composition-pattern-cards { min-inline-size: 0; display: grid; gap: .5rem; }
 .ds-composition-gallery .composition-pattern-navigation .composition-pattern-link.ds-button { display: flex; flex-direction: column; justify-content: start; align-items: stretch; gap: .75rem; inline-size: 14rem; block-size: auto; min-block-size: 14.5rem; padding: .75rem; border: var(--ds-border-width-default) solid var(--ds-color-border-default); border-radius: var(--ds-radius-card); background: var(--ds-color-background-surface); color: var(--ds-color-text-primary); white-space: normal; text-align: center; font-size: .875rem; line-height: 1.4; }
-.composition-pattern-label { display: flex; align-items: center; justify-content: center; flex: 1; min-block-size: 2.8em; text-align: center; }
-.composition-pattern-navigation .composition-pattern-link.ds-button:hover { background: var(--ds-color-action-neutral-hover-surface); color: var(--ds-color-action-neutral-hover-text); }
-.composition-pattern-navigation .composition-pattern-link.ds-button:active { background: var(--ds-color-action-neutral-active-surface); color: var(--ds-color-action-neutral-active-text); }
-.composition-pattern-navigation .composition-pattern-link.ds-button[aria-current="true"] { color: var(--ds-color-action-selected-rest-text); background: var(--ds-color-action-selected-rest-surface); border-color: currentColor; box-shadow: inset 0 -3px currentColor; }
+.composition-pattern-label { display: flex; align-items: center; justify-content: center; flex: 1; min-inline-size: 0; min-block-size: 2.8em; text-align: center; overflow-wrap: anywhere; }
 .composition-pattern-thumbnail { display: block; flex: none; inline-size: 100%; block-size: 9.625rem; overflow: hidden; isolation: isolate; border: 1px solid var(--ds-color-illustration-edge); border-radius: max(0px, calc(var(--ds-radius-card) - 4px)); background: var(--ds-color-illustration-ground); pointer-events: none; }
 .composition-pattern-thumbnail > svg { display: block; inline-size: 100%; block-size: 100%; }
 @media (forced-colors: active) {
   .composition-pattern-thumbnail { border-color: CanvasText; }
   .composition-pattern-thumbnail > svg { forced-color-adjust: none; }
-  .composition-pattern-navigation .composition-pattern-link.ds-button[aria-current="true"] { outline: 2px solid Highlight; outline-offset: -3px; }
 }
 .composition-pattern-content { min-inline-size: 0; }
 .composition-pattern-intro { display: flex; align-items: start; justify-content: space-between; gap: var(--ds-space-component-gapLarge); margin-block-end: 1.5rem; }
@@ -72,7 +56,7 @@
 .composition-component-tags code { padding: .2rem .5rem; background: var(--ds-color-background-canvas); border: var(--ds-border-width-default) solid var(--ds-color-border-default); border-radius: var(--ds-radius-control); font-size: .8rem; }
 .composition-source-files { margin: 0; overflow-wrap: anywhere; color: var(--ds-color-text-secondary); font-size: var(--ds-typography-size-small); }
 @container (max-width: 650px) {
-  .composition-gallery-heading, .composition-pattern-intro { flex-direction: column; align-items: start; }
+  .composition-pattern-intro { flex-direction: column; align-items: start; }
   .composition-pattern-guide { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
   .composition-preview-bar > :last-child { display: none; }
 }
@@ -163,3 +147,23 @@
 .composition-form-settings { min-inline-size: 0; max-inline-size: 100%; margin: 0; }
 .composition-form-fields { max-inline-size: 32rem; }
 .composition-form-action-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-component-gap); }
+
+/* Preview selectors use the common ghost button for all interaction states. */
+.ds-scope .ds-preview-choice.ds-button[data-variant]{background:var(--ds-color-background-surface);color:var(--ds-color-text-primary);border:var(--ds-border-width-default) solid var(--ds-color-border-default);border-radius:var(--ds-radius-card)}
+.ds-scope .ds-preview-choice.ds-button:is([aria-current="true"],[data-state~="current"]){border-color:currentColor;box-shadow:inset 0 -3px currentColor}
+@media(forced-colors:active){.ds-scope .ds-preview-choice.ds-button:is([aria-current="true"],[data-state~="current"]){outline:2px solid Highlight;outline-offset:-3px}}
+
+@container (max-width: 700px) {
+  .composition-gallery-layout { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .composition-pattern-rail { max-block-size: 20rem; }
+}
+
+/* Stade mounts the menu and preview directly in the shared panel layout. */
+#app .studio-main.patterns-view { container: studio-pattern-view / inline-size; }
+.patterns-view .studio-pattern-workspace.ds-panel-layout[data-panel-open="false"] { grid-template-columns: max-content minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); align-items: stretch; gap: 0; }
+.patterns-view .studio-pattern-workspace > .composition-pattern-rail { position: static; max-block-size: none; }
+.patterns-view .studio-pattern-workspace > .composition-pattern-content { min-block-size: 0; }
+@container studio-pattern-view (max-width: 700px) {
+  .patterns-view .studio-pattern-workspace.ds-panel-layout[data-panel-open="false"] { grid-template-columns: minmax(0, 1fr); }
+  .patterns-view .studio-pattern-workspace > .composition-pattern-rail { max-block-size: 20rem; }
+}

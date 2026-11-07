@@ -1,7 +1,7 @@
 const focusAttributes = ['id', 'data-view', 'data-token', 'data-component', 'data-mode', 'data-action'];
 const position = node => ({ top: node.scrollTop || 0, left: node.scrollLeft || 0 });
 const scroll = (node, value = { top: 0, left: 0 }) => { if (node) { node.scrollTop = value.top; node.scrollLeft = value.left; } };
-const primary = root => root.querySelector('.ds-panel-content') ?? root.querySelector('.ds-app-content');
+const primary = root => root.querySelector('[data-panel-primary]') ?? root.querySelector('.ds-panel-content') ?? root.querySelector('.ds-app-content');
 const compactLayout = root => {
   const layout = root.querySelector('.ds-panel-layout');
   return layout?.getAttribute('data-panel-compact') === 'true' ? layout : null;

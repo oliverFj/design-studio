@@ -1,4 +1,4 @@
-import { createComponentFactory, createLayout, createIcon } from '../core/components.mjs';
+import { createComponentFactory, createLayout, animateStandard } from '../core/components.mjs';
 import { COMPOSITIONS, COMPOSITION_KINDS } from './catalog.mjs';
 import { LAYOUT_PROFILES } from '../core/layout.mjs';
 import { mountComposition, createCompositionState } from './compositions.mjs';
@@ -20,27 +20,12 @@ export function mountCompositionGallery(theme, {
   const prefix = String(idPrefix).replace(/[^a-zA-Z0-9_-]/g, '-');
   if (!COMPOSITIONS[state.selected]) state.selected = 'editor';
   state.drafts ||= {};
-  const root = createLayout('fluid', { document }); root.className += ' ds-composition-gallery ds-scope';
-  const header = el('header', 'composition-gallery-heading');
-  const title = el('div');
-  title.append(el('p', 'composition-eyebrow', 'Fra opgave til oplevelse'),
-    c('heading', { variant: 'title', slots: { root: { tag: 'h2', text: 'Mønstre til rigtigt arbejde' } } }),
-    c('text', { text: 'Sammenhængende forløb med fælles komponenter. Vælg et mønster, og prøv det i dit tema.' }));
-  const controls = el('div', 'composition-gallery-controls');
-  controls.append(el('p', 'composition-gallery-count', Object.keys(COMPOSITIONS).length + ' interaktive eksempler'));
-  header.append(title, controls);
-  const layout = el('div', 'composition-gallery-layout');
-  const rail = c('scroll-area', { variant: 'body', slots: { content: '' } });
-  rail.className += ' composition-pattern-rail';
-  const viewport = rail.querySelector('.ds-scroll-area__viewport');
+  const root = createLayout('fluid', { document }); root.className += ' ds-composition-gallery composition-gallery-layout ds-scope';
+  const rail = el('aside', 'composition-pattern-rail');
+  const viewport = rail;
+  viewport.setAttribute('tabindex', '0');
   viewport.setAttribute('id', prefix + '-rail');
-  viewport.setAttribute('aria-label', 'Gennemse designmønstre vandret');
-  for (const [direction, icon, label] of [[-1, 'arrow-left', 'Rul mod venstre'], [1, 'arrow-right', 'Rul mod højre']]) {
-    const button = c('button', { variant: 'secondary', size: 'small', attrs: { 'aria-label': label, 'aria-controls': prefix + '-rail', 'data-pattern-scroll': String(direction) } });
-    button.replaceChildren(createIcon(icon, { decorative: true }, { document }));
-    button.addEventListener('click', () => viewport.scrollBy?.({ left: direction * Math.max(240, viewport.clientWidth * .8), behavior: 'instant' }));
-    controls.append(button);
-  }
+  viewport.setAttribute('aria-label', 'Gennemse designmønstre');
   const navigation = el('nav', 'composition-pattern-navigation'); navigation.setAttribute('aria-label', 'Designmønstre');
   const navButtons = new Map();
   for (const [kind, group] of Object.entries(COMPOSITION_KINDS).reverse()) {
@@ -49,7 +34,7 @@ export function mountCompositionGallery(theme, {
     const cards = el('div', 'composition-pattern-cards');
     for (const [id, item] of Object.entries(COMPOSITIONS).filter(([, item]) => item.kind === kind)) {
       const button = c('button', { text: item.name, variant: 'ghost', size: 'small', attrs: { 'data-pattern-nav': id } });
-      button.className += ' composition-pattern-link';
+      button.className += ' composition-pattern-link ds-preview-choice';
       const drawing = el('span', 'composition-pattern-thumbnail'); drawing.setAttribute('aria-hidden', 'true');
       drawing.append(illustrate(id));
       button.replaceChildren(drawing, el('span', 'composition-pattern-label', item.name));
@@ -59,11 +44,14 @@ export function mountCompositionGallery(theme, {
     section.append(cards);
     navigation.append(section);
   }
-  rail.querySelector('.ds-scroll-area__content').append(navigation);
+  rail.append(navigation);
   const content = el('article', 'composition-pattern-content');
-  layout.append(rail, content); root.append(header, layout);
+  root.append(rail, content);
   let mounted;
+  const transitions=new Set();
+  function stopTransition(){for(const effect of transitions)effect.cancel();transitions.clear();}
   function render() {
+    stopTransition();
     mounted?.destroy();
     const id = state.selected, item = COMPOSITIONS[id];
     for (const [key, button] of navButtons) {
@@ -123,16 +111,21 @@ export function mountCompositionGallery(theme, {
   function choose(id, origin) {
     if (!COMPOSITIONS[id] || state.selected === id) return;
     state.selected = id; render();
+    content.scrollTop = 0;
+    for(const child of content.children){
+      const effect=animateStandard(child,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0)'}]);
+      if(effect){transitions.add(effect);effect.finished.catch(()=>{}).finally(()=>transitions.delete(effect));}
+    }
     if (origin === 'related') {
-      const title = content.querySelector('#' + prefix + '-active-title'); title.setAttribute('tabindex', '-1'); title.focus();
+      const title = content.querySelector('#' + prefix + '-active-title'); title.setAttribute('tabindex', '-1'); title.focus({ preventScroll: true });
     }
     if (origin === 'related') {
       const card = navButtons.get(id).getBoundingClientRect(), frame = viewport.getBoundingClientRect();
-      const left = card.left < frame.left ? card.left - frame.left : card.right > frame.right ? card.right - frame.right : 0;
-      if (left) viewport.scrollBy?.({ left, behavior: 'instant' });
+      const top = card.top < frame.top ? card.top - frame.top : card.bottom > frame.bottom ? card.bottom - frame.bottom : 0;
+      if (top) viewport.scrollBy?.({ top, behavior: 'instant' });
     }
     announce(COMPOSITIONS[id].name + ' vises.');
   }
   render();
-  return { element: root, state, destroy() { mounted?.destroy(); root.remove(); } };
+  return { element: root, rail, content, state, destroy() { stopTransition(); mounted?.destroy(); root.remove(); } };
 }

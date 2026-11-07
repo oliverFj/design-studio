@@ -52,16 +52,16 @@ test('all pattern illustrations follow their family and isolate SVG definitions 
   }
 });
 
-test('horizontal cards and current preview agree without losing drafts, focus or the browsing position', () => {
+test('vertical choices and current preview agree without losing drafts, focus or the browsing position', () => {
   const document = dom(), state = createGalleryState();
   const mounted = mountCompositionGallery(theme, { document, state }); document.body.append(mounted.element);
-  const root = mounted.element, viewport = root.querySelector('.ds-scroll-area__viewport');
-  viewport.scrollLeft = 360;
+  const root = mounted.element, viewport = root.querySelector('.composition-pattern-rail');
+  viewport.scrollTop = 360;
   assert.equal(root.querySelectorAll('[data-pattern-nav]').length, Object.keys(COMPOSITIONS).length);
   const form = root.querySelector('[data-pattern-nav="form"]'); form.focus(); fire(form, 'click');
   assert.equal(document.activeElement, form);
   assert.equal(form.getAttribute('aria-current'), 'true');
-  assert.equal(viewport.scrollLeft, 360);
+  assert.equal(viewport.scrollTop, 360);
   const name = root.querySelector('#patterns-form-name-control'); name.value = 'Bevar dette'; fire(name, 'input');
   fire(root.querySelector('[data-pattern-nav="editor"]'), 'click');
   fire(root.querySelector('[data-action="reset-pattern"]'), 'click');
@@ -72,17 +72,20 @@ test('horizontal cards and current preview agree without losing drafts, focus or
   mounted.destroy();
 });
 
-test('rail controls move the shared viewport horizontally without changing the selected pattern', () => {
+test('related patterns reveal the selected item vertically in the shared viewport', () => {
   const document = dom(), state = createGalleryState();
   const mounted = mountCompositionGallery(theme, { document, state });
-  const viewport = mounted.element.querySelector('.ds-scroll-area__viewport'), moves = [];
-  viewport.clientWidth = 600;
+  const root = mounted.element, viewport = root.querySelector('.composition-pattern-rail'), moves = [];
+  const related = root.querySelector('[data-pattern]'), id = related.getAttribute('data-pattern');
+  viewport.getBoundingClientRect = () => ({ top: 10, bottom: 210 });
+  root.querySelector('[data-pattern-nav="'+id+'"]').getBoundingClientRect = () => ({ top: 310, bottom: 390 });
   viewport.scrollBy = options => moves.push(options);
-  fire(mounted.element.querySelector('[data-pattern-scroll="1"]'), 'click');
-  fire(mounted.element.querySelector('[data-pattern-scroll="-1"]'), 'click');
-  assert.deepEqual(moves, [{ left: 480, behavior: 'instant' }, { left: -480, behavior: 'instant' }]);
-  assert.equal(state.selected, 'editor');
+  fire(related, 'click');
+  assert.deepEqual(moves, [{ top: 180, behavior: 'instant' }]);
+  assert.equal(state.selected, id);
   assert.equal(viewport.getAttribute('tabindex'), '0');
+  assert.equal(root.querySelector('.composition-gallery-heading'), null);
+  assert.equal(root.querySelector('[data-pattern-scroll]'), null);
   mounted.destroy();
 });
 
@@ -95,4 +98,31 @@ test('catalog recovers an unknown selection and gives references a readable stru
   assert.ok(mounted.element.querySelector('.composition-component-tags'));
   assert.equal(mounted.element.querySelectorAll('pre').length, 1, 'only the optional integration code uses a code block');
   mounted.destroy();
+});
+
+test('pattern switches animate immediately and cancel superseded transitions', () => {
+  const document=dom(), create=document.createElement, effects=[];
+  document.createElement=tag=>{
+    const node=create(tag);
+    node.animate=(frames,options)=>{
+      const effect={frames,options,cancelled:false,finished:new Promise(()=>{}),cancel(){this.cancelled=true;}};
+      effects.push(effect);return effect;
+    };
+    return node;
+  };
+  const state=createGalleryState(), mounted=mountCompositionGallery(theme,{document,state});
+  assert.equal(effects.length,0,'initial mounting stays still');
+  mounted.content.scrollTop=420;mounted.rail.scrollTop=300;
+  fire(mounted.element.querySelector('[data-pattern-nav="form"]'),'click');
+  assert.equal(state.selected,'form');
+  assert.equal(mounted.content.scrollTop,0);
+  assert.equal(mounted.rail.scrollTop,300);
+  const first=[...effects];
+  assert.equal(first.length,4);
+  assert.ok(first.every(effect=>effect.options.duration===240));
+  fire(mounted.element.querySelector('[data-pattern-nav="editor"]'),'click');
+  assert.equal(state.selected,'editor');
+  assert.ok(first.every(effect=>effect.cancelled));
+  mounted.destroy();
+  assert.ok(effects.every(effect=>effect.cancelled));
 });

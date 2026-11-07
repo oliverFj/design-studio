@@ -1,3 +1,4 @@
+import {renderStadeBrand, STADE_TAGLINE} from './identity.mjs';
 import { renderPrinciples, bindPrinciples } from './principles.mjs';
 import { createBrandStudio } from './brand.mjs';
 import {createGraphicsState,chooseInitialGraphicFamily,graphicPreviewTheme,renderGraphicsView,bindGraphicsView} from './graphics.mjs';
@@ -212,9 +213,9 @@ function render() {
   }
   cssPreview();
   const wideView=['principles','patterns','motion','graphics'].includes(state.view);
-  document.title=state.view==='principles'?'Principper · Design Studio':state.view==='graphics'?'Grafik · Design Studio':'Design Studio · Komponenter og temaer';
+  document.title=state.view==='principles'?'Principper · Stade':state.view==='graphics'?'Grafik · Stade':'Stade · '+STADE_TAGLINE;
   const themeActions=showcase?'<a class="studio-button quiet" href="../#project-studio">Om projektet</a>':'<button type="button" class="studio-button" id="import">Åbn tema</button><button type="button" class="studio-button primary" id="save">Gem tema</button><input type="file" id="import-file" accept=".json,application/json" hidden>';
-  root.innerHTML='<a class="studio-skip" href="#studio-content">Gå til indhold</a><div class="shell ds-app-shell"><aside data-scrollbar-surface="inverse" class="sidebar ds-app-navigation" tabindex="0" aria-label="Designsystemets navigation"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Design Studio</div><div><div class="side-label">Designsystem</div><nav class="navigation" aria-label="Design Studio">'+[['principles','Principper'],['brand','Brandguide'],['components','Komponenter'],['patterns','Designmønstre'],['graphics','Grafik'],['motion','Animation og effekter'],['tokens','Tokens'],['quality','Kvalitet'],['package','Temaet']].map(([view,name])=>'<button type="button" class="nav-item '+(state.view===view?'active':'')+'" data-view="'+view+'" '+(state.view===view?'aria-current="page"':'')+'>'+icon(view)+name+'</button>').join('')+'</nav></div><div class="side-footer">'+renderComponent(previewTheme(),'signature',{identity:'fjordside',variant:'compact'})+'</div></aside><div class="workspace ds-app-workspace"><header class="topbar ds-app-header"><div class="breadcrumb">Design Studio <span>/</span><strong>'+(state.view==='principles'?'Principper':state.view==='motion'?'Animation og effekter':state.view==='graphics'?'Grafik':state.view==='patterns'?'Designmønstre':state.view==='quality'?'Kvalitet':'Temaer')+'</strong></div><div class="actions"><button type="button" class="studio-button quiet" id="toggle-inspector" aria-controls="studio-inspector"'+(wideView?' hidden':'')+'>'+(inspectorPanel.open?'Skjul egenskaber':'Vis egenskaber')+'</button><button type="button" class="studio-button quiet" id="discard" hidden>Nulstil ændringer</button>'+themeActions+'</div></header><main id="studio-main" class="ds-app-content studio-main'+(state.view==='principles'?' principles-view':state.view==='patterns'?' patterns-view':'')+'" tabindex="-1" aria-label="Design Studio – indhold"><div class="page-heading"><div><p class="eyebrow">'+(state.view==='principles'?'Designgrundlag':'Komponentbibliotek og temaer')+'</p><h1>'+(state.view==='principles'?'Principper':state.view==='patterns'?'Designmønstre':escape(state.pack.name))+'</h1><p class="page-description">'+(state.view==='principles'?'Vores fælles retning for temaer, komponenter, mønstre og produkter.':escape(state.pack.description))+'</p></div><label class="package-picker" for="package-select">Aktivt tema<select id="package-select">'+state.packages.map(pack=>'<option value="'+escape(pack.key)+'" '+(pack.key===state.key?'selected':'')+'>'+escape(pack.name)+'</option>').join('')+'</select></label></div><div class="content ds-panel-layout'+(wideView?' patterns-content':'')+'" data-panel-open="'+(!wideView&&inspectorPanel.open)+'"><section id="studio-content" class="canvas ds-panel-content" tabindex="0" aria-label="Designindhold">'+(state.view==='principles'?renderPrinciples(previewTheme()):state.view==='brand'?brandStudio.content():state.view==='components'?componentsView():state.view==='patterns'?patternsView():state.view==='graphics'?renderGraphicsView(previewTheme(),graphicsState,{showcase}):state.view==='motion'?renderMotionView(previewTheme(),motionState):state.view==='tokens'?tokensView():state.view==='quality'?qualityStudio.content():packageView())+'</section><button type="button" id="inspector-resize" class="inspector-resize ds-panel-resize" aria-label="Tilpas egenskabspanelets bredde"></button><aside id="studio-inspector" class="inspector ds-panel-side" tabindex="0" aria-label="Egenskaber">'+(state.view==='brand'?brandStudio.inspector():state.view==='components'?componentInspector():wideView?'':state.view==='tokens'?tokenInspector():state.view==='quality'?qualityStudio.inspector():packageInspector())+'</aside></div></main><footer id="status-bar" class="status-bar ds-app-footer" role="status"></footer></div></div>';
+  root.innerHTML='<a class="studio-skip" href="#studio-content">Gå til indhold</a><div class="shell ds-app-shell"><aside data-scrollbar-surface="inverse" class="sidebar ds-app-navigation" tabindex="0" aria-label="Designsystemets navigation">'+renderStadeBrand()+'<div><div class="side-label">Designsystem</div><nav class="navigation" aria-label="Stade">'+[['principles','Principper'],['brand','Brandguide'],['components','Komponenter'],['patterns','Designmønstre'],['graphics','Grafik'],['motion','Animation og effekter'],['tokens','Tokens'],['quality','Kvalitet'],['package','Temaet']].map(([view,name])=>'<button type="button" class="nav-item '+(state.view===view?'active':'')+'" data-view="'+view+'" '+(state.view===view?'aria-current="page"':'')+'>'+icon(view)+name+'</button>').join('')+'</nav></div><div class="side-footer">'+renderComponent(previewTheme(),'signature',{identity:'fjordside',variant:'compact'})+'</div></aside><div class="workspace ds-app-workspace"><header class="topbar ds-app-header"><div class="breadcrumb">Stade <span>/</span><strong>'+(state.view==='principles'?'Principper':state.view==='motion'?'Animation og effekter':state.view==='graphics'?'Grafik':state.view==='patterns'?'Designmønstre':state.view==='quality'?'Kvalitet':'Temaer')+'</strong></div><div class="actions"><button type="button" class="studio-button quiet" id="toggle-inspector" aria-controls="studio-inspector"'+(wideView?' hidden':'')+'>'+(inspectorPanel.open?'Skjul egenskaber':'Vis egenskaber')+'</button><button type="button" class="studio-button quiet" id="discard" hidden>Nulstil ændringer</button>'+themeActions+'</div></header><main id="studio-main" class="ds-app-content studio-main'+(state.view==='principles'?' principles-view':state.view==='patterns'?' patterns-view':'')+'" tabindex="-1" aria-label="Stade – indhold"><div class="page-heading"><div><h1>'+escape(state.pack.name)+'</h1><p class="page-description">'+escape(state.pack.description)+'</p></div><label class="package-picker" for="package-select">Aktivt tema<select id="package-select">'+state.packages.map(pack=>'<option value="'+escape(pack.key)+'" '+(pack.key===state.key?'selected':'')+'>'+escape(pack.name)+'</option>').join('')+'</select></label></div><div class="content ds-panel-layout'+(wideView?' patterns-content':'')+'" data-panel-open="'+(!wideView&&inspectorPanel.open)+'"><section id="studio-content" class="canvas ds-panel-content" tabindex="0" aria-label="Designindhold">'+(state.view==='principles'?renderPrinciples(previewTheme()):state.view==='brand'?brandStudio.content():state.view==='components'?componentsView():state.view==='patterns'?patternsView():state.view==='graphics'?renderGraphicsView(previewTheme(),graphicsState,{showcase}):state.view==='motion'?renderMotionView(previewTheme(),motionState):state.view==='tokens'?tokensView():state.view==='quality'?qualityStudio.content():packageView())+'</section><button type="button" id="inspector-resize" class="inspector-resize ds-panel-resize" aria-label="Tilpas egenskabspanelets bredde"></button><aside id="studio-inspector" class="inspector ds-panel-side" tabindex="0" aria-label="Egenskaber">'+(state.view==='brand'?brandStudio.inspector():state.view==='components'?componentInspector():wideView?'':state.view==='tokens'?tokenInspector():state.view==='quality'?qualityStudio.inspector():packageInspector())+'</aside></div></main><footer id="status-bar" class="status-bar ds-app-footer" role="status"></footer></div></div>';
   const swatches=document.querySelectorAll('[data-swatch]');
   let swatchValues={};
   if(swatches.length)try{swatchValues=resolveTokens(activeTheme());}catch{}
@@ -228,7 +229,13 @@ function render() {
   const compositionHost=document.querySelector('#compositions-host');
   if(compositionHost) {
     compositionGallery=mountCompositionGallery(previewTheme(),{document,state:galleryState,announce:message=>{document.querySelector('#announcer').textContent=message;},idPrefix:'studio-patterns'});
-    compositionHost.append(compositionGallery.element);
+    const {element,rail,content}=compositionGallery;
+    element.classList.add('content','ds-panel-layout','studio-pattern-workspace');
+    element.setAttribute('data-panel-open','false');
+    rail.classList.add('canvas','ds-panel-content');
+    content.classList.add('canvas','ds-panel-content');
+    content.id='studio-content';content.tabIndex=0;content.setAttribute('data-panel-primary','');
+    compositionHost.closest('.ds-panel-layout').replaceWith(element);
   }
   bind();
   refreshStatus();
@@ -319,7 +326,11 @@ function bind() {
     else colorPreference.set(modeSelect.value);
     document.querySelector('#color-mode').focus();
   });
-  catalogControls=(state.view==='components'&&state.mode==='catalog'?bindCatalogBrowser:bindComponentCatalog)(root,{state:state.view==='motion'?motionState:catalogState,allowNavigation,onChange(id){if(state.view!=='motion'&&id)state.component=id;render();}});
+  catalogControls=(state.view==='components'&&state.mode==='catalog'?bindCatalogBrowser:bindComponentCatalog)(root,{state:state.view==='motion'?motionState:catalogState,allowNavigation,pack:previewTheme(),components:components(),variantFor,onSelect(id){
+   if(id)state.component=id;
+   const inspector=document.querySelector('#studio-inspector');inspector.innerHTML=componentInspector();bindInspectionLinks(inspector);
+   inspector.querySelector('#variant-select')?.addEventListener('change',event=>{state.variants[state.component]=event.target.value;render();});
+  },onChange(id){if(state.view!=='motion'&&id)state.component=id;render();}});
   document.querySelector('#migrate-theme')?.addEventListener('click', () => {
     try { state.pack = migratePackage(state.pack); state.variants = {}; render(); notice('Temaet er konverteret som en kladde. Gennemgå det, og gem eller eksportér.'); }
     catch (error) { notice(error.message, true); }
@@ -341,7 +352,7 @@ function bind() {
       const candidate=clone(state.pack);
       if(dirty()) {
         candidate.history ||= [];
-        candidate.history.push({date:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Copenhagen',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()),note:'Designpakken blev opdateret i Design Studio.'});
+        candidate.history.push({date:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Copenhagen',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()),note:'Designpakken blev opdateret i Stade.'});
       }
       const data=await themeStorage.save(state.key,candidate);
       state.pack=data.package;state.saved=JSON.stringify(state.pack);state.file=data.file;
@@ -379,10 +390,10 @@ try{
   if(['principles','brand','components','patterns','graphics','motion','tokens','quality','package'].includes(params.get('view')))state.view=params.get('view');
   if(params.get('mode')==='patterns')state.view='patterns';
   const first=data.packages.find(p=>p.key===requested)?.key || data.packages.find(p=>p.id==='studio-light')?.key || data.packages[0]?.key;
-  if(!first)throw new Error('Der er ingen designpakker. Tilføj en pakke i mappen packages, og åbn Design Studio igen.');
+  if(!first)throw new Error('Der er ingen designpakker. Tilføj en pakke i mappen packages, og åbn Stade igen.');
   await load(first);
 }catch(error){
-  root.innerHTML='<main class="loading"><h1>Design Studio kunne ikke åbnes</h1><p>'+escape(error.message)+'</p><button class="studio-button" id="retry">Prøv igen</button></main>';
+  root.innerHTML='<main class="loading"><h1>Stade kunne ikke åbnes</h1><p>'+escape(error.message)+'</p><button class="studio-button" id="retry">Prøv igen</button></main>';
   document.querySelector('#retry').addEventListener('click',()=>location.reload());
 }
 }

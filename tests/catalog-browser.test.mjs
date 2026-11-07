@@ -73,8 +73,8 @@ test('grid uses illustrated cards and only renders the expanded component with v
  const components={button:COMPONENT_LIBRARY.button,card:COMPONENT_LIBRARY.card};
  const state=createCatalogState();
  const overview=renderCatalogBrowser(theme,{components,state});
- assert.equal((overview.match(/class="catalog-icon-card"/g)||[]).length,2);
- assert.doesNotMatch(overview,/specimen-preview|data-catalog-details|ds-card__|ds-button/);
+ assert.equal((overview.match(/class="ds-button ds-preview-choice catalog-icon-card"/g)||[]).length,2);
+ assert.doesNotMatch(overview,/specimen-preview|data-catalog-details|ds-card__/);
  assert.match(overview,/data-browser-open="button"/);
  assert.doesNotMatch(overview,/Grafisk forsøg|catalog-concept-icon/);
  state.expanded='button';
