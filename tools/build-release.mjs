@@ -1,7 +1,8 @@
-import { readFile, readdir, lstat, mkdir, writeFile } from 'node:fs/promises';
+import { readFile, readdir, lstat, mkdir, writeFile, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import {buildStudio} from './build-studio.mjs';
 import { deflateRawSync } from 'node:zlib';
 import { LIBRARY_VERSION } from '../core/library.mjs';
 import { offlineIssues } from './offline-checks.mjs';
@@ -77,7 +78,7 @@ export async function sourceEntries(directory = root) {
   }
   // Ship the collaboration runtime and reviewed data, with a fixed boundary
   // around the distributable files rather than all local collaboration data.
-  for (const file of ['catalog.mjs', 'schema.mjs', 'service.mjs', 'experiences.json']) {
+  for (const file of ['catalog.mjs', 'schema.mjs', 'service.mjs', 'ticket-schema.mjs', 'tickets.mjs', 'experiences.json']) {
     try { await add('collaboration/' + file); } catch (error) { if (error.code !== 'ENOENT') throw error; }
   }
   // The hidden starter ignore-file is intentional source, not local settings.
@@ -106,7 +107,12 @@ async function licenseEntries(directory) {
 }
 
 export async function buildRelease({ directory = root, output = path.join(directory, 'artifacts', 'release') } = {}) {
-  const html = await readFile(path.join(directory, 'index.html'));
+  let html;
+  if(path.resolve(directory)===path.resolve(root)){
+    await mkdir(output,{recursive:true});
+    const temporary=path.join(output,'.offline-'+randomUUID()+'.html');
+    try{html=Buffer.from(await buildStudio({output:temporary,includeTickets:false}));}finally{await unlink(temporary).catch(error=>{if(error.code!=='ENOENT')throw error;});}
+  }else html=await readFile(path.join(directory,'index.html'));
   const issues = offlineIssues(html.toString('utf8'));
   if (issues.length) throw new Error('Offlinebuildet kan ikke leveres: ' + issues.join('\n'));
   const offline = [{ name: 'index.html', data: html }, ...await licenseEntries(directory)];

@@ -8,6 +8,8 @@ import { COMPOSITIONS } from '../patterns/catalog.mjs';
 import { doctor, PROJECT_RUNTIME } from '../tools/doctor.mjs';
 import { experienceIdSchema, experienceSchema, proposalSchema } from './schema.mjs';
 import { searchExperiences } from './catalog.mjs';
+import {createTicketService} from './tickets.mjs';
+import {updateTicketSchema} from './ticket-schema.mjs';
 
 export const STUDIO_ROOT = fileURLToPath(new URL('../', import.meta.url));
 const MAX_EXPERIENCES = 2000;
@@ -78,6 +80,7 @@ export async function createCollaborationService({ studioRoot = STUDIO_ROOT, pro
     registered.set(id, real);
   }
   const knowledgeRoot = await fs.realpath(experienceRoot ?? path.join(root, 'collaboration'));
+  const tickets=await createTicketService({root:knowledgeRoot});
   const project = id => { if (!registered.has(id)) throw new Error('Projektet er ikke tilladt ved serverstart.'); return registered.get(id); };
   async function proposalDirectory(create = false) {
     const directory = path.join(knowledgeRoot, 'proposals');
@@ -199,7 +202,7 @@ export async function createCollaborationService({ studioRoot = STUDIO_ROOT, pro
       const actual = hashes.get(key);
       sourceChecks.push(actual.status ? { ...reference, ...actual } : { ...reference, actualSha256: actual.actualSha256, status: source.sha256 === actual.actualSha256 ? 'unchanged' : 'changed' });
     }
-    const sourceStatus = ['changed', 'unavailable', 'unverifiable', 'unchanged'].find(status => sourceChecks.some(check => check.status === status));
+    const sourceStatus = ['changed', 'unavailable', 'unverifiable', 'unchanged'].find(status => sourceChecks.some(check => check.status === status)) ?? 'unverifiable';
     return { id: experience.id, sourceStatus, sourceChecks, note: 'Kontrollen sammenligner filbytes med det registrerede grundlag. Ændrede kilder kræver en aktuel gennemgang; de gør ikke i sig selv erfaringen forkert. Erfaringens status og verificering er ikke ændret.' };
   }
   const docs = [
@@ -209,7 +212,21 @@ export async function createCollaborationService({ studioRoot = STUDIO_ROOT, pro
     ['graphics', 'Grafik og animation', 'Stilbevarende illustrationer, materialer og fælles afspiller.', 'docs/GRAPHICS-AUTHORING.md'],
     ['collaboration', 'Samarbejde og koordination', 'MCP-værktøjer, erfaringer og kuratering.', 'docs/COLLABORATION.md'],
   ];
+  async function relatedTickets(kind, id) {
+    const {total,results,hasMore}=await tickets.searchTickets({status:'open',[kind==='component'?'component':'pattern']:id,limit:5});
+    return {total,results,hasMore};
+  }
   return {
+    ...tickets,
+    async updateTicket(request) {
+      const parsed=updateTicketSchema.parse(request);
+      const heuristicIds=parsed.changes.resolution?.heuristicIds??[];
+      if(heuristicIds.length){
+        const known=new Set((await experiences()).map(entry=>entry.id));
+        for(const id of heuristicIds)if(!known.has(id))throw new Error('Ukendt heuristik-id i afslutningen: '+id);
+      }
+      return tickets.updateTicket(parsed);
+    },
     async searchLibrary({ query, limit = 10 }) {
       boundedLimit(limit);
       if (typeof query !== 'string' || !query.trim() || query.length > 300) throw new Error('Angiv en søgning på højst 300 tegn.');
@@ -220,11 +237,12 @@ export async function createCollaborationService({ studioRoot = STUDIO_ROOT, pro
       ];
       const words = query.toLocaleLowerCase('da').trim().split(/\s+/);
       const matches = all.filter(entry => words.every(word => JSON.stringify(entry).toLocaleLowerCase('da').includes(word)));
-      return { libraryVersion: LIBRARY_VERSION, total: matches.length, results: matches.slice(0, limit) };
+      const results=await Promise.all(matches.slice(0,limit).map(async entry=>entry.kind==='guide'?entry:{...entry,relatedTickets:await relatedTickets(entry.kind,entry.id)}));
+      return { libraryVersion: LIBRARY_VERSION, total: matches.length, results };
     },
     async getComponent({ id }) {
       if (!Object.hasOwn(COMPONENT_LIBRARY, id)) throw new Error('Ukendt komponent: ' + id);
-      return { id, libraryVersion: LIBRARY_VERSION, source: 'core/library.mjs', component: COMPONENT_LIBRARY[id] };
+      return { id, libraryVersion: LIBRARY_VERSION, source: 'core/library.mjs', component: COMPONENT_LIBRARY[id], relatedTickets:await relatedTickets('component',id) };
     },
     async getProjectContext({ projectId }) {
       const directory = project(projectId);
@@ -297,7 +315,7 @@ export async function createCollaborationService({ studioRoot = STUDIO_ROOT, pro
         if (!current) throw new Error('Ukendt erfarings-id.');
         if (experienceRevision(current) !== expectedRevision) throw new Error('Erfaringen er ændret siden gennemgangen. Hent posten og gennemgå den igen.');
         const checked = await checkSources(entry);
-        if (entry.status === 'reviewed' && checked.sourceStatus !== 'unchanged') throw new Error('En gennemgået erfaring kræver uændrede, tilgængelige kildehash. Kontrollér og opdatér kildegrundlaget først.');
+        if (entry.status === 'reviewed' && (entry.schemaVersion===1 ? checked.sourceStatus!=='unchanged' : ['changed','unavailable'].includes(checked.sourceStatus))) throw new Error('En gennemgået erfaring kræver uændrede, tilgængelige kildehash, når der er et registreret filgrundlag. Kontrollér og opdatér kildegrundlaget først.');
         const index = canonical.findIndex(item => item.id === id);
         const updated = canonical.slice();
         if (index === -1) updated.push(entry);

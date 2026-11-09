@@ -18,6 +18,12 @@ test('all pattern illustrations follow their family and isolate SVG definitions 
     const signatures = new Set();
     for (const id of Object.keys(COMPOSITIONS)) {
       const svg = illustrate(id);
+      if(COMPOSITIONS[id].illustration===false){
+        assert.equal(svg.getAttribute('data-catalog-placeholder'),'');
+        assert.equal(svg.getAttribute('aria-hidden'),'true');
+        assert.equal(svg.querySelectorAll('svg').length,0);
+        continue;
+      }
       assert.equal(svg.namespaceURI, 'http://www.w3.org/2000/svg');
       assert.equal(svg.getAttribute('data-family'), family);
       assert.equal(svg.getAttribute('aria-hidden'), 'true');

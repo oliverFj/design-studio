@@ -1,4 +1,13 @@
 .ds-composition-gallery, .ds-composition { container-type: inline-size; color: var(--ds-color-text-primary); }
+.composition-panel-layout{block-size:420px;margin-block:1rem;border:1px solid var(--ds-color-border-default);border-radius:var(--ds-radius-card);background:var(--ds-color-background-surface)}
+.composition-panel-layout>.ds-panel-content,.composition-panel-layout>.ds-panel-side{padding:1.25rem;min-width:0}
+.composition-panel-layout>.ds-panel-content{background:var(--ds-color-background-subtle)}
+.composition-panel-layout>.ds-panel-side{border-inline-start:1px solid var(--ds-color-border-default)}
+.composition-panel-layout [data-panel-demo-toggle]{color:var(--ds-color-text-secondary)}
+.composition-panel-layout [data-panel-demo-toggle] .ds-button__icon{font-family:system-ui,sans-serif;font-size:10px}
+.composition-panel-layout[data-panel-drag]>[data-panel-demo-toggle]{visibility:hidden;pointer-events:none}
+@media(min-width:801px) and (min-height:481px){.composition-panel-layout[data-panel-open="true"]:not([data-panel-compact="true"])>[data-panel-demo-toggle]:not(:focus-visible){opacity:0;pointer-events:none}}
+@media(max-width:800px),(max-height:480px){.composition-panel-layout{block-size:auto}.composition-panel-layout>.ds-panel-side{border-inline-start:0;border-block-start:1px solid var(--ds-color-border-default)}}
 .composition-site-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-component-gapLarge); border-bottom: var(--ds-border-width-default) solid var(--ds-color-border-default); padding-block-end: var(--ds-space-component-gapLarge); }
 .composition-mobile-navigation { display: none; }
 .composition-mobile-navigation summary { cursor: pointer; padding: var(--ds-space-component-padding); font: inherit; }
@@ -165,5 +174,5 @@
 .patterns-view .studio-pattern-workspace > .composition-pattern-content { min-block-size: 0; }
 @container studio-pattern-view (max-width: 700px) {
   .patterns-view .studio-pattern-workspace.ds-panel-layout[data-panel-open="false"] { grid-template-columns: minmax(0, 1fr); }
-  .patterns-view .studio-pattern-workspace > .composition-pattern-rail { max-block-size: 20rem; }
+  .patterns-view .studio-pattern-workspace > .composition-pattern-rail { max-block-size: 20rem; overflow: auto; }
 }

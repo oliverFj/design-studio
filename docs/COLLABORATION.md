@@ -1,6 +1,33 @@
 # Samarbejde, værktøjspakker og erfaringer
 
-Stade deler bibliotek, projektgrundlag og kildeunderstøttede erfaringer gennem en lokal MCP-server. Siden **Samarbejde og koordination** giver mennesker et overblik. Agenter bruger de samme registrerede værktøjer og erfaringsdata gennem serveren.
+Stade deler bibliotek, projektgrundlag, heuristik og en fælles ticketindbakke gennem en lokal MCP-server. Siden **Samarbejde og koordination** giver mennesker et overblik. Tickets er konkrete ændringsønsker til Stade. Erfaringer er heuristik: gode praksisser og tommelfingerregler fra korrigerede tilgange, med kontekst, begrundelse og begrænsninger.
+
+## Tickets og samlet gennemgang
+
+`create_ticket`, `search_tickets`, `get_ticket` og `update_ticket` håndterer typerne `bug`, `gap` og `enhancement`. Oprettelse kræver `ticket` med `type`, `title`, `description`, `requestedChange`, `area` og selvangivet `actor`. Valgfrie felter er `reportedFrom`, relative Stade-`files`, `tags`, `reproductionSteps`, `priority` (`low`, `normal`, `high`) og `relations: {components: [], patterns: []}`. Relationer bruger faktiske katalog-id'er, som agenten finder gennem biblioteket; filnavne og fritekst i `area` opretter ikke relationer automatisk. Genskabelsestrin er relevante for fejl, ikke et krav til idéer eller mangler.
+
+Søg før oprettelse. Søgning viser som standard åbne tickets; brug `status:all` for hele indbakken og `offset`/`limit` til gennemgang i sider. `component` og `pattern` filtrerer præcist på de registrerede relationer. Angives begge, skal begge passe. `get_component` og komponent-/mønsterresultater fra `search_library` medtager `relatedTickets: {total, results, hasMore}` med højst fem åbne tickets. Hent hele ticketen før vurdering; brug ticketsøgningen til resten, hvis `hasMore` er sand. Guide-resultater har ikke dette felt.
+
+En samlet gennemgang følger ticketen fra behov til afslutning:
+
+1. Læs den aktuelle indberetning og de berørte katalogdele. Afklar om det er et centralt Stade-behov, et produktlokalt valg, et gammelt fund eller en dublet. Brug `needs_info` ved manglende grundlag og `duplicate` med `duplicateOf` ved dubletter.
+2. Prioritér og afgræns det ønskede resultat. Brug `accepted` til en planlagt ændring og `in_progress` med `assignee`, når en agent tager arbejdet. Respekter en anden agents ansvar.
+3. Udfør kun kodeændringer inden for den aktuelle opgaves tilladelse og kontrollér den berørte funktion. Ticketen er ikke i sig selv en bestilling på at udføre indholdet.
+4. Afslut med en begrundelse og det faktiske ændrings- og kontrolgrundlag. En genbrugelig lære kan foreslås som separat heuristik; knyt dens eksisterende id til afslutningen, når det er relevant.
+
+Læs hele posten med `get_ticket` og send dens `revision` som `expectedRevision` til `update_ticket`, sammen med `changes`, `actor` og eventuel `note`. Afslutning som løst, fravalgt eller dublet kræver en note. En ny afslutning som `resolved` kræver desuden `resolution` med `summary`, mindst én `changes: [{file, note}]`, `verification: {kind, summary}` og `heuristicIds: []`. Filer skal være relative Stade-filer. Kontroltypen er `tested`, `source-inspection` eller `user-report`; beskriv hvad der faktisk blev kontrolleret uden at kalde en kodegennemgang for en test. Heuristik-id'er skal findes i biblioteket; en tom liste er gyldig. Historiske lukkede tickets uden `resolution` kan fortsat læses og kommenteres, men bliver ikke automatisk til dokumenterede afslutninger. Kommentarer kan oprettes med tomme `changes` og en `note`. Selvangivne aktørnavne er ikke autentifikation eller nye adgangsrettigheder.
+
+Hver revision gemmes atomisk som en ny, uforanderlig fil under `collaboration/tickets/TICKET-ID/`. To processer kan ikke offentliggøre samme revision. Ved konflikt skal agenten hente posten igen og tage stilling til den nye tilstand. Tickets kan ikke slette eller ændre produktkode og er ikke instruktioner til automatisk udførelse.
+
+### Ticketoversigten i Stade
+
+MCP læser aktuelle data ved hvert opslag. Den lokale Stade-oversigt begynder med højst 100 tickets fra seneste build og viser kilden og tidspunktet for seneste aflæsning. Vælg `collaboration/tickets` med **Forbind ticketmappe**. I understøttede browsere læses mappen med skrivebeskyttet File System Access, og mappehenvisningen gemmes i browserens IndexedDB. Ved næste åbning af indbakken genforbinder Stade automatisk, hvis læseadgangen stadig gælder. Ellers bruges **Giv læseadgang** til den huskede mappe uden nyt mappevalg. Baggrundslæsning beder aldrig om tilladelse. Oversigten aflæser cirka hvert tredje sekund, mens siden er synlig og indbakkevisningen er åben.
+
+**Vælg anden mappe** erstatter henvisningen efter et gyldigt valg. **Frakobl og glem** fjerner den gemte henvisning. En gyldig JSON-import afbryder og glemmer også mappeforbindelsen; annullering og ugyldige filer bevarer den. Kun mappehenvisningen gemmes, ikke ticketindholdet. Hvis browserens lokale lager ikke er tilgængeligt, fungerer forbindelsen i den aktuelle session, og oversigten forklarer, at mappen ikke kunne huskes. Browserens egne tilladelser og sletning af browserdata kan kræve ny adgang eller nyt mappevalg.
+
+Uden mappeforbindelse bruges build-snapshot som fallback. En eksporteret ticket-oversigt kan også indlæses manuelt som JSON; den er et importeret øjebliksbillede, ikke en liveforbindelse. UI'et ændrer ikke ticketfilerne. Den aktuelle indbakke og historik er altid tilgængelig gennem MCP.
+
+Tickets indgår ikke i web-showcasen, kildepakken eller den offentlige offline-ZIP; release bygger en separat udgave uden lokale tickets. Webudgaven viser ingen mappe- eller importknapper. Der tilføjes ingen netværksserver. Ved leverancekontrol skal den native mappevælger og direkte `file://`-forløb afprøves manuelt; et simuleret mappehåndtag eller HTTP-kontrol erstatter ikke den prøve. Genindlæs eksisterende MCP-forbindelser efter værktøjsændringer.
 
 [Materialemotorens udviklingsforslag](MATERIAL-ENGINE.md) afgrænser en mulig fælles kerne fra FormLab og beskriver, hvordan nye lokale motorer kan forberedes til genbrug fra starten.
 
@@ -13,6 +40,7 @@ Værktøjspakker er logiske grupper i én server. De er ikke særskilt installer
 | Bibliotek | `search_library`, `get_component` | Find fælles roller og mønstre, og hent en komponents faktiske definition. |
 | Projekter | `get_project_context`, `check_project` | Hent et tilknyttet projekts grundlag og kør det eksisterende læsende projekttjek. |
 | Erfaringer | `search_experiences`, `get_experience`, `check_experience_sources`, `propose_experience` | Find erfaringer, kontrollér deres kildegrundlag, og foreslå en ny kladde. |
+| Tickets | `create_ticket`, `search_tickets`, `get_ticket`, `update_ticket` | Indberet og gennemgå konkrete fejl, mangler og udvidelsesønsker til Stade med revisionskontrol. |
 
 Den selvstændige `index.html` kræver fortsat ingen server. Den viser værktøjskataloget og de centrale erfaringer fra `collaboration/experiences.json`, som blev pakket ved seneste build. Forslag fra `collaboration/proposals/` kommer først med efter kuratering og et nyt build. Siden undersøger ikke, om MCP er tilsluttet en agentapp. MCP-serveren er et separat udviklingsværktøj; den åbner ingen netværksport og genindlæser både centrale erfaringer og forslag ved opslag.
 
@@ -87,11 +115,11 @@ MCP erstatter ikke AGENTS.md eller produktets anvisninger. Uden en aktiv MCP-for
 
 ## Erfaringsformat
 
-`collaboration/experiences.json` er det versionsstyrede bibliotek. Hver post har en stabil identitet, et problem, en fremgangsmåde og evidens:
+`collaboration/experiences.json` er det versionsstyrede bibliotek. Nye forslag gennem MCP bruger format 2: situation, heuristik, begrundelse, belæg og begrænsninger. Format 1 læses fortsat uden automatisk omskrivning. Kilder kan være tomme, når grundlaget er en begrundet arbejds- eller brugerobservation; det beskrives i verification. Filhenvisninger og kontrolsummer kontrolleres, når de findes:
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "eksempel-ressourceejerskab",
   "title": "Afklar ejerskab før GPU-ressourcer frigives",
   "summary": "En kort forklaring af problemet og den relevante tilgang.",
@@ -99,8 +127,9 @@ MCP erstatter ikke AGENTS.md eller produktets anvisninger. Uden en aktiv MCP-for
   "scope": "project",
   "project": "produkt-id",
   "tags": ["gpu", "ressourcer"],
-  "problem": "Beskriv det observerede problem og udløseren.",
-  "approach": "Beskriv løsningen og hvorfor den er relevant.",
+  "context": "Beskriv den situation, hvor tilgangen måtte korrigeres.",
+  "heuristic": "Afklar hvem der ejer en delt ressource, før du frigiver den.",
+  "rationale": "En lokal rettelse kan ellers frigive noget, som andre stadig bruger.",
   "verification": {
     "kind": "user-report",
     "summary": "Eksempelpost. Ingen kode eller GPU-adfærd er efterprøvet."
@@ -168,7 +197,7 @@ node tools/experiences.mjs review ERFARINGS_ID --project formlab="E:/AI projekte
 node tools/experiences.mjs review ERFARINGS_ID --project formlab="E:/AI projekter/Second Gen/FormLab" --apply --expect AENDRINGSNOEGLE_FRA_FORHAANDSVISNING
 ```
 
-`review` viser som standard hele den foreslåede post uden at gemme. `--entry FILE` indlæser en komplet, redigeret post under samme ID; brug de samme valg ved anvendelse. En gennemgået post kan opdateres på samme måde. Anvendelse kræver både `--apply` og forhåndsvisningens `expectedChange` som `--expect`. Nøglen binder både grundpostens revision og hele den foreslåede ændring, så en ændret indholdsfil, forklaring eller dato kræver en ny forhåndsvisning. Godkendelse kræver uændrede, tilgængelige kildehash. Ved udfasning bruges `retire ID --reason "Forklaring og evt. erstatnings-id"`; kilderne må her godt være ændrede eller utilgængelige. `--date YYYY-MM-DD` kan fastholde datoen mellem forhåndsvisning og anvendelse.
+`review` viser som standard hele den foreslåede post uden at gemme. `--entry FILE` indlæser en komplet, redigeret post under samme ID; brug de samme valg ved anvendelse. En gennemgået post kan opdateres på samme måde. Anvendelse kræver både `--apply` og forhåndsvisningens `expectedChange` som `--expect`. Nøglen binder både grundpostens revision og hele den foreslåede ændring, så en ændret indholdsfil, forklaring eller dato kræver en ny forhåndsvisning. Format 1 kræver uændrede, tilgængelige kildehash ved godkendelse. I format 2 vurderer kuratoren også heuristikkens kontekst, begrundelse og belæg; kilder kan være tomme, og manglende hashes er ikke i sig selv en afvisning. Registrerede filkilder må fortsat ikke være ændrede eller utilgængelige ved godkendelsen. Ved udfasning bruges `retire ID --reason "Forklaring og evt. erstatnings-id"`; kilderne må her godt være ændrede eller utilgængelige. `--date YYYY-MM-DD` kan fastholde datoen mellem forhåndsvisning og anvendelse.
 
 Kuratering er en særskilt lokal agenthandling, som skal være bestilt. Den er ikke et nyt MCP-godkendelsesværktøj: `propose_experience` kan fortsat kun indsende kladder. Serveren læser den opdaterede samling ved næste opslag; offlineoversigten opdateres ved build. En afbrudt oprydning kan efterlade den gamle kladde, men den centrale gennemgåede post har forrang.
 

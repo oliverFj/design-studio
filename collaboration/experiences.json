@@ -1,9 +1,9 @@
 [
   {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "id": "formlab-texture-resize-ownership",
     "title": "Skift teksturstørrelse uden at miste ejerskabet",
-    "summary": "FormLab har en fælles vej til at udskifte teksturbilleder og frigive den tidligere GPU-allokering, mens delte ejere bevares.",
+    "summary": "Afklar ejerskab og bevar den fælles ressourcelivscyklus, når teksturer skifter størrelse.",
     "status": "reviewed",
     "scope": "project",
     "project": "formlab",
@@ -15,8 +15,9 @@
       "memory",
       "ownership"
     ],
-    "problem": "Et billede kan indlæses asynkront og erstatte en lille placeholder med et større kort. En lokal ny implementering kan overse den tidligere GPU-allokering, ændre et delt Texture-objekts identitet eller genaktivere en endeligt frigivet tekstur.",
-    "approach": "Brug FormLabs updateMaterialTexture og disposeMaterialTextures. Ved ændrede dimensioner frigiver updateMaterialTexture GPU-lageret før ny upload, men bevarer selve Texture-objektet. Cache og referenceoptælling tilhører fortsat de konkrete ejere. Endeligt frigivne teksturer afviser senere opdateringer.",
+    "context": "Et billede kan indlæses asynkront og erstatte en lille placeholder med et større kort. En lokal ny implementering kan overse den tidligere GPU-allokering, ændre et delt Texture-objekts identitet eller genaktivere en endeligt frigivet tekstur.",
+    "heuristic": "Brug den eksisterende fælles opdaterings- og frigivelsesvej frem for lokale varianter. Skeln mellem at frigive en GPU-allokering ved ændrede dimensioner og at frigive det sidste ejerskab endeligt; bevar delte objektidentiteter, og afvis sene opdateringer til frigivne ressourcer. I FormLab er updateMaterialTexture og disposeMaterialTextures de konkrete indgange; cache og referenceoptælling tilhører fortsat ejerne.",
+    "rationale": "En lokal billedudskiftning kan ellers efterlade den gamle GPU-allokering eller ødelægge en tekstur, som andre stadig bruger. Den korrigerede tilgang bevarer både ressourceoprydning, delte referencer og beskyttelsen mod sene asynkrone svar.",
     "verification": {
       "kind": "source-inspection",
       "summary": "Aktuel kode og den eksisterende regressionstest er gennemlæst. Testen beskriver ændrede dimensioner, bevaret objektidentitet, gentagen frigivelse og sent billedsvar. Ingen test er kørt i denne gennemgang; faktisk GPU-allokering og forbrug er ikke målt. Gennemlæst arbejdskopi den 2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263. Arbejdskopien kan indeholde lokale ændringer; kildehashene identificerer de gennemlæste filbytes."
@@ -52,13 +53,13 @@
         "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
       }
     ],
-    "updatedAt": "2026-11-07"
+    "updatedAt": "2026-11-09"
   },
   {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "id": "formlab-preview-resource-cleanup",
     "title": "Frigiv alle previewets GPU-ressourcer",
-    "summary": "Et lukket preview skal også frigive skyggekort, miljøkort og øvrige egne renderressourcer. Den gamle mangel i detaljeprøven er allerede håndteret i den nuværende kode.",
+    "summary": "Kortlæg alle previewets egne ressourcer og frigiv dem gennem én fuldstændig lukkevej.",
     "status": "reviewed",
     "scope": "project",
     "project": "formlab",
@@ -71,8 +72,9 @@
       "dispose",
       "stale-findings"
     ],
-    "problem": "Gentagen åbning og lukning af previews kan efterlade GPU-ressourcer, hvis oprydningen kun frigiver materialer eller renderer. Historiske fejlbeskrivelser kan samtidig få en ny agent til at gentage en rettelse, som allerede findes.",
-    "approach": "Læs den aktuelle dispose-vej før en historisk fejl genåbnes. detail-preview.js frigiver nu sun.shadow, environmentMap, antialiasing og renderer. Materialegeneratorens preview frigiver tilsvarende alle lysenes skyggekort og annullerer planlagt rendering. Bevar den eksplicitte ressourceoprydning og verificér gentagne åbne/lukke-forløb ved ændringer.",
+    "context": "Gentagen åbning og lukning af previews kan efterlade GPU-ressourcer, hvis oprydningen kun frigiver materialer eller renderer. Historiske fejlbeskrivelser kan samtidig få en ny agent til at gentage en rettelse, som allerede findes.",
+    "heuristic": "Gennemgå previewets samlede ejerskab ved lukning: annullér planlagt rendering, og frigiv egne materialer, geometri, lysenes skyggekort, miljøkort, kantudglatning og renderer efter produktets livscyklus. Genbrug og bevar den eksisterende oprydning frem for at nøjes med et renderer- eller materialedispose. I FormLab viser detail-preview.js og material-generator-studio.js de konkrete lukkeveje; gentagne åbne/lukke-forløb skal efterprøves ved ændringer.",
+    "rationale": "Et preview kan se lukket ud, mens ressourcer ejet af lys eller hjælpefunktioner stadig lever. Den tidligere mangel i detaljeprøven er allerede rettet i det gennemgåede kildegrundlag og er derfor belæg for en praksis, ikke et åbent ændringsønske.",
     "verification": {
       "kind": "source-inspection",
       "summary": "Begge aktuelle dispose-implementeringer er gennemlæst og sammenholdt med det historiske arkitekturfund. Ingen browser- eller GPU-test er kørt, og hukommelsesforbrug over gentagne åbninger er ikke målt. Gennemlæst arbejdskopi den 2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263. Arbejdskopien kan indeholde lokale ændringer; kildehashene identificerer de gennemlæste filbytes."
@@ -108,13 +110,13 @@
         "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
       }
     ],
-    "updatedAt": "2026-11-07"
+    "updatedAt": "2026-11-09"
   },
   {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "id": "formlab-async-preview-revisions",
     "title": "Lad kun det aktuelle beregningssvar overtage previewet",
-    "summary": "FormLab kontrollerer åbent værksted, jobstatus og revision før et asynkront resultat bliver til synlig geometri eller materiale.",
+    "summary": "Kontrollér revision, jobidentitet og modtagerens livscyklus, før et asynkront resultat overtager synlig state.",
     "status": "reviewed",
     "scope": "project",
     "project": "formlab",
@@ -127,8 +129,9 @@
       "cancellation",
       "ownership"
     ],
-    "problem": "En bruger kan ændre parametre, skifte familie eller lukke værkstedet, mens en beregning eller billedindlæsning stadig kører. Et sent svar kan ellers overskrive nyere arbejde eller oprette ressourcer til et lukket preview.",
-    "approach": "Bevar material-source-studios revisions- og livscykluskontrol: onResult afviser lukket dialog, disposed værksted, ikke-aktuelt job og forkert revision, før der oprettes ny BufferGeometry. Asynkron genindlæsning af gemte kort accepteres kun ved uændret revision. Lukning og suspendering annullerer arbejde og hæver revisionen; lukning frigiver geometri og preview.",
+    "context": "En bruger kan ændre parametre, skifte familie eller lukke værkstedet, mens en beregning eller billedindlæsning stadig kører. Et sent svar kan ellers overskrive nyere arbejde eller oprette ressourcer til et lukket preview.",
+    "heuristic": "Afvis et resultat, hvis værkstedet er lukket eller frigivet, jobbet ikke længere er aktuelt, eller revisionen er ændret. Udfør kontrollen før nye renderressourcer oprettes. Indfang også revisionen ved asynkron genindlæsning af gemte resultater; annullér arbejde og hæv revisionen ved lukning. FormLabs material-source-studio.js anvender dette før BufferGeometry oprettes og ved adoption af gemte kort.",
+    "rationale": "Annullering kan ikke garantere, at et allerede afsendt svar aldrig ankommer. En kontrol ved selve adoptionen beskytter nyere arbejde og forhindrer, at et sent svar opretter ressourcer til en modtager, som ikke længere findes.",
     "verification": {
       "kind": "source-inspection",
       "summary": "Resultatadoption, genindlæsning af gemte kort samt suspend/close/dispose er gennemlæst i den aktuelle kode. Ingen timing-, browser- eller GPU-test er kørt i denne gennemgang. Gennemlæst arbejdskopi den 2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263. Arbejdskopien kan indeholde lokale ændringer; kildehashene identificerer de gennemlæste filbytes."
@@ -164,13 +167,13 @@
         "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
       }
     ],
-    "updatedAt": "2026-11-07"
+    "updatedAt": "2026-11-09"
   },
   {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "id": "formlab-physical-normal-gradients",
     "title": "Hold materialets relief uafhængigt af kameraets kantudglatning",
-    "summary": "FormLab adskiller fysisk overfladehældning fra skærmens udglatning, så kamerabevægelse ikke skal skabe et nyt relief i materialet.",
+    "summary": "Adskil fysisk overfladehældning fra skærmens kantudglatning, når materialets normal beregnes.",
     "status": "reviewed",
     "scope": "project",
     "project": "formlab",
@@ -183,8 +186,9 @@
       "camera",
       "material"
     ],
-    "problem": "Hvis skærmafhængige kantmasker eller diskrete ejer-id'er bliver til en højde, som differentieres med dFdx/dFdy, kan materialets beregnede normal ændre sig ved små kamerabevægelser.",
-    "approach": "Følg material-surface-gradients kontrakt: beregn og filtrér dh/dx og dh/dy i fysiske materialekoordinater før kantdækning. Brug skærmafledte mål til kontinuerte positioner, koordinater og filterstørrelser. Bevar forskellen mellem fysisk relief og visuel kantudglatning. Shaderændringer skal efterfølgende afprøves i rigtig WebGL med upload, nær/fjern visning og små kameraflytninger.",
+    "context": "Hvis skærmafhængige kantmasker eller diskrete ejer-id'er bliver til en højde, som differentieres med dFdx/dFdy, kan materialets beregnede normal ændre sig ved små kamerabevægelser.",
+    "heuristic": "Beregn og filtrér dh/dx og dh/dy i fysiske materialekoordinater, før skærmens kantdækning anvendes. Brug skærmafledte mål til kontinuerte positioner, koordinater og filterstørrelser; lad ikke AA-masker, diskrete ejer-id’er eller cellemasker blive til en højde, som differentieres med dFdx/dFdy. FormLabs material-surface-gradient.js er den konkrete kontrakt. Efter shaderændringer skal den berørte rendervej kontrolleres i rigtig WebGL med upload, nær/fjern visning og små kameraflytninger.",
+    "rationale": "Skærmafhængige masker og diskrete spring kan ellers ændre den beregnede normal ved små kamerabevægelser, selv om det fysiske materiale er uændret. At holde de to beregninger adskilt gør relief og filtrering uafhængige beslutninger; en CPU-kontrol alene dokumenterer ikke resultatet i WebGL.",
     "verification": {
       "kind": "source-inspection",
       "summary": "Den centrale GLSL-hjælper og produktets aktuelle normal- og kontrolkontrakt er gennemlæst. Ingen shaderkompilering, billedsammenligning eller GPU-test er udført; tidsligt flimrende fuger er ikke målt. Gennemlæst arbejdskopi den 2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263. Arbejdskopien kan indeholde lokale ændringer; kildehashene identificerer de gennemlæste filbytes."
@@ -220,13 +224,13 @@
         "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
       }
     ],
-    "updatedAt": "2026-11-07"
+    "updatedAt": "2026-11-09"
   },
   {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "id": "kontroller-aktuel-kilde-foer-historisk-rettelse",
     "title": "Kontrollér den aktuelle kode før en historisk rettelse gentages",
-    "summary": "En tidligere fejlbeskrivelse kan være korrekt som historik, selv om problemet allerede er rettet. Sammenhold fundets versionsgrundlag med den aktuelle kode, før nyt arbejde startes.",
+    "summary": "Kontrollér versionsgrundlag og nuværende implementering, før en historisk fejl bliver til nyt rettelsesarbejde.",
     "status": "reviewed",
     "scope": "shared",
     "project": "formlab",
@@ -238,8 +242,9 @@
       "history",
       "regression"
     ],
-    "problem": "En ny agent læser et gammelt fund uden at kontrollere den aktuelle implementering og bruger tid på at gentage en allerede udført rettelse. Historiske kildehenvisninger og linjenumre kan fortsat se troværdige ud.",
-    "approach": "Find fundets dato, kodeversion og kilder. Kontrollér den aktuelle kode og de relevante eksisterende kontroller. Registrér forskellen mellem historisk fejl, nuværende implementering og faktisk genafprøvet adfærd. I FormLab omtaler arkitekturens historiske kodegennemgang manglende frigivelse af sun.shadow, mens den aktuelle detail-preview.js allerede kalder sun.shadow.dispose(). Brug kildehash og version til at opdage senere kildeændringer; en ændret fil kræver ny vurdering.",
+    "context": "En ny agent læser et gammelt fund uden at kontrollere den aktuelle implementering og bruger tid på at gentage en allerede udført rettelse. Historiske kildehenvisninger og linjenumre kan fortsat se troværdige ud.",
+    "heuristic": "Find fundets dato, version og kilder, og sammenhold dem med den aktuelle implementering og relevante eksisterende kontroller. Skeln mellem historisk fejl, kode som allerede er rettet, og adfærd som faktisk er genafprøvet. Brug versions- og kildehash som støtte til at opdage ændringer, ikke som bevis for et fejlfrit brugerforløb. I det dokumenterede FormLab-eksempel nævner et historisk arkitekturfund manglende skyggefrigivelse, mens detail-preview.js allerede kalder sun.shadow.dispose().",
+    "rationale": "Et gammelt fund og troværdige linjehenvisninger kan få en ny agent til at gentage en udført rettelse eller overskrive en nyere løsning. Den fælles lære handler om kildevurdering og overdragelse; den gør ikke FormLabs konkrete GPU-regler universelle.",
     "verification": {
       "kind": "source-inspection",
       "summary": "Proceserfaringen er kurateret ud fra ét konkret, gennemlæst tilfælde i FormLab. Ingen GPU-test eller måling af procesgevinst på tværs af apps er udført. Gennemlæst arbejdskopi den 2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263. Arbejdskopien kan indeholde lokale ændringer; kildehashene identificerer de gennemlæste filbytes."
@@ -267,13 +272,13 @@
         "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
       }
     ],
-    "updatedAt": "2026-11-07"
+    "updatedAt": "2026-11-09"
   },
   {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "id": "formlab-infill-continuous-field-jacobian-2026-11-08",
     "title": "Bevar kontinuerte koordinater og analytisk feltbasis i blændingens tilmuring",
-    "summary": "FormLabs source-brick infill flimmer i bond, herringbone og radial blev afgrænset til wrapped per-cell fysiske koordinater. Et kontinuerligt metre-chart og analytisk felt-Jacobian stabiliserer atlasfiltrering og normalretning i de isolerede produktionsprøver.",
+    "summary": "Differentier kontinuerte fysiske koordinater, og brug en analytisk feltbasis gennem roterede eller radiale materialeceller.",
     "status": "reviewed",
     "scope": "project",
     "project": "formlab",
@@ -289,8 +294,9 @@
       "jacobian",
       "textureGrad"
     ],
-    "problem": "masonryStudyPhysicalCoordinates returnerede cellens wrapped local-koordinater for masonryStudyDomain >= 4. De lokale koordinater springer ved hver sten/fuge; dFdx/dFdy over dem gav forkerte pixel-footprints og atlasgradienter under kamerabevægelse. En ny temporalprøve af det faktiske source-materiale på produktionsmesh for blind-panels reproducerede problemet. Korrigeret filtrering alene skal også bevare atlasnormalernes orientering i de roterede og radiale feltceller.",
-    "approach": "Brug det bevarede kontinuerte vMasonryStudyUv.xy metre-chart som fysisk koordinat for felt-domænerne. Beregn cellens lokale differential analytisk med masonryFieldBasis: rotation og retningsskift i herringbone, radial/tangent Jacobian i radial og identitet i bond. Transformér de kontinuerte skærmdifferentialer ind i feltets atlasbasis før textureGrad, og transformér atlas- og slidnormalgradienter tilbage til den fysiske basis med den transponerede differential. Hold diskrete celle-id og wrapped local-positioner ude af skærmafledninger. Bevar øvrige materialers stier gennem identitetsfallback. Erfaringen afklarer den rettede årsag bag den tidligere blændingsobservation; den gamle observation er historisk evidens.",
+    "context": "masonryStudyPhysicalCoordinates returnerede cellens wrapped local-koordinater for masonryStudyDomain >= 4. De lokale koordinater springer ved hver sten/fuge; dFdx/dFdy over dem gav forkerte pixel-footprints og atlasgradienter under kamerabevægelse. En ny temporalprøve af det faktiske source-materiale på produktionsmesh for blind-panels reproducerede problemet. Korrigeret filtrering alene skal også bevare atlasnormalernes orientering i de roterede og radiale feltceller.",
+    "heuristic": "Bevar et kontinuerligt fysisk koordinatgrundlag, når materialeceller bruger wrapped lokale koordinater. Hold diskrete celle-id’er og lokale koordinatspring ude af skærmafledninger. Transformér de kontinuerte skærmdifferentialer analytisk til atlasbasis før textureGrad, og transformér atlas- og slidnormalgradienter tilbage med den transponerede differential. I FormLabs infill bruges vMasonryStudyUv.xy og masonryFieldBasis: identitet i bond, rotation/retningsskift i herringbone og radial/tangent Jacobian i radial. Bevar identitetsfallback for andre materialestier, og brug negative kontroller til at afgrænse årsagen.",
+    "rationale": "Wrapped koordinater springer ved sten og fuger og gav derfor forkerte pixel-footprints ved kamerabevægelse. Korrigeret filtrering skal samtidig bevare normalernes retning. De gemte produktionsprøver og den negative kontrol underbygger den afgrænsede årsag og rettelse; de dokumenterer ikke hele scenen eller fysisk GPU-adfærd.",
     "verification": {
       "kind": "tested",
       "summary": "Afprøvet 2026-11-08 i headless Chrome/ANGLE SwiftShader (software-WebGL) på den faktisk anvendte arbejdskopi. Tre WebGL-tests bestod: source-brick temporal, ny field-infill temporal og stone/quoin. Field-prøven bruger det faktiske produktions-blind-panels mesh og source-materiale, isoleret fra scenen. 12 rettede temporaltilfælde: bond/herringbone/radial x 3 m/1,5 m x farve/normal; nul pixels med RGB-delta over 6, største enkeltpixeldelta 2 og ingen GL-/side-/consolefejl. Wrapped-koordinat negativ kontrol genindfører over 1000 ændrede farvepixels ved 3 m i alle tre mønstre. Seks shader-basisresultater (atlas-delta og normal-gradient for tre mønstre) matcher CPU finite-difference Jacobianreferencer med nul byteafvigelse. Prøven beviser hverken brugerens samlede scene, perspektiv/skygger/okklusion eller fysisk GPU-adfærd."
@@ -360,13 +366,13 @@
         "revision": "working-tree@2026-11-08; captured infill regression evidence"
       }
     ],
-    "updatedAt": "2026-11-08"
+    "updatedAt": "2026-11-09"
   },
   {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "id": "formlab-blind-panel-temporal-observation-2026-11-08",
     "title": "Afprøv blændingens tilmuring i dens faktiske rendervej",
-    "summary": "Historisk WebGL-observation fra før rettelsen af blændingens feltkoordinater. Erstattet af formlab-infill-continuous-field-jacobian-2026-11-08, der afgrænser årsagen og den efterprøvede rettelse.",
+    "summary": "Udgået historisk praksis om at observere den faktiske rendervej; erstattet af den afgrænsede infill/Jacobian-heuristik.",
     "status": "retired",
     "scope": "project",
     "project": "formlab",
@@ -381,8 +387,9 @@
       "herringbone",
       "radial"
     ],
-    "problem": "Brugeren rapporterer flimmer i blændingens tilmurede vinduesområde. Den eksisterende brick-shimmer-prøve bruger masonryStudy:false, og detailprøvens bueprofil er en anden flade.",
-    "approach": "Identificér den faktiske v2 blind-panels-flade, bevar dens produktionsgeometri og materiale, og sammenlign farve og normaler ved en fysisk kameraflytning på præcis én pixel. Genbrug skillens observe-blind-panel-prøve til afgrænset observation før en hypotese om shaderårsagen ændres til en rettelse.",
+    "context": "Brugeren rapporterer flimmer i blændingens tilmurede vinduesområde. Den eksisterende brick-shimmer-prøve bruger masonryStudy:false, og detailprøvens bueprofil er en anden flade.",
+    "heuristic": "Ved observation af et renderproblem skal prøven bruge den faktisk berørte produktionsflade, materiale og koordinatvej. Sammenlign farve og normaler under en kontrolleret kameraflytning, og skeln mellem rå forskelle og en kalibreret regressionsgrænse. Den historiske FormLab-prøve brugte det faktiske blind-panels source-materiale; almindelige murstensprøver og en anden bueprofil var ikke automatisk repræsentative.",
+    "rationale": "En grøn prøve af en beslægtet flade kan skjule, at brugerens problem ligger i en anden produktionsvej. Posten bevares som udgået historisk evidens: de oprindelige observationer er senere afløst af en afgrænset årsag, rettelse og regressionstest i formlab-infill-continuous-field-jacobian-2026-11-08. Den skal ikke genåbne et allerede afklaret problem.",
     "verification": {
       "kind": "tested",
       "summary": "Kørt 2026-11-08 mod FormLabs arbejdskopi med headless Chrome/ANGLE SwiftShader (software-WebGL). 12 observationer på faktiske source-munkesten/units og bond, herringbone, radial ved 3 m og 1,5 m. Ingen kontrollerede GL-/compile-/sidefejl. Ved 3 m var andelen af ændrede farvepixels over delta 6 ca. 3,22 %, 8,01 % og 8,71 %; største normalforskel 7, 188 og 176. temporalRegressionAsserted:false: der er ingen kalibreret flimmerbeståelsesgrænse. Almindelige murstens- og tekstur-uploadprøver samt en separat fine-ashlar-kantstensprøve bestod, men er andre dækningsområder."
@@ -424,6 +431,6 @@
         "revision": "working-tree@2026-11-08"
       }
     ],
-    "updatedAt": "2026-11-08"
+    "updatedAt": "2026-11-09"
   }
 ]

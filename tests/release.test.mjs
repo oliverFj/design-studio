@@ -24,6 +24,9 @@ async function fixture(t) {
   await put('core/runtime.mjs', 'export const example = true;');
   await put('showcase/index.html', '<!doctype html><title>Showcase</title>');
   await put('showcase/showcase.mjs', 'export const showcase = true;');
+  await put('collaboration/tickets.mjs','export const ticketRuntime = true;');
+  await put('collaboration/ticket-schema.mjs','export const ticketSchema = true;');
+  await put('collaboration/tickets/private-ticket/000001.json','{"private":"ticket content"}');
   await put('templates/offline/.gitignore', 'node_modules/\nindex.html\n');
   await put('assets/fonts/test.woff2', 'Public font fixture');
   await put('licenses/tabler-icons-MIT.txt', 'MIT license fixture');
@@ -64,6 +67,8 @@ test('release archives preserve bytes, readable licenses, checksums and determin
     } else {
       assert.ok(files.has('core/runtime.mjs')); assert.ok(files.has('templates/offline/.gitignore')); assert.ok(files.has('assets/fonts/test.woff2')); assert.ok(files.has('.gitattributes'));
       assert.ok(files.has('showcase/index.html')); assert.ok(files.has('showcase/showcase.mjs'));
+      assert.ok(files.has('collaboration/tickets.mjs'));assert.ok(files.has('collaboration/ticket-schema.mjs'));
+      assert.equal([...files.keys()].some(name=>name.startsWith('collaboration/tickets/')),false);
       assert.equal(files.has('index.html'), false);
     }
   }

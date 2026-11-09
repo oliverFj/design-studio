@@ -7,17 +7,17 @@ const questions = [
   {
     id: 'access',
     label: 'Hvad må en agent få adgang til?',
-    content: 'Du vælger, hvilke projekter og tjenester en forbindelse skal omfatte, og om agenten må læse eller også ændre noget. Stades MCP læser bibliotek og tilladte projekter og kan oprette nye erfaringskladder. Den kan ikke godkende erfaringer eller ændre produktets kode. Adgangen skal håndhæves af værktøjet, så den også gælder, hvis en agent tager fejl.',
+    content: 'Du vælger, hvilke projekter og tjenester en forbindelse skal omfatte, og om agenten må læse eller også ændre noget. Stades MCP læser bibliotek og tilladte projekter, håndterer tickets og opretter heuristikkladder. Den kan ikke godkende erfaringer eller ændre produktets kode. Adgangen skal håndhæves af værktøjet, så den også gælder, hvis en agent tager fejl.',
   },
   {
     id: 'storage',
     label: 'Skal vi have en database eller en server?',
-    content: 'Det fælles bibliotek kan fortsat ligge i versionsstyrede filer. En database bliver relevant, når flere agenter skal opdatere fælles opgaver og status samtidigt. En MCP-tjeneste kan køre lokalt på din computer; adgang fra andre computere eller tjenester kræver en passende delt løsning. Den færdige offlineudgave af Stade kan fortsat åbnes selvstændigt.',
+    content: 'Det fælles bibliotek kan fortsat ligge i versionsstyrede filer. Tickets bruger atomiske filrevisioner, så flere lokale agenter kan skrive uden at overskrive hinanden. En database kan blive relevant ved andre krav til drift eller søgning. En MCP-tjeneste kan køre lokalt på din computer; adgang fra andre computere eller tjenester kræver en passende delt løsning. Den færdige offlineudgave af Stade kan fortsat åbnes selvstændigt.',
   },
   {
     id: 'memory',
     label: 'Hvilke erfaringer skal blive fælles?',
-    content: 'En erfaring bør have en kilde, en forklaring på hvad der blev afprøvet, og en afgrænsning af hvor den gælder. Forsøg skal kunne blive til godkendte løsninger, erstattes eller udgå. Et erfaringsbibliotek giver agenter noget at slå op i; det træner ikke automatisk modellerne og giver ikke i sig selv hukommelse på tværs af alle chats.',
+    content: 'En erfaring er en tommelfingerregel fra en korrigeret tilgang: hvornår den gælder, hvad man bør gøre, hvorfor og med hvilke begrænsninger. Belægget kan være afprøvning, kildegennemgang eller en brugerobservation. Tickets beskriver derimod konkrete ændringsønsker til Stade. Et erfaringsbibliotek giver agenter noget at slå op i; det træner ikke automatisk modellerne og giver ikke i sig selv hukommelse på tværs af alle chats.',
   },
   {
     id: 'quality',
@@ -58,7 +58,7 @@ export function renderIntegrations(theme) {
       <div class="connections-terms">
         ${card({ term: 'API', name: 'En aftale mellem programmer', description: 'Et program beder et andet om en bestemt funktion eller oplysning gennem en fast grænseflade. Et API kan være lokalt i koden eller tilgængeligt over nettet.', example: 'Et produkt bruger det fælles biblioteks funktioner til at vise en knap i sit eget tema.', status: 'Findes · Bibliotekets API' })}
         ${card({ term: 'CLI', name: 'Værktøjer gennem kommandoer', description: 'En udvikler eller agent giver en tekstkommando for at udføre en opgave. Du beskriver det ønskede resultat; agenten håndterer kommandoerne.', example: 'Agenten kontrollerer et projekts designfiler eller opdaterer dets kopi af biblioteket.', status: 'Findes · Lokale værktøjer' })}
-        ${card({ term: 'MCP', name: 'En fælles forbindelse til agenter', description: 'En standard, som lader en agent opdage tilgængelige værktøjer, hente relevant viden og kalde handlinger med klart beskrevne input og svar.', example: 'Stades værktøjer kan finde en komponent, kontrollere et projekt og hente eller foreslå en erfaring.', status: 'Findes · Lokal Stade-MCP' })}
+        ${card({ term: 'MCP', name: 'En fælles forbindelse til agenter', description: 'En standard, som lader en agent opdage tilgængelige værktøjer, hente relevant viden og kalde handlinger med klart beskrevne input og svar.', example: 'Stades værktøjer kan finde komponenter, kontrollere projekter, dele heuristik og indberette eller gennemgå tickets.', status: 'Findes · Lokal Stade-MCP' })}
       </div>
       <p class="connections-note">API = Application Programming Interface · CLI = Command Line Interface · MCP = Model Context Protocol.</p>
       <p class="connections-note">Status beskriver funktioner i denne udgave af Stade. Siden undersøger ikke aktive forbindelser, installerede plugins eller adgang i andre apps.</p>
@@ -96,7 +96,7 @@ export function renderIntegrations(theme) {
     <section class="connections-section" aria-labelledby="connections-next">
       <h2 id="connections-next" class="connections-section-title">Når behovet vokser</h2>
       <dl class="connections-roadmap">
-        <div><dt>Fælles opgavestatus ${badge('Senere ved behov')}</dt><dd>Arbejdsfordeling, overdragelse og håndtering af samtidige ændringer kræver særskilte regler. Det leverede fundament deler værktøjer og erfaringer; det er endnu ikke en opgavefordeler.</dd></div>
+        <div><dt>Fælles ticketindbakke ${badge('Implementeret')}</dt><dd>Fejl, mangler og udvidelser til Stade har fælles status, ansvarlig og historik. Revisionskontrol beskytter mod overskrivning mellem agenter. Indbakken udfører ikke automatisk opgaver og erstatter ikke produkternes egne planer.</dd></div>
         <div><dt>Flere forbindelser ${badge('Senere ved behov')}</dt><dd>Sikkerhedsfund, andre tjenester og adgang fra flere computere kan kobles til gennem nye, afgrænsede værktøjer. Drift og lagring vælges efter det konkrete behov.</dd></div>
       </dl>
     </section>
@@ -114,8 +114,8 @@ export function renderIntegrations(theme) {
   </article>`;
 }
 
-export function bindIntegrations(root, theme) {
-  bindCollaborationLibrary(root, theme);
+export function bindIntegrations(root, theme, options={}) {
+  const controls=bindCollaborationLibrary(root, theme,options);
   root.querySelectorAll('[aria-label="Beslutninger om Stades forbindelser"] .ds-accordion__item').forEach((details, index) => {
     details.addEventListener('toggle', () => {
       const id = questions[index].id;
@@ -123,4 +123,5 @@ export function bindIntegrations(root, theme) {
       else openQuestions.delete(id);
     });
   });
+  return controls;
 }

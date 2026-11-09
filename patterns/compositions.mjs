@@ -1,4 +1,5 @@
 import { COMPOSITIONS } from './catalog.mjs';
+import {createResizablePanelState,mountResizablePanel} from './resizable-panel.mjs';
 import { createObjectWorkbenchState, mountObjectWorkbench } from './object-workbench.mjs';
 import { createResourceLibraryState, mountResourceLibrary } from './resource-library.mjs';
 import { createHistoryEditorState, mountHistoryEditor } from './history-editor.mjs';
@@ -9,6 +10,7 @@ import { createRecipeEditorState, mountRecipeEditor } from './recipe-editor.mjs'
 import { WEB_PATTERNS, createWebState, mountWebPattern } from './web.mjs';
 
 export function createCompositionState(id) {
+  if(id==='resizable-panel')return createResizablePanelState();
   if (WEB_PATTERNS.includes(id)) return createWebState(id);
   if (id === 'editor') return createObjectWorkbenchState();
   if (id === 'parameter-workbench') return createParameterWorkbenchState();
@@ -26,6 +28,7 @@ export function mountComposition(theme, id, {
   announce = () => {}, onChange = () => {}, onUse = () => {}, idPrefix = 'composition-' + id,
 } = {}) {
   if (!COMPOSITIONS[id]) throw new Error('Ukendt sammensætning: ' + id);
+  if(id==='resizable-panel')return mountResizablePanel(theme,{document,state,announce,onChange,idPrefix});
   if (WEB_PATTERNS.includes(id)) return mountWebPattern(theme, id, { document, state, onChange, idPrefix });
   if (id === 'editor') return mountObjectWorkbench(theme, { document, state, announce, onChange, idPrefix });
   if (id === 'parameter-workbench') return mountParameterWorkbench(theme, { document, state, announce, onChange, onUse, idPrefix });

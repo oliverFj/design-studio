@@ -64,7 +64,7 @@ try{
       await page.screenshot({path:path.join(output,'covers',concept.id+'.png'),scale:'css'});
       console.log('Renderet produktkort '+concept.id.toUpperCase());
     }
-    await writeFile(path.join(output,'capture.json'),JSON.stringify({date:'2026-11-04',browser:await browser.version(),deviceScaleFactor:2,source:'studio.html — buildStudio({showcase:true})',screenshots:shots,errors},null,2));
+    await writeFile(path.join(output,'capture.json'),JSON.stringify({date:new Date().toISOString(),browser:await browser.version(),deviceScaleFactor:2,source:'studio.html — buildStudio({showcase:true})',screenshots:shots,errors},null,2));
     await import('./review.mjs');
   }
   await page.setViewportSize({width:1440,height:1080});

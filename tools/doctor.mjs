@@ -5,6 +5,7 @@ import { validatePackage, generateCSS, LIBRARY_VERSION } from '../core/engine.mj
 import { projectPath, inputFingerprint, offlineIssues } from './offline-checks.mjs';
 
 export const PROJECT_RUNTIME = [
+  ['core/catalog-placeholder.mjs', 'runtime/catalog-placeholder.mjs'],
   ...['graphic-tokens.mjs','graphics.mjs','graphics/catalog.mjs',
     ...['anatomy','lightroom','passage','fieldlines'].map(id=>'graphics/families/'+id+'.mjs'),
     ...['anatomy','lightroom','passage','fieldlines'].map(id=>'graphics/families/'+id+'-catalog.mjs'),

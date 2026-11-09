@@ -52,6 +52,7 @@ export function generateAppShellCSS(scope = '.ds-scope') {
   const forms = suffix => layout('form-layout', suffix);
   const fields = forms(' > .ds-form-fields'), actions = forms(' > .ds-form-actions');
   const compact = suffix => panels('[data-panel-compact="true"]' + suffix);
+  const collapsible = suffix => panels('[data-panel-collapsible="true"]' + suffix);
   return [
     `${shell('')} { box-sizing: border-box; min-inline-size: 0; min-block-size: 0; }`,
     `${navigation}, ${workspace}, ${header}, ${content}, ${footer} { min-inline-size: 0; min-block-size: 0; }`,
@@ -62,6 +63,11 @@ export function generateAppShellCSS(scope = '.ds-scope') {
     `${panels(' > .ds-panel-resize::before')} { content: ''; display: block; inline-size: 2px; block-size: 2.5rem; border-radius: 1px; background: currentColor; }`,
     `${panels(' > .ds-panel-resize:hover')} { color: var(--ds-color-action-neutral-hover-text, currentColor); background: var(--ds-color-action-neutral-hover-surface, transparent); }`,
     `${panels(' > .ds-panel-content:focus-visible')}, ${panels(' > .ds-panel-side:focus-visible')}, ${panels(' > .ds-panel-resize:focus-visible')}, ${forms(' > .ds-form-fields:focus-visible')} { outline: max(3px, var(--ds-border-width-focus, 3px)) solid var(--ds-color-focus, currentColor); outline-offset: calc(-1 * max(3px, var(--ds-border-width-focus, 3px))); }`,
+    `${collapsible('')} { position: relative; }`,
+    `${collapsible(' > [data-panel-grip]')} { z-index: 3; touch-action: none; margin: 12px 16px 12px auto; }`,
+    `${collapsible('[data-panel-drag]')} { user-select: none; }`,
+    `${collapsible('[data-panel-drag="close"] > [data-panel-grip]')} { outline: 2px solid var(--ds-color-focus, currentColor); outline-offset: 3px; }`,
+    `${collapsible('[data-panel-hint]::after')} { content: attr(data-panel-hint); position: absolute; z-index: 4; inset-block-start: 12px; inset-inline-end: 16px; padding: 8px 12px; border: 1px solid var(--ds-color-border-field, currentColor); border-radius: var(--ds-radius-control, 6px); background: var(--ds-color-background-surface, white); color: var(--ds-color-text-primary, black); font-size: .8125rem; pointer-events: none; }`,
     `${actions} { display: flex; flex-wrap: wrap; gap: var(--ds-space-component-gap, 6px); padding: var(--ds-space-component-padding, 12px); border-block-start: var(--ds-border-width-default, 1px) solid var(--ds-color-border-default, currentColor); background: var(--ds-color-background-surface, transparent); }`,
     `@media (min-width: ${BREAKPOINTS.workspace + 1}px) and (min-height: ${BREAKPOINTS.short + 1}px) {`,
     `  ${shell('')} { display: grid; grid-template-columns: var(--ds-app-navigation-width, 14rem) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); block-size: var(--ds-app-height, var(--ds-app-viewport-height, 100vh)); overflow: hidden; }`,
@@ -72,6 +78,13 @@ export function generateAppShellCSS(scope = '.ds-scope') {
     `  ${footer} { grid-row: 3; }`,
     `  ${panels('')} { display: grid; grid-template-columns: minmax(0, 1fr) 8px var(--ds-panel-width, 20rem); gap: 0; overflow: hidden; }`,
     `  ${panels('[data-panel-open="false"]')} { grid-template-columns: minmax(0, 1fr); }`,
+    `  ${collapsible('[data-panel-open="false"]')} { grid-template-columns: minmax(0, 1fr) 0px 0px; }`,
+    `  ${collapsible(':not([data-panel-compact="true"]) > .ds-panel-side')} { inline-size: var(--ds-panel-width, 20rem); transform: translateX(var(--ds-panel-drag-offset, 0px)); }`,
+    `  ${collapsible(' > .ds-panel-resize')} { transform: translateX(var(--ds-panel-drag-offset, 0px)); }`,
+    `  ${collapsible('[data-panel-open="false"][data-panel-revealing="true"]')} { grid-template-columns: minmax(0, 1fr) 8px var(--ds-panel-preview-width, 0px); }`,
+    `  ${collapsible('[data-panel-transition="closing"] > .ds-panel-side')}, ${collapsible('[data-panel-transition="closing"] > .ds-panel-resize')}, ${collapsible('[data-panel-revealing="true"] > .ds-panel-side')} { display: block; }`,
+    `  ${collapsible(':not([data-panel-compact="true"]) > [data-panel-grip]')} { position: absolute; top: 50%; right: calc(var(--ds-panel-width, 20rem) - 12px - var(--ds-panel-drag-offset, 0px)); transform: translateY(-50%); width: 32px; min-width: 32px; height: 56px; margin: 0; cursor: ew-resize; }`,
+    `  ${collapsible('[data-panel-open="false"]:not([data-panel-compact="true"]) > [data-panel-grip]')} { right: max(4px, calc(var(--ds-panel-preview-width, 0px) - 12px)); }`,
     `  ${panelContent}, ${panelSide} { overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; scroll-padding: var(--ds-space-component-padding, 12px); }`,
     `  ${forms('')} { display: grid; grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; }`,
     `  ${fields} { overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; scroll-padding: var(--ds-space-component-padding, 12px); padding: max(var(--ds-space-component-paddingCompact, 6px), calc(max(3px, var(--ds-border-width-focus, 3px)) + max(2px, var(--ds-border-offset-focus, 3px)))); }`,

@@ -35,7 +35,9 @@ Efter kode-, design- eller temaændringer køres `npm run build` igen. Brugeren 
 
 ## Samarbejde med agenter
 
-Siden **Samarbejde og koordination** forklarer API, CLI og MCP og viser værktøjspakker og erfaringer. Den lokale MCP leverer otte værktøjer til bibliotek, projektgrundlag og erfaringsopslag. Erfaringernes kildefiler kontrolleres automatisk ved opslag; nye forslag gemmes som kladder, mens gennemgang, rettelser og udfasning har en særskilt kurateringsvej.
+Siden **Samarbejde og koordination** forklarer API, CLI og MCP og viser værktøjspakker, heuristik og tickets. Den lokale MCP leverer tolv værktøjer til bibliotek, projektgrundlag, heuristik og konkrete fejl, mangler og udvidelsesønsker. Erfaringernes kildefiler kontrolleres automatisk ved opslag; nye heuristikforslag gemmes som kladder, mens gennemgang, rettelser og udfasning har en særskilt kurateringsvej. Tickets kan knyttes til komponenter og mønstre; en ny afslutning som løst kræver beskrivelse af ændringen og den faktiske kontrol.
+
+Vælg **Forbind ticketmappe** i den lokale indbakke og vælg `collaboration/tickets`. Stade husker mappen i browseren og genforbinder efter genindlæsning, når læseadgangen stadig gælder. Ellers bruges **Giv læseadgang** uden nyt mappevalg. Indbakken aflæses cirka hvert tredje sekund, mens visningen er åben og siden er synlig. **Frakobl og glem** fjerner den gemte henvisning. Tickets er lokale og følger ikke med web-showcase eller offentlige leveringspakker.
 
 Efter `npm ci` installeres forbindelsen og den fælles skill i Codex med:
 
@@ -60,7 +62,7 @@ En mulig fælles materialemotor er beskrevet i [udviklingsforslaget](docs/MATERI
 
 Under **Designsystem → Designmønstre** findes interaktive eksempler på en objekteditor med kontekstpanel inspireret af FormLab, et parametrisk værksted, en opskriftseditor med lag, en formular, en liste med detaljevisning, et ressourcebibliotek og fortryd/gentag med gemmepunkt samt header/navigation, hero, footer og billedgalleri. De samme eksempler indgår i web-showcasen og kan afprøves med alle temaer. `node tools/cli.mjs examples PROJECT_DIR` kopierer valgfri referencekode og den selvstændige historikhjælper til et tilknyttet projekt uden overskrivning. Se [genbrug af designmønstre](docs/INTEGRATION.md#valgfrie-sammensætningseksempler).
 
-Mønstrene vælges i en vandret kortbjælke over eksemplet. Rul sidelæns eller brug pilene; skift mellem kort bevarer kladder og bjælkens scrollposition. Hvert af de elleve mønstre har sin egen statiske illustration i Tegnets anatomi, Lysrum, Passage og Feltlinjer — 44 motiver, som følger temaets grafikmaterialer og Studios illustrationsvalg.
+Mønstrene vælges i en vandret kortbjælke over eksemplet. Rul sidelæns eller brug pilene; skift mellem kort bevarer kladder og bjælkens scrollposition. Elleve mønstre har statiske illustrationer i Tegnets anatomi, Lysrum, Passage og Feltlinjer — 44 motiver, som følger temaets grafikmaterialer og Studios illustrationsvalg. Det interaktive mønster **Panel med træk og sammenklapning** bruger samme standardplaceholder som komponenter uden illustration. Panelet demonstrerer skalering, lukning ved slip i lukkezonen og genåbning med kantgrebet; kladden bevares.
 
 Komponentstruktur redigeres i det fælles bibliotek, ikke i hvert tema. Padding og gap kommer fra biblioteket. De semantiske spacingtokens skal være positive; temaet kan hverken udelade grundlayoutet eller erstatte det med nul-padding.
 

@@ -126,6 +126,84 @@ test('a hidden resize handle gives focus back and cancels dragging when the work
   controls.destroy();
 });
 
+test('collapsible panels preview a close, allow reversal and only close on release while remembering their width', () => {
+  const {container, panel, handle, toggle, events, controls} = fixture({collapsible:true, width:360});
+  fire(handle,'pointerdown',{pointerId:1,clientX:400,button:0});
+  fire(events,'pointermove',{pointerId:1,clientX:610});
+  assert.equal(container.getAttribute('data-panel-drag'),'close');
+  assert.equal(container.getAttribute('data-panel-open'),'true');
+  assert.equal(panel.hidden,false);
+  assert.equal(handle.getAttribute('aria-valuenow'),'240','content is not squeezed below its minimum');
+  fire(events,'pointermove',{pointerId:1,clientX:500});
+  assert.equal(container.getAttribute('data-panel-drag'),'resize');
+  assert.equal(container.getAttribute('data-panel-hint'),null);
+  fire(events,'pointermove',{pointerId:1,clientX:610});
+  fire(events,'pointerup',{pointerId:1});
+  assert.equal(container.getAttribute('data-panel-open'),'false');
+  assert.equal(panel.hidden,true);
+  assert.equal(handle.getAttribute('aria-valuenow'),'360');
+  fire(toggle,'click');
+  assert.equal(panel.hidden,false);
+  assert.equal(handle.getAttribute('aria-valuenow'),'360');
+  controls.destroy();
+});
+
+test('the edge grip previews reopening, ignores short pulls and suppresses the click after a completed drag', () => {
+  const {container, panel, handle, toggle, events, controls} = fixture({collapsible:true,open:false,width:380});
+  fire(toggle,'pointerdown',{pointerId:1,clientX:880,button:0});
+  fire(events,'pointermove',{pointerId:1,clientX:850});
+  assert.equal(container.getAttribute('data-panel-revealing'),'true');
+  assert.equal(panel.inert,true);
+  fire(events,'pointerup',{pointerId:1}); fire(toggle,'click',{detail:1});
+  assert.equal(container.getAttribute('data-panel-open'),'false'); assert.equal(panel.hidden,true);
+  fire(toggle,'pointerdown',{pointerId:2,clientX:880,button:0});
+  fire(events,'pointermove',{pointerId:2,clientX:790});
+  fire(events,'pointerup',{pointerId:2}); fire(toggle,'click',{detail:1});
+  assert.equal(container.getAttribute('data-panel-open'),'true');
+  assert.equal(handle.getAttribute('aria-valuenow'),'380','a short intentional pull restores the previous width');
+  assert.equal(panel.inert,false);
+  fire(handle,'keydown',{key:'Enter'}); assert.equal(panel.hidden,true);
+  fire(toggle,'click',{detail:0}); assert.equal(panel.hidden,false,'keyboard activation remains available');
+  controls.destroy();
+});
+
+test('Escape, cancellation, viewport changes and disposal clear drag previews without losing content', () => {
+  const {container, panel, field, handle, toggle, events, controls, viewportFlow} = fixture({collapsible:true,width:350});
+  field.value='Min kladde';
+  fire(toggle,'pointerdown',{pointerId:1,clientX:500,button:0});
+  fire(events,'pointermove',{pointerId:1,clientX:710});
+  fire(events,'keydown',{key:'Escape'}); fire(toggle,'click',{detail:1});
+  assert.equal(panel.hidden,false); assert.equal(handle.getAttribute('aria-valuenow'),'350');
+  assert.equal(container.getAttribute('data-panel-drag'),null);
+  controls.setOpen(false);
+  fire(toggle,'pointerdown',{pointerId:2,clientX:880,button:0});
+  fire(events,'pointermove',{pointerId:2,clientX:780});
+  fire(events,'pointercancel',{pointerId:2});
+  assert.equal(panel.hidden,true); assert.equal(container.getAttribute('data-panel-revealing'),null);
+  controls.setOpen(true);
+  fire(handle,'pointerdown',{pointerId:3,clientX:500,button:0});
+  fire(events,'pointermove',{pointerId:3,clientX:710}); viewportFlow(true);
+  fire(events,'pointerup',{pointerId:3});
+  assert.equal(panel.hidden,false); assert.equal(handle.getAttribute('aria-valuenow'),'350');
+  viewportFlow(false);
+  fire(toggle,'pointerdown',{pointerId:4,clientX:500,button:0});
+  fire(events,'pointermove',{pointerId:4,clientX:710}); controls.destroy();
+  assert.equal(container.getAttribute('data-panel-drag'),null); assert.equal(field.value,'Min kladde');
+});
+
+test('unfinished disclosure animations cannot hide a reopened panel', async () => {
+  const {container,document,panel,controls}=fixture({collapsible:true});
+  document.defaultView.getComputedStyle=()=>({gridTemplateColumns:container.getAttribute('data-panel-open')==='true'?'572px 8px 320px':'900px 0px 0px'});
+  const animations=[];
+  container.animate=()=>{let resolve;const animation={finished:new Promise(r=>{resolve=r;}),cancel(){this.cancelled=true;},finish(){resolve();}};animations.push(animation);return animation;};
+  controls.setOpen(false); assert.equal(panel.hidden,false); assert.equal(panel.inert,true);
+  controls.setOpen(true); assert.equal(animations[0].cancelled,true);
+  animations[0].finish(); await Promise.resolve(); assert.equal(panel.hidden,false);
+  animations[1].finish(); await Promise.resolve(); assert.equal(panel.inert,false);
+  controls.setOpen(false); controls.destroy();
+  assert.equal(panel.hidden,true); assert.equal(container.getAttribute('data-panel-transition'),null);
+});
+
 test('shared panel and form layouts isolate scroll without changing card or stack display in compact mode', () => {
   const css = generateAppShellCSS('#product');
   assert.match(css, /\.ds-panel-layout > \.ds-panel-side/);

@@ -82,7 +82,7 @@
     "view": "patterns",
     "mode": "catalog",
     "viewport": {
-      "width": 1440,
+      "width": 1920,
       "height": 1500
     },
     "crop": ".composition-demo"

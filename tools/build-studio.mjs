@@ -7,9 +7,10 @@ import {TABLER_LICENSE} from '../core/icons.mjs';
 import {SIGNATURE_LICENSE} from '../core/signature-assets.mjs';
 import {dataModule} from './bundle-data.mjs';
 import {assertDeliverySize} from './delivery-size.mjs';
+import {createTicketService} from '../collaboration/tickets.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-export async function buildStudio({output=path.join(root,'index.html'),showcase=false,themes:providedThemes}={}) {
+export async function buildStudio({output=path.join(root,'index.html'),showcase=false,includeTickets=!showcase,ticketRoot=path.join(root,'collaboration'),themes:providedThemes}={}) {
 const themes = providedThemes ?? [];
 if(!providedThemes)for (const file of (await readdir(path.join(root, 'packages'))).filter(name => name.endsWith('.json')).sort()) {
   const pack = JSON.parse(await readFile(path.join(root, 'packages', file), 'utf8'));
@@ -26,6 +27,7 @@ const bundle = await build({
     name: 'offline-studio',
     setup(builder) {
       builder.onLoad({ filter: /[\\/]bundled-themes\.mjs$/ }, () => ({ contents: dataModule(themes), loader: 'js' }));
+      builder.onLoad({filter:/[\\/]bundled-tickets\.mjs$/},async()=>({contents:'export default '+JSON.stringify({...(!includeTickets?{total:0,tickets:[],public:true}:{...await(await createTicketService({root:ticketRoot})).snapshot(),public:false}),builtAt:new Date().toISOString()}),loader:'js'}));
     },
   }],
 });
@@ -41,7 +43,7 @@ html = html.replace('<link rel="stylesheet" href="../patterns/styles.css">', () 
 html = html.replace('</body>', () => '<script>' + bundle.outputFiles[0].text.replace(/<\/script/gi, '<\\/script') + '</script></body>');
 html=html.replace('</head>',()=>'<script type="text/plain" id="tabler-license">'+TABLER_LICENSE+'\n\n'+SIGNATURE_LICENSE+'</script></head>');
 assertDeliverySize('studio',html);
-if(showcase)html=html.replace('Se og rediger brandguides, logoer, tokens og komponenter i dit fælles komponentbibliotek og dine temaer.','Udforsk hele Design Studio: afprøv temaer, tokens, komponenter og designmønstre. Ændringer gælder kun i din browser og kan ikke gemmes.');
+if(showcase)html=html.replace('Se og rediger brandguides, logoer, tokens og komponenter i dit fælles komponentbibliotek og dine temaer.','Brug Stade: rediger temaer, tokens og brandguides, afprøv komponenter og designmønstre, og hent dine temaer som JSON.');
 await writeFile(output, html);
 console.log('Design Studio bygget: '+output+' · ' + themes.length + ' temaer · ' + Math.round(Buffer.byteLength(html) / 1024) + ' KB');
 return html;

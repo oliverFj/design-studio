@@ -107,7 +107,16 @@ export async function compositionQualityReport(theme, { document = globalThis.do
         });
         continue;
       }
-      if (composition === 'editor') {
+      if (composition === 'resizable-panel') {
+        const input=root.querySelector('#'+prefix+'-name-control');
+        input.value='Bevar min panelkladde';send(input,'input');input.focus();
+        const toggle=root.querySelector('[data-panel-demo-toggle]');
+        send(toggle,'click');
+        add('disclosure','closed','Panelet kan lukkes med bevaret kladde',state.panel.open===false&&state.name==='Bevar min panelkladde');
+        send(toggle,'click');
+        add('disclosure','restore','Genåbning bevarer feltets node og værdi',state.panel.open===true&&root.querySelector('#'+prefix+'-name-control')===input&&input.value==='Bevar min panelkladde');
+        checks.push(...compositionStructureReport(root,{composition,scenario:'disclosure'}));
+      } else if (composition === 'editor') {
         send(root.querySelector('[data-object="detail"]'), 'click');
         add('selection', 'surface-selection', 'Direkte fladevalg følger træ og egenskaber', state.selected === 'detail' && root.querySelector('#' + prefix + '-object-name-control')?.value === 'Detalje');
         send(root.querySelector('[data-tab="relations"]'), 'click');

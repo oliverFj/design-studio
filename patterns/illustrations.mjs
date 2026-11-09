@@ -2,6 +2,7 @@ import { resolveTokens } from '../core/engine.mjs';
 import { getGraphicFamily } from '../core/graphics.mjs';
 import { GRAPHIC_TOKEN_BINDINGS, GRAPHIC_TOKEN_DEFAULTS } from '../core/graphic-tokens.mjs';
 import { COMPOSITIONS } from './catalog.mjs';
+import { createCatalogPlaceholder } from '../core/catalog-placeholder.mjs';
 import { paint } from './illustrations-primitives.mjs';
 import * as anatomy from './illustrations-anatomy.mjs';
 import * as lightroom from './illustrations-lightroom.mjs';
@@ -27,6 +28,7 @@ export function createPatternIllustrator(theme, { document = globalThis.document
   };
   return id => {
     if (!Object.hasOwn(COMPOSITIONS, id)) throw new Error('Unknown pattern illustration: ' + id);
+    if (COMPOSITIONS[id].illustration === false) return createCatalogPlaceholder({document});
     const prefix = `pattern-${family}-${id}-${++sequence}`;
     const { parts, definitions = [] } = families[family].draw(id, { prefix });
     const svg = create('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 600 420', width: 600, height: 420, 'aria-hidden': 'true', focusable: 'false', 'data-family': family, 'data-pattern-illustration': id, style });

@@ -4,6 +4,17 @@ export const COMPOSITION_KINDS = Object.freeze({
 });
 
 export const COMPOSITIONS = Object.freeze({
+  'resizable-panel': Object.freeze({
+    name: 'Panel med træk og sammenklapning', version: '1.0.0', layout: 'workspace', kind: 'workflow',
+    illustration: false,
+    useWhen: 'Brugeren skal tilpasse pladsen mellem en arbejdsflade og et egenskabspanel og kunne lukke panelet uden at miste sin kladde.',
+    related: Object.freeze(['editor', 'list-detail']),
+    description: 'Skalér et sidepanel, træk det til lukkezonen og slip. Træk eller klik i kantgrebet for at åbne igen med bevaret indhold.',
+    usage: 'Brug den fælles panelcontroller mountPanelControls fra core/panels.mjs med collapsible:true. patterns/resizable-panel.mjs eksporterer mountResizablePanel som valgfri referencekode. Produktet ejer indhold og state; controlleren ejer træk, fokus, tastatur og bevægelse.',
+    components: ['heading', 'text', 'field', 'button', 'instruction-note'],
+    interactions: ['Skalering med træk eller separatorens piletaster', 'Lukkezone vises før panelet lukkes ved slip', 'Escape eller et træk tilbage annullerer lukningen', 'Kantgrebet åbner ved træk, klik eller tastatur', 'Kladde og panelbredde bevares ved lukning og temaskift', 'Smal visning bruger stablet indhold og en almindelig knap'],
+    qualityScenarios: Object.freeze(['initial', 'disclosure']),
+  }),
   'site-header': Object.freeze({
     name: 'Header og navigation', version: '1.0.0', layout: 'split',
     kind: 'section',
@@ -124,4 +135,4 @@ export const COMPOSITIONS = Object.freeze({
   }),
 });
 
-export const PATTERN_FILES = Object.freeze(['catalog.mjs', 'compositions.mjs', 'web.mjs', 'form.mjs', 'list-detail.mjs', 'object-workbench.mjs', 'parameter-workbench.mjs', 'recipe-editor.mjs', 'resource-library.mjs', 'history.mjs', 'history-editor.mjs', 'gallery.mjs', 'illustrations.mjs', 'illustrations-primitives.mjs', 'illustrations-anatomy.mjs', 'illustrations-lightroom.mjs', 'illustrations-passage.mjs', 'illustrations-fieldlines.mjs', 'quality.mjs', 'styles.css']);
+export const PATTERN_FILES = Object.freeze(['resizable-panel.mjs', 'catalog.mjs', 'compositions.mjs', 'web.mjs', 'form.mjs', 'list-detail.mjs', 'object-workbench.mjs', 'parameter-workbench.mjs', 'recipe-editor.mjs', 'resource-library.mjs', 'history.mjs', 'history-editor.mjs', 'gallery.mjs', 'illustrations.mjs', 'illustrations-primitives.mjs', 'illustrations-anatomy.mjs', 'illustrations-lightroom.mjs', 'illustrations-passage.mjs', 'illustrations-fieldlines.mjs', 'quality.mjs', 'styles.css']);

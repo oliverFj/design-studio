@@ -14,7 +14,7 @@ async function editor({showcase=false,themeId='studio-light'}={}){
  const exposed=source.replace(/startStudio\(\);\s*$/,'')+`
  render=()=>{};
  brandStudio.bind=()=>{};qualityStudio.bind=()=>{};
- if(!showcase)download=(...args)=>globalThis.downloads.push(args);
+ download=(...args)=>globalThis.downloads.push(args);
  export const editorTest={state,model,tokenInspector,changeToken,bind,download,packageInspector,brandContent:()=>brandStudio.content(),
    chooseMode:value=>colorPreference.set(value),
    resetModel:()=>{readModel=null;},
@@ -71,14 +71,14 @@ test('editor mode edits, inspector values and CSS export retain the selected mod
  assert.match(principles,/Afspil bevægelse/,'the motion example uses the shared component runtime');
 });
 
-test('public studio allows theme experiments while omitting exports and blocking downloads',async()=>{
+test('public studio offers the same theme experiments and exports as the local editor',async()=>{
  const {api,downloads}=await editor({showcase:true});
  api.chooseMode('dark');api.changeToken('#181a25');
  assert.equal(api.state.pack.modes.dark.tokens['color.background.canvas'].$value,'#181a25');
- assert.doesNotMatch(api.packageInspector(),/id="download-css"/);
- assert.doesNotMatch(api.brandContent(),/data-brand-download/);
+ assert.match(api.packageInspector(),/id="download-css"/);
+ assert.match(api.brandContent(),/data-brand-download/);
  api.download('theme.json','{}','application/json');
- assert.equal(downloads.length,0);
+ assert.equal(downloads.length,1);
 });
 
 test('editor offers named Bauhaus colors, edits only the selected appearance and exports the full theme',async()=>{

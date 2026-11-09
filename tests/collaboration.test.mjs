@@ -48,6 +48,48 @@ test('schema rejects unsafe IDs, invented fields, impossible dates and projectle
   for (const file of ['../secret', '/secret', 'C:\\secret', 'nested/../../secret', 'C:secret']) assert.equal(experienceSchema.safeParse({ ...sample(), sources: [{ ...sample().sources[0], file }] }).success, false);
 });
 
+test('library discovery includes bounded explicitly related open tickets and ignores closed or unlinked reports', async t => {
+  const {service}=await fixture(t);
+  const report={type:'gap',title:'Knapfamilie',description:'Et konkret ændringsønske til knapper og panelmønster.',requestedChange:'Gennemgå den ønskede variant.',area:'button',actor:'library-test'};
+  const linked=(await service.createTicket({ticket:{...report,relations:{components:['button'],patterns:['resizable-panel']}}})).ticket;
+  for(let index=0;index<6;index++)await service.createTicket({ticket:{...report,title:'Ekstra knapønske '+index,relations:{components:['button'],patterns:[]}}});
+  await service.createTicket({ticket:report});
+  const resolved=(await service.createTicket({ticket:{...report,title:'Tidligere rettelse',relations:{components:['button'],patterns:['resizable-panel']}}})).ticket;
+  await service.updateTicket({id:resolved.id,expectedRevision:1,actor:'library-test',note:'Afsluttet i prøven.',changes:{status:'resolved',resolution:{summary:'Afgrænset rettelse.',changes:[{file:'core/components.mjs',note:'Rettet i fixturegrundlaget.'}],verification:{kind:'tested',summary:'Fixturekontrollen bestod.'},heuristicIds:[]}}});
+  const component=await service.getComponent({id:'button'});
+  assert.equal(component.component.name,'Knap');
+  assert.equal(component.relatedTickets.total,7);
+  assert.equal(component.relatedTickets.results.length,5);
+  assert.equal(component.relatedTickets.hasMore,true);
+  assert.ok(component.relatedTickets.results.every(ticket=>ticket.status!=='resolved'&&ticket.relations.components.includes('button')));
+  const library=await service.searchLibrary({query:'button',limit:20});
+  assert.equal(library.results.find(item=>item.id==='button').relatedTickets.total,7);
+  const pattern=(await service.searchLibrary({query:'resizable-panel'})).results.find(item=>item.id==='resizable-panel');
+  assert.deepEqual(pattern.relatedTickets.results.map(ticket=>ticket.id),[linked.id]);
+  assert.equal(pattern.relatedTickets.total,1);assert.equal(pattern.relatedTickets.hasMore,false);
+  const guide=(await service.searchLibrary({query:'agent-workflow'})).results.find(item=>item.kind==='guide');
+  assert.equal(guide.relatedTickets,undefined);
+});
+
+test('ticket resolution links only existing heuristics and allows completion without creating a heuristic', async t => {
+  const {service,knowledge}=await fixture(t);
+  const ticket=(await service.createTicket({ticket:{type:'gap',title:'En manglende variant',description:'Et afgrænset behov.',requestedChange:'Tilføj den nødvendige variant.',area:'Knapper',actor:'resolution-test'}})).ticket;
+  const resolution={summary:'Varianten er tilføjet.',changes:[{file:'core/library.mjs',note:'Den relevante variant er opdateret.'}],verification:{kind:'source-inspection',summary:'Den berørte definition er gennemgået.'},heuristicIds:['unknown-rule']};
+  await assert.rejects(service.updateTicket({id:ticket.id,expectedRevision:1,actor:'resolution-test',note:'Afslutning.',changes:{status:'resolved',resolution}}),/Ukendt heuristik-id/);
+  assert.equal((await service.getTicket({id:ticket.id})).ticket.revision,1,'a rejected reference publishes nothing');
+  const {problem,approach,...base}=sample('existing-rule');
+  await service.proposeExperience({experience:{...base,schemaVersion:2,context:problem,heuristic:approach,rationale:'Den anbefalede tilgang bevarer ejerskabet.'}});
+  const linked=await service.updateTicket({id:ticket.id,expectedRevision:1,actor:'resolution-test',note:'Afslutning med relevant praksis.',changes:{status:'resolved',resolution:{...resolution,heuristicIds:['existing-rule']}}});
+  assert.deepEqual(linked.ticket.resolution.heuristicIds,['existing-rule']);
+  const other=(await service.createTicket({ticket:{type:'bug',title:'En lokal knapfejl',description:'Fejlen er afgrænset.',requestedChange:'Ret knappen.',area:'Knapper',actor:'resolution-test'}})).ticket;
+  const completed=await service.updateTicket({id:other.id,expectedRevision:1,actor:'resolution-test',note:'Der kom ingen ny heuristik ud af rettelsen.',changes:{status:'resolved',resolution:{...resolution,heuristicIds:[]}}});
+  assert.deepEqual(completed.ticket.resolution.heuristicIds,[]);
+  await fs.unlink(path.join(knowledge,'proposals','existing-rule.json'));
+  assert.deepEqual((await service.getTicket({id:ticket.id})).ticket.resolution.heuristicIds,['existing-rule'],'historical records remain readable if referenced knowledge is unavailable');
+  const annotated=await service.updateTicket({id:ticket.id,expectedRevision:2,actor:'resolution-test',changes:{},note:'Efterfølgende note uden ny resolution.'});
+  assert.equal(annotated.ticket.revision,3);
+});
+
 test('new proposals remain drafts, reload immediately and cannot replace canonical or pending records', async t => {
   const { service, knowledge } = await fixture(t);
   await service.proposeExperience({ experience: sample() });
@@ -339,7 +381,7 @@ test('proposal capacity does not block curation and canonical symlinks cannot re
   assert.equal(await fs.readFile(target, 'utf8'), '[]');
 });
 
-test('SDK stdio client discovers, validates and calls the actual eight-tool server', async t => {
+test('SDK stdio client discovers, validates and calls the actual twelve-tool server', async t => {
   const { knowledge, project } = await fixture(t);
   const serverURL = new URL('../tools/mcp-server.mjs', import.meta.url).href;
   const transportURL = new URL('../node_modules/@modelcontextprotocol/sdk/dist/esm/server/stdio.js', import.meta.url).href;
@@ -350,7 +392,7 @@ test('SDK stdio client discovers, validates and calls the actual eight-tool serv
   await client.connect(transport);
   const { tools } = await client.listTools();
   assert.deepEqual(tools.map(tool => tool.name).sort(), TOOL_PACKAGES.flatMap(pack => pack.tools.map(tool => tool.name)).sort());
-  assert.equal(tools.length, 8);
+  assert.equal(tools.length, 12);
   assert.equal(tools.find(tool => tool.name === 'propose_experience').annotations.readOnlyHint, false);
   assert.ok(tools.every(tool => tool.inputSchema && tool.outputSchema));
   const library = await client.callTool({ name: 'search_library', arguments: { query: 'datagrid' } });
@@ -359,7 +401,9 @@ test('SDK stdio client discovers, validates and calls the actual eight-tool serv
   assert.equal((await client.callTool({ name: 'get_component', arguments: { id: 'button' } })).structuredContent.id, 'button');
   assert.equal((await client.callTool({ name: 'get_project_context', arguments: { projectId: 'test-project' } })).structuredContent.linked, false);
   assert.equal((await client.callTool({ name: 'check_project', arguments: { projectId: 'test-project' } })).structuredContent.valid, false);
-  const proposed = await client.callTool({ name: 'propose_experience', arguments: { experience: sample() } });
+  const {problem,approach,...legacy}=sample();
+  const heuristic={...legacy,schemaVersion:2,context:problem,heuristic:approach,rationale:'En korrigeret tilgang gør ejerskab eksplicit.'};
+  const proposed = await client.callTool({ name: 'propose_experience', arguments: { experience: heuristic } });
   assert.equal(proposed.structuredContent.status, 'draft');
   const experience = await client.callTool({ name: 'get_experience', arguments: { id: 'gpu-sample' } });
   assert.equal(experience.structuredContent.experience.id, 'gpu-sample');
@@ -372,6 +416,18 @@ test('SDK stdio client discovers, validates and calls the actual eight-tool serv
   assert.equal((await client.callTool({ name: 'get_project_context', arguments: { projectId: 'unknown' } })).isError, true);
   assert.equal((await client.callTool({ name: 'search_library', arguments: { query: 'button', limit: 1000 } })).isError, true);
   assert.equal((await client.callTool({ name: 'propose_experience', arguments: { experience: { ...sample('second'), status: 'reviewed' } } })).isError, true);
+  const created=await client.callTool({name:'create_ticket',arguments:{ticket:{type:'enhancement',title:'Tydeligere panelgreb',area:'Paneler',description:'Grebet bør kunne findes i lukket tilstand.',requestedChange:'Vis en diskret trekant.',actor:'regression',relations:{components:['button'],patterns:['resizable-panel']}}}});
+  assert.equal(created.isError,undefined);
+  const ticket=created.structuredContent.ticket;
+  assert.equal((await client.callTool({name:'search_tickets',arguments:{query:'panelgreb'}})).structuredContent.total,1);
+  assert.equal((await client.callTool({name:'get_ticket',arguments:{id:ticket.id}})).structuredContent.ticket.revision,1);
+  const componentContext=(await client.callTool({name:'get_component',arguments:{id:'button'}})).structuredContent.relatedTickets;
+  assert.equal(componentContext.total,1);assert.equal(componentContext.results[0].id,ticket.id);
+  const patternContext=(await client.callTool({name:'search_library',arguments:{query:'resizable-panel'}})).structuredContent.results[0].relatedTickets;
+  assert.equal(patternContext.total,1);assert.equal(patternContext.results[0].id,ticket.id);
+  const updated=await client.callTool({name:'update_ticket',arguments:{id:ticket.id,expectedRevision:1,actor:'reviewer',changes:{status:'accepted'},note:'Gennemgået.'}});
+  assert.equal(updated.structuredContent.ticket.revision,2);
+  assert.equal((await client.callTool({name:'update_ticket',arguments:{id:ticket.id,expectedRevision:1,actor:'anden',changes:{priority:'high'}}})).isError,true);
 });
 
 test('startup arguments cannot add implicit, duplicate or relative project permissions', async () => {

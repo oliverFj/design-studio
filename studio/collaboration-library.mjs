@@ -2,6 +2,7 @@ import { renderComponent } from '../core/components.mjs';
 import { downloadFile } from '../core/files.mjs';
 import { TOOL_PACKAGES, EXPERIENCE_STATUSES, searchExperiences } from '../collaboration/catalog.mjs';
 import experiences from '../collaboration/experiences.json' with { type: 'json' };
+import {renderTicketInbox,bindTicketInbox} from './tickets.mjs';
 
 const draft = { query: '', scope: '', status: '', open: new Set(), packages: new Set() };
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -19,8 +20,9 @@ function experienceMarkup(theme, entry) {
         paragraph(entry.summary),
         { component: 'accordion', options: { idPrefix: 'experience-' + entry.id, items: [{
           id: entry.id, label: 'Læs erfaring og kilder', open: draft.open.has(entry.id), content: [
-            { tag: 'h4', text: 'Problem' }, paragraph(entry.problem),
-            { tag: 'h4', text: 'Fremgangsmåde' }, paragraph(entry.approach),
+            { tag: 'h4', text: 'Situation og anvendelse' }, paragraph(entry.context??entry.problem),
+            { tag: 'h4', text: 'Heuristik / god praksis' }, paragraph(entry.heuristic??entry.approach),
+            ...(entry.rationale?[{tag:'h4',text:'Hvorfor denne tilgang?'},paragraph(entry.rationale)]:[]),
             { tag: 'h4', text: evidenceLabels[entry.verification.kind] }, paragraph(entry.verification.summary),
             { tag: 'h4', text: 'Gælder med disse forbehold' },
             { tag: 'ul', children: entry.limits.map(text => ({ tag: 'li', text })) },
@@ -32,7 +34,7 @@ function experienceMarkup(theme, entry) {
       ],
       footer: [
         { component: 'badge', options: { text: EXPERIENCE_STATUSES[entry.status], variant: entry.status === 'reviewed' ? 'accent' : 'neutral' } },
-        { tag: 'span', text: entry.scope === 'shared' ? 'Fælles erfaring' : 'Produktlokal · ' + entry.project },
+        { tag: 'span', text: entry.scope === 'shared' ? 'Fælles heuristik' : 'Produktlokal · ' + entry.project },
         { tag: 'span', text: evidenceLabels[entry.verification.kind] },
       ],
     },
@@ -48,16 +50,17 @@ function results(theme) {
 
 export function renderCollaborationLibrary(theme) {
   return `<div class="collaboration-library">
+    ${renderTicketInbox(theme)}
     <section class="connections-section" aria-labelledby="experience-library-title">
-      <div class="connections-section-heading"><span class="connections-number" aria-hidden="true">01</span><h2 id="experience-library-title">Erfaringer, der kan gives videre</h2></div>
-      <p class="connections-copy">Find en kendt fejl, før arbejdet begynder forfra. Hver erfaring viser, hvor den gælder, hvad den bygger på, og hvad der stadig skal efterprøves. Gennemgået betyder, at posten er kontrolleret mod sine kilder; den konkrete kontrol står på posten.</p>
+      <div class="connections-section-heading"><span class="connections-number" aria-hidden="true">01</span><h2 id="experience-library-title">Heuristik og gode praksisser</h2></div>
+      <p class="connections-copy">Erfaringer er heuristik: tommelfingerregler og gode praksisser, som formes, når en tilgang har skullet korrigeres. Hver post beskriver situationen, den anbefalede tilgang, begrundelsen, belægget og begrænsningerne. Konkrete ændringsønsker til Stade hører til tickets.</p>
       <p class="connections-copy">Når agenten henter en erfaring gennem MCP, sammenlignes kildernes aktuelle filer automatisk med de gemte kontrolsummer. Svaret skelner mellem uændret, ændret, utilgængelig og uden sammenligningsgrundlag. En ændret kilde kræver en ny gennemgang; erfaringen bliver ikke automatisk forkert eller omskrevet.</p>
       <form class="experience-filters" role="search" aria-label="Søg i erfaringer">
         <label class="studio-field" for="experience-query">Søg i erfaringer<input id="experience-query" class="studio-input" type="search" placeholder="Fx GPU, materialer eller hukommelse" value="${escape(draft.query)}"></label>
         <label class="studio-field" for="experience-scope">Omfang<select id="experience-scope" class="studio-input">${[['', 'Alle områder'], ['shared', 'Fælles'], ['project', 'Produktlokale']].map(([value, label]) => `<option value="${value}"${value === draft.scope ? ' selected' : ''}>${label}</option>`).join('')}</select></label>
         <label class="studio-field" for="experience-status">Status<select id="experience-status" class="studio-input">${[['', 'Aktuelle'], ['reviewed', 'Gennemgået'], ['draft', 'Kladde'], ['retired', 'Udgået']].map(([value, label]) => `<option value="${value}"${value === draft.status ? ' selected' : ''}>${label}</option>`).join('')}</select></label>
       </form>
-      <div class="experience-result-bar"><p id="experience-count" role="status">${selection().length} af ${experiences.length} erfaringer</p>${renderComponent(theme, 'button', { text: 'Hent erfaringer som JSON', variant: 'tertiary', attrs: { id: 'experience-export' } })}</div>
+      <div class="experience-result-bar"><p id="experience-count" role="status">${selection().length} af ${experiences.length} erfaringer</p>${renderComponent(theme, 'button', { text: 'Hent heuristik som JSON', variant: 'tertiary', attrs: { id: 'experience-export' } })}</div>
       <div class="experience-results">${results(theme)}</div>
       <p class="connections-note">Dette er den samling, der fulgte med seneste build. Nye forslag gemmes af MCP-tjenesten som kladder og kommer først med her efter gennemgang og et nyt build. JSON-downloaden indeholder hele den viste udgaves samling, også poster som er skjult af filtre.</p>
     </section>
@@ -72,13 +75,13 @@ export function renderCollaborationLibrary(theme) {
           body: [paragraph(pack.description), { component: 'accordion', options: { idPrefix: 'tool-package-' + pack.id, items: [{
             id: pack.id, label: `Se ${pack.tools.length} værktøjer`, open: draft.packages.has(pack.id), content: pack.tools.flatMap(tool => [
               { tag: 'h4', text: tool.title }, paragraph(tool.description),
-              paragraph(`${tool.name} · ${tool.readOnly ? 'Læser og undersøger' : 'Opretter en ny kladde'}`),
+              paragraph(`${tool.name} · ${tool.readOnly ? 'Læser og undersøger' : pack.id==='tickets'?'Skriver i ticketindbakken':'Opretter en ny heuristikkladde'}`),
             ]),
           }] } }],
           footer: { component: 'badge', options: { text: 'Implementeret · Lokal MCP', variant: 'accent' } },
         },
       })).join('')}</div>
-      <p class="connections-note">Pakkerne er logiske samlinger, ikke separat installerede plugins. Denne side måler ikke, om din agentapp har forbindelse. Projekter skal være tilføjet på tjenestens tilladelsesliste; forslag kan kun oprette nye erfaringskladder.</p>
+      <p class="connections-note">Pakkerne er logiske samlinger. Denne side måler ikke, om din agentapp har forbindelse. Tickets kan oprettes og opdateres med revisionskontrol; heuristikforslag bliver kladder, som gennemgås særskilt. Projektadgang ændres ikke af en indberetning.</p>
     </section>
 
     <section class="connections-section" aria-labelledby="collaboration-install-title">
@@ -108,9 +111,10 @@ export function renderCollaborationLibrary(theme) {
   </div>`;
 }
 
-export function bindCollaborationLibrary(root, theme) {
+export function bindCollaborationLibrary(root, theme, options={}) {
   const host = root.querySelector('.collaboration-library');
   if (!host) return;
+  const tickets=bindTicketInbox(host,theme,options);
   const update = () => {
     host.querySelector('.experience-results').innerHTML = results(theme);
     host.querySelector('#experience-count').textContent = `${selection().length} af ${experiences.length} erfaringer`;
@@ -128,5 +132,6 @@ export function bindCollaborationLibrary(root, theme) {
     if (event.target.open) opened.add(id);
     else opened.delete(id);
   }, true);
-  host.querySelector('#experience-export').addEventListener('click', () => downloadFile('stade-erfaringer.json', JSON.stringify(experiences, null, 2), 'application/json'));
+  host.querySelector('#experience-export').addEventListener('click', () => downloadFile('stade-heuristik.json', JSON.stringify(experiences, null, 2), 'application/json'));
+  return {destroy(){tickets.destroy();}};
 }

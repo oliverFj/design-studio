@@ -8,6 +8,7 @@ desktop.ini
 /artifacts/
 /index.html
 /examples/workspace/index.html
+/collaboration/tickets/
 *.log
 !collaboration/evidence/**/*.log
 .env
