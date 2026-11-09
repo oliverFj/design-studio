@@ -85,7 +85,10 @@ export async function runAgentSetup(args, { connection = { planConnection, apply
   if (options.command === 'status') {
     const current = await connection.inspectConnection(settings);
     const skills = await skillInstaller.planSkills(skillSettings);
-    result = { connection: current, skills: skills.skills, conflicts: skills.conflicts, ...(options.probe && current.registered ? { serverCheck: await probe(current) } : {}), note: 'Status viser lokal opsætning. Det er ikke en måling af den aktuelle chats indlæste værktøjer.' };
+    const guidanceDrift = skills.skills.filter(skill => skill.guidance?.status !== 'current').map(skill => ({ id: skill.id, status: skill.guidance?.status ?? 'unavailable' }));
+    result = { connection: current, skills: skills.skills, conflicts: skills.conflicts, guidanceDrift,
+      ...(options.probe && current.registered ? { serverCheck: await probe(current) } : {}),
+      note: 'Status læser kun lokal opsætning. guidance sammenligner kilde, installerede filer og sidste installationshash; guidanceDrift viser vejledning, der mangler eller afviger. Lokale ændringer overskrives ikke. Status måler ikke den aktuelle chats indlæste værktøjer.' };
   } else {
     const plannedConnection = await connection.planConnection(settings);
     const plannedSkills = await skillInstaller.planSkills(skillSettings);

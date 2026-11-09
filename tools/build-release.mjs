@@ -78,7 +78,7 @@ export async function sourceEntries(directory = root) {
   }
   // Ship the collaboration runtime and reviewed data, with a fixed boundary
   // around the distributable files rather than all local collaboration data.
-  for (const file of ['catalog.mjs', 'schema.mjs', 'service.mjs', 'ticket-schema.mjs', 'tickets.mjs', 'experiences.json']) {
+  for (const file of ['catalog.mjs', 'schema.mjs', 'service.mjs', 'guides.mjs', 'search.mjs', 'graphics.mjs', 'ticket-schema.mjs', 'tickets.mjs', 'experiences.json']) {
     try { await add('collaboration/' + file); } catch (error) { if (error.code !== 'ENOENT') throw error; }
   }
   // The hidden starter ignore-file is intentional source, not local settings.

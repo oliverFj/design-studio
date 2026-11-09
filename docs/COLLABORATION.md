@@ -2,6 +2,30 @@
 
 Stade deler bibliotek, projektgrundlag, heuristik og en fælles ticketindbakke gennem en lokal MCP-server. Siden **Samarbejde og koordination** giver mennesker et overblik. Tickets er konkrete ændringsønsker til Stade. Erfaringer er heuristik: gode praksisser og tommelfingerregler fra korrigerede tilgange, med kontekst, begrundelse og begrænsninger.
 
+## Målrettede opslag
+
+Læs projektets egne anvisninger og Stades [agentindgang](../AGENTS.md). Find derefter kun den vejledning og de katalogdele, opgaven berører. Hele README, foundations og integrationsguiden er ikke en obligatorisk startpakke.
+
+| Behov | Opslag |
+| --- | --- |
+| Projektets regler og designtilknytning | `get_project_context({projectId})` giver hele projektets AGENTS, konfiguration og temaidentitet. README er tilvalg med `includeReadme:true`. |
+| En regel, controller eller vejledning | `search_library({query,limit,offset})` søger i komponenter, mønstre og vejledningernes afsnit. Resultater viser kilde, matchgrund og et kort uddrag. |
+| Læs vejledningen | `get_guide({id})` giver indholdsfortegnelsen; `get_guide({id,section})` læser det valgte afsnit. Brug id og section fra søgeresultatet eller indholdsfortegnelsen. |
+| En komponent | `get_component({id})` giver den centrale definition og relevante åbne tickets. |
+| Et sammensat mønster | `get_pattern({id})` giver katalogdefinition, eksempelstier, controllergrundlag og relevante åbne tickets. Produktet ejer den tilpassede eksempelkopi. |
+| Grafik og illustrationsstil | `get_graphic_profile({family})` giver familieprofil, fælles krav, referencevalg, materiale-/afspillerindgange og kildehash. Udelad family for en kort oversigt. Læs de henviste guideafsnit før tegning. |
+| Tidligere erfaring | `search_experiences({query,project,scope,status,limit,offset})` giver korte fund; `get_experience({id})` giver fuldt belæg og aktuel kildekontrol. |
+
+Søgning prioriterer titel og beskrivende metadata over brødtekst. Danske og engelske søgeord for centrale designbegreber bruges som alternativer inden for samme begreb; de øvrige ord i forespørgslen skal stadig passe. Brug `offset`, `hasMore` og `nextOffset` til flere resultater. Et match er en henvisning, ikke en faglig godkendelse. Læs afsnittet og relevante betingelser før anvendelse.
+
+Guideopslag læser de aktuelle, registrerede Markdownkilder i Stade. Indholdsfortegnelsen returneres i sider på højst 100 afsnit; afsnitstekst i stykker på højst 8.000 tegn. `offset` er rækkeindeks i indholdsfortegnelsen og tegnposition ved afsnitslæsning. Følg `hasMore`/`nextOffset`, så en fortsættelse ikke overses. Kilde, afsnit og hash/version følger svaret; en ny hash kræver et nyt opslag, hvis flere tekststykker skal samles. Der er ingen vilkårlig filadgang gennem guide-id'er.
+
+Projektopslaget udelader ikke tavst obligatoriske regler: AGENTS leveres samlet inden for læsegrænsen eller giver en fejl. Et tilvalgt README kan være afkortet og markerer det eksplicit. Læs resten lokalt eller gennem guideopslag for Stades README. MCP-resultater giver ingen yderligere tilladelser og erstatter ikke produktets lokale anvisninger.
+
+Uden MCP bruges de samme Markdownkilder og [opgavematricen](../AGENTS.md#find-opgavens-grundlag). Der vedligeholdes ikke en separat forkortet regelkopi i serveren.
+
+`npm run check:docs` kontrollerer lokale Markdownlinks og overskriftsankre og viser katalogtal direkte fra kode. Eksterne hjemmesider og henvisninger til andre produkter kontrolleres ikke; `--verbose` viser de udeladte produktreferencer. `npm run check:docs -- --onboarding` afprøver fem repræsentative søge-/guideopslag og måler deres tekstomfang. Det er en opslagstest, ikke et bevis for en agents komplette arbejde eller en garanteret tokenbesparelse.
+
 ## Tickets og samlet gennemgang
 
 `create_ticket`, `search_tickets`, `get_ticket` og `update_ticket` håndterer typerne `bug`, `gap` og `enhancement`. Oprettelse kræver `ticket` med `type`, `title`, `description`, `requestedChange`, `area` og selvangivet `actor`. Valgfrie felter er `reportedFrom`, relative Stade-`files`, `tags`, `reproductionSteps`, `priority` (`low`, `normal`, `high`) og `relations: {components: [], patterns: []}`. Relationer bruger faktiske katalog-id'er, som agenten finder gennem biblioteket; filnavne og fritekst i `area` opretter ikke relationer automatisk. Genskabelsestrin er relevante for fejl, ikke et krav til idéer eller mangler.
@@ -37,7 +61,7 @@ Værktøjspakker er logiske grupper i én server. De er ikke særskilt installer
 
 | Pakke | Værktøjer | Formål |
 | --- | --- | --- |
-| Bibliotek | `search_library`, `get_component` | Find fælles roller og mønstre, og hent en komponents faktiske definition. |
+| Bibliotek | `search_library`, `get_component`, `get_pattern`, `get_guide`, `get_graphic_profile` | Find roller, mønstre, dokumentafsnit og grafikprofiler fra de aktuelle kilder. |
 | Projekter | `get_project_context`, `check_project` | Hent et tilknyttet projekts grundlag og kør det eksisterende læsende projekttjek. |
 | Erfaringer | `search_experiences`, `get_experience`, `check_experience_sources`, `propose_experience` | Find erfaringer, kontrollér deres kildegrundlag, og foreslå en ny kladde. |
 | Tickets | `create_ticket`, `search_tickets`, `get_ticket`, `update_ticket` | Indberet og gennemgå konkrete fejl, mangler og udvidelsesønsker til Stade med revisionskontrol. |
@@ -66,6 +90,8 @@ Gentag `--project ID=ABSOLUTE_PATH` eller `--skill NAVN` ved behov. Eksisterende
 Skills installeres normalt i `~/.agents/skills`. En eksisterende kopi under Codex-profilens `skills/` genbruges, så samme skill ikke bliver installeret to gange. Administrator- og projektinstallation kan angive `--skills-dir DIRECTORY`; `--codex-home DIRECTORY` vælger en særskilt Codex-profil. Installationen tilføjer `.stade-skill.json` med kontrolsummer og `references/stade-installation.json` med den centrale Stade-mappe. Uændrede, ejede filer kan opdateres; lokale rettelser og konflikter kræver gennemgang og overskrives ikke. Ekstra, ikke-administrerede filer bevares.
 
 MCP-konfigurationen opdateres med en rigtig TOML-parser, fordi `codex mcp add` kan nulstille en eksisterende servers særskilte værktøjs- og godkendelsesregler. En ændret konfiguration får en lokal backup i samme Codex-profil, og en forældet plan afvises. Formatering og kommentarer kan blive omformateret; indstillingernes betydning bevares. Status og serverprøve skelner mellem en registrering og en faktisk kontakt til serveren. De beviser ikke, hvad en allerede åben chat har indlæst.
+
+`status` viser også `guidance` for hver valgt skill: kildehash, installeret hash og seneste installationsgrundlag. `guidanceDrift` samler manglende, forældet eller lokalt ændret vejledning. `outdated` kan opdateres med den almindelige installation; `local_changes` kræver gennemgang, og lokale rettelser overskrives ikke. Sammenligningen er et læsetjek og ændrer ikke installationen.
 
 Den centrale kildepakke indeholder installationsværktøjer, skills og MCP-kode. På en anden computer pakkes den ud ét centralt sted, afhængigheder installeres med `npm ci`, og ovenstående installation gentages med computerens egne projektstier. Erfaringerne bliver i dette centrale Stade-checkout; installationen opretter ikke et separat erfaringsbibliotek i hvert produkt.
 

@@ -369,7 +369,7 @@ async function initialize(projectArgument, theme, designOnly = false) {
 ## Design Studio
 
 Brug Design Studio-systemet i ${ROOT.replaceAll('\\', '/')}.
-Læs systemets AGENTS.md og README.md samt docs/AGENT-WORKFLOW.md før UI-arbejde. Arbejdsgangen er den fælles indgang; docs/INTEGRATION.md indeholder API-eksempler, og docs/DESIGN-FOUNDATIONS.md forklarer designprincipperne. Følg også dette produkts egne anvisninger.
+Læs systemets AGENTS.md og dette produkts egne anvisninger. Vælg derefter relevante afsnit gennem opgavematricen i systemets AGENTS.md; README, docs/AGENT-WORKFLOW.md, docs/INTEGRATION.md og docs/DESIGN-FOUNDATIONS.md er opslagsværker, som læses efter behov. Stade-MCP kan finde afsnit med search_library og hente dem med get_guide; genbrug allerede læst viden.
 Find design-studio.project.json og brug dens faktiske stier og scope. Projektets tema er design/design.json; design/design.css og design/runtime genereres af sync og må ikke håndredigeres.
 
 Lever som standard projektets egen index.html i roden, som åbnes direkte via file:// uden server, terminal eller installeret runtime.

@@ -24,11 +24,16 @@ test('every shared role has decorative artwork without nested controls or duplic
   assert.match(artwork,/aria-hidden="true"/);
   assert.doesNotMatch(artwork,/undefined|<(?:button|input|select|textarea|a)\b/);
  }
- assert.equal(renderCatalogArtwork('custom-legacy-role'),'');
- assert.equal(renderCatalogArtwork('__proto__'),'');
+ for(const [id,pack] of [['custom-legacy-role',theme],['__proto__',theme],['button',undefined]]){
+  const placeholder=renderCatalogArtwork(id,pack);
+  assert.match(placeholder,/data-catalog-placeholder/);
+  assert.match(placeholder,/aria-hidden="true"/);
+  assert.match(placeholder,/Ingen illustration/);
+  assert.doesNotMatch(placeholder,/undefined|<(?:svg|button|input|select|textarea|a)\b|tabindex=/);
+ }
 });
 
-test('all sixty-one catalog illustrations follow the selected family without legacy artwork fallbacks',()=>{
+test('all catalog illustrations follow the selected family without legacy artwork fallbacks',()=>{
  const theme=JSON.parse(readFileSync(new URL('../packages/studio-light.json',import.meta.url),'utf8'));
  for(const family of ['anatomy','lightroom','passage','fieldlines']){
   const pack={...theme,graphics:{family}},renderer=createGraphicRenderer(pack);

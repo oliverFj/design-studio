@@ -42,6 +42,27 @@ test('experience search includes source, approach and project; retired knowledge
   assert.equal(searchExperiences(entries, { query: 'nonexistent' }).length, 0);
 });
 
+test('experience results rank useful fields, filter projects and page concise evidence without losing full records', async t => {
+  const { service, knowledge } = await fixture(t);
+  const incidental = { ...sample('incidental'), title: 'Ejerskab', tags: ['ressourcer'], summary: 'En observation.', verification: { kind: 'source-inspection', summary: 'gpu ' + 'langt belæg '.repeat(100) }, sources: Array.from({ length: 4 }, () => sample().sources[0]) };
+  const relevant = sample('gpu-relevant');
+  const otherProject = { ...sample('gpu-other'), project: 'andet' };
+  await fs.writeFile(path.join(knowledge, 'experiences.json'), JSON.stringify([incidental, relevant, otherProject]));
+  const first = await service.searchExperiences({ query: 'gpu', project: 'formlab', limit: 1 });
+  assert.equal(first.total, 2);
+  assert.equal(first.results[0].id, relevant.id);
+  assert.equal(first.nextOffset, 1);
+  const next = await service.searchExperiences({ query: 'gpu', project: 'formlab', limit: 1, offset: first.nextOffset });
+  assert.equal(next.results[0].id, incidental.id);
+  assert.equal(next.hasMore, false);
+  assert.equal(next.results[0].sources.length, 2);
+  assert.equal(next.results[0].sourceCount, 4);
+  assert.equal(next.results[0].sourcesTruncated, true);
+  assert.equal(next.results[0].verificationTruncated, true);
+  assert.equal(next.results[0].sources[0].sha256, incidental.sources[0].sha256);
+  assert.equal((await service.getExperience({ id: incidental.id })).experience.verification.summary, incidental.verification.summary.trim());
+});
+
 test('schema rejects unsafe IDs, invented fields, impossible dates and projectless local knowledge', () => {
   assert.equal(experienceSchema.safeParse(sample()).success, true);
   for (const entry of [{ ...sample(), id: '../escape' }, { ...sample(), extra: true }, { ...sample(), updatedAt: '2026-02-30' }, { ...sample(), project: undefined }, { ...sample(), sources: [{ ...sample().sources[0], sha256: 'fake' }] }]) assert.equal(experienceSchema.safeParse(entry).success, false);
@@ -381,7 +402,7 @@ test('proposal capacity does not block curation and canonical symlinks cannot re
   assert.equal(await fs.readFile(target, 'utf8'), '[]');
 });
 
-test('SDK stdio client discovers, validates and calls the actual twelve-tool server', async t => {
+test('SDK stdio client discovers, validates and calls the actual fifteen-tool server', async t => {
   const { knowledge, project } = await fixture(t);
   const serverURL = new URL('../tools/mcp-server.mjs', import.meta.url).href;
   const transportURL = new URL('../node_modules/@modelcontextprotocol/sdk/dist/esm/server/stdio.js', import.meta.url).href;
@@ -392,13 +413,27 @@ test('SDK stdio client discovers, validates and calls the actual twelve-tool ser
   await client.connect(transport);
   const { tools } = await client.listTools();
   assert.deepEqual(tools.map(tool => tool.name).sort(), TOOL_PACKAGES.flatMap(pack => pack.tools.map(tool => tool.name)).sort());
-  assert.equal(tools.length, 12);
+  assert.equal(tools.length, 15);
   assert.equal(tools.find(tool => tool.name === 'propose_experience').annotations.readOnlyHint, false);
   assert.ok(tools.every(tool => tool.inputSchema && tool.outputSchema));
+  const graphic = await client.callTool({ name: 'get_graphic_profile', arguments: { family: 'anatomy' } });
+  assert.equal(graphic.isError, undefined);
+  assert.equal(graphic.structuredContent.family, 'anatomy');
+  assert.equal(graphic.structuredContent.review.technicalValidationDoesNotApproveStyle, true);
+  assert.equal((await client.callTool({ name: 'get_graphic_profile', arguments: { family: '../private' } })).isError, true);
   const library = await client.callTool({ name: 'search_library', arguments: { query: 'datagrid' } });
   assert.equal(library.isError, undefined);
   assert.ok(library.structuredContent.results.some(result => result.id === 'data-grid'));
   assert.equal((await client.callTool({ name: 'get_component', arguments: { id: 'button' } })).structuredContent.id, 'button');
+  const guide = await client.callTool({ name: 'get_guide', arguments: { id: 'agent-workflow' } });
+  assert.equal(guide.isError, undefined);
+  assert.ok(guide.structuredContent.sections.length > 0);
+  const section = await client.callTool({ name: 'get_guide', arguments: { id: 'agent-workflow', section: guide.structuredContent.sections[0].section } });
+  assert.equal(section.isError, undefined);
+  assert.ok(section.structuredContent.content.length > 0);
+  const pattern = await client.callTool({ name: 'get_pattern', arguments: { id: 'resizable-panel' } });
+  assert.equal(pattern.isError, undefined);
+  assert.ok(pattern.structuredContent.exampleFiles.includes('patterns/resizable-panel.mjs'));
   assert.equal((await client.callTool({ name: 'get_project_context', arguments: { projectId: 'test-project' } })).structuredContent.linked, false);
   assert.equal((await client.callTool({ name: 'check_project', arguments: { projectId: 'test-project' } })).structuredContent.valid, false);
   const {problem,approach,...legacy}=sample();

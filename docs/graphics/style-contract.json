@@ -4,7 +4,7 @@
   "language": "da",
   "auditedOn": "2026-11-06",
   "pathBase": "repository-root",
-  "purpose": "Dokumenteret, maskinlæsbart authoringgrundlag for stilbevarende grafik og senere MCP-integration.",
+  "purpose": "Dokumenteret, maskinlæsbart authoringgrundlag for stilbevarende grafik og versionsbestemte MCP-opslag.",
   "authority": {
     "humanGuide": "docs/GRAPHICS-AUTHORING.md",
     "materialSource": "core/graphic-tokens.mjs",

@@ -2,7 +2,7 @@
 
 Følg [agentarbejdsgangen](AGENT-WORKFLOW.md) for rækkefølge, valg af komponenter og proportional kontrol. Denne guide beskriver API og integration; produktets egne anvisninger ejer skærme og funktioner.
 
-API'et beskriver bibliotek 3.9.1 og de 62 implementerede roller i det aftalte katalog. `COMPONENT_COVERAGE` viser den relevante runtimeindgang; almindelig komponentmarkup forbinder ikke automatisk en kompleks controller. Brug produktets faktiske filstier fra `design-studio.project.json`.
+Den aktuelle biblioteksversion og kataloget findes i `core/library.mjs`. `COMPONENT_COVERAGE` viser den relevante runtimeindgang; almindelig komponentmarkup forbinder ikke automatisk en kompleks controller. Brug produktets faktiske filstier fra `design-studio.project.json`.
 
 Brug [den fælles signaturkomponent](SIGNATURE.md), når et produkt skal krediteres med Fjordside-logo og Oliver Fjordside i Platypi. [Onlinevejledningen](WEBSITE-SHOWCASE.md) beskriver opdatering og udgivelse af Design Studio på hjemmesiden.
 
@@ -139,11 +139,13 @@ Controlleren har `getState()`, tavs `update({value, draft, error, disabled, read
 
 Talfeltet bruger centrerede cifre med fast cifferbredde og symmetrisk indvendig luft. Bredden beregnes fra min/max og decimalpræcisionen i grænser og step, med plads til fortegn. Den er stabil under redigering, har en kompakt minimumsbredde og reserverer højst 12 tegn; `step: 'any'` reserverer mindst seks. Meget lange værdier kan redigeres i feltet uden at udvide panelet. De native op/ned-pile skjules kun i denne kombination; piletaster og talfeltets semantik bevares. Almindelige `number-input` beholder deres betjening.
 
+Parameterpaneler bruger normalt `range-field` med `with-input` og den fælles `mountRangeField`. Gyldige ændringer opdaterer prøven live; produktet bevarer seneste gyldige visning under ugyldige kladder og adskiller forhåndsvisning fra lagring. Talfeltet har centrerede cifre, symmetrisk luft og stabil bredde efter interval og trin. Se [skyderkontrakten](INTEGRATION.md#skyder-med-præcis-talindtastning).
+
 ## Valgfrie sammensætningseksempler
 
 Før referencekode udledes af eller indføres i et eksisterende produkt, læses de relevante dele af [produktbaserede mønstre og skånsom opdatering](PRODUCT-PATTERNS.md). Vejledningen beskriver referenceforløb fra de fire aktuelle produkter, herunder FormLabs Materialegenerator og Detaljeværksted, og grænserne for en gradvis overgang.
 
-Offline-editorens Designsystem → Designmønstre og web-showcasen viser samme tolv eksempler: panel med træk og sammenklapning, objekteditor med kontekstpanel, parametrisk værksted, opskriftseditor med lag, formular med validering, liste med detaljevisning, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. De bruger bibliotekets eksisterende roller og det valgte tema. Kilde, version, formål, komponenter og interaktioner findes i patterns/catalog.mjs; implementering og layout findes i patterns/compositions.mjs, de enkelte mønstermoduler og patterns/styles.css. PATTERN_FILES i kataloget er den fælles liste til referenceeksport og showcase.
+Offline-editorens Designmønstre og web-showcasen viser samme tolv eksempler: panel med træk og sammenklapning, objekteditor med kontekstpanel, parametrisk værksted, opskriftseditor med lag, formular med validering, liste med detaljevisning, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. De bruger bibliotekets eksisterende roller og det valgte tema. Kilde, version, formål, komponenter og interaktioner findes i patterns/catalog.mjs; implementering og layout findes i patterns/compositions.mjs, de enkelte mønstermoduler og patterns/styles.css. PATTERN_FILES i kataloget er den fælles liste til referenceeksport og showcase.
 
 `mountResizablePanel` fra `patterns/resizable-panel.mjs` er referenceeksemplet til `mountPanelControls`, som eksporteres fra runtime. Controlleren forbindes med `{container, panel, handle, toggle, width, minimum, maximum, open, onChange}`. Værten bruger `ds-panel-layout` med børnene `ds-panel-content`, `ds-panel-resize`, `ds-panel-side` og en native toggleknap. `onChange({width,open})` giver produktet mulighed for at bevare tilstanden. `setOpen(boolean)`, `setWidth(number)` og `destroy()` styrer livscyklussen.
 
@@ -325,6 +327,14 @@ Med `href` bliver elementet et native `a`; uden er det en native `button`. Knapl
 
 `tag` og `segmented-option` understøtter `iconName` og `pressed`; produktet håndterer klik og opdaterer valget. Navngiv `toolbar` og `segmented-control` med `label`. Brug `segmented-control` med `variant: 'wrap'` til længere labels. Produktet ejer handlinger og valglogik.
 
+### Designkontrakt og websiteindhold
+
+Knapper følger et hierarki inspireret af Carbon: primary er hovedhandlingen, secondary er en solid neutral ledsager, tertiary er en indrammet handling, og ghost er supplerende. Fremhævelse, størrelse, destruktiv betydning og ikonbrug er særskilte valg. Et sideikon begrunder plads mellem label og ikon; uden sideikon centreres teksten med symmetrisk padding. Knaplignende navigation bruger native links med samme fremtoning, mens tekstlinks beholder linkrollens understregning. Dette er Design Studios eget API; det kopierer ikke Carbons komponentkode.
+
+Secondary bruger inverse grundfarver og egne hover-/active-flade- og tekstpar under color.action.secondaryHover/Active. Destruktiv betydning er et intent på primary, tertiary eller ghost. Historiske variantnavne kan stadig læses og renderes, men er adskilt fra det offentlige katalog. Se integrationsguiden for API og migration i ny kode.
+
+Link, navigation og image er selvstændige biblioteksroller; header, hero, footer og galleri er sammensætninger af dem og eksisterende roller. Native navigation og menusemantik holdes adskilt. Eksempelillustrationer bruger temaets semantiske flader, primærfarve og brandaccent. Produktets egne billeder og alternative tekster er produktindhold.
+
 ## Faner og native navigation
 
 `tabs` leverer forbundne tab-/panel-id'er, én valgt fane og ét synligt panel. Angiv `items` med entydige, stabile `id`, en ikke-tom `label`, valgfri `disabled` og `content`. Indhold følger slotkontrakten: tekst, deklarative noder eller fælles komponenter. `selectedId` vælger den første aktive fane; uden bruges første tilgængelige fane. Et ukendt `selectedId` afvises ved komponentoprettelse. `orientation: 'vertical'` vælger både lodret opbygning og tastaturretning; standarden er vandret. Brug `idPrefix`, når produktet har brug for genkendelige relationer.
@@ -360,6 +370,10 @@ Controlleren bruger venstre/højre eller op/ned, Home/End og Enter/Mellemrum. De
 `accordion` bruger browserens `details`/`summary`, også til en enkelt disclosure. Angiv `items: [{label,content,open}]` og eventuelt et gruppenavn gennem `label`. Browseren styrer Enter/Mellemrum samt åbning og lukning. Produktet kan gemme foldestatus fra `toggle`/`details.open`. `disabled` afvises, fordi native details ingen sådan tilstand har; utilgængelige oplysninger skal have et særskilt produktvalg.
 
 `breadcrumb` og `pagination` bruger navngivet `nav`, en ordnet liste og native links. Begge tager `label` og `items: [{label,href,current,disabled}]`. Ét aktuelt led får `aria-current="page"`; brødkrummer vælger ellers automatisk sidste led. Uden `href` eller med `disabled: true` bliver et led til tekst uden tabstop eller aktiv destination. Skilletegn i brødkrummer er dekorative. Produktet ejer adresser, sidetal, udeladelser og datalæsning; der er ingen ekstra navigationscontroller.
+
+### Semantik og bevaret kladde
+
+Tabs bruger gensidige tab-/panelrelationer, ét aktivt tabstop og automatisk eller manuel aktivering. Paneler og deres kladder bevares. Accordion bruger native `details`/`summary`; brødkrummer og paginering bruger native links. Det fælles fanemønster følger [APG Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
 
 ## Datatabeller
 
@@ -402,6 +416,10 @@ const table=mountDataTable(view,{
 `update({selectedIds,expandedIds,sort,...callbacks})` genlæser den aktuelle markup uden at genskabe den. `onSelectionChange(ids,{rowId,all,event})`, `onExpand(ids,{rowId,expanded,event})` og `onAction(rowId,actionId,{event})` forbinder produktets state og kommandoer. `destroy()` fjerner lyttere. Brug en stabil host eller genmontér efter udskiftning af selve roden.
 
 `status` er `'ready'`, `'loading'`, `'error'` eller `'empty'`. Loading genbruger spinner og `aria-busy`; error genbruger alert; empty genbruger empty-state. `message` giver produktets forklaring. Loading/error kan bevare tidligere rækker som læsbart indhold med deaktiverede kontroller; empty viser ingen datarækker. `pagination` tager den eksisterende pagination-roles options. Produktet ejer destinationer, totaler, hentning og genforsøg. Et levende eksempel med sortering, valg, rækkehandlinger og bevarede detailfelter findes i `studio/data-table-example.mjs`.
+
+### Valg af tabelrolle
+
+Brug `data-table` til læsning med sortering, valg, rækkehandlinger og detaljer. Native tabeloverskrifter og almindelig Tab-navigation bevares; sortering anmodes hos produktet og bekræftes først, når data er opdateret. Brug `data-grid` ved egentlig celleredigering med et samlet tastaturforløb. At flytte aktiv celle er noget andet end at markere data; fokus og markering vises og rapporteres særskilt.
 
 ## Redigerbart datagrid
 
@@ -453,6 +471,10 @@ Kopiering giver rektangulær TSV med citerede felter for tabs, linjeskift, citat
 
 `onDraftChange(draft)` varsler redigeringens start og indtastning. Læs altid den aktuelle `draft`, før en visning erstattes. `update` afviser fjernelse af den aktive kladdes række/kolonne, ændring af dens `type`, `min`, `max`, `step`, `required` eller `options` og ændringer, der gør cellen utilgængelig for redigering. Editor, kladde og tidligere konfiguration bevares ved `false`. Andre opdateringer genbruger noder og bevarer editorens tekstmarkering og lokal rulning. Ændres den aktive celles accepterede værdi eksternt, bevares kladden med en konfliktfejl, og commit afvises, indtil produktet eller brugeren afklarer konflikten. Annullering viser da den nye eksterne værdi. Bevar arbejdskopi og kladde bevidst ved genmontering; de er ikke automatisk gemte projektdata.
 
+### Validering og lagringsansvar
+
+En grid-editor har en kladde, som bevares ved fejl, og kan annulleres uden at ændre arbejdskopien. Synkron validering afsluttes for hele den foreslåede ændring, før celler accepteres. TSV-indsættelse er atomisk: ukendt format, låste celler, områdeoverskridelse eller en ugyldig værdi afviser hele indsættelsen. Produktets data og lagring er et separat ansvar; et accepteret grid-commit er ikke en gemt fil eller serverbekræftelse. Se [den præcise grid-kontrakt](INTEGRATION.md#redigerbart-datagrid).
+
 ## Kommandomenuer
 
 `menubar`, `menu` og `menu-item` leverer fælles markup. Forbind dem med `mountMenuControls` fra runtime. Roden skal indeholde udløsere og menupaneler; hver udløser har `aria-haspopup="menu"` og `aria-controls` med menuens entydige id. Menuer bruger `role="menu"`; en topmenu bruger native knapper med `role="menuitem"` under `role="menubar"`. En selvstændig menuknap beholder knaprollen. Brug tydelige tilgængelige navne.
@@ -488,6 +510,12 @@ Controlleren leverer pile, Home/End, typeahead, Enter/Space, Escape med fokusret
 
 Brug `aria-disabled="true"` til utilgængelige punkter: de kan fokuseres med pile, men udføres ikke. Produktet ejer kommandoer, placering, eventuelle genveje og checkbox/radio-state med synlige markører og `aria-checked`. Menukæden lukkes før `onAction`, så en kommando kan åbne en dialog og placere fokus dér. Et selvstændigt, interaktivt eksempel findes i `studio/menu-example.mjs` og i editorens menulinjekatalog.
 
+### Semantik og kompakte varianter
+
+Menulinje (`menubar`), kommandomenu (`menu`) og menupunkt (`menu-item`) følger [WAI-ARIA APG Menu and Menubar](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/). Biblioteket leverer native knapper, roller, dele og visuelle tilstande samt `mountMenuControls` til fokus og åbning/lukning. Produktet forbinder udløsere og menuer gennem `aria-controls` og ejer placering, kommandoer og data. Brug pile mellem topmenuer og menupunkter, Home/End og typeahead. Enter/Ned åbner menuen, Escape lukker det inderste niveau og returnerer fokus, og Tab forlader menukæden. Checkbox/radio bruger aria-checked; produktet opdaterer valg og synlige markører. Undermenuer bruger aria-haspopup og aria-expanded. Deaktiverede punkter forklares og kan fokuseres med pile, men må ikke aktiveres. Formularfelter hører til i en popover eller dialog. Vis kun implementerede genveje. Se [menuintegration](INTEGRATION.md#kommandomenuer).
+
+Desktopvarianterne til button, input, select, toolbar og segmented-option er eksplicitte valg til tætte desktopværktøjer. De genbruger temaets semantiske tokens, 32 px kontrolhøjde og den fælles fokusmarkering. Disse standardvarianter bevarer deres eksisterende større mål. Tree bruger som standard det kompakte hierarki med 32 px rækker og tæt indrykning; roomy bevarer de større 44 px klikflader og tekstombrydning, mens desktop er et kompatibelt eksplicit valg af den kompakte præsentation. Handlingsknappens tool-variant har symbol over en kort 13 px label og mindst 52 px samlet klikflade. Brug større mål ved touch eller behov for større klikflader. Menuernes katalog beskriver anvendelse, grupper, destruktive handlinger og højst ét undermenuniveau. Produktspecifikke værktøjslinjer og inspektørlayout bliver i produktet.
+
 ## Billeder og websiteeksempler
 
 `image` bruger `figure`, `img` og valgfri billedtekst. Angiv altid `alt`, når du leverer `src`; tom tekst er tilladt for dekoration. `caption: ''` skjuler billedteksten. Grundudgaven bevarer motivets format; `landscape` og `square` beskærer med `object-fit: cover`.
@@ -518,6 +546,10 @@ function reveal(panel) {
 Funktionen returnerer en native Animation eller null ved reduceret bevægelse eller manglende browserstøtte. Sæt derfor den anvendelige sluttilstand før kaldet. Produktet annullerer eventuelle effekter, når en visning afmonteres. Fanen Animation og effekter demonstrerer den faktiske standard; i komponentkataloget vender kortene tilbage samtidig med, at variantpanelet lukker.
 
 Illustrationsforløb er en særskilt rolle med `duration.illustration` og den fælles `mountGraphicMotion`. En betroet `createPlan(svg, motif)`-funktion kan levere et nyt begrebs forløb uden at registrere en komponentrolle; playeren ejer stadig afspilning, reduceret bevægelse og oprydning. Planen er almindelig kildekode, ikke JavaScript i temadata. Se [authoring-API'et og familieprofilerne](GRAPHICS-AUTHORING.md#en-plan-på-den-fælles-afspiller).
+
+### Bevægelsens sluttilstand
+
+Den fælles standard i core/motion.mjs bruger 240 ms, hurtig start og rolig afslutning uden ekstra forsinkelse. Åbning og tilbagevenden har samme timing. Samtidige ændringer afløser ikke hinanden med ventetid; reduceret bevægelse viser slutlayoutet straks.
 
 ## Hierarkisk indhold med tree
 
@@ -558,9 +590,19 @@ Et item har `id`, `label` og valgfrie `iconName`, `meta`, `badge`, `children`, `
 
 Callbacks foreslår handlinger; de ændrer ikke produktets data. Produktet validerer flytning og valg, opdaterer tilstanden og sender resultatet tilbage med `update`. Det ejer også kontekstmenu, fortryd og en klik-/tastaturbetjent flyttehandling, når drag-and-drop bruges. En tastaturgenvej alene erstatter ikke et klikbart alternativ til træk. Se [WCAG 2.2 om dragging movements](https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html).
 
-Pil op/ned og Home/End flytter kun rækkefokus; højre/venstre åbner, lukker eller navigerer mellem forælder og barn. Bogstaver søger efter rækkenavne med en buffer på 700 ms. Enter vælger rækken, mens Space skifter dens valgtilstand ved multivalg. Normalt klik erstatter valget, Ctrl/Meta-klik skifter en række, og Shift-klik eller Shift+pil op/ned foreslår et interval. `item.disabled` blokerer valg og træk, men ikke foldning eller særskilt aktiverede handlinger. Sådanne rækker kan fortsat få fokus; kun disabled-blade uden aktive handlinger springes over. `action.disabled` styrer den enkelte knap. Tab når den fokuserede rækkes native handlingsknapper; Enter/Space aktiverer knappen. ContextMenu eller Shift+F10 åbner produktets kontekstmenu. Fokus og vedvarende valg skal kunne skelnes. [Designgrundlaget](DESIGN-FOUNDATIONS.md#hierarkier-og-rækkehandlinger) beskriver kilder og afgrænsning.
+Pil op/ned og Home/End flytter kun rækkefokus; højre/venstre åbner, lukker eller navigerer mellem forælder og barn. Bogstaver søger efter rækkenavne med en buffer på 700 ms. Enter vælger rækken, mens Space skifter dens valgtilstand ved multivalg. Normalt klik erstatter valget, Ctrl/Meta-klik skifter en række, og Shift-klik eller Shift+pil op/ned foreslår et interval. `item.disabled` blokerer valg og træk, men ikke foldning eller særskilt aktiverede handlinger. Sådanne rækker kan fortsat få fokus; kun disabled-blade uden aktive handlinger springes over. `action.disabled` styrer den enkelte knap. Tab når den fokuserede rækkes native handlingsknapper; Enter/Space aktiverer knappen. ContextMenu eller Shift+F10 åbner produktets kontekstmenu. Fokus og vedvarende valg skal kunne skelnes. Se [semantik og rækkehandlinger](#semantik-og-rækkehandlinger) for kilder og afgrænsning.
 
 Træet ejer sin indrykning, rækkeanatomi og fokus. Brug eksisterende `scroll-area` til lange træer og produktets shell til placering og maksimal højde. Brede redigerbare kolonner hører til en særskilt treegrid-løsning.
+
+### Semantik og rækkehandlinger
+
+Tree er en selvstændig rolle til hierarkisk objektvalg. Grundsemantikken følger [WAI-ARIA APG Tree View](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/): `tree`, indlejrede `treeitem`/`group`, navngivet rod, `aria-expanded` på forældre og `aria-selected` på valgbare rækker. Ved multivalg bruges `aria-multiselectable`. Fokus vises særskilt fra vedvarende valg; foldning ændrer ikke i sig selv produktets valg.
+
+Design Studio supplerer træet med få native rækkehandlinger. Dette er bibliotekets konkrete udvidelse: rækkefokus bevæges gennem én aktiv tabstop-position, og den aktive rækkes handlinger kan nås med Tab. Handlingsknapper bevarer deres egen tastaturadfærd, navn og eventuelle `aria-pressed`; de må ikke overtage træets navigation eller ændre valg som bivirkning. `item.disabled` deaktiverer objektvalg og træk. Foldning og handlinger har selvstændig tilgængelighed, så eksempelvis Lås op ikke forsvinder sammen med det låste objektvalg. Produktet skal bevare eller flytte fokus meningsfuldt, når et item fjernes. Principperne bygger på [APG Keyboard Interface](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/) og [Button Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/).
+
+Rækker, foldning og handlinger bruger bibliotekets fælles semantiske spacing-, kontrol-, fokus- og actiontokens. Produktet leverer navne, symboler, tilladelser, valgregler, flytning og menuindhold. Det er ikke en generalisering af én branches datamodel. Ved drag-and-drop skal produktet tilbyde en tilsvarende klikbar flyttehandling, som også kan betjenes med tastatur; [WCAG 2.2, 2.5.7](https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html) skelner dette fra tastaturbetjening alene.
+
+Tree er ikke en tabel med redigerbare celler. Har hierarkiet mange interaktive kolonner, er [APG Treegrid](https://www.w3.org/WAI/ARIA/apg/patterns/treegrid/) det relevante særskilte mønster. Kildebaserede principper og automatiske prøver erstatter ikke kontrol af konkrete hjælpemidler og produktforløb.
 
 ## Tema og tokens
 
@@ -572,19 +614,47 @@ Produktets sidelayout kan bruge CSS-variabler som --ds-space-6 og --ds-color-bac
 
 ## Afstande og indlejrede flader
 
-Brug den uindrammede stack til afstand mellem direkte børn: standard bruger space.component.gapLarge, compact bruger space.component.gap. Felter og valggrupper ejer stadig deres interne padding og afstand; undgå ekstra lokale margins på samme grænse. Produktet vælger grupperne, biblioteket leverer rytmen.
-
-Native details beholder almindeligt block-layout. Efter summary placeres en separat stack med varianten disclosure-body. Den bruger gapLarge fra overskriften og gap mellem børnene, og fylder kun, når details er åben. Sæt ikke flex-stack på selve details-roden.
+Produktet vælger grupperne; biblioteket leverer rytmen. Undgå ekstra lokale margins på samme grænse.
 
 En contained scroll-area ejer den synlige flade, kant, radius og klipning. Den indre card, inspector eller toolbar får scroll-areaens surface-part: dens ekstra ramme fjernes, mens originale dele og indvendig spacing bevares. Når et allerede indrammet kort har en fast header, bruges body-varianten på det scrollende indhold. Tilføj ikke endnu en indrammet wrapper alene til scrollbarens placering.
 
 Valggrupper bruger indholdsbaserede minimumsbredder. Brug segmented-control med wrap til lange labels og mange valg; gruppen kan gå over flere rækker. Giv produktpanelet tilstrækkelig bredde. Del ikke almindelige ord vilkårligt for at presse dem ind. Brug divider med vertical til funktionelle grupper i en vandret toolbar frem for store tomme mellemrum.
+
+### Scroll-area
+
+Scroll-area har den faste anatomi root > viewport > content. Kun viewport scroller, og inset holder scrollbaren inden for den ydre afrunding. Content reserverer plads til tastaturfokus. contained ejer én samlet flade, kant og afrunding. Den indre native card, inspector eller toolbar får ds-scroll-area__surface og bevarer sin padding, orientering og direkte dele; surface fjerner kun den ekstra ramme, baggrund og skygge. body bruges til scrolling inde i et allerede indrammet kort med fast header. Dette er Design Studios konkrete anvendelse af [Carbons lagmodel](https://www.carbondesignsystem.com/building-blocks/foundations/color/overview): indlejring skaber kontrollerede fladelag frem for gentagne panelrammer. Viewport kan modtage tastaturfokus med tabindex=0 og et tilgængeligt navn. Produktet ejer maksimal højde og placering.
+
+### Stack og native details
+
+Stack samler direkte felter, noter og handlinger i en lodret strøm. Standard bruger gapLarge mellem indholdsenheder; compact bruger gap mellem tæt relaterede kontroller. Grundrollen og compact har kun display, retning, minWidth og positivt gap, så de tilfører ingen ekstra ramme eller padding. Felter, kort og valggrupper ejer fortsat deres egen indvendige afstand. Kortets root-gap separerer header, body og footer, men skaber ikke automatisk afstand mellem bodyens indlejrede børn; disse kan have en body-stak.
+
+En native details bevarer summary og browserens åbne/lukkede adfærd. Details-root beholder block-layout uden ds-stack; en separat disclosure-body-stak efter summary bruger gap mellem kontroller og paddingBlockStart med gapLarge til udløseren. Den indvendige afstand findes kun, når den native body er synlig, så lukket details ikke efterlader en tom flexafstand. Default og compact er fortsat uden padding. Sammenhængende segmentvalg forbliver én enhed i stakken, så deres interne opbygning bevares.
 
 ## Synlige interaktioner og tæthed
 
 Handlingsfamilierne neutral, primary, selected, danger og accent har hver fire tokens under color.action: eksempelvis neutralHover, neutralHoverText, neutralActive og neutralActiveText. Biblioteket binder disse flade-/tekstpar til de relevante roller og varianter; synlig hover må ikke bero på en lille tekstfarveændring alene. Vedvarende valg og aria-pressed bevares under hover og tryk, og disabled er undtaget.
 
 Temaer justerer tæthed med positive space.component.padding, paddingLarge, paddingCompact, gap og gapLarge samt typografitokens. Bevar bibliotekets minimumsklikflader. De interne --ds-interaction-variabler er komponentlokale implementeringsdetaljer og må ikke sættes som globale tema-overrides.
+
+### Rytme og klikflader
+
+Almindelige handlingskontroller bruger som standard mindst 44px klikflade; dokumenterede kompakte valg og tætte hierarkier kan være mindre. Padding følger den fælles opbygning og positive semantiske tokens. Mærker og billedtekstetiketter har mindre indvendig afstand, fordi de beskriver indhold frem for at udføre en handling. Korte kategorietiketter bruger moderat tracking; formularlabels følger almindelig læsetypografi.
+
+Kort og detaljepaneler bruger kant og flade som deres grundhierarki. Skygge bruges til hævede kort og flydende dialoger. Paneltitler følger title/panel-skalaen, mens display og expressive har særskilte responsive størrelser. Temaet bestemmer fontkarakteren; en expressive rolle kræver ikke kursiv.
+
+Kontakter, valgte mærkater og værktøjstip bruger komplette semantiske forgrund/baggrund-par. En mørk temaudgave må ikke antage, at primaryText eller primary også er den rigtige farve på en invers flade. Native kontroller og fokusmarkeringer bevares på tværs af udtrykkene. Egne dele, der er direkte børn i komponentens anatomi, styles med direkte child-selektorer, så en indlejret komponent bevarer sit eget hierarki. Handlingsgruppens interne dele bruger egne selectors; sammensatte knapper beholder deres varianter og tilstande.
+
+### Layout og semantiske tilstandsfarver
+
+Knapper og segmentvalg bevarer hele ord gennem normal word-break og overflow-wrap. Segmenter har min-content som indholdets nedre breddegrænse, og gruppen kan bryde til flere rækker. Standardgruppen fordeler ledig plads lige, når labels kan være der; wrap bruger en indholdsbestemt basis til større eller varierende grupper. Ingen fast procentkolonne eller produktspecifik ordopdeling styrer disse valg. Ubegrænsede enkeltord kan stadig kræve en særskilt afgrænset visning; biblioteket lover ikke, at alle tænkelige strenge kan vises ved enhver bredde. Lodrette handlingsknapper har automatisk bredde og strækkes af toolbar; lodrette dividers strækkes til den aktuelle rækkes højde.
+
+[Carbon Content switcher](https://www.carbondesignsystem.com/building-blocks/core/components/content-switcher/guidelines) begrunder lige kontrolbredder med plads til den længste label. Design Studios wrap-variant udvider dette til grupper af beslægtede valg i smalle paneler. Carbon anbefaler ellipsis med tooltip ved meget lange labels; almindelige labels skal kunne læses som hele ord.
+
+Hover og active har semantiske flade- og tekstpar under color.action: neutralHover/Active, primaryHover/Active, selectedHover/Active, dangerHover/Active og accentHover/Active med tilsvarende Text-tokens. Neutrale handlinger, primære handlinger, valgte segmenter, destruktive handlinger og accenthandlinger bevarer hver deres familie. Pressed handlingsknapper følger primary; et valgt segment følger selected. Disabled får ingen hover- eller active-feedback. Fuld opacity bevarer tekstkontrast. Fire private --ds-interaction-* bindings i bibliotekets opskrifter vælger den relevante familie; temaappearance kan ikke skrive dem.
+
+Dette følger [Carbons interaktionstokens](https://www.carbondesignsystem.com/building-blocks/foundations/color/overview): feedback ændrer fladen, og tekstfarven understøtter den. [Fluent 2 Button](https://fluent2.microsoft.design/components/web/react/core/button/usage) kræver læselig tekst og ikoner i alle interaktive tilstande og et tydeligt hierarki mellem primære og øvrige handlinger. Runtime kontrollerer de nye farvepar samt pressed/current sammen med hover/active.
+
+Indrammede handlinger og indtastning bruger color.border.field. Kort og panelskillelinjer bruger color.border.default. Listehandlinger har direkte heading og description-dele; aria-current beskriver det aktuelle navigationsmål uden toggle-semantik.
 
 ## Brand
 
@@ -620,6 +690,10 @@ Dialog/panel har `title`, `body` og slots `body`/`footer`. `describeBody:false` 
 Popover er ikke modal. Escape og eksplicit lukning returnerer fokus; klik eller fokus udenfor lukker uden at overtage det nye fokus. Skift ikke panelets markup ved hver åbning, hvis kladder skal bevares. Tooltip indeholder kun forklarende tekst, har som standard `delay:300` og `closeDelay:120` millisekunder og bevarer eksisterende `aria-describedby` på udløseren. Den erstatter ikke udløserens navn.
 
 Tooltip/popover understøtter `placement: 'top'|'bottom'|'left'|'right'`, vender ved viewportkanter og genplaceres ved scrolling, resize og ændret elementstørrelse. Native Popover API giver top layer uden portals. Uden API'en bruges en fast positioneret fallback; clipping fra forfædre kan da stadig begrænse panelet. Der er ingen ekstern runtimeafhængighed.
+
+### Overlaysemantik
+
+Tooltip flytter ikke fokus og indeholder ingen interaktive kontroller; Escape lukker hjælpen, og hover over hjælpen holder den synlig. Interaktiv hjælp bruger en ikke-modal popover. Placeringen følger viewport, scrolling og ændrede størrelser; den native Popover API bruges til top layer, når den findes. Dialog og drawer bruger native dialog med eksplicit modalitet. Escape lukker det inderste overlay, og fokus vender meningsfuldt tilbage. Principperne bygger på [APG Tooltip](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/), [APG Dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) og [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API/Using).
 
 ## Tidligere produkter
 
@@ -664,6 +738,10 @@ host.append(create('field-group', {
 
 `readOnly` (alias `readonly`) på tekst- og talfelter bevarer fokus og kopiering og forhindrer redigering. Det erstatter ikke `disabled`. Select, checkbox, radio, switch og range har ingen native readonly-tilstand. `range-field` viser den initiale værdi i et `output`; produktets inputhåndtering opdaterer den synlige værdi ved ændringer.
 
+### Indholdets semantik
+
+Avatarer har navne uafhængigt af billeder; initialer bevares under indlæsning og ved billedfejl. Feltgrupper bruger `fieldset`/`legend`. Label, hjælp og fejl har særskilte relationer, så hjælpeteksten ikke bliver kontrollens navn. Tal og flerlinjetekst bruger native input/textarea; de nye kontrollers effektive feltkanter er omfattet af samme bindende kontrastkontrol.
+
 ## Loading, fremdrift og tomt indhold
 
 `spinner` tager en forståelig `label` og varianterne `small`, `default` eller `large`. Den er en polite status; brug `announce: false`, hvis den omgivende visning allerede annoncerer arbejdet. `skeleton` er altid dekorativ med `aria-hidden="true"`; vælg `default` til en tekstlinje, `block` til en flade og `circle` til en rund pladsholder. Angiv én loading-status for hele området. Begge beholder deres betydning uden animation ved reduceret bevægelse.
@@ -671,6 +749,10 @@ host.append(create('field-group', {
 `progress` bruger native `<progress>` med en tilknyttet `label`. `max` er et positivt tal (standard 100), og `value` ligger mellem 0 og max. Udeladt eller null `value` giver ubestemt fremdrift. `valueText` kan beskrive et trin, eksempelvis `"3 af 8 filer"`. Komponenten er ikke en live-region; produktet annoncerer relevante milepæle frem for hvert værdiskift.
 
 `empty-state` tager `title`, `body` og valgfrie deklarative handlinger i `slots.actions`. Den er almindeligt navngivet indhold, også når en tabel eller søgning er tom. Produktet ejer søgning, nulstilling og oprettelse samt en eventuel separat statusmeddelelse.
+
+### Status og annoncering
+
+Loading skal have ét forståeligt navn for det relevante område. Spinner beskriver en aktivitet, progress viser native målelig eller ubestemt fremdrift, og skeleton reserverer dekorativ plads. Annoncér milepæle frem for hvert procenttrin. Toast annoncerer beskeden uden knaptekster, flytter ikke fokus og pauser sin tid ved hover, fokus og skjult dokument. Meddelelser med handlinger forsvinder kun ved eksplicit lukning. Tom tilstand forklarer situationen og kan tilbyde et næste skridt uden at være en automatisk live-region.
 
 ## Korte meddelelser med toast
 
@@ -698,6 +780,10 @@ const selection = mountFileUpload(picker, {
 `mountFileUpload` læser begrænsninger fra den renderede komponent; samme options kan gives direkte til controlleren. `files` kan angive et allerede accepteret lokalt udvalg. Det valideres før montering. `accept` understøtter filendelser, MIME-typer og familier som `image/*`; valideringen bruger navn, type og størrelse og undersøger ikke filindholdet. Input og drop bruger samme validator. Annullering eller ugyldige filer bevarer tidligere valg og udløser ikke `onChange`.
 
 Controlleren giver en kopi i `files`, `setFiles(files)`, `remove(index)`, `clear()` og `destroy()`. `onChange(files, detail)` kaldes først efter et gyldigt nyt valg; `detail.source` er `input`, `drop`, `programmatic`, `remove` eller `clear`. `onInvalid(errors, detail)` kan supplere den viste fejl. `validateFileSelection(files, options)` giver samme validering uden DOM og returnerer `{ valid, files, errors }`. Brug controllerens `files` som det samlede udvalg, også efter drop og fjernelse. Produktet ejer læsning, lagring og en eventuel netværksoverførsel.
+
+### Validering og bevaret udvalg
+
+Filvalg bevarer native input og tastaturbetjening. Input og valgfrit drop bruger samme metadata-validering før et nyt udvalg accepteres. Annullering og afviste filer bevarer det tidligere udvalg. Produktet ejer læsning, lagring og eventuel overførsel; filnavne er tekst, og metadata-validering er ikke en undersøgelse af filindholdet.
 
 ## Filtrerede valg og native dato/tid
 
@@ -729,3 +815,25 @@ Piletaster, Home/End og Enter navigerer og vælger, mens DOM-fokus bliver i inpu
 `update({items})` bevarer inputnode, kladde, valg og kendte labels for valgte ID'er, der ikke findes i et filtreret eller nyt svar. `update({value})` eller `update({values})` ændrer udtrykkeligt valget; `update({query})` erstatter kladden. Ved asynkrone søgninger bruges det `requestId`, som `onQueryChange` leverede. Gamle resultater og svar efter afmontering ignoreres med returværdien `false`; opdateringer uden request-ID er produktets bevidste synkrone ændringer. `loading` og `error` giver fælles status og beskrivelse. Produktet ejer forespørgsler og eventuel annullering.
 
 `date-picker` og `time-picker` bruger native `input type="date"`/`"time"` med den fælles label/hjælp/fejl-opbygning. Datoer bruger `YYYY-MM-DD`; tid bruger `HH:mm`, eventuelt med sekunder og millisekunder. Tom værdi er `''`. `min`/`max` følger samme format; `step` er positivt eller `'any'` (dage for dato, sekunder for tid). `required`, `readOnly`, `disabled`, `name`, `hint` og `error` følger felt-API'et. Browseren leverer lokal visning og eventuel kalender-/tidsvælger; de lagrede strenge indeholder ingen tidszone. Produktet håndterer native `input`/`change`, validering og lagring.
+
+### Værdier og asynkrone svar
+
+Combobox og multivalg skelner mellem indtastningskladde og valgte ID'er. Tastaturnavigation bevarer inputfokus, og asynkrone resultater forbindes med request-ID'er, så gamle svar ikke overtager nyere valg. Dato og tid bruger native kontroller og tidszonefri værdistrenge; produktet bestemmer databetydning og eventuel tidszonekonvertering.
+
+
+## Vælg controller
+
+| Behov | Anvendelse og produktansvar |
+| --- | --- |
+| Formular | `field` forbinder label, hjælp og fejl. Produktet ejer validering og flytter fokus til første fejl ved afvist indsendelse. |
+| Filtrerede valg og dato/tid | Brug `mountCombobox`/`mountMultiselect`; produktet ejer stabile ID'er og asynkrone forespørgsler med controllerens request-ID. Native `date-picker`/`time-picker` bruger dato-/tidsstrenge uden tidszone. |
+| Status og filvalg | Brug én navngivet loading-status; skeleton er dekorativ. Forbind `mountToast` og `mountFileUpload`. Bevar tidligere filer ved cancel/fejl; produktet ejer data og eventuel overførsel. |
+| Datatabel | Brug native `data-table` og `mountDataTable` til valg, ekspansion og handlingscallbacks. Produktet sorterer data og bekræfter derefter sorteringstilstanden. |
+| Redigerbart datagrid | Brug `data-grid` og `mountDataGrid` til cellenavigation, særskilt markering, kladder og atomisk TSV-indsættelse. Synkron `validateCell` afgør, om en ændring kan accepteres; `onCommit` overfører den accepterede arbejdskopi til produktets state. |
+| Kommandomenu | `mountMenuControls(root, {onAction})` forbinder udløsere og menuer gennem `aria-controls`. Produktet ejer markup, placering, kommandoer og checkbox/radio-state. |
+| Træ | `mountTree(theme, host, options)` leverer tastatur og fokus. Produktets callbacks accepterer valg, foldning og flytning gennem `update`. |
+| Dialog og drawer | Brug native dialog fra `createComponent` med `mountDialog`/`mountDrawer` eller produktets etablerede tilgængelige adapter. Hjælperen forbinder åbning, lukning og fokusretur; produktet ejer handlinger og kladder. `modal:false` er eksplicit ikke-modalt; `open:true` alene giver ikke modaladfærd. |
+| Faner | Brug `tabs` og `mountTabs`, også ved eksisterende kompatibel markup. Bevar panelerne ved skift; produktet ejer indhold og data. Automatisk aktivering bruges til indhold uden ventetid. |
+| Tooltip og popover | Brug `mountTooltip` til kort hjælp uden kontroller; `mountPopover` til interaktivt indhold. Brug navn, fokusretur og Escape; bevar panelerne under samme designscope og inden for en eventuel native modaldialog. |
+| Accordion og webnavigation | Brug native `accordion`, `breadcrumb` og `pagination`. Produktet ejer adresser, foldestatus og udsnittet af sidetal; der kræves ingen lokal tastaturcontroller. |
+| Panel og bevægelse | Brug `mountPanelControls` og `animateStandard`, når de passer til behovet. Sluttilstanden skal fungere uden animation. |

@@ -58,7 +58,7 @@ Efter tema- eller biblioteksændringer køres `node tools/cli.mjs sync PROJECT_D
 
 ## Designmønstre og fælles layout
 
-Editor og showcase indeholder elleve afprøvbare referenceeksempler: objekteditor, parametrisk værksted, opskriftseditor med lag, formular, liste med detaljer, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. Kortbjælken viser familiespecifikke illustrationer og kan rulles vandret. `node tools/cli.mjs examples PROJECT_DIR` kopierer referencekoden og illustrationsmodulerne uden overskrivning. Produktet ejer derefter tilpasning, data og lagring. Eksemplernes handlinger og gemmepunkter gælder kun hukommelsen; ressourcebiblioteket indlæser ikke i sig selv produktfiler.
+Editor og showcase indeholder de afprøvbare referenceeksempler fra `patterns/catalog.mjs`: panel med træk og sammenklapning, objekteditor, parametrisk værksted, opskriftseditor med lag, formular, liste med detaljer, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. Kortbjælken viser familiespecifikke illustrationer og kan rulles vandret. `node tools/cli.mjs examples PROJECT_DIR` kopierer referencekoden og illustrationsmodulerne uden overskrivning. Produktet ejer derefter tilpasning, data og lagring. Eksemplernes handlinger og gemmepunkter gælder kun hukommelsen; ressourcebiblioteket indlæser ikke i sig selv produktfiler.
 
 Breddeprofilerne `prose`, `form`, `panel`, `split`, `workspace` og `fluid` følger med fælles CSS og runtime. De giver indholdsbestemte standarder og kan tilpasses lokalt; produktet ejer kolonner og placering. Se [designgrundlaget](DESIGN-FOUNDATIONS.md) og [API og designmønstre](INTEGRATION.md).
 
@@ -73,3 +73,43 @@ Dette eksporterer en separat webdemo til `artifacts/showcase/` med offentlige te
 Til en anden eksportmappe bruges `node tools/build-showcase.mjs --out DIRECTORY`. Til den fulde Studio-udgave uden gemning og eksport bruges `node tools/build-showcase.mjs --studio --out DIRECTORY`. Den bygges fra editorens faktiske interface, og besøgende kan eksperimentere i deres egen browser.
 
 Den tilknyttede hjemmeside bruger den fulde udgave. Kør `npm run sync:design-studio`, `npm run build:production` og `npm run deploy:production` fra hjemmesidens projektmappe, når en onlineopdatering er bestilt. Eksport og build offentliggør ikke automatisk hjemmesiden. Se [den samlede onlinevejledning](WEBSITE-SHOWCASE.md).
+
+## Editorens komponentvisning
+
+Studios komponentkatalog holder rækkens korttoppe synlige og lader den aktive top hænge sammen med et fælles variantpanel. Eksemplerne i rækken skjules under udfoldning og vender animeret tilbage ved lukning. Kortbredderne fastholdes, så panelets spænd over rækken ikke aktiverer tomme gridkolonner. Panelets øverste hjørner er skarpe i alle temaer; de nederste bruger temaets afrunding. Dette er editorens visningsmønster og tilføjer ikke layoutkrav til produktets kortkomponent.
+
+## Skrifter og portabilitet
+
+Temaets primære skrift skal følge med leverancen og have dokumenteret licens og tegn-/vægtdækning. De offentlige temaer bruger lokale WOFF2-filer: Inter til fælles sans, Source Serif 4 til de relevante expressive serifroller og Roboto Mono til tekniske detaljer. Castle bevarer Nunito og Alegreya; Fjordside bevarer Platypi, komprimeret fra de medfølgende TTF-originaler uden subsetting. De fælles Latin-udsnit dækker dansk og vestlig latin; andre skriftsystemer kan bruge fallback. Samme fontfil er ikke et løfte om identisk rasterisering på alle platforme.
+
+Normale builds bruger de indcheckede ressourcer. Offline-editoren forbliver én selvstændig fil, og kildeleverancen indeholder låsefil frem for installerede afhængigheder. Buildets genbrug af gentagne data ændrer ikke temaformat eller runtime-API. Leveringsmanifestet registrerer faktiske størrelser og kontrolsummer. Windows-, macOS- og Linux-CI er konfigureret; platformsgarantier kræver gennemførte kørsler og relevant konkret kontrol. Se [produktion og levering](PRODUCTION.md).
+
+## Verifikationsstatus
+
+Status konsolideret 9. november 2026.
+
+Reel Windows-højkontrast, operativsystemets filvælger og det samlede direkte `file://`-forløb er endnu ikke manuelt verificeret som samlet leverance. Faktiske Mac-/Linux-kørsler er heller ikke dokumenteret. En konfigureret CI-matrix er ikke dokumentation for gennemførte kørsler. Opdatér denne status ved ny faktisk kontrol; henvis til dens belæg og skeln mellem HTTP-kontrol, statiske offlineprøver og direkte filkontrol.
+
+## Brug editoren
+
+Dobbeltklik på **[index.html](../index.html)** i systemmappen. Design Studio åbner direkte i din normale browser og fungerer offline. Der kræves ingen server, Windows-app, terminal eller installeret Node.js for at bruge den færdige fil. Alle medfølgende temaer er indbygget.
+
+De medfølgende temaer har deres egne farvetilstande, herunder lyse, mørke og særlige farvevariationer. Farvetilstanden kan følge systemet eller vælges manuelt; det manuelle valg har forrang. Temafilen gemmer alle leverede tilstande, mens en CSS-eksport gælder den valgte fremtoning. Ældre enkeltstående temaer bliver ikke automatisk konverteret.
+
+**Åbn tema** læser en JSON-fil, du vælger, eksempelvis et projekts `design/design.json`. **Gem tema** henter det aktuelle tema som en JSON-fil med tokens, brandguide, originalressourcer og historik. Browseren håndterer placeringen; den oprindeligt åbnede fil overskrives ikke automatisk. Gem den hentede fil på den ønskede placering, og erstat projektets tema bevidst, hvis ændringen skal bruges dér.
+
+Åbnede temaer og ændringer findes i den aktuelle browsersession. Gem dem som filer før genindlæsning eller lukning; hentede temaer kan åbnes igen med **Åbn tema**. De indbyggede temaer er kopier fra seneste build, og redigering ændrer ikke filerne i `packages/`.
+
+`npm start` er en valgfri genvej for udviklere med Node.js; den åbner `index.html` i browseren.
+
+- **Komponenter:** Det samme katalog i alle temaer, med søgning, kategorier og valg mellem illustrationskort og liste. Vælg en komponent for at se varianter og tilstande i det fælles detaljeområde.
+- **Animation og effekter:** Afprøv den fælles standard for udfoldning og tilbagevenden: 240 ms i begge retninger, uden ekstra forsinkelse og med respekt for reduceret bevægelse.
+- **Tokens:** Redigér temaets værdier. Bibliotekets dokumenterede standardværdier dækker roller, som temaet ikke overskriver.
+- **Brandguide:** Principper, anvendelsesregler, godkendte logoer, skrifter og originalressourcer.
+- **Temaet:** Navn, beskrivelse, historik, JSON-eksport og genereret CSS.
+
+Under **Designmønstre** findes interaktive eksempler på en objekteditor med kontekstpanel inspireret af FormLab, et parametrisk værksted, en opskriftseditor med lag, en formular, en liste med detaljevisning, et ressourcebibliotek og fortryd/gentag med gemmepunkt samt header/navigation, hero, footer og billedgalleri. De samme eksempler indgår i web-showcasen og kan afprøves med alle temaer. `node tools/cli.mjs examples PROJECT_DIR` kopierer valgfri referencekode og den selvstændige historikhjælper til et tilknyttet projekt uden overskrivning. Se [genbrug af designmønstre](INTEGRATION.md#valgfrie-sammensætningseksempler).
+
+Mønstrene vælges i en vandret kortbjælke over eksemplet. Rul sidelæns eller brug pilene; skift mellem kort bevarer kladder og bjælkens scrollposition. Elleve mønstre har statiske illustrationer i Tegnets anatomi, Lysrum, Passage og Feltlinjer — 44 motiver, som følger temaets grafikmaterialer og Studios illustrationsvalg. Det interaktive mønster **Panel med træk og sammenklapning** bruger samme standardplaceholder som komponenter uden illustration. Panelet demonstrerer skalering, lukning ved slip i lukkezonen og genåbning med kantgrebet; kladden bevares.
+
+Temaet valideres før åbning og gemning. Ugyldige kladder kan redigeres, men ikke gemmes som gyldige temaer. **Hent CSS** under **Temaet** henter temaets genererede CSS for den valgte fremtoning. Når en hentet temafil er lagt tilbage i et produkt, opdateres produktets CSS og runtime med `sync`.

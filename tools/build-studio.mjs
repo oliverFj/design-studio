@@ -20,7 +20,7 @@ if(!providedThemes)for (const file of (await readdir(path.join(root, 'packages')
 }
 const bundle = await build({
   entryPoints: [path.join(root, 'studio/app.mjs')], bundle: true, write: false,
-  format: 'iife', target: 'es2022', minify: true, legalComments: 'none',
+  format: 'iife', target: 'es2022', minify: true, legalComments: 'none', charset: 'utf8',
   loader: { '.md': 'text' },
   define:{__STUDIO_SHOWCASE__:JSON.stringify(showcase)},
   plugins: [{

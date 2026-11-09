@@ -1,8 +1,13 @@
+import { searchMatch } from './search.mjs';
+
 /** Shared, browser-safe descriptions. Execution stays in the local MCP service. */
 export const TOOL_PACKAGES = Object.freeze([
   { id: 'library', name: 'Bibliotek og mønstre', description: 'Find fælles komponenter, designmønstre og deres kilder.', tools: [
     { name: 'search_library', title: 'Søg i biblioteket', description: 'Find eksisterende komponenter, mønstre og vejledninger før nyt arbejde. Komponenter og mønstre medtager op til fem relevante åbne tickets og totalantal.', readOnly: true },
     { name: 'get_component', title: 'Forklar en komponent', description: 'Hent den centrale komponents anvendelse, dele, varianter og eksempel samt relevante åbne tickets.', readOnly: true },
+    { name: 'get_pattern', title: 'Hent et mønster', description: 'Hent hele mønsterdefinitionen, referencefiler, fælles controllergrundlag og relevante åbne tickets.', readOnly: true },
+    { name: 'get_guide', title: 'Læs en vejledning', description: 'Hent indholdsfortegnelse eller ét afsnit med kildehash. offset bladrer i afsnitslisten eller tekstens tegn; følg nextOffset.', readOnly: true },
+    { name: 'get_graphic_profile', title: 'Hent en illustrationsprofil', description: 'Hent fælles grafikregler og en valgfri families stilprofil, referencepakke, guideafsnit og kildehash. Teknisk gyldighed er ikke stilgodkendelse.', readOnly: true },
   ] },
   { id: 'projects', name: 'Projektgrundlag', description: 'Hent projektets anvisninger og kontrollér dets designtilknytning.', tools: [
     { name: 'get_project_context', title: 'Hent projektgrundlag', description: 'Læs grundlaget for et projekt, som er tilladt ved serverstart.', readOnly: true },
@@ -28,12 +33,12 @@ export const TICKET_PRIORITIES={low:'Lav',normal:'Normal',high:'Høj'};
 
 export const EXPERIENCE_STATUSES = Object.freeze({ draft: 'Kladde', reviewed: 'Gennemgået', retired: 'Udgået' });
 
-const normalize = value => String(value ?? '').normalize('NFKD').replace(/\p{Diacritic}/gu, '').toLocaleLowerCase('da');
-
-/** All query words must occur; a missing status excludes retired knowledge. */
-export function searchExperiences(entries, { query = '', scope, status } = {}) {
-  const words = normalize(query).split(/\s+/).filter(Boolean);
+/** All query concepts must occur; a missing status excludes retired knowledge. */
+export function searchExperiences(entries, { query = '', scope, status, project } = {}) {
   return entries.filter(entry => (!scope || entry.scope === scope)
-    && (status ? entry.status === status : entry.status !== 'retired')
-    && words.every(word => normalize(JSON.stringify(entry)).includes(word)));
+    && (!project || entry.project === project)
+    && (status ? entry.status === status : entry.status !== 'retired'))
+    .map((entry, index) => ({ entry, index, match: searchMatch(query, { id: entry.id, title: entry.title, tags: entry.tags, summary: entry.summary, body: JSON.stringify(entry) }) }))
+    .filter(item => item.match)
+    .sort((a, b) => b.match.score - a.match.score || a.index - b.index).map(({ entry }) => entry);
 }

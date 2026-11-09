@@ -156,8 +156,14 @@ test('list filtering, empty state and review action keep selection and detail co
 test('gallery retains independent example state across selection and theme remount', () => {
   const state = createGalleryState(), document = dom();
   let gallery = mountCompositionGallery(theme('studio-light'), { document, state });
-  const picker = gallery.element.querySelector('select'); picker.value = 'form'; fire(picker, 'change');
+  fire(gallery.element.querySelector('[data-pattern-nav="form"]'), 'click');
+  assert.equal(state.selected, 'form');
+  assert.equal(gallery.element.querySelector('[data-pattern-nav="form"]').getAttribute('aria-current'), 'true');
   const input = gallery.element.querySelector('#patterns-form-name-control'); input.value = 'Bevar kladden'; fire(input, 'input');
+  fire(gallery.element.querySelector('[data-pattern-nav="editor"]'), 'click');
+  assert.equal(state.selected, 'editor');
+  fire(gallery.element.querySelector('[data-pattern-nav="form"]'), 'click');
+  assert.equal(gallery.element.querySelector('#patterns-form-name-control').value, 'Bevar kladden');
   gallery.destroy(); gallery = mountCompositionGallery(theme('nocturne'), { document, state });
   assert.equal(gallery.element.querySelector('#patterns-form-name-control').value, 'Bevar kladden');
   assert.equal(state.drafts.editor.selected, 'panel');
@@ -183,10 +189,11 @@ test('pattern choice metadata is complete and related choices preserve drafts', 
   const destination = related.getAttribute('data-pattern');
   fire(related, 'click');
   assert.equal(state.selected, destination);
-  const picker = gallery.element.querySelector('select');
-  assert.equal(picker.value, destination);
+  const current = gallery.element.querySelectorAll('[data-pattern-nav]').filter(button => button.getAttribute('aria-current') === 'true');
+  assert.equal(current.length, 1);
+  assert.equal(current[0].getAttribute('data-pattern-nav'), destination);
   assert.equal(document.activeElement, gallery.element.querySelector('#patterns-active-title'));
-  picker.value = 'form'; fire(picker, 'change');
+  fire(gallery.element.querySelector('[data-pattern-nav="form"]'), 'click');
   assert.equal(gallery.element.querySelector('#patterns-form-name-control').value, 'Min ufærdige kladde');
   gallery.destroy();
 });

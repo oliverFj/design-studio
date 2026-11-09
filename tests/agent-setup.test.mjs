@@ -31,3 +31,15 @@ test('status never probes an absent registration and cannot silently add project
   assert.equal(result.serverCheck, undefined);
   await assert.rejects(runAgentSetup(['status', '--project', 'example=' + process.cwd()]), /status ændrer ikke/);
 });
+
+test('status exposes outdated and locally edited guidance without applying installation', async () => {
+  const skills = [{ id: 'current', guidance: { status: 'current' } }, { id: 'stale', guidance: { status: 'outdated' } }, { id: 'edited', guidance: { status: 'local_changes' } }];
+  const result = await runAgentSetup(['status'], {
+    connection: { inspectConnection: async () => ({ registered: true }), applyConnection: writeForbidden },
+    skillInstaller: { planSkills: async () => ({ skills, conflicts: [{ id: 'edited', message: 'local edit' }] }), applySkills: writeForbidden },
+    probe: writeForbidden, log() {},
+  });
+  assert.deepEqual(result.guidanceDrift, [{ id: 'stale', status: 'outdated' }, { id: 'edited', status: 'local_changes' }]);
+  assert.equal(result.conflicts.length, 1);
+  assert.equal(result.skills, skills);
+});

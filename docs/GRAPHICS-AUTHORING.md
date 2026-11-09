@@ -6,7 +6,7 @@ Denne guide er indgangen til at tegne produktillustrationer, nye begreber og kun
 
 **Version 1 · 6. november 2026. Målet er at videreføre komponentkortenes faktiske illustrationsstil.** Samme farver, motividé og familienavn er ikke tilstrækkeligt. Stilen ligger også i forholdet mellem kontur og masse, tekstspor, tomrum, materialelag, kurver, lys og bevægelse.
 
-Denne guide og familieguidernes **bindende tegneregler** er arbejdsstandarden for nye illustrationer. Den maskinlæsbare [stilkontrakt](graphics/style-contract.json) registrerer fælles regler, faktiske materiale-defaults, familieopskrifter, referencevalg og vurderingskriterier. Den er et dokumenteret grundlag for en senere fælles MCP; den er ikke en kørende MCP-server, en ny runtime eller en automatisk æstetisk validator.
+Denne guide og familieguidernes **bindende tegneregler** er arbejdsstandarden for nye illustrationer. Den maskinlæsbare [stilkontrakt](graphics/style-contract.json) registrerer fælles regler, faktiske materiale-defaults, familieopskrifter, referencevalg og vurderingskriterier. Stade-MCP udleverer grundlaget med `get_graphic_profile`; stilgodkendelse kræver fortsat konkret visuel sammenligning.
 
 Brug kilderne i denne rækkefølge:
 
@@ -114,7 +114,9 @@ Bedøm kandidaten i denne rækkefølge:
 
 De automatiske prøver i [graphics.test.mjs](../tests/graphics.test.mjs) kontrollerer blandt andet motiver, navngivne dele, SVG-referencer og afspilleradfærd. De bedømmer ikke stregens optiske vægt, familiens komposition eller kvaliteten af en metafor. Et stilafvigende motiv kan bestå samtlige tekniske prøver.
 
-Den maskinlæsbare kontrakt gør det muligt senere at lade en MCP udlevere familieprofil, referencevalg og kontrolkrav som én versionsbestemt pakke. Nye godkendte stiludvidelser skal opdatere både den relevante familieguide og kontrakten; de aktuelle SVG-kilder og temaets tokens forbliver de faktiske tegne- og materialekilder.
+Brug `get_graphic_profile({})` til familieoversigten og de fælles regler. `get_graphic_profile({family:"anatomy"})` henter eksempelvis Tegnets anatomis kontraktprofil, referencevalg, kontrolkrav og guidehenvisninger med kildehash. De øvrige familie-id'er er `lightroom`, `passage` og `fieldlines`. Læs de relevante guideafsnit med `get_guide`, og gennemgå de faktiske motiver før tegning. Et kildehash viser en kildeversion, ikke en æstetisk godkendelse.
+
+Nye godkendte stiludvidelser skal opdatere både den relevante familieguide og kontrakten; de aktuelle SVG-kilder og temaets tokens forbliver de faktiske tegne- og materialekilder. Produktkort med animation bruger den fælles afspiller, dekorativ afspilning og et meningsfuldt statisk slutbillede efter reglerne ovenfor. Valg af illustrationsfamilie erstatter ikke produktets brand eller behovet for at godkende motivet.
 
 ## Det eksisterende grafikværksted
 

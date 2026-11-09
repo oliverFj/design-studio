@@ -106,6 +106,20 @@ function overlaps(first, second) {
   return a === b || a.startsWith(b + path.sep) || b.startsWith(a + path.sep);
 }
 
+function guidanceStatus(source, destination, metadata) {
+  const names = new Set([...source.files.keys(), ...Object.keys(metadata?.files ?? {}).filter(name => name !== INSTALLATION)]);
+  const files = [...names].sort().map(file => ({ file,
+    sourceSha256: source.files.get(file)?.sha256 ?? null,
+    installedSha256: destination.files.get(file)?.sha256 ?? null,
+    baselineSha256: metadata?.files[file] ?? null,
+  }));
+  const differsFromSource = files.some(file => file.sourceSha256 !== file.installedSha256);
+  const sourceChanged = metadata ? files.some(file => file.sourceSha256 !== file.baselineSha256) : false;
+  const locallyChanged = metadata ? files.some(file => file.baselineSha256 !== null && file.installedSha256 !== file.baselineSha256) : false;
+  return { status: !destination.exists ? 'missing' : !metadata ? 'unmanaged' : locallyChanged ? 'local_changes' : differsFromSource ? 'outdated' : 'current',
+    differsFromSource, sourceChanged, locallyChanged, files };
+}
+
 export async function planSkills({ studioRoot, codexHome = path.join(os.homedir(), '.codex'), skillsDir, skills = ['stade-collaboration'] } = {}) {
   if (typeof studioRoot !== 'string' || !studioRoot || typeof codexHome !== 'string' || !codexHome ||
       skillsDir !== undefined && (typeof skillsDir !== 'string' || !skillsDir) || !Array.isArray(skills) ||
@@ -136,6 +150,7 @@ export async function planSkills({ studioRoot, codexHome = path.join(os.homedir(
       assertSameCase(source, INSTALLATION); assertSameCase(destination, META);
       if (collidesAsDirectory(destination, META)) throw new Error('En mappe blokerer skillens ejerskabsfil.');
       const metadata = readMetadata(destination, id), owned = metadata?.files ?? {};
+      item.guidance = guidanceStatus(source, destination, metadata);
       for (const [name, digest] of Object.entries(owned)) {
         if (destination.files.get(name)?.sha256 !== digest) throw new Error('En ejet skillfil er lokalt ændret eller slettet: ' + name);
       }

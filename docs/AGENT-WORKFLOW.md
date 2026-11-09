@@ -2,11 +2,11 @@
 
 Denne vejledning er den fælles arbejdsgang fra produktstart til kontrolleret leverance. Produktets egne anvisninger bestemmer indhold, funktioner og arkitektur. Genbrug viden fra den aktuelle session; genlæs kun ændrede eller relevante dele.
 
-Bibliotek 3.9.1 leverer de 62 roller i det aftalte katalog på tværs af de medfølgende temaer og deres lyse/mørke tilstande. Temasamlingen er åben for nye produkttemaer og har ikke et fast antal. Brug dækningsoversigten til at skelne mellem indhold, native adfærd og en controller, der skal forbindes. Katalogets dækning er ikke en tilgængelighedscertificering eller et universelt komponentløfte.
+Brug det aktuelle katalog og `COMPONENT_COVERAGE` i `core/library.mjs` til at skelne mellem markup, native adfærd og controllere. Dækningen er afgrænset og er ikke en tilgængelighedscertificering.
 
 ## Find grundlaget
 
-Læs systemets [README](../README.md), [AGENTS.md](../AGENTS.md) og [designgrundlag](DESIGN-FOUNDATIONS.md) samt produktets egne anvisninger før UI-arbejde.
+Læs produktets egne anvisninger og systemets [AGENTS.md](../AGENTS.md). Brug opgavematricen dér og læs kun de relevante afsnit; README er en introduktion, ikke obligatorisk agentkontekst. [Designgrundlaget](DESIGN-FOUNDATIONS.md) ejer generelle tekniske principper og kvalitetskrav; [integrationsguiden](INTEGRATION.md) ejer komponentkontrakter og API. Søg via MCP og hent det konkrete guideafsnit eller mønster, når forbindelsen er tilgængelig; ellers læses samme kildefiler lokalt.
 
 Ved gentagen fejlsøgning eller overdraget arbejde: søg i de [fælles erfaringer](COLLABORATION.md#agentens-arbejdsgang), og læs relevante poster med kilder og begrænsninger. Brug Stade-MCP, når forbindelsen er tilgængelig; ellers læses `collaboration/experiences.json` direkte. Efterprøv løsningen i den aktuelle produktversion, og foreslå kun nye erfaringer ved konkret genbrugelig viden.
 
@@ -61,20 +61,7 @@ Ved personlig afsenderkreditering bruges [signature med Fjordside-identiteten](S
 
 Et deklarativt preview viser ikke nødvendigvis en færdig interaktion. Vælg den relevante fælles runtime:
 
-| Behov | Anvendelse og produktansvar |
-| --- | --- |
-| Formular | `field` forbinder label, hjælp og fejl. Produktet ejer validering og flytter fokus til første fejl ved afvist indsendelse. |
-| Filtrerede valg og dato/tid | Brug `mountCombobox`/`mountMultiselect`; produktet ejer stabile ID'er og asynkrone forespørgsler med controllerens request-ID. Native `date-picker`/`time-picker` bruger dato-/tidsstrenge uden tidszone. |
-| Status og filvalg | Brug én navngivet loading-status; skeleton er dekorativ. Forbind `mountToast` og `mountFileUpload`. Bevar tidligere filer ved cancel/fejl; produktet ejer data og eventuel overførsel. |
-| Datatabel | Brug native `data-table` og `mountDataTable` til valg, ekspansion og handlingscallbacks. Produktet sorterer data og bekræfter derefter sorteringstilstanden. |
-| Redigerbart datagrid | Brug `data-grid` og `mountDataGrid` til cellenavigation, særskilt markering, kladder og atomisk TSV-indsættelse. Synkron `validateCell` afgør, om en ændring kan accepteres; `onCommit` overfører den accepterede arbejdskopi til produktets state. |
-| Kommandomenu | `mountMenuControls(root, {onAction})` forbinder udløsere og menuer gennem `aria-controls`. Produktet ejer markup, placering, kommandoer og checkbox/radio-state. |
-| Træ | `mountTree(theme, host, options)` leverer tastatur og fokus. Produktets callbacks accepterer valg, foldning og flytning gennem `update`. |
-| Dialog og drawer | Brug native dialog fra `createComponent` med `mountDialog`/`mountDrawer` eller produktets etablerede tilgængelige adapter. Hjælperen forbinder åbning, lukning og fokusretur; produktet ejer handlinger og kladder. `modal:false` er eksplicit ikke-modalt; `open:true` alene giver ikke modaladfærd. |
-| Faner | Brug `tabs` og `mountTabs`, også ved eksisterende kompatibel markup. Bevar panelerne ved skift; produktet ejer indhold og data. Automatisk aktivering bruges til indhold uden ventetid. |
-| Tooltip og popover | Brug `mountTooltip` til kort hjælp uden kontroller; `mountPopover` til interaktivt indhold. Brug navn, fokusretur og Escape; bevar panelerne under samme designscope og inden for en eventuel native modaldialog. |
-| Accordion og webnavigation | Brug native `accordion`, `breadcrumb` og `pagination`. Produktet ejer adresser, foldestatus og udsnittet af sidetal; der kræves ingen lokal tastaturcontroller. |
-| Panel og bevægelse | Brug `mountPanelControls` og `animateStandard`, når de passer til behovet. Sluttilstanden skal fungere uden animation. |
+Find den relevante runtime og produktansvaret i [controlleroversigten](INTEGRATION.md#vælg-controller), og læs komponentens eget API-afsnit før integration.
 
 Bevar dokumentdata, kladder, valg, viste fejl og relevante gemmetilstande ved temaskift eller genmontering. Fjern en gemt-bekræftelse, når indholdet ændres igen. Kassér controllere og effekter med deres `destroy`/cleanup før udskiftning af DOM. Se [API og eksempler](INTEGRATION.md).
 
@@ -110,12 +97,12 @@ Direkte filkontrol er en særskilt slutkontrol ved ændrede offlineafhængighede
 
 Ved ændret filhåndtering: afprøv gemning, genåbning og afvisning af en ugyldig fil uden datatab. Doctor skal acceptere produktets aktuelle build. Rapportér kort ændringen, de udførte kontroller og væsentlige begrænsninger. Dokumentation konsolideres, når brugeren bestiller det; opret ikke løbende sessionsrapporter.
 
-Reel Windows-højkontrast, operativsystemets filvælger og det samlede direkte `file://`-forløb er fortsat uden manuel verifikation. Faktiske Mac-/Linux-kørsler er heller ikke dokumenteret. Angiv den udførte kontrol præcist; lokale WOFF2-filer og en konfigureret CI-matrix erstatter ikke platform- og hjælpemiddelkontrol. Ved en systemleverance bruges [leveringspakkerne](PRODUCTION.md#leveringspakker-og-portabel-opsætning), som holder installerede afhængigheder og lokale filer ude af kildepakken.
+Se [verifikationsstatus](PRODUCTION.md#verifikationsstatus) for uafprøvede platform- og hjælpemiddelforløb. Ved en systemleverance bruges [leveringspakkerne](PRODUCTION.md#leveringspakker-og-portabel-opsætning), som holder installerede afhængigheder og lokale filer ude af kildepakken.
 
 ## Når selve systemet ændres
 
 Fælles roller skal have `name`, `description`, `usage`, `composes`, `parts`, `variants`, `states` og deklarativt `preview` i `core/library.mjs`. Genbrug semantiske tokens og dokumenterede centrale defaults. Hold kontrakt, runtime, kvalitet, skema, temaer og interface konsistente.
 
-Kør `npm test` og `npm run check` efter ændringer i format, runtime eller værktøjer. Kør `npm run build` efter kode-, design- eller temaændringer. Ved biblioteksændringer opdateres hjemmesidens showcase med `npm run sync:design-studio` og dens normale build; synkronisér produkter, der skal have ændringen. Hæv `STARTER_VERSION` i `tools/starter.mjs`, når startskabelonerne ændres. Temaændringer noteres i temaets `history`.
+Systemkravene i dette afsnit har forrang for den generelle regel om én lille kontrol: Kør `npm test` og `npm run check` efter ændringer i format, runtime eller værktøjer. Kør `npm run build` efter kode-, design- eller temaændringer. Ved biblioteksændringer opdateres hjemmesidens showcase med `npm run sync:design-studio` og dens normale build; synkronisér produkter, der skal have ændringen. Hæv `STARTER_VERSION` i `tools/starter.mjs`, når startskabelonerne ændres. Temaændringer noteres i temaets `history`.
 
 Format 1 virker fortsat. Migration er eksplicit med `migrate FILE --out NEW_FILE`; bevar originalen og gennemgå gamle indre afstande før tilkobling. Se [format og migration](PACKAGE-FORMAT.md).

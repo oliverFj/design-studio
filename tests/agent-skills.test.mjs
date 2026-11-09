@@ -63,6 +63,29 @@ test('safe updates replace and retire only unchanged owned files, preserving unm
   assert.equal((await planSkills(options)).changed, false);
 });
 
+test('read-only guidance inspection distinguishes stale sources from local edits without updating either', async t => {
+  const { options, source, target } = await fixture(t);
+  assert.equal((await planSkills(options)).skills[0].guidance.status, 'missing');
+  await applySkills(await planSkills(options));
+  assert.equal((await planSkills(options)).skills[0].guidance.status, 'current');
+  const installed = await read(path.join(target, 'SKILL.md'));
+  await write(path.join(source, 'SKILL.md'), '# New central guidance\n');
+  const stale = (await planSkills(options)).skills[0].guidance;
+  assert.equal(stale.status, 'outdated'); assert.equal(stale.sourceChanged, true); assert.equal(stale.locallyChanged, false);
+  const hashes = stale.files.find(file => file.file === 'SKILL.md');
+  assert.equal(hashes.installedSha256, digest(installed));
+  assert.equal(hashes.baselineSha256, digest(installed));
+  assert.notEqual(hashes.sourceSha256, hashes.installedSha256);
+  assert.equal(await read(path.join(target, 'SKILL.md')), installed);
+  await write(path.join(target, 'references', 'workflow.md'), 'Local workflow');
+  const conflict = await planSkills(options);
+  assert.equal(conflict.skills[0].guidance.status, 'local_changes');
+  assert.equal(conflict.skills[0].guidance.sourceChanged, true);
+  assert.equal(conflict.skills[0].guidance.locallyChanged, true);
+  assert.equal(conflict.conflicts.length, 1);
+  assert.equal(await read(path.join(target, 'references', 'workflow.md')), 'Local workflow');
+});
+
 test('local edits and owned deletions conflict before another requested skill is installed', async t => {
   for (const deleted of [false, true]) await t.test(deleted ? 'owned deletion' : 'local edit', async t => {
     const { options, target } = await fixture(t, [ID, OTHER]);
