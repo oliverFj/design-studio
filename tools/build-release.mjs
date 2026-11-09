@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
 import {buildStudio} from './build-studio.mjs';
+import {buildScenePages,SCENE_IDS} from './build-scenes.mjs';
 import { deflateRawSync } from 'node:zlib';
 import { LIBRARY_VERSION } from '../core/library.mjs';
 import { offlineIssues } from './offline-checks.mjs';
@@ -68,7 +69,7 @@ export async function sourceEntries(directory = root) {
       const child = path.join(relative, item.name), normalized = child.split(path.sep).join('/');
       if (item.isDirectory()) await walk(child, extensions);
       else if (item.isSymbolicLink()) throw new Error('Kildepakken følger ikke symbolske links: ' + child);
-      else if (extensions.includes(path.extname(item.name)) && !['examples/workspace/index.html'].includes(normalized)) await add(child);
+      else if (extensions.includes(path.extname(item.name)) && !['examples/workspace/index.html',...SCENE_IDS.map(id=>'examples/scenes/'+id+'.html')].includes(normalized)) await add(child);
       else if (normalized === 'templates/offline/.gitignore') await add(child);
     }
   };
@@ -107,15 +108,21 @@ async function licenseEntries(directory) {
 }
 
 export async function buildRelease({ directory = root, output = path.join(directory, 'artifacts', 'release') } = {}) {
-  let html;
+  let html,scenes=[];
   if(path.resolve(directory)===path.resolve(root)){
     await mkdir(output,{recursive:true});
     const temporary=path.join(output,'.offline-'+randomUUID()+'.html');
     try{html=Buffer.from(await buildStudio({output:temporary,includeTickets:false}));}finally{await unlink(temporary).catch(error=>{if(error.code!=='ENOENT')throw error;});}
+    scenes=await buildScenePages(directory);
   }else html=await readFile(path.join(directory,'index.html'));
+  if(path.resolve(directory)!==path.resolve(root))for(const id of SCENE_IDS){
+    try{scenes.push({id,html:await readFile(path.join(directory,'examples/scenes',id+'.html'),'utf8')});}
+    catch(error){if(error.code!=='ENOENT')throw error;}
+  }
   const issues = offlineIssues(html.toString('utf8'));
   if (issues.length) throw new Error('Offlinebuildet kan ikke leveres: ' + issues.join('\n'));
-  const offline = [{ name: 'index.html', data: html }, ...await licenseEntries(directory)];
+  for(const scene of scenes){const issues=offlineIssues(scene.html);if(issues.length)throw new Error(scene.id+': '+issues.join('\n'));}
+  const offline = [{ name: 'index.html', data: html }, ...scenes.map(({id,html})=>({name:'examples/scenes/'+id+'.html',data:Buffer.from(html)})), ...await licenseEntries(directory)];
   const source = await sourceEntries(directory);
   const artifacts = [
     { name: 'design-studio-offline.zip', entries: offline },

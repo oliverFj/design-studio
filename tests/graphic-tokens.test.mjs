@@ -78,19 +78,21 @@ test('illustration material bounds validate resolved aliases and every authored 
   assert.match(errorText(named),/modes.celadon.*depthOpacity/);
 });
 
-test('shipped themes own illustration palettes and materials but no Studio family preference',()=>{
+test('shipped themes recommend a family and keep material geometry stable across colors',()=>{
   for(const id of PUBLIC_THEME_IDS){
     const pack=load(id),before=structuredClone(pack);
-    assert.equal(pack.graphics,undefined,id);
-    for(const tokenId of Object.keys(GRAPHIC_TOKEN_DEFAULTS))assert.deepEqual(pack.tokens[tokenId],pack.modes[pack.defaultMode].tokens[tokenId],id+' base matches the default mode: '+tokenId);
+    assert.ok(GRAPHIC_FAMILY_IDS.includes(pack.graphics?.family),id+' recommends a registered family');
+    const base=resolveTokens(pack);
+    const defaultColors=resolveTokens(resolveThemeMode(pack,pack.defaultMode));
+    for(const tokenId of Object.keys(GRAPHIC_TOKEN_DEFAULTS))assert.equal(base[tokenId],defaultColors[tokenId],id+' base matches the default color: '+tokenId);
     for(const mode of Object.keys(pack.modes)){
       const snapshot=resolveThemeMode(pack,mode);
       assert.deepEqual(validatePackage(snapshot),{valid:true,errors:[]},id+'/'+mode);
       assert.deepEqual(snapshot.graphics,pack.graphics);
       for(const [tokenId,definition]of Object.entries(GRAPHIC_TOKEN_DEFAULTS)){
-        const authored=pack.modes[mode].tokens[tokenId];
+        const authored=pack.modes[mode].tokens[tokenId]??pack.tokens[tokenId];
         assert.equal(authored?.$type,definition.$type,id+'/'+mode+': '+tokenId);
-        assert.equal(String(authored.$value).includes('{'),false,id+'/'+mode+' owns its illustration values');
+        if(definition.$type!=='color')assert.equal(resolveTokens(snapshot)[tokenId],base[tokenId],id+'/'+mode+' preserves '+tokenId);
       }
     }
     assert.deepEqual(pack,before);
@@ -100,7 +102,7 @@ test('shipped themes own illustration palettes and materials but no Studio famil
   assert.notEqual(signal['color.illustration.subject'],signal['color.action.primary.rest.surface']);
   assert.equal(load('porcelaen').modes.celadon.name,'Celadon');
   assert.equal(load('terminal').modes.rav.name,'Rav');
-  assert.deepEqual(Object.keys(load('bauhaus').modes),['solgul','kalk','signalroed']);
+  for(const mode of ['solgul','kalk','signalroed'])assert.ok(load('bauhaus').modes[mode]);
 });
 
 test('unmigrated format 1 packages gain neither illustration tokens nor family metadata',()=>{

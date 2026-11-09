@@ -2,9 +2,9 @@ import { validatePackage } from '../core/engine.mjs';
 
 /** Keep independent theme copies in this session and download edited files. */
 export function createThemeStorage(themes, { download } = {}) {
-  // Earlier Studio exports included this UI choice. Read them without carrying
-  // the obsolete field into editable theme data or subsequent downloads.
-  const themeCopy=pack=>{const copy=structuredClone(pack);delete copy.graphics;return copy;};
+  // The authored illustration default belongs to the theme. Studio's explicit
+  // viewing preference is kept separately and never written into this copy.
+  const themeCopy=pack=>structuredClone(pack);
   const entries = new Map(themes.map(({ key, package: pack }) => [key, { key, package: themeCopy(pack), file: key + '.json' }]));
   let nextKey = 0;
   const checked = pack => {

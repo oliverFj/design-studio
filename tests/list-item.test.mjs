@@ -77,7 +77,7 @@ test('list item appearance schema exposes every canonical part, variant and stat
     assert.equal(value.properties.parts.additionalProperties, false);
     assert.deepEqual(value.properties.styles, { $ref: '#/$defs/appearanceStyles' });
   }
-  const theme = load('studio-light');
+  const theme = resolveThemeMode(load('studio-light'), 'light');
   theme.appearance['list-item'] = { parts: { heading: { styles: { color: '{color.text.primary}' } } }, states: { current: { styles: { borderLeftColor: '{color.action.selected.rest.text}' } } } };
   assert.deepEqual(validatePackage(theme), { valid: true, errors: [] });
 });

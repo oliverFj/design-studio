@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "id": "castle-studio",
   "name": "Castle Studio",
-  "description": "En poleret, varm identitet med elfenben, dyb teal og kobber. Nunito og Alegreya bevarer Castle Studios venlige karakter, mens ensartede kontroller giver systemet et professionelt udtryk.",
+  "description": "Venlig Nunito, kursiv Alegreya og bløde, sammenhængende former. Elfenben, dyb teal og kobber giver en varm identitet i både dagslys og aftenskov.",
   "tokens": {
     "color.caption.text": {
       "$type": "color",
@@ -19,30 +19,10 @@
       "$value": "Alegreya,Georgia,serif",
       "description": "Alegreya til udtryksfulde overskrifter og billedtekster."
     },
-    "typography.size.expressive": {
-      "$type": "dimension",
-      "$value": "28px",
-      "description": "Skriftstørrelse til udtryksfulde overskrifter."
-    },
-    "typography.size.expressiveLarge": {
-      "$type": "dimension",
-      "$value": "36px",
-      "description": "Skriftstørrelse til større udtryksfulde overskrifter."
-    },
-    "typography.size.captionText": {
-      "$type": "dimension",
-      "$value": "14px",
-      "description": "Skriftstørrelse til almindelige, supplerende billedtekster."
-    },
     "typography.weight.expressive": {
       "$type": "fontWeight",
       "$value": 500,
       "description": "Skriftvægt til udtryksfuld typografi."
-    },
-    "typography.lineHeight.captionText": {
-      "$type": "number",
-      "$value": 1.25,
-      "description": "Linjehøjde til almindelige, supplerende billedtekster."
     },
     "typography.tracking.captionLabel": {
       "$type": "dimension",
@@ -53,21 +33,6 @@
       "$type": "dimension",
       "$value": "12px",
       "description": "Afrunding til handlingsknapper."
-    },
-    "size.icon.compact": {
-      "$type": "dimension",
-      "$value": "19px",
-      "description": "Ikonstørrelse til kompakte handlinger."
-    },
-    "size.icon.action": {
-      "$type": "dimension",
-      "$value": "18px",
-      "description": "Ikonstørrelse til handlingsknapper."
-    },
-    "size.actionButton.width": {
-      "$type": "dimension",
-      "$value": "64px",
-      "description": "Bredde til en kompakt handlingsknap."
     },
     "color.caption.surface": {
       "$type": "color",
@@ -169,31 +134,6 @@
       "$value": "{typography.font.body}",
       "description": "Primærskriften følger temaet som lokal WOFF2; generisk fallback bruges til tegn uden for den medfølgende dækning."
     },
-    "typography.size.body": {
-      "$type": "dimension",
-      "$value": "14px",
-      "description": "Læsbar brødtekst i det kompakte værktøjsinterface."
-    },
-    "typography.size.heading": {
-      "$type": "dimension",
-      "$value": "26px",
-      "description": "Primær overskrift med et kompakt, tydeligt hierarki."
-    },
-    "typography.size.label": {
-      "$type": "dimension",
-      "$value": "13px",
-      "description": "Funktionelle labels med tydelig vægt i kompakte formularer."
-    },
-    "typography.size.small": {
-      "$type": "dimension",
-      "$value": "13px",
-      "description": "Bevaret typografisk rolle: small."
-    },
-    "typography.size.title": {
-      "$type": "dimension",
-      "$value": "16px",
-      "description": "Titler i kort og dialoger."
-    },
     "typography.weight.body": {
       "$type": "fontWeight",
       "$value": 500,
@@ -208,66 +148,6 @@
       "$type": "fontWeight",
       "$value": 700,
       "description": "Eksisterende lokal fontvægt for label."
-    },
-    "typography.lineHeight.body": {
-      "$type": "number",
-      "$value": 1.6,
-      "description": "Linjehøjde for body; native controls beholder normal."
-    },
-    "typography.lineHeight.heading": {
-      "$type": "number",
-      "$value": 1.18,
-      "description": "Linjehøjde for heading; native controls beholder normal."
-    },
-    "typography.lineHeight.control": {
-      "$type": "number",
-      "$value": 1.35,
-      "description": "Linjehøjde for control; native controls beholder normal."
-    },
-    "space.scale.1": {
-      "$type": "dimension",
-      "$value": "4px",
-      "description": "Delt afstandsskala."
-    },
-    "space.scale.2": {
-      "$type": "dimension",
-      "$value": "8px",
-      "description": "Delt afstandsskala."
-    },
-    "space.scale.3": {
-      "$type": "dimension",
-      "$value": "12px",
-      "description": "Delt afstandsskala."
-    },
-    "space.scale.4": {
-      "$type": "dimension",
-      "$value": "16px",
-      "description": "Delt afstandsskala."
-    },
-    "space.scale.6": {
-      "$type": "dimension",
-      "$value": "24px",
-      "description": "Delt afstandsskala."
-    },
-    "space.scale.8": {
-      "$type": "dimension",
-      "$value": "32px",
-      "description": "Delt afstandsskala."
-    },
-    "size.control.height": {
-      "$type": "dimension",
-      "$value": "2.75rem",
-      "description": "Minimumhøjde til almindelige kontroller."
-    },
-    "size.checkbox": {
-      "$type": "dimension",
-      "$value": "1.125rem",
-      "description": "Eksisterende reference for checkbox; produktet ejer layout."
-    },
-    "size.dialog.maxWidth": {
-      "$type": "dimension",
-      "$value": "460px",
-      "description": "Eksisterende reference for dialog.maxWidth; produktet ejer layout."
     },
     "border.width.default": {
       "$type": "dimension",
@@ -384,45 +264,10 @@
       "$value": "#6f9fb4",
       "description": "Vand og voldgrav."
     },
-    "typography.size.control": {
-      "$type": "dimension",
-      "$value": "13px",
-      "description": "Tekst i almindelige kontroller og knapper."
-    },
-    "typography.size.tiny": {
-      "$type": "dimension",
-      "$value": "12px",
-      "description": "Bevaret typografisk rolle: tiny."
-    },
-    "typography.size.shortcut": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Bevaret typografisk rolle: shortcut."
-    },
-    "typography.size.close": {
-      "$type": "dimension",
-      "$value": "20px",
-      "description": "Bevaret typografisk rolle: close."
-    },
-    "typography.size.libraryItem": {
-      "$type": "dimension",
-      "$value": "13.5px",
-      "description": "Skriftstørrelse til korte listeelementer."
-    },
     "typography.weight.strong": {
       "$type": "fontWeight",
       "$value": 800,
       "description": "Eksisterende lokal fontvægt for strong."
-    },
-    "typography.lineHeight.note": {
-      "$type": "number",
-      "$value": 1.4,
-      "description": "Linjehøjde for note; native controls beholder normal."
-    },
-    "typography.lineHeight.tiny": {
-      "$type": "number",
-      "$value": 1.35,
-      "description": "Linjehøjde for tiny; native controls beholder normal."
     },
     "typography.tracking.section": {
       "$type": "dimension",
@@ -454,106 +299,6 @@
       "$value": "999px",
       "description": "Eksisterende afrunding for pill."
     },
-    "space.px0": {
-      "$type": "dimension",
-      "$value": "0px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px1": {
-      "$type": "dimension",
-      "$value": "1px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px2": {
-      "$type": "dimension",
-      "$value": "2px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px3": {
-      "$type": "dimension",
-      "$value": "3px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.control.inset": {
-      "$type": "dimension",
-      "$value": "4px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px5": {
-      "$type": "dimension",
-      "$value": "5px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px6": {
-      "$type": "dimension",
-      "$value": "6px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px7": {
-      "$type": "dimension",
-      "$value": "7px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px8": {
-      "$type": "dimension",
-      "$value": "8px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px9": {
-      "$type": "dimension",
-      "$value": "9px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px10": {
-      "$type": "dimension",
-      "$value": "10px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px11": {
-      "$type": "dimension",
-      "$value": "11px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px12": {
-      "$type": "dimension",
-      "$value": "12px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px14": {
-      "$type": "dimension",
-      "$value": "14px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px16": {
-      "$type": "dimension",
-      "$value": "16px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px18": {
-      "$type": "dimension",
-      "$value": "18px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px20": {
-      "$type": "dimension",
-      "$value": "20px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px22": {
-      "$type": "dimension",
-      "$value": "22px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px24": {
-      "$type": "dimension",
-      "$value": "24px",
-      "description": "Bevaret kompakt editorafstand."
-    },
-    "space.px26": {
-      "$type": "dimension",
-      "$value": "26px",
-      "description": "Bevaret kompakt editorafstand."
-    },
     "shadow.selected": {
       "$type": "shadow",
       "$value": "{elevation.level1}",
@@ -569,40 +314,15 @@
       "$value": 1,
       "description": "Genvejslabels bevarer fuld dækning og læsbarhed; hierarki følger tekstfarve og typografi."
     },
-    "size.icon.brand": {
-      "$type": "dimension",
-      "$value": "32px",
-      "description": "Godkendt borglogo vises i en kvadratisk 32 px flade."
-    },
     "color.background.detail": {
       "$type": "color",
       "$value": "{palette.neutral.0}",
       "description": "Semantisk farverolle: color.background.detail."
     },
-    "typography.size.clock": {
-      "$type": "dimension",
-      "$value": "18px",
-      "description": "Kompakte tids- og taletiketter."
-    },
     "typography.weight.medium": {
       "$type": "fontWeight",
       "$value": 600,
       "description": "Eksisterende mellem-vægt i kompakte checkbox-labels."
-    },
-    "typography.size.panel": {
-      "$type": "dimension",
-      "$value": "16px",
-      "description": "Læsbare paneltitler over kompakte kontrolgrupper."
-    },
-    "typography.size.meta": {
-      "$type": "dimension",
-      "$value": "11px",
-      "description": "Kompakte metadata og målvisning."
-    },
-    "typography.size.badge": {
-      "$type": "dimension",
-      "$value": "10.5px",
-      "description": "Små statusmærker."
     },
     "typography.tracking.badge": {
       "$type": "dimension",
@@ -618,11 +338,6 @@
       "$type": "dimension",
       "$value": "3px",
       "description": "Små materiale- og farveprøver."
-    },
-    "typography.lineHeight.help": {
-      "$type": "number",
-      "$value": 1.5,
-      "description": "Læsbar hjælpetekst i kompakte paneler."
     },
     "color.caption.labelText": {
       "$type": "color",
@@ -674,51 +389,6 @@
       "$value": "0.1em",
       "description": "Temaets fælles visuelle værdi for typography.tracking.label."
     },
-    "size.switch.width": {
-      "$type": "dimension",
-      "$value": "2.75rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.width."
-    },
-    "size.switch.height": {
-      "$type": "dimension",
-      "$value": "1.5rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.height."
-    },
-    "size.switch.thumb": {
-      "$type": "dimension",
-      "$value": "1.125rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.thumb."
-    },
-    "size.switch.inset": {
-      "$type": "dimension",
-      "$value": "0.1875rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.inset."
-    },
-    "space.component.padding": {
-      "$type": "dimension",
-      "$value": "0.625rem",
-      "description": "12 px indvendig afstand i almindelige komponenter."
-    },
-    "space.component.paddingLarge": {
-      "$type": "dimension",
-      "$value": "0.875rem",
-      "description": "16 px indvendig afstand i større indholdsflader."
-    },
-    "space.component.paddingCompact": {
-      "$type": "dimension",
-      "$value": "0.375rem",
-      "description": "8 px indvendig afstand i kompakte kontroller."
-    },
-    "space.component.gap": {
-      "$type": "dimension",
-      "$value": "0.375rem",
-      "description": "8 px mellem beslægtede dele og kontroller."
-    },
-    "space.component.gapLarge": {
-      "$type": "dimension",
-      "$value": "0.625rem",
-      "description": "12 px mellem større indholdsgrupper."
-    },
     "color.border.field": {
       "$type": "color",
       "$value": "{palette.neutral.600}",
@@ -738,11 +408,6 @@
       "$type": "color",
       "$value": "{palette.accent.600}",
       "description": "Semantisk farverolle: color.brand.accent."
-    },
-    "typography.size.display": {
-      "$type": "dimension",
-      "$value": "48px",
-      "description": "Temaets fælles visuelle værdi for typography.size.display."
     },
     "shadow.floating": {
       "$type": "shadow",
@@ -848,11 +513,6 @@
       "$type": "color",
       "$value": "{palette.neutral.0}",
       "description": "Semantisk farverolle: color.action.accentActiveText."
-    },
-    "typography.size.compact": {
-      "$type": "dimension",
-      "$value": "13px",
-      "description": "Tekst i kompakte handlinger; normal klikflade følger bibliotekets minimum."
     },
     "color.action.secondary.hover.surface": {
       "$type": "color",
@@ -1408,11 +1068,15 @@
     {
       "date": "2026-11-06",
       "note": "Dedikeret illustrationsregister med kuraterede billedfarver og materialer i alle temaets farvevariationer. Lysrum er valgt som grafisk udgangspunkt; alle fire billedfamilier kan fortsat vælges. Illustrationsforløb bruger en særskilt varighed på 3200 ms."
+    },
+    {
+      "date": "2026-11-09",
+      "note": "Samlet temakuratering: tydelig hensigt, navngivne farver, fælles størrelser og afstande samt en anbefalet, frit valgbar illustrationsstil."
     }
   ],
   "brand": {
     "name": "Castle Studio",
-    "summary": "Castle Studios varme billedbogsidentitet forener elfenben, dyb teal, kobber, Nunito og kursiv Alegreya. Den rolige produktflade giver illustrationer og fortælling plads, mens konsekvente kontroller gør værktøjerne klare og professionelle.",
+    "summary": "Venlig Nunito, kursiv Alegreya og bløde, sammenhængende former. Elfenben, dyb teal og kobber giver en varm identitet i både dagslys og aftenskov.",
     "principles": [
       {
         "id": "design-first",
@@ -1477,7 +1141,7 @@
       {
         "id": "typography",
         "title": "Typografi",
-        "description": "Nunito giver funktionelle labels og tekst et venligt udtryk. 14 px brødtekst og 13 px kontroltekst gør værktøjsflader kompakte; 16 px paneltitler bevarer hierarkiet. Alegreya giver udtryksfulde overskrifter og fremhævede billedtekster karakter. De lokale WOFF2-fontoriginaler og licenser følger temaet. Variabel Nunito dækker 500, 600, 700 og 800; Alegreya-kursiv bevares i vægt 500. Roboto Mono følger med til tekniske detaljer.",
+        "description": "Nunito giver betjeningen en venlig stemme; kursiv Alegreya reserveres til korte introduktioner og billedtekster. Størrelser, linjehøjder og afstande følger bibliotekets fælles målestok. Desktop og kompakt vælges gennem funktionelle komponentvarianter.",
         "tokens": [
           "typography.font.body",
           "typography.font.heading",
@@ -1488,7 +1152,6 @@
           "typography.size.captionText",
           "typography.weight.label",
           "typography.weight.strong",
-          "typography.size.compact",
           "typography.size.panel"
         ],
         "components": [
@@ -1512,7 +1175,7 @@
       {
         "id": "surfaces",
         "title": "Flader, afrunding og skygge",
-        "description": "Solide varme læseflader, bløde hjørner og diskrete skygger giver et klart hierarki. Biblioteket ejer indvendig afstand, dele og grundlayout; temaet vælger farver, afrunding og tæthed.",
+        "description": "Solide varme flader med 8 px kontrolafrunding og 16 px på kort. Dockede paneler adskilles af linjer; fælles afstandstokens giver samme rytme som de øvrige temaer.",
         "tokens": [
           "radius.card",
           "radius.control",
@@ -1543,7 +1206,7 @@
         ],
         "dos": [
           "Brug solid papirfarve til kort, dialoger, paneler og billedtekstflader.",
-          "Brug temaets 12/16/8 px indvendige afstande og 8/12 px gap gennem bibliotekets fælles tokens; bevar almindelige knappers minimumshøjde på 44 px.",
+          "Brug bibliotekets fælles 16/24/8 px indvendige afstande og 8/16 px gap; vælg tæthed gennem komponentens varianter.",
           "Ret temaet og regenerer CSS efter et visuelt valg.",
           "Lad felter og afgrænsede sekundære handlinger følge bibliotekets samme kantrolle; ghost- og teksthandlinger beholder deres diskrete hierarki."
         ],
@@ -1692,6 +1355,32 @@
         "donts": [
           "Vis ikke hover alene ved at gøre tekst og flade gennemsigtige.",
           "Tilføj ikke en lokal hoverfarve til hver knap eller erstat fokus med hover."
+        ]
+      },
+      {
+        "id": "shared-measures",
+        "title": "Fælles målestok",
+        "description": "Skriftstørrelser, linjehøjder, kontrolmål og afstande følger bibliotekets fælles skala. Temaets egen karakter ligger i skriftvalg, vægt, geometri, materialer og bevægelse. Navigation kan være i samme farvefamilie som arbejdsfladen eller bruge en afstemt kontrast.",
+        "tokens": [
+          "typography.size.body",
+          "typography.size.heading",
+          "typography.size.panel",
+          "space.scale.1",
+          "space.scale.2",
+          "space.scale.3",
+          "space.scale.4",
+          "space.scale.6",
+          "space.scale.8",
+          "size.control.height"
+        ],
+        "components": [],
+        "dos": [
+          "Vælg kompakt eller desktop gennem komponentens funktionelle varianter.",
+          "Lad sidemenuens farve understøtte den konkrete skærm."
+        ],
+        "donts": [
+          "Skab ikke tæthed ved at ændre temaets målestok.",
+          "Gør ikke kontrastfarvet sidemenu til et krav."
         ]
       }
     ],
@@ -1848,361 +1537,29 @@
   "defaultMode": "light",
   "modes": {
     "light": {
+      "name": "Elfenben",
+      "colorScheme": "light",
+      "tokens": {}
+    },
+    "dark": {
+      "name": "Aftenskov",
+      "colorScheme": "dark",
       "tokens": {
-        "color.background.canvas": {
-          "$type": "color",
-          "$value": "{palette.neutral.50}",
-          "description": "Semantisk farverolle: color.background.canvas."
-        },
-        "color.background.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.background.surface."
-        },
-        "color.background.control": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.background.control."
-        },
-        "color.background.detail": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.background.detail."
-        },
-        "color.background.subtle": {
-          "$type": "color",
-          "$value": "{palette.neutral.100}",
-          "description": "Semantisk farverolle: color.background.subtle."
-        },
-        "color.text.primary": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.text.primary."
-        },
-        "color.text.secondary": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.text.secondary."
-        },
-        "color.text.muted": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.text.muted."
-        },
-        "color.text.label": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.text.label."
-        },
-        "color.border.default": {
-          "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.border.default."
-        },
-        "color.border.field": {
-          "$type": "color",
-          "$value": "{palette.neutral.600}",
-          "description": "Semantisk farverolle: color.border.field."
-        },
-        "color.border.strong": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.border.strong."
-        },
-        "color.action.primary.rest.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.600}",
-          "description": "Semantisk farverolle: color.action.primary."
-        },
-        "color.action.primary.rest.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.primaryText."
-        },
-        "color.action.selected.rest.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.50}",
-          "description": "Semantisk farverolle: color.action.subtle."
-        },
-        "color.action.selected.rest.text": {
-          "$type": "color",
-          "$value": "{palette.brand.800}",
-          "description": "Semantisk farverolle: color.action.subtleText."
-        },
-        "color.background.inverse": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.background.inverse."
-        },
-        "color.text.inverse": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.text.inverse."
-        },
-        "color.focus": {
-          "$type": "color",
-          "$value": "{palette.brand.600}",
-          "description": "Semantisk farverolle: color.focus."
-        },
-        "color.brand.accent": {
-          "$type": "color",
-          "$value": "{palette.accent.600}",
-          "description": "Semantisk farverolle: color.brand.accent."
-        },
-        "color.brand.accentDeep": {
-          "$type": "color",
-          "$value": "{palette.accent.800}",
-          "description": "Semantisk farverolle: color.brand.accentDeep."
-        },
-        "color.status.danger": {
-          "$type": "color",
-          "$value": "{palette.danger.600}",
-          "description": "Semantisk farverolle: color.status.danger."
-        },
-        "color.status.dangerSurface": {
-          "$type": "color",
-          "$value": "{palette.danger.50}",
-          "description": "Semantisk farverolle: color.status.dangerSurface."
-        },
-        "color.status.dangerText": {
-          "$type": "color",
-          "$value": "{palette.danger.800}",
-          "description": "Semantisk farverolle: color.status.dangerText."
-        },
-        "color.status.dangerContrast": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.status.dangerContrast."
-        },
-        "color.status.success": {
-          "$type": "color",
-          "$value": "{palette.success.600}",
-          "description": "Semantisk farverolle: color.status.success."
-        },
-        "color.status.info": {
-          "$type": "color",
-          "$value": "{palette.info.600}",
-          "description": "Semantisk farverolle: color.status.info."
-        },
-        "color.status.warning": {
-          "$type": "color",
-          "$value": "{palette.warning.600}",
-          "description": "Semantisk farverolle: color.status.warning."
-        },
-        "color.disabled.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.100}",
-          "description": "Semantisk farverolle: color.disabled.surface."
-        },
-        "color.disabled.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.500}",
-          "description": "Semantisk farverolle: color.disabled.text."
-        },
-        "color.caption.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.caption.surface."
-        },
         "color.caption.text": {
           "$type": "color",
-          "$value": "{palette.neutral.900}",
+          "$value": "{palette.neutral.50}",
           "description": "Semantisk farverolle: color.caption.text."
         },
         "color.caption.labelSurface": {
           "$type": "color",
-          "$value": "{palette.brand.600}",
+          "$value": "{palette.brand.200}",
           "description": "Semantisk farverolle: color.caption.labelSurface."
         },
-        "color.caption.labelText": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.caption.labelText."
-        },
-        "color.action.neutral.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.action.neutralHover."
-        },
-        "color.action.neutral.hover.text": {
+        "color.caption.surface": {
           "$type": "color",
           "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.neutralHoverText."
+          "description": "Semantisk farverolle: color.caption.surface."
         },
-        "color.action.neutral.active.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.300}",
-          "description": "Semantisk farverolle: color.action.neutralActive."
-        },
-        "color.action.neutral.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.neutralActiveText."
-        },
-        "color.action.selected.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.100}",
-          "description": "Semantisk farverolle: color.action.selectedHover."
-        },
-        "color.action.selected.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.selectedHoverText."
-        },
-        "color.action.selected.active.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.200}",
-          "description": "Semantisk farverolle: color.action.selectedActive."
-        },
-        "color.action.selected.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.selectedActiveText."
-        },
-        "color.action.primary.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.700}",
-          "description": "Semantisk farverolle: color.action.primaryHover."
-        },
-        "color.action.primary.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.primaryHoverText."
-        },
-        "color.action.primary.active.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.800}",
-          "description": "Semantisk farverolle: color.action.primaryActive."
-        },
-        "color.action.primary.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.primaryActiveText."
-        },
-        "color.action.secondary.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.800}",
-          "description": "Semantisk farverolle: color.action.secondaryHover."
-        },
-        "color.action.secondary.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.secondaryHoverText."
-        },
-        "color.action.secondary.active.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.action.secondaryActive."
-        },
-        "color.action.secondary.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.secondaryActiveText."
-        },
-        "color.action.danger.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.danger.700}",
-          "description": "Semantisk farverolle: color.action.dangerHover."
-        },
-        "color.action.danger.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.dangerHoverText."
-        },
-        "color.action.danger.active.surface": {
-          "$type": "color",
-          "$value": "{palette.danger.800}",
-          "description": "Semantisk farverolle: color.action.dangerActive."
-        },
-        "color.action.danger.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.dangerActiveText."
-        },
-        "color.action.accent.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.accent.700}",
-          "description": "Semantisk farverolle: color.action.accentHover."
-        },
-        "color.action.accent.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.accentHoverText."
-        },
-        "color.action.accent.active.surface": {
-          "$type": "color",
-          "$value": "{palette.accent.800}",
-          "description": "Semantisk farverolle: color.action.accentActive."
-        },
-        "color.action.accent.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.accentActiveText."
-        },
-        "color.illustration.ground": {
-          "$type": "color",
-          "$value": "#e6ece3",
-          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
-        },
-        "color.illustration.plane": {
-          "$type": "color",
-          "$value": "#f2f2e0",
-          "description": "Et selvstændigt materialeplan i illustrationen."
-        },
-        "color.illustration.ink": {
-          "$type": "color",
-          "$value": "#243a37",
-          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
-        },
-        "color.illustration.subject": {
-          "$type": "color",
-          "$value": "#396e65",
-          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
-        },
-        "color.illustration.counterpoint": {
-          "$type": "color",
-          "$value": "#c38c6e",
-          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
-        },
-        "color.illustration.context": {
-          "$type": "color",
-          "$value": "#c2d2c9",
-          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
-        },
-        "color.illustration.edge": {
-          "$type": "color",
-          "$value": "#778781",
-          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
-        },
-        "color.illustration.light": {
-          "$type": "color",
-          "$value": "#fff8dd",
-          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
-        },
-        "color.illustration.depth": {
-          "$type": "color",
-          "$value": "#b0bab3",
-          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
-        },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 1.8,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
-        },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.15,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
-        },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
-        }
-      }
-    },
-    "dark": {
-      "tokens": {
         "color.background.canvas": {
           "$type": "color",
           "$value": "{palette.neutral.950}",
@@ -2213,16 +1570,6 @@
           "$value": "{palette.neutral.900}",
           "description": "Semantisk farverolle: color.background.surface."
         },
-        "color.background.control": {
-          "$type": "color",
-          "$value": "{palette.neutral.850}",
-          "description": "Semantisk farverolle: color.background.control."
-        },
-        "color.background.detail": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.background.detail."
-        },
         "color.background.subtle": {
           "$type": "color",
           "$value": "{palette.neutral.800}",
@@ -2238,30 +1585,10 @@
           "$value": "{palette.neutral.200}",
           "description": "Semantisk farverolle: color.text.secondary."
         },
-        "color.text.muted": {
-          "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.text.muted."
-        },
-        "color.text.label": {
-          "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.text.label."
-        },
         "color.border.default": {
           "$type": "color",
           "$value": "{palette.neutral.700}",
           "description": "Semantisk farverolle: color.border.default."
-        },
-        "color.border.field": {
-          "$type": "color",
-          "$value": "{palette.neutral.400}",
-          "description": "Semantisk farverolle: color.border.field."
-        },
-        "color.border.strong": {
-          "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.border.strong."
         },
         "color.action.primary.rest.surface": {
           "$type": "color",
@@ -2283,30 +1610,10 @@
           "$value": "{palette.brand.100}",
           "description": "Semantisk farverolle: color.action.subtleText."
         },
-        "color.background.inverse": {
-          "$type": "color",
-          "$value": "{palette.neutral.100}",
-          "description": "Semantisk farverolle: color.background.inverse."
-        },
-        "color.text.inverse": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.text.inverse."
-        },
         "color.focus": {
           "$type": "color",
           "$value": "{palette.brand.200}",
           "description": "Semantisk farverolle: color.focus."
-        },
-        "color.brand.accent": {
-          "$type": "color",
-          "$value": "{palette.accent.300}",
-          "description": "Semantisk farverolle: color.brand.accent."
-        },
-        "color.brand.accentDeep": {
-          "$type": "color",
-          "$value": "{palette.accent.200}",
-          "description": "Semantisk farverolle: color.brand.accentDeep."
         },
         "color.status.danger": {
           "$type": "color",
@@ -2328,6 +1635,21 @@
           "$value": "{palette.neutral.950}",
           "description": "Semantisk farverolle: color.status.dangerContrast."
         },
+        "color.disabled.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.disabled.surface."
+        },
+        "color.disabled.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.400}",
+          "description": "Semantisk farverolle: color.disabled.text."
+        },
+        "color.background.control": {
+          "$type": "color",
+          "$value": "{palette.neutral.850}",
+          "description": "Semantisk farverolle: color.background.control."
+        },
         "color.status.success": {
           "$type": "color",
           "$value": "{palette.success.200}",
@@ -2343,35 +1665,55 @@
           "$value": "{palette.warning.200}",
           "description": "Semantisk farverolle: color.status.warning."
         },
-        "color.disabled.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.800}",
-          "description": "Semantisk farverolle: color.disabled.surface."
-        },
-        "color.disabled.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.400}",
-          "description": "Semantisk farverolle: color.disabled.text."
-        },
-        "color.caption.surface": {
+        "color.background.detail": {
           "$type": "color",
           "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.caption.surface."
-        },
-        "color.caption.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.50}",
-          "description": "Semantisk farverolle: color.caption.text."
-        },
-        "color.caption.labelSurface": {
-          "$type": "color",
-          "$value": "{palette.brand.200}",
-          "description": "Semantisk farverolle: color.caption.labelSurface."
+          "description": "Semantisk farverolle: color.background.detail."
         },
         "color.caption.labelText": {
           "$type": "color",
           "$value": "{palette.neutral.950}",
           "description": "Semantisk farverolle: color.caption.labelText."
+        },
+        "color.brand.accentDeep": {
+          "$type": "color",
+          "$value": "{palette.accent.200}",
+          "description": "Semantisk farverolle: color.brand.accentDeep."
+        },
+        "color.text.muted": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.text.muted."
+        },
+        "color.text.label": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.text.label."
+        },
+        "color.border.strong": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.border.strong."
+        },
+        "color.border.field": {
+          "$type": "color",
+          "$value": "{palette.neutral.400}",
+          "description": "Semantisk farverolle: color.border.field."
+        },
+        "color.background.inverse": {
+          "$type": "color",
+          "$value": "{palette.neutral.100}",
+          "description": "Semantisk farverolle: color.background.inverse."
+        },
+        "color.text.inverse": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.text.inverse."
+        },
+        "color.brand.accent": {
+          "$type": "color",
+          "$value": "{palette.accent.300}",
+          "description": "Semantisk farverolle: color.brand.accent."
         },
         "color.action.neutral.hover.surface": {
           "$type": "color",
@@ -2393,26 +1735,6 @@
           "$value": "{palette.neutral.50}",
           "description": "Semantisk farverolle: color.action.neutralActiveText."
         },
-        "color.action.selected.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.800}",
-          "description": "Semantisk farverolle: color.action.selectedHover."
-        },
-        "color.action.selected.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.50}",
-          "description": "Semantisk farverolle: color.action.selectedHoverText."
-        },
-        "color.action.selected.active.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.action.selectedActive."
-        },
-        "color.action.selected.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.50}",
-          "description": "Semantisk farverolle: color.action.selectedActiveText."
-        },
         "color.action.primary.hover.surface": {
           "$type": "color",
           "$value": "{palette.brand.100}",
@@ -2433,25 +1755,25 @@
           "$value": "{palette.neutral.950}",
           "description": "Semantisk farverolle: color.action.primaryActiveText."
         },
-        "color.action.secondary.hover.surface": {
+        "color.action.selected.hover.surface": {
           "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.action.secondaryHover."
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.action.selectedHover."
         },
-        "color.action.secondary.hover.text": {
+        "color.action.selected.hover.text": {
           "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.secondaryHoverText."
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.selectedHoverText."
         },
-        "color.action.secondary.active.surface": {
+        "color.action.selected.active.surface": {
           "$type": "color",
-          "$value": "{palette.neutral.300}",
-          "description": "Semantisk farverolle: color.action.secondaryActive."
+          "$value": "{palette.neutral.700}",
+          "description": "Semantisk farverolle: color.action.selectedActive."
         },
-        "color.action.secondary.active.text": {
+        "color.action.selected.active.text": {
           "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.secondaryActiveText."
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.selectedActiveText."
         },
         "color.action.danger.hover.surface": {
           "$type": "color",
@@ -2492,6 +1814,26 @@
           "$type": "color",
           "$value": "{palette.neutral.950}",
           "description": "Semantisk farverolle: color.action.accentActiveText."
+        },
+        "color.action.secondary.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.action.secondaryHover."
+        },
+        "color.action.secondary.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.action.secondaryHoverText."
+        },
+        "color.action.secondary.active.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.300}",
+          "description": "Semantisk farverolle: color.action.secondaryActive."
+        },
+        "color.action.secondary.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.action.secondaryActiveText."
         },
         "color.illustration.ground": {
           "$type": "color",
@@ -2537,23 +1879,11 @@
           "$type": "color",
           "$value": "#0d1614",
           "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
-        },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 1.8,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
-        },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.16,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
-        },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
         }
       }
     }
+  },
+  "graphics": {
+    "family": "lightroom"
   }
 }

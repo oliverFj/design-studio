@@ -1,6 +1,6 @@
 /** Hard limits for uncompressed UTF-8 delivery files, with room for normal growth. */
-// Shared scenes, pattern compositions and the sourced collaboration catalog; fonts and logos remain pooled.
-export const DELIVERY_SIZE_LIMITS=Object.freeze({studio:2_100_000,workspace:1_650_000,themes:850_000});
+// Includes four interactive use cases; fonts, logos and theme data remain pooled.
+export const DELIVERY_SIZE_LIMITS=Object.freeze({studio:2_150_000,workspace:1_650_000,themes:850_000});
 
 export function assertDeliverySize(delivery,content){
  const limit=DELIVERY_SIZE_LIMITS[delivery];

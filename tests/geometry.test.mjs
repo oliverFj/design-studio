@@ -21,6 +21,9 @@ test('all public themes pass supported calculated component geometry without mut
 
 test('old switch inset is reported as uneven geometry, including in checked state',()=>{
  const {model,resolved}=fixture();
+ // Reproduce the historical 2px track border explicitly; the common default
+ // now uses 1px, where this inset happens to be correctly centered.
+ model.components.switch.parts.track.styles.border='2px solid {color.border.strong}';
  model.components.switch.parts.thumb.styles.top='{size.switch.inset}';
  const check=result(model,resolved,'switch.centered');
  assert.equal(check.status,'warning');assert.equal(check.measured,2);

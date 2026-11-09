@@ -2,6 +2,8 @@
 
 Denne guide er indgangen til at tegne produktillustrationer, nye begreber og kunstneriske UI-studier med de fire godkendte illustrationsstilarter. Metoden kombinerer en agents fortolkning af et begreb med redigerbare SVG-opskrifter, temaets grafikmaterialer og én fælles animationsafspiller, når der leveres bevægelse.
 
+Temaet kan anbefale en familie med `graphics.family`; anbefalingen følger med åbning og gemning af temafilen. Studios **Illustrationsstil → Følg temaet** bruger den, mens brugerens manuelle valg har forrang. Familierne kan bruges i alle temaer. UI-materialer som frost, gradientkanter og gradienttekst beskrives særskilt i [temaformatet](PACKAGE-FORMAT.md#materialer-frost-og-gradienttekst); de ændrer ikke illustrationsfamiliernes tegneregler.
+
 ## Stilkontrakt og referencehierarki
 
 **Version 1 · 6. november 2026. Målet er at videreføre komponentkortenes faktiske illustrationsstil.** Samme farver, motividé og familienavn er ikke tilstrækkeligt. Stilen ligger også i forholdet mellem kontur og masse, tekstspor, tomrum, materialelag, kurver, lys og bevægelse.
@@ -42,8 +44,8 @@ Tallene herunder er kildeaflæste. Tegneparametre angives i SVG-enheder; kortets
 | Egenskab | Faktisk værdi / kilde | Anvendelse |
 | --- | --- | --- |
 | Tegnefelt | `600 × 420`, forhold `10:7`; [renderer](../core/graphics.mjs). | Samme koordinatsystem på tværs af motiver og størrelser. |
-| Grundmaterialets kontur | Tokendefault `1.8`; de 15 medfølgende temaers 40 farvetilstande opløser aktuelt til `1.6–2.2`. [Grafiktokens](../core/graphic-tokens.mjs), `packages/*.json`. | Læs det valgte temas faktiske værdi. Intervallet er en observation, ikke en ny tokenbegrænsning. |
-| Grundmaterialets dybdestyrke | Tokendefault `.12`; observeret `.10–.18` i samme samling. | Opacitet for illustrativ skygge, hvor familien bruger den. Ikke et krav om skygge i alle motiver. |
+| Grundmaterialets kontur | Tokendefault `1.8`; temaet kan overskrive den. [Grafiktokens](../core/graphic-tokens.mjs), `packages/*.json`. | Læs det valgte temas faktiske værdi; en observeret variation er ikke en ny tokenbegrænsning. |
+| Grundmaterialets dybdestyrke | Tokendefault `.12`; temaet kan overskrive den. | Opacitet for illustrativ skygge, hvor familien bruger den. Ikke et krav om skygge i alle motiver. |
 | Varighed | `duration.illustration`, default og alle aktuelt leverede tilstande `3200ms`. | Ét afgrænset illustrationsforløb. Bibliotekets almindelige UI-udfoldning på `240ms` er en anden rolle. |
 | SVG-wrapper | `fill="none"`, runde caps/joins, `font-family="Arial,sans-serif"`; familieopskrifter kan angive egen skrift. | Runde stregender er ikke samme beslutning som afrundede rektangler. |
 | Komponentkort | Minimumshøjde `232px`, padding `12px`, gap `12px`; billedvindue `154px` højt og fuld tilgængelig bredde. | Disse værdier tilhører kortet. SVG'en får ingen automatisk ikonforenkling eller fortykkelse. |
@@ -109,7 +111,7 @@ Bedøm kandidaten i denne rækkefølge:
 
 1. **Betydning:** kan den rigtige relation aflæses i slutbilledet? En søgning, et valg og et gemt trin må ikke ende som samme generiske netværk.
 2. **Familie:** sammenlign kontur/massetæthed, tekstniveauer, tomrum, hjørner, kurver og materialelag mod referencepakken. Ret en systematisk afvigelse i den fælles tegnehjælper frem for at lappe enkelte motiver.
-3. **Produktstørrelse og tema:** sammenlign ved `600 × 420` og den faktiske kortstørrelse. Kontrollér de farvetilstande, der leveres. For grafik, der skal følge hele Studio-temavælgeren, gennemgå alle medfølgende temaer og deres tilstande samlet; afgrænsede studier kan bruge et udtrykkeligt valgt udsnit. Brug eksempelvis Studio Light lys/mørk og Kyst som første prøve, men rapportér ikke dette som kontrol af alle temaer.
+3. **Produktstørrelse og tema:** sammenlign ved `600 × 420` og den faktiske kortstørrelse. Kontrollér de farvetilstande, der leveres. For grafik, der skal følge hele Studio-temavælgeren, gennemgå alle medfølgende temaer og deres tilstande samlet; afgrænsede studier kan bruge et udtrykkeligt valgt udsnit. Brug eksempelvis lyse og mørke farver i Studio og Riso som første prøve, men rapportér ikke dette som kontrol af alle temaer.
 4. **Bevægelse, når den leveres:** se `0`, `.25`, `.5`, `.75`, `1`, pause/genoptag, baglæns og reduceret bevægelse. Sammenlign slutpose og oprydning med den statiske komposition. Statisk produktgrafik kræver ikke en animationsplan.
 
 De automatiske prøver i [graphics.test.mjs](../tests/graphics.test.mjs) kontrollerer blandt andet motiver, navngivne dele, SVG-referencer og afspilleradfærd. De bedømmer ikke stregens optiske vægt, familiens komposition eller kvaliteten af en metafor. Et stilafvigende motiv kan bestå samtlige tekniske prøver.
@@ -184,7 +186,7 @@ I grafikværkstedet tilføjes et begreb ved at udvide `CONCEPTS` og skrive en op
 
 ### Designmønstrenes produktgrafik
 
-Designmønstrene bruger 44 godkendte, statiske illustrationer: ét særskilt motiv for hvert af de 11 mønstre i hver af de fire familier. De følger de samme semantiske grafikmaterialer og `600 × 420`-tegnefelt som komponentreferencerne. Den vandrette kortvælger i [gallery.mjs](../patterns/gallery.mjs) ejer navigation og klikflader; SVG'erne er dekorative og har ikke ekstra tastaturstop eller egen afspiller.
+Designmønstrene bruger 44 godkendte, statiske illustrationer: ét særskilt motiv for hvert af de 11 mønstre i hver af de fire familier. De følger de samme semantiske grafikmaterialer og `600 × 420`-tegnefelt som komponentreferencerne. Kortvælgeren i [gallery.mjs](../patterns/gallery.mjs) ejer navigation og klikflader; SVG'erne er dekorative og har ikke ekstra tastaturstop eller egen afspiller.
 
 | Fil | Ansvar |
 | --- | --- |

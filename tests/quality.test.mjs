@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {parseColor,contrastRatio,themeContrastReport,componentContrastReport,controlBoundaryReport,componentBoundaryReport} from '../core/quality.mjs';
 import {validatePackage,materializePackage,resolveTokens} from '../core/engine.mjs';
+import {DEFAULT_TOKENS} from '../core/library.mjs';
 import fs from 'node:fs';
 const theme = () => { const pack=JSON.parse(fs.readFileSync(new URL('../packages/studio-light.json',import.meta.url),'utf8'));pack.tokens['color.border.field'].$value='#667085';return pack; };
 test('contrast uses sRGB luminance and alpha compositing',()=>{
@@ -17,7 +18,7 @@ test('theme validation rejects invisible text, low focus contrast and undersized
  assert.match(validatePackage(text).errors.join(' '),/color.text.secondary.*contrast/);
  const focus=theme();focus.tokens['color.focus'].$value='#ffffff';
  assert.match(validatePackage(focus).errors.join(' '),/color.focus.*contrast/);
- const small=theme();small.tokens['size.control.height'].$value='12px';
+ const small=theme();small.tokens['size.control.height']={...DEFAULT_TOKENS['size.control.height'],$value:'12px'};
  assert.match(validatePackage(small).errors.join(' '),/size.control.height/);
  const clear=theme();clear.tokens['color.background.surface'].$value='rgb(255 255 255 / .5)';
  assert.match(validatePackage(clear).errors.join(' '),/opaque/);

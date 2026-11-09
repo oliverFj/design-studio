@@ -1,14 +1,9 @@
 {
   "schemaVersion": 2,
   "id": "studio-light",
-  "name": "Studio Light",
-  "description": "Et præcist, lyst produktudtryk med bløde grå flader, indigo, klar sans-typografi og diskret dybde. Et roligt udgangspunkt for professionelle digitale produkter.",
+  "name": "Studio",
+  "description": "Rolig sans-typografi, bløde præcise hjørner og diskret dybde. Indigo, mineral og blomme giver hver sin atmosfære i lyse og mørke farver.",
   "tokens": {
-    "typography.size.captionText": {
-      "$type": "dimension",
-      "$value": "14px",
-      "description": "Normal billedtekst med et underordnet typografisk niveau."
-    },
     "color.background.canvas": {
       "$type": "color",
       "$value": "{palette.neutral.50}",
@@ -104,31 +99,6 @@
       "$value": "{typography.font.body}",
       "description": "Primærskriften følger temaet som lokal WOFF2; generisk fallback bruges til tegn uden for den medfølgende dækning."
     },
-    "typography.size.body": {
-      "$type": "dimension",
-      "$value": "1rem",
-      "description": "Normal læsetekst."
-    },
-    "typography.size.heading": {
-      "$type": "dimension",
-      "$value": "2rem",
-      "description": "Primær overskrift i designeksemplerne."
-    },
-    "typography.size.label": {
-      "$type": "dimension",
-      "$value": "0.875rem",
-      "description": "Labels og betjeningskontroller."
-    },
-    "typography.size.small": {
-      "$type": "dimension",
-      "$value": "0.8125rem",
-      "description": "Hjælpetekst og kompakte badges."
-    },
-    "typography.size.title": {
-      "$type": "dimension",
-      "$value": "1.125rem",
-      "description": "Titler i kort og dialoger."
-    },
     "typography.weight.body": {
       "$type": "fontWeight",
       "$value": 400,
@@ -143,66 +113,6 @@
       "$type": "fontWeight",
       "$value": 600,
       "description": "Labels og handlingsknappers tekstvægt."
-    },
-    "typography.lineHeight.body": {
-      "$type": "number",
-      "$value": 1.6,
-      "description": "Linjehøjde uden enhed for brødtekst."
-    },
-    "typography.lineHeight.heading": {
-      "$type": "number",
-      "$value": 1.15,
-      "description": "Linjehøjde uden enhed for overskrifter."
-    },
-    "typography.lineHeight.control": {
-      "$type": "number",
-      "$value": 1.35,
-      "description": "Linjehøjde uden enhed for knapper og badges."
-    },
-    "space.scale.1": {
-      "$type": "dimension",
-      "$value": "0.25rem",
-      "description": "Små indvendige mellemrum."
-    },
-    "space.scale.2": {
-      "$type": "dimension",
-      "$value": "0.5rem",
-      "description": "Tæt afstand mellem beslægtede elementer."
-    },
-    "space.scale.3": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Kompakt indvendig afstand."
-    },
-    "space.scale.4": {
-      "$type": "dimension",
-      "$value": "1rem",
-      "description": "Standardafstand og vandret kontrolpadding."
-    },
-    "space.scale.6": {
-      "$type": "dimension",
-      "$value": "1.5rem",
-      "description": "Indvendig afstand i større overflader."
-    },
-    "space.scale.8": {
-      "$type": "dimension",
-      "$value": "2rem",
-      "description": "Afstand mellem visuelle grupper."
-    },
-    "size.control.height": {
-      "$type": "dimension",
-      "$value": "2.75rem",
-      "description": "Minimumshøjde for knapper, input og select."
-    },
-    "size.checkbox": {
-      "$type": "dimension",
-      "$value": "1.125rem",
-      "description": "Checkboxens visuelle størrelse."
-    },
-    "size.dialog.maxWidth": {
-      "$type": "dimension",
-      "$value": "36rem",
-      "description": "Dialogfladens maksimale bredde."
     },
     "border.width.default": {
       "$type": "dimension",
@@ -304,26 +214,6 @@
       "$value": "{palette.neutral.0}",
       "description": "Semantisk farverolle: color.caption.labelText."
     },
-    "typography.size.control": {
-      "$type": "dimension",
-      "$value": "{typography.size.label}",
-      "description": "Temaets fælles visuelle værdi for typography.size.control."
-    },
-    "typography.size.panel": {
-      "$type": "dimension",
-      "$value": "{typography.size.title}",
-      "description": "Temaets fælles visuelle værdi for typography.size.panel."
-    },
-    "typography.size.tiny": {
-      "$type": "dimension",
-      "$value": "{typography.size.small}",
-      "description": "Temaets fælles visuelle værdi for typography.size.tiny."
-    },
-    "typography.size.shortcut": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Temaets fælles visuelle værdi for typography.size.shortcut."
-    },
     "typography.weight.strong": {
       "$type": "fontWeight",
       "$value": "{typography.weight.label}",
@@ -374,55 +264,10 @@
       "$value": "999px",
       "description": "Temaets fælles visuelle værdi for radius.pill."
     },
-    "size.switch.width": {
-      "$type": "dimension",
-      "$value": "2.75rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.width."
-    },
-    "size.switch.height": {
-      "$type": "dimension",
-      "$value": "1.5rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.height."
-    },
-    "size.switch.thumb": {
-      "$type": "dimension",
-      "$value": "1.125rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.thumb."
-    },
-    "size.switch.inset": {
-      "$type": "dimension",
-      "$value": "0.1875rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.inset."
-    },
     "opacity.shortcut": {
       "$type": "number",
       "$value": 1,
       "description": "Temaets fælles visuelle værdi for opacity.shortcut."
-    },
-    "space.component.padding": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Temaets fælles visuelle værdi for space.component.padding."
-    },
-    "space.component.paddingLarge": {
-      "$type": "dimension",
-      "$value": "1rem",
-      "description": "Temaets fælles visuelle værdi for space.component.paddingLarge."
-    },
-    "space.component.paddingCompact": {
-      "$type": "dimension",
-      "$value": "0.375rem",
-      "description": "Temaets fælles visuelle værdi for space.component.paddingCompact."
-    },
-    "space.component.gap": {
-      "$type": "dimension",
-      "$value": "0.375rem",
-      "description": "Temaets fælles visuelle værdi for space.component.gap."
-    },
-    "space.component.gapLarge": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Temaets fælles visuelle værdi for space.component.gapLarge."
     },
     "color.border.field": {
       "$type": "color",
@@ -458,11 +303,6 @@
       "$type": "color",
       "$value": "{palette.warning.600}",
       "description": "Semantisk farverolle: color.status.warning."
-    },
-    "typography.size.display": {
-      "$type": "dimension",
-      "$value": "3.5rem",
-      "description": "Temaets fælles visuelle værdi for typography.size.display."
     },
     "shadow.floating": {
       "$type": "shadow",
@@ -1129,34 +969,55 @@
     {
       "date": "2026-11-06",
       "note": "Dedikeret illustrationsregister med kuraterede billedfarver og materialer i alle temaets farvevariationer. Tegnets anatomi er valgt som grafisk udgangspunkt; alle fire billedfamilier kan fortsat vælges. Illustrationsforløb bruger en særskilt varighed på 3200 ms."
+    },
+    {
+      "date": "2026-11-09",
+      "note": "Samlet temakuratering: tydelig hensigt, navngivne farver, fælles størrelser og afstande samt en anbefalet, frit valgbar illustrationsstil."
     }
   ],
-  "appearance": {},
+  "appearance": {
+    "tag": {
+      "parts": {
+        "root": {
+          "styles": {
+            "color": "{color.text.primary}"
+          }
+        }
+      },
+      "states": {
+        "hover": {
+          "styles": {
+            "color": "{color.action.selected.rest.text}"
+          }
+        }
+      }
+    }
+  },
   "brand": {
     "name": "Studio Light",
-    "summary": "Et præcist, lyst produktudtryk med bløde grå flader, indigo, klar sans-typografi og diskret dybde. Et roligt udgangspunkt for professionelle digitale produkter.",
+    "summary": "Rolig sans-typografi, bløde præcise hjørner og diskret dybde. Indigo, mineral og blomme giver hver sin atmosfære i lyse og mørke farver.",
     "principles": [
       {
-        "id": "clarity",
-        "title": "Klarhed",
-        "description": "Lad typografisk hierarki, ensartede kontroller og tydelig kontrast gøre indhold og handlinger lette at aflæse."
+        "id": "intent-1",
+        "title": "Rolig",
+        "description": "Inter og et fast typografisk hierarki giver plads til indhold og gentaget betjening."
       },
       {
-        "id": "restraint",
-        "title": "Visuel ro",
-        "description": "Brug accentfarven sparsomt og lad neutrale flader skabe forskellen mellem grupper."
+        "id": "intent-2",
+        "title": "Afbalanceret",
+        "description": "Kontroller har mindre afrunding end kort; kanter og diskret dybde viser lag."
       },
       {
-        "id": "precision",
-        "title": "Præcision",
-        "description": "Brug bibliotekets komponenter med fælles mål og tilstande. Visuel karakter kommer fra temaets tokens."
+        "id": "intent-3",
+        "title": "Alsidig",
+        "description": "Farven ændrer temperatur og stemning, mens form og bevægelse forbliver genkendelige."
       }
     ],
     "sections": [
       {
         "id": "palette",
         "title": "Farver og hierarki",
-        "description": "Kølige neutrale flader giver indholdet plads; indigo markerer handlinger og aktive valg.",
+        "description": "Vælg Indigo og Indigonat for det klassiske studie, Mineral og Mineralnat for kølig ro eller Blomme og Blommenat for en varmere karakter. Hver farve har komplette tekst-, flade- og handlingspar.",
         "tokens": [
           "color.background.canvas",
           "color.background.surface",
@@ -1266,6 +1127,32 @@
           "Vis ikke hover alene ved at gøre tekst og flade gennemsigtige.",
           "Tilføj ikke en lokal hoverfarve til hver knap eller erstat fokus med hover."
         ]
+      },
+      {
+        "id": "shared-measures",
+        "title": "Fælles målestok",
+        "description": "Skriftstørrelser, linjehøjder, kontrolmål og afstande følger bibliotekets fælles skala. Temaets egen karakter ligger i skriftvalg, vægt, geometri, materialer og bevægelse. Navigation kan være i samme farvefamilie som arbejdsfladen eller bruge en afstemt kontrast.",
+        "tokens": [
+          "typography.size.body",
+          "typography.size.heading",
+          "typography.size.panel",
+          "space.scale.1",
+          "space.scale.2",
+          "space.scale.3",
+          "space.scale.4",
+          "space.scale.6",
+          "space.scale.8",
+          "size.control.height"
+        ],
+        "components": [],
+        "dos": [
+          "Vælg kompakt eller desktop gennem komponentens funktionelle varianter.",
+          "Lad sidemenuens farve understøtte den konkrete skærm."
+        ],
+        "donts": [
+          "Skab ikke tæthed ved at ændre temaets målestok.",
+          "Gør ikke kontrastfarvet sidemenu til et krav."
+        ]
       }
     ],
     "logos": [],
@@ -1327,360 +1214,13 @@
   "defaultMode": "light",
   "modes": {
     "light": {
-      "tokens": {
-        "color.background.canvas": {
-          "$type": "color",
-          "$value": "{palette.neutral.50}",
-          "description": "Semantisk farverolle: color.background.canvas."
-        },
-        "color.background.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.background.surface."
-        },
-        "color.background.control": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.background.control."
-        },
-        "color.background.detail": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.background.detail."
-        },
-        "color.background.subtle": {
-          "$type": "color",
-          "$value": "{palette.neutral.100}",
-          "description": "Semantisk farverolle: color.background.subtle."
-        },
-        "color.text.primary": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.text.primary."
-        },
-        "color.text.secondary": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.text.secondary."
-        },
-        "color.text.muted": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.text.muted."
-        },
-        "color.text.label": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.text.label."
-        },
-        "color.border.default": {
-          "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.border.default."
-        },
-        "color.border.field": {
-          "$type": "color",
-          "$value": "{palette.neutral.600}",
-          "description": "Semantisk farverolle: color.border.field."
-        },
-        "color.border.strong": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.border.strong."
-        },
-        "color.action.primary.rest.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.600}",
-          "description": "Semantisk farverolle: color.action.primary."
-        },
-        "color.action.primary.rest.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.primaryText."
-        },
-        "color.action.selected.rest.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.50}",
-          "description": "Semantisk farverolle: color.action.subtle."
-        },
-        "color.action.selected.rest.text": {
-          "$type": "color",
-          "$value": "{palette.brand.800}",
-          "description": "Semantisk farverolle: color.action.subtleText."
-        },
-        "color.background.inverse": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.background.inverse."
-        },
-        "color.text.inverse": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.text.inverse."
-        },
-        "color.focus": {
-          "$type": "color",
-          "$value": "{palette.brand.600}",
-          "description": "Semantisk farverolle: color.focus."
-        },
-        "color.brand.accent": {
-          "$type": "color",
-          "$value": "{palette.accent.600}",
-          "description": "Semantisk farverolle: color.brand.accent."
-        },
-        "color.brand.accentDeep": {
-          "$type": "color",
-          "$value": "{palette.accent.800}",
-          "description": "Semantisk farverolle: color.brand.accentDeep."
-        },
-        "color.status.danger": {
-          "$type": "color",
-          "$value": "{palette.danger.600}",
-          "description": "Semantisk farverolle: color.status.danger."
-        },
-        "color.status.dangerSurface": {
-          "$type": "color",
-          "$value": "{palette.danger.50}",
-          "description": "Semantisk farverolle: color.status.dangerSurface."
-        },
-        "color.status.dangerText": {
-          "$type": "color",
-          "$value": "{palette.danger.800}",
-          "description": "Semantisk farverolle: color.status.dangerText."
-        },
-        "color.status.dangerContrast": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.status.dangerContrast."
-        },
-        "color.status.success": {
-          "$type": "color",
-          "$value": "{palette.success.600}",
-          "description": "Semantisk farverolle: color.status.success."
-        },
-        "color.status.info": {
-          "$type": "color",
-          "$value": "{palette.info.600}",
-          "description": "Semantisk farverolle: color.status.info."
-        },
-        "color.status.warning": {
-          "$type": "color",
-          "$value": "{palette.warning.600}",
-          "description": "Semantisk farverolle: color.status.warning."
-        },
-        "color.disabled.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.100}",
-          "description": "Semantisk farverolle: color.disabled.surface."
-        },
-        "color.disabled.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.500}",
-          "description": "Semantisk farverolle: color.disabled.text."
-        },
-        "color.caption.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.caption.surface."
-        },
-        "color.caption.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.caption.text."
-        },
-        "color.caption.labelSurface": {
-          "$type": "color",
-          "$value": "{palette.brand.600}",
-          "description": "Semantisk farverolle: color.caption.labelSurface."
-        },
-        "color.caption.labelText": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.caption.labelText."
-        },
-        "color.action.neutral.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.action.neutralHover."
-        },
-        "color.action.neutral.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.neutralHoverText."
-        },
-        "color.action.neutral.active.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.300}",
-          "description": "Semantisk farverolle: color.action.neutralActive."
-        },
-        "color.action.neutral.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.neutralActiveText."
-        },
-        "color.action.selected.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.100}",
-          "description": "Semantisk farverolle: color.action.selectedHover."
-        },
-        "color.action.selected.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.selectedHoverText."
-        },
-        "color.action.selected.active.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.200}",
-          "description": "Semantisk farverolle: color.action.selectedActive."
-        },
-        "color.action.selected.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.selectedActiveText."
-        },
-        "color.action.primary.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.700}",
-          "description": "Semantisk farverolle: color.action.primaryHover."
-        },
-        "color.action.primary.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.primaryHoverText."
-        },
-        "color.action.primary.active.surface": {
-          "$type": "color",
-          "$value": "{palette.brand.800}",
-          "description": "Semantisk farverolle: color.action.primaryActive."
-        },
-        "color.action.primary.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.primaryActiveText."
-        },
-        "color.action.secondary.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.800}",
-          "description": "Semantisk farverolle: color.action.secondaryHover."
-        },
-        "color.action.secondary.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.secondaryHoverText."
-        },
-        "color.action.secondary.active.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.action.secondaryActive."
-        },
-        "color.action.secondary.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.secondaryActiveText."
-        },
-        "color.action.danger.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.danger.700}",
-          "description": "Semantisk farverolle: color.action.dangerHover."
-        },
-        "color.action.danger.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.dangerHoverText."
-        },
-        "color.action.danger.active.surface": {
-          "$type": "color",
-          "$value": "{palette.danger.800}",
-          "description": "Semantisk farverolle: color.action.dangerActive."
-        },
-        "color.action.danger.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.dangerActiveText."
-        },
-        "color.action.accent.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.accent.700}",
-          "description": "Semantisk farverolle: color.action.accentHover."
-        },
-        "color.action.accent.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.accentHoverText."
-        },
-        "color.action.accent.active.surface": {
-          "$type": "color",
-          "$value": "{palette.accent.800}",
-          "description": "Semantisk farverolle: color.action.accentActive."
-        },
-        "color.action.accent.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.0}",
-          "description": "Semantisk farverolle: color.action.accentActiveText."
-        },
-        "color.illustration.ground": {
-          "$type": "color",
-          "$value": "#ececf6",
-          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
-        },
-        "color.illustration.plane": {
-          "$type": "color",
-          "$value": "#f5f4f5",
-          "description": "Et selvstændigt materialeplan i illustrationen."
-        },
-        "color.illustration.ink": {
-          "$type": "color",
-          "$value": "#2e314b",
-          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
-        },
-        "color.illustration.subject": {
-          "$type": "color",
-          "$value": "#6862b8",
-          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
-        },
-        "color.illustration.counterpoint": {
-          "$type": "color",
-          "$value": "#72a09c",
-          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
-        },
-        "color.illustration.context": {
-          "$type": "color",
-          "$value": "#d0cfe9",
-          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
-        },
-        "color.illustration.edge": {
-          "$type": "color",
-          "$value": "#808195",
-          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
-        },
-        "color.illustration.light": {
-          "$type": "color",
-          "$value": "#fffdf4",
-          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
-        },
-        "color.illustration.depth": {
-          "$type": "color",
-          "$value": "#b7b8c6",
-          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
-        },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 1.8,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
-        },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.12,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
-        },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
-        }
-      }
+      "name": "Indigo",
+      "colorScheme": "light",
+      "tokens": {}
     },
     "dark": {
+      "name": "Indigonat",
+      "colorScheme": "dark",
       "tokens": {
         "color.background.canvas": {
           "$type": "color",
@@ -1692,16 +1232,6 @@
           "$value": "{palette.neutral.900}",
           "description": "Semantisk farverolle: color.background.surface."
         },
-        "color.background.control": {
-          "$type": "color",
-          "$value": "{palette.neutral.850}",
-          "description": "Semantisk farverolle: color.background.control."
-        },
-        "color.background.detail": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.background.detail."
-        },
         "color.background.subtle": {
           "$type": "color",
           "$value": "{palette.neutral.800}",
@@ -1717,30 +1247,10 @@
           "$value": "{palette.neutral.200}",
           "description": "Semantisk farverolle: color.text.secondary."
         },
-        "color.text.muted": {
-          "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.text.muted."
-        },
-        "color.text.label": {
-          "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.text.label."
-        },
         "color.border.default": {
           "$type": "color",
           "$value": "{palette.neutral.700}",
           "description": "Semantisk farverolle: color.border.default."
-        },
-        "color.border.field": {
-          "$type": "color",
-          "$value": "{palette.neutral.400}",
-          "description": "Semantisk farverolle: color.border.field."
-        },
-        "color.border.strong": {
-          "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.border.strong."
         },
         "color.action.primary.rest.surface": {
           "$type": "color",
@@ -1762,30 +1272,10 @@
           "$value": "{palette.brand.100}",
           "description": "Semantisk farverolle: color.action.subtleText."
         },
-        "color.background.inverse": {
-          "$type": "color",
-          "$value": "{palette.neutral.100}",
-          "description": "Semantisk farverolle: color.background.inverse."
-        },
-        "color.text.inverse": {
-          "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.text.inverse."
-        },
         "color.focus": {
           "$type": "color",
           "$value": "{palette.brand.200}",
           "description": "Semantisk farverolle: color.focus."
-        },
-        "color.brand.accent": {
-          "$type": "color",
-          "$value": "{palette.accent.300}",
-          "description": "Semantisk farverolle: color.brand.accent."
-        },
-        "color.brand.accentDeep": {
-          "$type": "color",
-          "$value": "{palette.accent.200}",
-          "description": "Semantisk farverolle: color.brand.accentDeep."
         },
         "color.status.danger": {
           "$type": "color",
@@ -1807,21 +1297,6 @@
           "$value": "{palette.neutral.950}",
           "description": "Semantisk farverolle: color.status.dangerContrast."
         },
-        "color.status.success": {
-          "$type": "color",
-          "$value": "{palette.success.200}",
-          "description": "Semantisk farverolle: color.status.success."
-        },
-        "color.status.info": {
-          "$type": "color",
-          "$value": "{palette.info.200}",
-          "description": "Semantisk farverolle: color.status.info."
-        },
-        "color.status.warning": {
-          "$type": "color",
-          "$value": "{palette.warning.200}",
-          "description": "Semantisk farverolle: color.status.warning."
-        },
         "color.disabled.surface": {
           "$type": "color",
           "$value": "{palette.neutral.800}",
@@ -1831,6 +1306,31 @@
           "$type": "color",
           "$value": "{palette.neutral.400}",
           "description": "Semantisk farverolle: color.disabled.text."
+        },
+        "color.background.control": {
+          "$type": "color",
+          "$value": "{palette.neutral.850}",
+          "description": "Semantisk farverolle: color.background.control."
+        },
+        "color.background.detail": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.background.detail."
+        },
+        "color.text.muted": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.text.muted."
+        },
+        "color.text.label": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.text.label."
+        },
+        "color.border.strong": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.border.strong."
         },
         "color.caption.surface": {
           "$type": "color",
@@ -1852,6 +1352,41 @@
           "$value": "{palette.neutral.950}",
           "description": "Semantisk farverolle: color.caption.labelText."
         },
+        "color.border.field": {
+          "$type": "color",
+          "$value": "{palette.neutral.400}",
+          "description": "Semantisk farverolle: color.border.field."
+        },
+        "color.background.inverse": {
+          "$type": "color",
+          "$value": "{palette.neutral.100}",
+          "description": "Semantisk farverolle: color.background.inverse."
+        },
+        "color.text.inverse": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.text.inverse."
+        },
+        "color.brand.accent": {
+          "$type": "color",
+          "$value": "{palette.accent.300}",
+          "description": "Semantisk farverolle: color.brand.accent."
+        },
+        "color.status.success": {
+          "$type": "color",
+          "$value": "{palette.success.200}",
+          "description": "Semantisk farverolle: color.status.success."
+        },
+        "color.status.info": {
+          "$type": "color",
+          "$value": "{palette.info.200}",
+          "description": "Semantisk farverolle: color.status.info."
+        },
+        "color.status.warning": {
+          "$type": "color",
+          "$value": "{palette.warning.200}",
+          "description": "Semantisk farverolle: color.status.warning."
+        },
         "color.action.neutral.hover.surface": {
           "$type": "color",
           "$value": "{palette.neutral.800}",
@@ -1871,26 +1406,6 @@
           "$type": "color",
           "$value": "{palette.neutral.50}",
           "description": "Semantisk farverolle: color.action.neutralActiveText."
-        },
-        "color.action.selected.hover.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.800}",
-          "description": "Semantisk farverolle: color.action.selectedHover."
-        },
-        "color.action.selected.hover.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.50}",
-          "description": "Semantisk farverolle: color.action.selectedHoverText."
-        },
-        "color.action.selected.active.surface": {
-          "$type": "color",
-          "$value": "{palette.neutral.700}",
-          "description": "Semantisk farverolle: color.action.selectedActive."
-        },
-        "color.action.selected.active.text": {
-          "$type": "color",
-          "$value": "{palette.neutral.50}",
-          "description": "Semantisk farverolle: color.action.selectedActiveText."
         },
         "color.action.primary.hover.surface": {
           "$type": "color",
@@ -1912,25 +1427,25 @@
           "$value": "{palette.neutral.950}",
           "description": "Semantisk farverolle: color.action.primaryActiveText."
         },
-        "color.action.secondary.hover.surface": {
+        "color.action.selected.hover.surface": {
           "$type": "color",
-          "$value": "{palette.neutral.200}",
-          "description": "Semantisk farverolle: color.action.secondaryHover."
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.action.selectedHover."
         },
-        "color.action.secondary.hover.text": {
+        "color.action.selected.hover.text": {
           "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.secondaryHoverText."
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.selectedHoverText."
         },
-        "color.action.secondary.active.surface": {
+        "color.action.selected.active.surface": {
           "$type": "color",
-          "$value": "{palette.neutral.300}",
-          "description": "Semantisk farverolle: color.action.secondaryActive."
+          "$value": "{palette.neutral.700}",
+          "description": "Semantisk farverolle: color.action.selectedActive."
         },
-        "color.action.secondary.active.text": {
+        "color.action.selected.active.text": {
           "$type": "color",
-          "$value": "{palette.neutral.900}",
-          "description": "Semantisk farverolle: color.action.secondaryActiveText."
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.selectedActiveText."
         },
         "color.action.danger.hover.surface": {
           "$type": "color",
@@ -1971,6 +1486,31 @@
           "$type": "color",
           "$value": "{palette.neutral.950}",
           "description": "Semantisk farverolle: color.action.accentActiveText."
+        },
+        "color.action.secondary.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.action.secondaryHover."
+        },
+        "color.action.secondary.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.action.secondaryHoverText."
+        },
+        "color.action.secondary.active.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.300}",
+          "description": "Semantisk farverolle: color.action.secondaryActive."
+        },
+        "color.action.secondary.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.action.secondaryActiveText."
+        },
+        "color.brand.accentDeep": {
+          "$type": "color",
+          "$value": "{palette.accent.200}",
+          "description": "Semantisk farverolle: color.brand.accentDeep."
         },
         "color.illustration.ground": {
           "$type": "color",
@@ -2016,23 +1556,1875 @@
           "$type": "color",
           "$value": "#0f1118",
           "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+        }
+      }
+    },
+    "mineral": {
+      "name": "Mineral",
+      "colorScheme": "light",
+      "tokens": {
+        "color.action.primary.rest.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.700}",
+          "description": "Semantisk farverolle: color.action.primary."
         },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 1.8,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
+        "color.action.selected.rest.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.500}",
+          "description": "Semantisk farverolle: color.action.subtle."
         },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.13,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
+        "color.action.selected.rest.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.0}",
+          "description": "Semantisk farverolle: color.action.subtleText."
         },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
+        "color.caption.labelSurface": {
+          "$type": "color",
+          "$value": "{palette.brand.700}",
+          "description": "Semantisk farverolle: color.caption.labelSurface."
+        },
+        "color.action.primary.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.800}",
+          "description": "Semantisk farverolle: color.action.primaryHover."
+        },
+        "color.action.primary.active.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.900}",
+          "description": "Semantisk farverolle: color.action.primaryActive."
+        },
+        "color.action.selected.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.600}",
+          "description": "Semantisk farverolle: color.action.selectedHover."
+        },
+        "color.action.selected.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.0}",
+          "description": "Semantisk farverolle: color.action.selectedHoverText."
+        },
+        "color.action.selected.active.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.700}",
+          "description": "Semantisk farverolle: color.action.selectedActive."
+        },
+        "color.action.selected.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.0}",
+          "description": "Semantisk farverolle: color.action.selectedActiveText."
+        },
+        "palette.neutral.0": {
+          "$type": "color",
+          "$value": "#fcfefd",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.50": {
+          "$type": "color",
+          "$value": "#eff5f4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.100": {
+          "$type": "color",
+          "$value": "#e1edeb",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.200": {
+          "$type": "color",
+          "$value": "#cbdcda",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.300": {
+          "$type": "color",
+          "$value": "#aabfbd",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.400": {
+          "$type": "color",
+          "$value": "#8ea7a4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.500": {
+          "$type": "color",
+          "$value": "#708b88",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.550": {
+          "$type": "color",
+          "$value": "#637d7a",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.600": {
+          "$type": "color",
+          "$value": "#526c69",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.700": {
+          "$type": "color",
+          "$value": "#405754",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.800": {
+          "$type": "color",
+          "$value": "#2c4240",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.850": {
+          "$type": "color",
+          "$value": "#223735",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.900": {
+          "$type": "color",
+          "$value": "#192c2a",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.950": {
+          "$type": "color",
+          "$value": "#10211f",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.1000": {
+          "$type": "color",
+          "$value": "#050c0b",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.50": {
+          "$type": "color",
+          "$value": "#eaf9f8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.100": {
+          "$type": "color",
+          "$value": "#c9eeee",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.200": {
+          "$type": "color",
+          "$value": "#9bdce0",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.300": {
+          "$type": "color",
+          "$value": "#72cbd0",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.400": {
+          "$type": "color",
+          "$value": "#3cabb3",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.500": {
+          "$type": "color",
+          "$value": "#147d83",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.600": {
+          "$type": "color",
+          "$value": "#156f75",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.700": {
+          "$type": "color",
+          "$value": "#115e64",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.800": {
+          "$type": "color",
+          "$value": "#104c52",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.900": {
+          "$type": "color",
+          "$value": "#103c42",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.950": {
+          "$type": "color",
+          "$value": "#0a292e",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.50": {
+          "$type": "color",
+          "$value": "#fff8e9",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.100": {
+          "$type": "color",
+          "$value": "#f9e8c5",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.200": {
+          "$type": "color",
+          "$value": "#f0cc8b",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.300": {
+          "$type": "color",
+          "$value": "#dfb56a",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.400": {
+          "$type": "color",
+          "$value": "#b9893c",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.500": {
+          "$type": "color",
+          "$value": "#a36d28",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.600": {
+          "$type": "color",
+          "$value": "#8c5b22",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.700": {
+          "$type": "color",
+          "$value": "#714719",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.800": {
+          "$type": "color",
+          "$value": "#5b3812",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.900": {
+          "$type": "color",
+          "$value": "#44290d",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.950": {
+          "$type": "color",
+          "$value": "#2c1c0b",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "elevation.level1": {
+          "$type": "shadow",
+          "$value": "none",
+          "description": "Temaværdi for elevation.level1."
+        },
+        "elevation.level2": {
+          "$type": "shadow",
+          "$value": "0 2px 8px rgba(20,24,34,.025), 0 12px 28px rgba(20,24,34,.045)",
+          "description": "Temaværdi for elevation.level2."
+        },
+        "elevation.level3": {
+          "$type": "shadow",
+          "$value": "0 12px 32px rgba(20,24,34,.1), 0 32px 80px rgba(20,24,34,.12)",
+          "description": "Temaværdi for elevation.level3."
+        },
+        "color.illustration.ground": {
+          "$type": "color",
+          "$value": "#e6efeb",
+          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
+        },
+        "color.illustration.plane": {
+          "$type": "color",
+          "$value": "#eff6ef",
+          "description": "Et selvstændigt materialeplan i illustrationen."
+        },
+        "color.illustration.ink": {
+          "$type": "color",
+          "$value": "#193b3a",
+          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
+        },
+        "color.illustration.subject": {
+          "$type": "color",
+          "$value": "#2c7373",
+          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
+        },
+        "color.illustration.counterpoint": {
+          "$type": "color",
+          "$value": "#b28d4e",
+          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
+        },
+        "color.illustration.context": {
+          "$type": "color",
+          "$value": "#bfd5d2",
+          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
+        },
+        "color.illustration.edge": {
+          "$type": "color",
+          "$value": "#718886",
+          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
+        },
+        "color.illustration.light": {
+          "$type": "color",
+          "$value": "#f9fff4",
+          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
+        },
+        "color.illustration.depth": {
+          "$type": "color",
+          "$value": "#adbdb9",
+          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+        }
+      }
+    },
+    "mineralnat": {
+      "name": "Mineralnat",
+      "colorScheme": "dark",
+      "tokens": {
+        "color.background.canvas": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.background.canvas."
+        },
+        "color.background.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.background.surface."
+        },
+        "color.background.subtle": {
+          "$type": "color",
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.background.subtle."
+        },
+        "color.text.primary": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.text.primary."
+        },
+        "color.text.secondary": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.text.secondary."
+        },
+        "color.border.default": {
+          "$type": "color",
+          "$value": "{palette.neutral.700}",
+          "description": "Semantisk farverolle: color.border.default."
+        },
+        "color.action.primary.rest.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.200}",
+          "description": "Semantisk farverolle: color.action.primary."
+        },
+        "color.action.primary.rest.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.primaryText."
+        },
+        "color.action.selected.rest.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.300}",
+          "description": "Semantisk farverolle: color.action.subtle."
+        },
+        "color.action.selected.rest.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.subtleText."
+        },
+        "color.focus": {
+          "$type": "color",
+          "$value": "{palette.brand.300}",
+          "description": "Semantisk farverolle: color.focus."
+        },
+        "color.status.danger": {
+          "$type": "color",
+          "$value": "{palette.danger.200}",
+          "description": "Semantisk farverolle: color.status.danger."
+        },
+        "color.status.dangerSurface": {
+          "$type": "color",
+          "$value": "{palette.danger.950}",
+          "description": "Semantisk farverolle: color.status.dangerSurface."
+        },
+        "color.status.dangerText": {
+          "$type": "color",
+          "$value": "{palette.danger.100}",
+          "description": "Semantisk farverolle: color.status.dangerText."
+        },
+        "color.status.dangerContrast": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.status.dangerContrast."
+        },
+        "color.disabled.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.disabled.surface."
+        },
+        "color.disabled.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.400}",
+          "description": "Semantisk farverolle: color.disabled.text."
+        },
+        "color.background.control": {
+          "$type": "color",
+          "$value": "{palette.neutral.850}",
+          "description": "Semantisk farverolle: color.background.control."
+        },
+        "color.background.detail": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.background.detail."
+        },
+        "color.text.muted": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.text.muted."
+        },
+        "color.text.label": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.text.label."
+        },
+        "color.border.strong": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.border.strong."
+        },
+        "color.caption.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.caption.surface."
+        },
+        "color.caption.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.caption.text."
+        },
+        "color.caption.labelSurface": {
+          "$type": "color",
+          "$value": "{palette.brand.300}",
+          "description": "Semantisk farverolle: color.caption.labelSurface."
+        },
+        "color.caption.labelText": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.caption.labelText."
+        },
+        "color.border.field": {
+          "$type": "color",
+          "$value": "{palette.neutral.400}",
+          "description": "Semantisk farverolle: color.border.field."
+        },
+        "color.background.inverse": {
+          "$type": "color",
+          "$value": "{palette.neutral.100}",
+          "description": "Semantisk farverolle: color.background.inverse."
+        },
+        "color.text.inverse": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.text.inverse."
+        },
+        "color.brand.accent": {
+          "$type": "color",
+          "$value": "{palette.accent.200}",
+          "description": "Semantisk farverolle: color.brand.accent."
+        },
+        "color.status.success": {
+          "$type": "color",
+          "$value": "{palette.success.200}",
+          "description": "Semantisk farverolle: color.status.success."
+        },
+        "color.status.info": {
+          "$type": "color",
+          "$value": "{palette.info.200}",
+          "description": "Semantisk farverolle: color.status.info."
+        },
+        "color.status.warning": {
+          "$type": "color",
+          "$value": "{palette.warning.200}",
+          "description": "Semantisk farverolle: color.status.warning."
+        },
+        "color.action.neutral.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.action.neutralHover."
+        },
+        "color.action.neutral.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.neutralHoverText."
+        },
+        "color.action.neutral.active.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.700}",
+          "description": "Semantisk farverolle: color.action.neutralActive."
+        },
+        "color.action.neutral.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.neutralActiveText."
+        },
+        "color.action.primary.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.100}",
+          "description": "Semantisk farverolle: color.action.primaryHover."
+        },
+        "color.action.primary.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.primaryHoverText."
+        },
+        "color.action.primary.active.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.50}",
+          "description": "Semantisk farverolle: color.action.primaryActive."
+        },
+        "color.action.primary.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.primaryActiveText."
+        },
+        "color.action.selected.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.200}",
+          "description": "Semantisk farverolle: color.action.selectedHover."
+        },
+        "color.action.selected.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.selectedHoverText."
+        },
+        "color.action.selected.active.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.100}",
+          "description": "Semantisk farverolle: color.action.selectedActive."
+        },
+        "color.action.selected.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.selectedActiveText."
+        },
+        "color.action.danger.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.danger.100}",
+          "description": "Semantisk farverolle: color.action.dangerHover."
+        },
+        "color.action.danger.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.dangerHoverText."
+        },
+        "color.action.danger.active.surface": {
+          "$type": "color",
+          "$value": "{palette.danger.50}",
+          "description": "Semantisk farverolle: color.action.dangerActive."
+        },
+        "color.action.danger.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.dangerActiveText."
+        },
+        "color.action.accent.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.accent.100}",
+          "description": "Semantisk farverolle: color.action.accentHover."
+        },
+        "color.action.accent.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.accentHoverText."
+        },
+        "color.action.accent.active.surface": {
+          "$type": "color",
+          "$value": "{palette.accent.50}",
+          "description": "Semantisk farverolle: color.action.accentActive."
+        },
+        "color.action.accent.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.accentActiveText."
+        },
+        "color.action.secondary.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.action.secondaryHover."
+        },
+        "color.action.secondary.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.action.secondaryHoverText."
+        },
+        "color.action.secondary.active.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.300}",
+          "description": "Semantisk farverolle: color.action.secondaryActive."
+        },
+        "color.action.secondary.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.action.secondaryActiveText."
+        },
+        "palette.neutral.0": {
+          "$type": "color",
+          "$value": "#fcfefd",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.50": {
+          "$type": "color",
+          "$value": "#eff5f4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.100": {
+          "$type": "color",
+          "$value": "#e1edeb",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.200": {
+          "$type": "color",
+          "$value": "#cbdcda",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.300": {
+          "$type": "color",
+          "$value": "#aabfbd",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.400": {
+          "$type": "color",
+          "$value": "#8ea7a4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.500": {
+          "$type": "color",
+          "$value": "#708b88",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.550": {
+          "$type": "color",
+          "$value": "#637d7a",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.600": {
+          "$type": "color",
+          "$value": "#526c69",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.700": {
+          "$type": "color",
+          "$value": "#405754",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.800": {
+          "$type": "color",
+          "$value": "#2c4240",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.850": {
+          "$type": "color",
+          "$value": "#223735",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.900": {
+          "$type": "color",
+          "$value": "#192c2a",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.950": {
+          "$type": "color",
+          "$value": "#10211f",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.1000": {
+          "$type": "color",
+          "$value": "#050c0b",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.50": {
+          "$type": "color",
+          "$value": "#eaf9f8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.100": {
+          "$type": "color",
+          "$value": "#c9eeee",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.200": {
+          "$type": "color",
+          "$value": "#9bdce0",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.300": {
+          "$type": "color",
+          "$value": "#72cbd0",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.400": {
+          "$type": "color",
+          "$value": "#3cabb3",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.500": {
+          "$type": "color",
+          "$value": "#147d83",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.600": {
+          "$type": "color",
+          "$value": "#156f75",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.700": {
+          "$type": "color",
+          "$value": "#115e64",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.800": {
+          "$type": "color",
+          "$value": "#104c52",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.900": {
+          "$type": "color",
+          "$value": "#103c42",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.950": {
+          "$type": "color",
+          "$value": "#0a292e",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "color.brand.accentDeep": {
+          "$type": "color",
+          "$value": "{palette.accent.100}",
+          "description": "Semantisk farverolle: color.brand.accentDeep."
+        },
+        "palette.accent.50": {
+          "$type": "color",
+          "$value": "#fff8e9",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.100": {
+          "$type": "color",
+          "$value": "#f9e8c5",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.200": {
+          "$type": "color",
+          "$value": "#f0cc8b",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.300": {
+          "$type": "color",
+          "$value": "#dfb56a",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.400": {
+          "$type": "color",
+          "$value": "#b9893c",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.500": {
+          "$type": "color",
+          "$value": "#a36d28",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.600": {
+          "$type": "color",
+          "$value": "#8c5b22",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.700": {
+          "$type": "color",
+          "$value": "#714719",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.800": {
+          "$type": "color",
+          "$value": "#5b3812",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.900": {
+          "$type": "color",
+          "$value": "#44290d",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.950": {
+          "$type": "color",
+          "$value": "#2c1c0b",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "elevation.level1": {
+          "$type": "shadow",
+          "$value": "none",
+          "description": "Temaværdi for elevation.level1."
+        },
+        "elevation.level2": {
+          "$type": "shadow",
+          "$value": "0 4px 16px rgba(0,0,0,.14)",
+          "description": "Elevation afstemt til mørke flader."
+        },
+        "elevation.level3": {
+          "$type": "shadow",
+          "$value": "0 16px 40px rgba(0,0,0,.28)",
+          "description": "Elevation afstemt til mørke flader."
+        },
+        "color.illustration.ground": {
+          "$type": "color",
+          "$value": "#172b2a",
+          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
+        },
+        "color.illustration.plane": {
+          "$type": "color",
+          "$value": "#2f423f",
+          "description": "Et selvstændigt materialeplan i illustrationen."
+        },
+        "color.illustration.ink": {
+          "$type": "color",
+          "$value": "#e0eee4",
+          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
+        },
+        "color.illustration.subject": {
+          "$type": "color",
+          "$value": "#8fbeb6",
+          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
+        },
+        "color.illustration.counterpoint": {
+          "$type": "color",
+          "$value": "#c2aa72",
+          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
+        },
+        "color.illustration.context": {
+          "$type": "color",
+          "$value": "#36514e",
+          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
+        },
+        "color.illustration.edge": {
+          "$type": "color",
+          "$value": "#8a9a94",
+          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
+        },
+        "color.illustration.light": {
+          "$type": "color",
+          "$value": "#f0ffe6",
+          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
+        },
+        "color.illustration.depth": {
+          "$type": "color",
+          "$value": "#0a1313",
+          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+        }
+      }
+    },
+    "blomme": {
+      "name": "Blomme",
+      "colorScheme": "light",
+      "tokens": {
+        "palette.neutral.0": {
+          "$type": "color",
+          "$value": "#faf7ff",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.50": {
+          "$type": "color",
+          "$value": "#f2eef7",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.100": {
+          "$type": "color",
+          "$value": "#e9e6ef",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.200": {
+          "$type": "color",
+          "$value": "#d8d4df",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.300": {
+          "$type": "color",
+          "$value": "#bbb6c3",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.400": {
+          "$type": "color",
+          "$value": "#a29cab",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.500": {
+          "$type": "color",
+          "$value": "#878092",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.550": {
+          "$type": "color",
+          "$value": "#7c7588",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.600": {
+          "$type": "color",
+          "$value": "#6b6378",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.700": {
+          "$type": "color",
+          "$value": "#564e64",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.800": {
+          "$type": "color",
+          "$value": "#453c54",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.850": {
+          "$type": "color",
+          "$value": "#332942",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.900": {
+          "$type": "color",
+          "$value": "#261d35",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.950": {
+          "$type": "color",
+          "$value": "#1a1424",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.50": {
+          "$type": "color",
+          "$value": "#f2edfa",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.100": {
+          "$type": "color",
+          "$value": "#e8e0f3",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.200": {
+          "$type": "color",
+          "$value": "#d6c8e7",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.300": {
+          "$type": "color",
+          "$value": "#c0acd8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.400": {
+          "$type": "color",
+          "$value": "#a68ac6",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.500": {
+          "$type": "color",
+          "$value": "#8c69b5",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.600": {
+          "$type": "color",
+          "$value": "#7950a8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.700": {
+          "$type": "color",
+          "$value": "#67448f",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.800": {
+          "$type": "color",
+          "$value": "#553876",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.900": {
+          "$type": "color",
+          "$value": "#432c5c",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.950": {
+          "$type": "color",
+          "$value": "#302043",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.50": {
+          "$type": "color",
+          "$value": "#f5ebf4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.100": {
+          "$type": "color",
+          "$value": "#efdbe5",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.200": {
+          "$type": "color",
+          "$value": "#e4bfcc",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.300": {
+          "$type": "color",
+          "$value": "#d79dad",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.400": {
+          "$type": "color",
+          "$value": "#c87688",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.500": {
+          "$type": "color",
+          "$value": "#b94e63",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.50": {
+          "$type": "color",
+          "$value": "#edeef4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.100": {
+          "$type": "color",
+          "$value": "#dde2e5",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.200": {
+          "$type": "color",
+          "$value": "#bfcdcb",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.300": {
+          "$type": "color",
+          "$value": "#9cb3ab",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.400": {
+          "$type": "color",
+          "$value": "#729585",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.500": {
+          "$type": "color",
+          "$value": "#487760",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.50": {
+          "$type": "color",
+          "$value": "#eeeef9",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.100": {
+          "$type": "color",
+          "$value": "#dee1f2",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.200": {
+          "$type": "color",
+          "$value": "#c2cbe4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.300": {
+          "$type": "color",
+          "$value": "#a0b1d4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.400": {
+          "$type": "color",
+          "$value": "#7792c1",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.500": {
+          "$type": "color",
+          "$value": "#4f72ae",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.50": {
+          "$type": "color",
+          "$value": "#f2edf1",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.100": {
+          "$type": "color",
+          "$value": "#e8e0de",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.200": {
+          "$type": "color",
+          "$value": "#d6c9bd",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.300": {
+          "$type": "color",
+          "$value": "#c0ae95",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.400": {
+          "$type": "color",
+          "$value": "#a68d66",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.500": {
+          "$type": "color",
+          "$value": "#8c6c37",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.50": {
+          "$type": "color",
+          "$value": "#f2edfa",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.100": {
+          "$type": "color",
+          "$value": "#e8e0f3",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.200": {
+          "$type": "color",
+          "$value": "#d6c8e7",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.300": {
+          "$type": "color",
+          "$value": "#c0acd8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.400": {
+          "$type": "color",
+          "$value": "#a68ac6",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.500": {
+          "$type": "color",
+          "$value": "#8c69b5",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.600": {
+          "$type": "color",
+          "$value": "#7950a8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.700": {
+          "$type": "color",
+          "$value": "#67448f",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.800": {
+          "$type": "color",
+          "$value": "#553876",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.900": {
+          "$type": "color",
+          "$value": "#432c5c",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.950": {
+          "$type": "color",
+          "$value": "#302043",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "elevation.level1": {
+          "$type": "shadow",
+          "$value": "0 2px 6px rgba(8, 5, 14, 0.24)",
+          "description": "Temaværdi for elevation.level1."
+        },
+        "elevation.level2": {
+          "$type": "shadow",
+          "$value": "0 2px 12px rgba(8, 5, 14, 0.14)",
+          "description": "Temaværdi for elevation.level2."
+        },
+        "elevation.level3": {
+          "$type": "shadow",
+          "$value": "0 16px 44px rgba(8, 5, 14, 0.42)",
+          "description": "Temaværdi for elevation.level3."
+        },
+        "color.illustration.ground": {
+          "$type": "color",
+          "$value": "#ece5f1",
+          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
+        },
+        "color.illustration.plane": {
+          "$type": "color",
+          "$value": "#f5ebee",
+          "description": "Et selvstændigt materialeplan i illustrationen."
+        },
+        "color.illustration.ink": {
+          "$type": "color",
+          "$value": "#392b45",
+          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
+        },
+        "color.illustration.subject": {
+          "$type": "color",
+          "$value": "#8e6aad",
+          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
+        },
+        "color.illustration.counterpoint": {
+          "$type": "color",
+          "$value": "#bd899e",
+          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
+        },
+        "color.illustration.context": {
+          "$type": "color",
+          "$value": "#d8cbe3",
+          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
+        },
+        "color.illustration.edge": {
+          "$type": "color",
+          "$value": "#867b8f",
+          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
+        },
+        "color.illustration.light": {
+          "$type": "color",
+          "$value": "#fff2eb",
+          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
+        },
+        "color.illustration.depth": {
+          "$type": "color",
+          "$value": "#bab1c1",
+          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+        }
+      }
+    },
+    "blommenat": {
+      "name": "Blommenat",
+      "colorScheme": "dark",
+      "tokens": {
+        "color.background.canvas": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.background.canvas."
+        },
+        "color.background.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.background.surface."
+        },
+        "color.background.subtle": {
+          "$type": "color",
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.background.subtle."
+        },
+        "color.background.control": {
+          "$type": "color",
+          "$value": "{palette.neutral.850}",
+          "description": "Semantisk farverolle: color.background.control."
+        },
+        "color.background.detail": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.background.detail."
+        },
+        "color.background.inverse": {
+          "$type": "color",
+          "$value": "{palette.neutral.100}",
+          "description": "Semantisk farverolle: color.background.inverse."
+        },
+        "color.text.primary": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.text.primary."
+        },
+        "color.text.secondary": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.text.secondary."
+        },
+        "color.text.muted": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.text.muted."
+        },
+        "color.text.label": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.text.label."
+        },
+        "color.text.inverse": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.text.inverse."
+        },
+        "color.border.default": {
+          "$type": "color",
+          "$value": "{palette.neutral.700}",
+          "description": "Semantisk farverolle: color.border.default."
+        },
+        "color.border.strong": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.border.strong."
+        },
+        "color.action.primary.rest.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.200}",
+          "description": "Semantisk farverolle: color.action.primary."
+        },
+        "color.action.primary.rest.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.primaryText."
+        },
+        "color.action.selected.rest.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.900}",
+          "description": "Semantisk farverolle: color.action.subtle."
+        },
+        "color.action.selected.rest.text": {
+          "$type": "color",
+          "$value": "{palette.brand.100}",
+          "description": "Semantisk farverolle: color.action.subtleText."
+        },
+        "color.brand.accent": {
+          "$type": "color",
+          "$value": "{palette.accent.300}",
+          "description": "Semantisk farverolle: color.brand.accent."
+        },
+        "color.focus": {
+          "$type": "color",
+          "$value": "{palette.brand.200}",
+          "description": "Semantisk farverolle: color.focus."
+        },
+        "color.status.danger": {
+          "$type": "color",
+          "$value": "{palette.danger.200}",
+          "description": "Semantisk farverolle: color.status.danger."
+        },
+        "color.status.dangerSurface": {
+          "$type": "color",
+          "$value": "{palette.danger.950}",
+          "description": "Semantisk farverolle: color.status.dangerSurface."
+        },
+        "color.status.dangerText": {
+          "$type": "color",
+          "$value": "{palette.danger.100}",
+          "description": "Semantisk farverolle: color.status.dangerText."
+        },
+        "color.status.dangerContrast": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.status.dangerContrast."
+        },
+        "color.disabled.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.disabled.surface."
+        },
+        "color.disabled.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.400}",
+          "description": "Semantisk farverolle: color.disabled.text."
+        },
+        "color.caption.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.caption.surface."
+        },
+        "color.caption.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.caption.text."
+        },
+        "color.caption.labelSurface": {
+          "$type": "color",
+          "$value": "{palette.brand.200}",
+          "description": "Semantisk farverolle: color.caption.labelSurface."
+        },
+        "color.caption.labelText": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.caption.labelText."
+        },
+        "color.border.field": {
+          "$type": "color",
+          "$value": "{palette.neutral.400}",
+          "description": "Semantisk farverolle: color.border.field."
+        },
+        "color.status.success": {
+          "$type": "color",
+          "$value": "{palette.success.200}",
+          "description": "Semantisk farverolle: color.status.success."
+        },
+        "color.status.info": {
+          "$type": "color",
+          "$value": "{palette.info.200}",
+          "description": "Semantisk farverolle: color.status.info."
+        },
+        "color.status.warning": {
+          "$type": "color",
+          "$value": "{palette.warning.200}",
+          "description": "Semantisk farverolle: color.status.warning."
+        },
+        "color.action.neutral.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.action.neutralHover."
+        },
+        "color.action.neutral.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.neutralHoverText."
+        },
+        "color.action.neutral.active.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.700}",
+          "description": "Semantisk farverolle: color.action.neutralActive."
+        },
+        "color.action.neutral.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.neutralActiveText."
+        },
+        "color.action.primary.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.100}",
+          "description": "Semantisk farverolle: color.action.primaryHover."
+        },
+        "color.action.primary.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.primaryHoverText."
+        },
+        "color.action.primary.active.surface": {
+          "$type": "color",
+          "$value": "{palette.brand.50}",
+          "description": "Semantisk farverolle: color.action.primaryActive."
+        },
+        "color.action.primary.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.primaryActiveText."
+        },
+        "color.action.selected.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.action.selectedHover."
+        },
+        "color.action.selected.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.selectedHoverText."
+        },
+        "color.action.selected.active.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.700}",
+          "description": "Semantisk farverolle: color.action.selectedActive."
+        },
+        "color.action.selected.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.selectedActiveText."
+        },
+        "color.action.danger.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.danger.100}",
+          "description": "Semantisk farverolle: color.action.dangerHover."
+        },
+        "color.action.danger.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.dangerHoverText."
+        },
+        "color.action.danger.active.surface": {
+          "$type": "color",
+          "$value": "{palette.danger.50}",
+          "description": "Semantisk farverolle: color.action.dangerActive."
+        },
+        "color.action.danger.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.dangerActiveText."
+        },
+        "color.action.accent.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.accent.100}",
+          "description": "Semantisk farverolle: color.action.accentHover."
+        },
+        "color.action.accent.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.accentHoverText."
+        },
+        "color.action.accent.active.surface": {
+          "$type": "color",
+          "$value": "{palette.accent.50}",
+          "description": "Semantisk farverolle: color.action.accentActive."
+        },
+        "color.action.accent.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.accentActiveText."
+        },
+        "color.action.secondary.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.action.secondaryHover."
+        },
+        "color.action.secondary.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.action.secondaryHoverText."
+        },
+        "color.action.secondary.active.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.300}",
+          "description": "Semantisk farverolle: color.action.secondaryActive."
+        },
+        "color.action.secondary.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.action.secondaryActiveText."
+        },
+        "palette.neutral.0": {
+          "$type": "color",
+          "$value": "#faf7ff",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.50": {
+          "$type": "color",
+          "$value": "#f2eef7",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.100": {
+          "$type": "color",
+          "$value": "#e9e6ef",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.200": {
+          "$type": "color",
+          "$value": "#d8d4df",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.300": {
+          "$type": "color",
+          "$value": "#bbb6c3",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.400": {
+          "$type": "color",
+          "$value": "#a29cab",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.500": {
+          "$type": "color",
+          "$value": "#878092",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.550": {
+          "$type": "color",
+          "$value": "#7c7588",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.600": {
+          "$type": "color",
+          "$value": "#6b6378",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.700": {
+          "$type": "color",
+          "$value": "#564e64",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.800": {
+          "$type": "color",
+          "$value": "#453c54",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.850": {
+          "$type": "color",
+          "$value": "#332942",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.900": {
+          "$type": "color",
+          "$value": "#261d35",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.950": {
+          "$type": "color",
+          "$value": "#1a1424",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.50": {
+          "$type": "color",
+          "$value": "#f2edfa",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.100": {
+          "$type": "color",
+          "$value": "#e8e0f3",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.200": {
+          "$type": "color",
+          "$value": "#d6c8e7",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.300": {
+          "$type": "color",
+          "$value": "#c0acd8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.400": {
+          "$type": "color",
+          "$value": "#a68ac6",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.500": {
+          "$type": "color",
+          "$value": "#8c69b5",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.600": {
+          "$type": "color",
+          "$value": "#7950a8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.700": {
+          "$type": "color",
+          "$value": "#67448f",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.800": {
+          "$type": "color",
+          "$value": "#553876",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.900": {
+          "$type": "color",
+          "$value": "#432c5c",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.950": {
+          "$type": "color",
+          "$value": "#302043",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.50": {
+          "$type": "color",
+          "$value": "#f5ebf4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.100": {
+          "$type": "color",
+          "$value": "#efdbe5",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.200": {
+          "$type": "color",
+          "$value": "#e4bfcc",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.300": {
+          "$type": "color",
+          "$value": "#d79dad",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.400": {
+          "$type": "color",
+          "$value": "#c87688",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.danger.500": {
+          "$type": "color",
+          "$value": "#b94e63",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.50": {
+          "$type": "color",
+          "$value": "#edeef4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.100": {
+          "$type": "color",
+          "$value": "#dde2e5",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.200": {
+          "$type": "color",
+          "$value": "#bfcdcb",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.300": {
+          "$type": "color",
+          "$value": "#9cb3ab",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.400": {
+          "$type": "color",
+          "$value": "#729585",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.success.500": {
+          "$type": "color",
+          "$value": "#487760",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.50": {
+          "$type": "color",
+          "$value": "#eeeef9",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.100": {
+          "$type": "color",
+          "$value": "#dee1f2",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.200": {
+          "$type": "color",
+          "$value": "#c2cbe4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.300": {
+          "$type": "color",
+          "$value": "#a0b1d4",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.400": {
+          "$type": "color",
+          "$value": "#7792c1",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.info.500": {
+          "$type": "color",
+          "$value": "#4f72ae",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.50": {
+          "$type": "color",
+          "$value": "#f2edf1",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.100": {
+          "$type": "color",
+          "$value": "#e8e0de",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.200": {
+          "$type": "color",
+          "$value": "#d6c9bd",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.300": {
+          "$type": "color",
+          "$value": "#c0ae95",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.400": {
+          "$type": "color",
+          "$value": "#a68d66",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.warning.500": {
+          "$type": "color",
+          "$value": "#8c6c37",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "color.brand.accentDeep": {
+          "$type": "color",
+          "$value": "{palette.accent.200}",
+          "description": "Semantisk farverolle: color.brand.accentDeep."
+        },
+        "palette.accent.50": {
+          "$type": "color",
+          "$value": "#f2edfa",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.100": {
+          "$type": "color",
+          "$value": "#e8e0f3",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.200": {
+          "$type": "color",
+          "$value": "#d6c8e7",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.300": {
+          "$type": "color",
+          "$value": "#c0acd8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.400": {
+          "$type": "color",
+          "$value": "#a68ac6",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.500": {
+          "$type": "color",
+          "$value": "#8c69b5",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.600": {
+          "$type": "color",
+          "$value": "#7950a8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.700": {
+          "$type": "color",
+          "$value": "#67448f",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.800": {
+          "$type": "color",
+          "$value": "#553876",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.900": {
+          "$type": "color",
+          "$value": "#432c5c",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.950": {
+          "$type": "color",
+          "$value": "#302043",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "elevation.level1": {
+          "$type": "shadow",
+          "$value": "0 2px 6px rgba(8, 5, 14, 0.24)",
+          "description": "Temaværdi for elevation.level1."
+        },
+        "elevation.level2": {
+          "$type": "shadow",
+          "$value": "0 2px 12px rgba(8, 5, 14, 0.14)",
+          "description": "Temaværdi for elevation.level2."
+        },
+        "elevation.level3": {
+          "$type": "shadow",
+          "$value": "0 16px 44px rgba(8, 5, 14, 0.42)",
+          "description": "Temaværdi for elevation.level3."
+        },
+        "color.illustration.ground": {
+          "$type": "color",
+          "$value": "#221b2d",
+          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
+        },
+        "color.illustration.plane": {
+          "$type": "color",
+          "$value": "#3a3242",
+          "description": "Et selvstændigt materialeplan i illustrationen."
+        },
+        "color.illustration.ink": {
+          "$type": "color",
+          "$value": "#eee3f5",
+          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
+        },
+        "color.illustration.subject": {
+          "$type": "color",
+          "$value": "#bca5d3",
+          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
+        },
+        "color.illustration.counterpoint": {
+          "$type": "color",
+          "$value": "#bd92a7",
+          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
+        },
+        "color.illustration.context": {
+          "$type": "color",
+          "$value": "#4a3f58",
+          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
+        },
+        "color.illustration.edge": {
+          "$type": "color",
+          "$value": "#968d9f",
+          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
+        },
+        "color.illustration.light": {
+          "$type": "color",
+          "$value": "#fff0e9",
+          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
+        },
+        "color.illustration.depth": {
+          "$type": "color",
+          "$value": "#0f0c14",
+          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
         }
       }
     }
+  },
+  "graphics": {
+    "family": "lightroom"
   }
 }

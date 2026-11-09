@@ -192,11 +192,17 @@ export function componentContrastReport(model,resolved) {
 
 export function validateThemeQuality(model,resolved) {
   const errors=[];
+  const frostOpacity=resolved['material.frost.opacity'];
+  if(typeof frostOpacity!=='number'||!Number.isFinite(frostOpacity)||frostOpacity<0||frostOpacity>1)errors.push('tokens.material.frost.opacity: must resolve to a number from 0 to 1.');
   for (const id of ['color.background.canvas','color.background.surface','color.background.control','color.background.inverse']) {
     const color=parseColor(resolved[id]);
     if (!color || color[3] !== 1) errors.push('tokens.'+id+': foundational surface must be an opaque, measurable color (hex, rgb, hsl, oklab, oklch or color(srgb)).');
   }
   for (const check of themeContrastReport(resolved)) if (!check.passed) errors.push('tokens.'+check.foreground+' on '+check.background+': '+(check.ratio===null?'unmeasurable color':check.ratio.toFixed(2)+':1 contrast')+'; minimum '+check.minimum+':1.');
+  if(resolved['gradient.ink'])for(const background of ['color.background.canvas','color.background.surface','color.background.subtle']){
+    const ratio=gradientContrastRatio(resolved[background],resolved['gradient.ink']);
+    if(ratio===null||ratio<4.5)errors.push('tokens.gradient.ink on '+background+': '+(ratio===null?'unmeasurable contrast':ratio.toFixed(2)+':1 contrast')+'; minimum 4.5:1.');
+  }
   for (const check of controlBoundaryReport(resolved)) if (!check.passed) errors.push('tokens.'+check.foreground+' on '+check.background+': '+(check.ratio===null?'unmeasurable field boundary':check.ratio.toFixed(2)+':1 field boundary contrast')+'; minimum '+check.minimum+':1.');
   for (const check of componentBoundaryReport(model,resolved)) if (!check.passed) errors.push('components.'+check.component+'.'+check.part+' ['+check.variant+'/'+check.state+'] on '+check.background+': '+(check.ratio===null?'unmeasurable field boundary':check.ratio.toFixed(2)+':1 field boundary contrast')+'; minimum '+check.minimum+':1.');
   for (const check of componentContrastReport(model,resolved)) if(!check.passed) errors.push('components.'+check.component+'.'+check.part+' ['+check.variant+'/'+check.state+']: '+(check.ratio===null?'unmeasurable contrast':check.ratio.toFixed(2)+':1 contrast')+'; minimum '+check.minimum+':1.');

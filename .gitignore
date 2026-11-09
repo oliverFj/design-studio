@@ -8,6 +8,8 @@ desktop.ini
 /artifacts/
 /index.html
 /examples/workspace/index.html
+/examples/scenes/aureol.html
+/examples/scenes/obsidian.html
 /collaboration/tickets/
 *.log
 !collaboration/evidence/**/*.log

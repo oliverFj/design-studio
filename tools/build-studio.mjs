@@ -1,5 +1,5 @@
 import { build, transform } from 'esbuild';
-import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validatePackage } from '../core/engine.mjs';
@@ -8,11 +8,13 @@ import {SIGNATURE_LICENSE} from '../core/signature-assets.mjs';
 import {dataModule} from './bundle-data.mjs';
 import {assertDeliverySize} from './delivery-size.mjs';
 import {createTicketService} from '../collaboration/tickets.mjs';
+import {PUBLIC_THEME_IDS} from './public-themes.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 export async function buildStudio({output=path.join(root,'index.html'),showcase=false,includeTickets=!showcase,ticketRoot=path.join(root,'collaboration'),themes:providedThemes}={}) {
 const themes = providedThemes ?? [];
-if(!providedThemes)for (const file of (await readdir(path.join(root, 'packages'))).filter(name => name.endsWith('.json')).sort()) {
+if(!providedThemes)for (const id of PUBLIC_THEME_IDS) {
+  const file=id+'.json';
   const pack = JSON.parse(await readFile(path.join(root, 'packages', file), 'utf8'));
   const result = validatePackage(pack);
   if (!result.valid) throw new Error(file + ': ' + result.errors.join('\n'));
@@ -32,7 +34,7 @@ const bundle = await build({
   }],
 });
 let html = await readFile(path.join(root, 'studio/index.html'), 'utf8');
-for (const file of ['styles.css', 'project-overview.css', 'component-catalog.css', 'principles.css', 'graphics.css']) {
+for (const file of ['styles.css', 'project-overview.css', 'component-catalog.css', 'principles.css', 'graphics.css', 'scenes.css', 'scenes/editorial-commerce.css', 'scenes/workspaces.css']) {
   const css = (await transform(await readFile(path.join(root, 'studio', file), 'utf8'), {loader:'css',minify:true,legalComments:'none'})).code;
   html = html.replace('<link rel="stylesheet" href="./' + file + '">', () => '<style>' + css.replace(/<\/style/gi, '<\\/style') + '</style>');
 }

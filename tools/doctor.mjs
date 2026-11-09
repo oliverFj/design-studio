@@ -6,6 +6,7 @@ import { projectPath, inputFingerprint, offlineIssues } from './offline-checks.m
 
 export const PROJECT_RUNTIME = [
   ['core/catalog-placeholder.mjs', 'runtime/catalog-placeholder.mjs'],
+  ['core/materials.mjs', 'runtime/materials.mjs'],
   ...['graphic-tokens.mjs','graphics.mjs','graphics/catalog.mjs',
     ...['anatomy','lightroom','passage','fieldlines'].map(id=>'graphics/families/'+id+'.mjs'),
     ...['anatomy','lightroom','passage','fieldlines'].map(id=>'graphics/families/'+id+'-catalog.mjs'),

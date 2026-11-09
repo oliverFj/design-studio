@@ -100,9 +100,13 @@ Brug [fælles standardanimation](INTEGRATION.md#fælles-standardanimation). Edit
 
 ## Paletter, farvetilstande og brugerpræferencer
 
+Temaet ejer typografi, geometri, materialer og bevægelse. Farvevalget ejer paletter, semantiske farver, gradientfarver og farveafstemte skygger. Illustrationer er fælles; temaet kan anbefale en familie gennem `graphics.family`, som brugeren kan tilsidesætte. Hensigt og brandregler samles på siden **Temaet**, mens produktspecifikke originaler bevarer deres egne anvendelsesregler. Se [temaformatet og den kuraterede samling](PACKAGE-FORMAT.md#temahensigt-og-offentlig-samling).
+
 Primitive paletter ligger under `palette.*` og semantiske roller under `color.*`. Paletten definerer værdier; komponenten anvender den semantiske rolle. Et brand kan have særskilte primære farver og accentfarver. Et tema kan leveres alene som lyst eller mørkt; begge farvetilstande er valgfrit. Når begge leveres, er de sammenhørende fremtoninger inden for samme temaidentitet, ikke et skift til et andet brand. Enkeltstående temaer beholder deres værdier uanset farvepræference.
 
-`core/scales.mjs` samler primitive afstande, elevation, dokumentlag og ikonstørrelser. Positive semantiske komponentafstande bevares. Indholdsbaseret layout og containerregler findes i referenceeksemplerne; fælles viewportgrænser til genereret shell-CSS findes i `BREAKPOINTS`. Valget af produktets kolonner tilhører fortsat produktet.
+De offentlige temaer har alle både lyse og mørke farvevalg og arver fælles tekststørrelser, linjehøjder, kontrolmål og semantiske afstande. `core/scales.mjs` samler 4px-baserede afstandstrin, elevation, dokumentlag og ikonstørrelser. Positive semantiske komponentafstande bevares; skrifter, vægte, hjørner og overflader giver karakter uden nye målestokke. Indholdsbaseret layout og containerregler findes i referenceeksemplerne; fælles viewportgrænser til genereret shell-CSS findes i `BREAKPOINTS`. Valget af produktets kolonner og sidemenuens farve tilhører produktet; en invers menu er ikke obligatorisk.
+
+Materialer bruges efter opgaven. Lyskanter, gradienttekst og frost er valgfrie behandlinger af eksisterende roller; vigtig tekst og betjening beholder målbare læseflader. Se [materialekontrakten](PACKAGE-FORMAT.md#materialer-frost-og-gradienttekst). De mere rumlige materialestudier viser et større spillerum end Studios egen arbejdsflade.
 
 Farvepræferencen kan følge `prefers-color-scheme` eller være et gemt manuelt valg. Højkontrast er en selvstændig brugerpræference, ikke et ekstra brandtema. Den fælles CSS reagerer på `prefers-contrast: more`, `forced-colors: active` og reduceret bevægelse. Systemfarver bevares, grænser og valgmarkeringer får synlige signaler, og skygger er ikke eneste information om en flade. Native kontroller beholder deres browsersemantik.
 

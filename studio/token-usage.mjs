@@ -10,7 +10,7 @@ export function usageDetails(entry,components={},escape=escapeHTML){
   if(!entry)return '<p class="help">Ingen anvendelsesdata for tokenet.</p>';
   const e=value=>escape(String(value));
   const token=id=>'<button type="button" class="token-ref" data-token="'+e(id)+'">'+e(id)+'</button>';
-  const component=id=>id==='@graphics'?'<strong>Grafik og billedfamilier</strong>':'<button type="button" class="token-ref" data-component="'+e(id)+'">'+e(components[id]?.name??id)+'</button>';
+  const component=id=>id==='@graphics'?'<strong>Grafik og billedfamilier</strong>':id==='@materials'?'<strong>Materialer og effekter</strong>':'<button type="button" class="token-ref" data-component="'+e(id)+'">'+e(components[id]?.name??id)+'</button>';
   const location=usage=>'<code>'+e(usage.part??'root')+'</code>'
     +(usage.variant?' · variant <code>'+e(usage.variant)+'</code>':'')
     +(usage.state?' · tilstand <code>'+e(usage.state)+'</code>':'')
@@ -28,7 +28,7 @@ export function usageDetails(entry,components={},escape=escapeHTML){
     return ids.length?'<p class="help"><strong>'+title+'</strong></p><div>'+ids.map(token).join('')+'</div>':'';
   }
   const explanation=active(entry)
-    ?entry.compatibility?'Kompatibilitetsværdi, som stadig påvirker fælles komponenter.':(entry.direct??[]).concat(entry.indirect??[]).some(use=>use.domain==='graphics')?'Bruges i de fælles billedfamilier, direkte eller gennem andre tokens.':'Bruges i fælles komponenters opskrifter, direkte eller gennem andre tokens.'
+    ?entry.compatibility?'Kompatibilitetsværdi, som stadig påvirker fælles komponenter.':(entry.direct??[]).concat(entry.indirect??[]).some(use=>use.domain==='materials')?'Bruges i fælles materialer og effekter, direkte eller gennem andre tokens.':(entry.direct??[]).concat(entry.indirect??[]).some(use=>use.domain==='graphics')?'Bruges i de fælles billedfamilier, direkte eller gennem andre tokens.':'Bruges i fælles komponenters opskrifter, direkte eller gennem andre tokens.'
     :usageLabel(entry)==='Kompatibilitet'?'Bevares til kompatibilitet. Ingen kendt brug i fælles komponenter; værdien kan stadig bruges i ældre produktkode.'
     :'Ingen kendt brug i fælles komponenter. Tokenet kan stadig bruges i produktets egen kode.';
   return '<p class="help">'+explanation+'</p>'

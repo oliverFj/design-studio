@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createComponent, createComponentFactory } from '../core/components.mjs';
 import { materializePackage } from '../core/engine.mjs';
+import { DEFAULT_TOKENS } from '../core/library.mjs';
 import { PUBLIC_THEME_IDS } from '../tools/public-themes.mjs';
 import { dom } from './support/dom.mjs';
 
@@ -86,7 +87,7 @@ test('factory uses its own validated snapshot of component definitions and appro
 
 test('factory rejects invalid themes at creation and invalid component requests at use', () => {
   const document = dom(), invalid = theme('studio-light');
-  invalid.tokens['space.component.padding'].$value = '0px';
+  invalid.tokens['space.component.padding'] = { ...DEFAULT_TOKENS['space.component.padding'], $value: '0px' };
   assert.throws(() => createComponentFactory(invalid, { document }), /Invalid design package/);
   assert.throws(() => createComponentFactory(theme('studio-light'), { document: {} }), /DOM document/);
   const create = createComponentFactory(theme('studio-light'), { document });

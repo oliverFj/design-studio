@@ -390,7 +390,7 @@ test('themes cannot remove padding, gap, component parts or the shared catalog',
   const zero=themeFixture('studio-light');zero.tokens[id]=token('dimension','0');assert.match(errorsFor(zero),/must resolve to a positive/);
   const alias=themeFixture('studio-light');alias.tokens['space.zero']=token('dimension','0px');alias.tokens[id]=token('dimension','{space.zero}');assert.match(errorsFor(alias),/must resolve to a positive/);
  }
- const indirect=themeFixture('studio-light');indirect.tokens['space.component.paddingLarge']=token('dimension','{space.scale.6}');indirect.tokens['space.scale.6'].$value='0';assert.match(errorsFor(indirect),/must resolve to a positive/);
+ const indirect=themeFixture('studio-light');indirect.tokens['space.component.paddingLarge']=token('dimension','{space.scale.6}');indirect.tokens['space.scale.6']=token('dimension','0');assert.match(errorsFor(indirect),/must resolve to a positive/);
 });
 test('schema appearance properties match runtime allowlist and reject v2 structural definitions',()=>{
  const schema=JSON.parse(readFileSync(new URL('../schema/design-package.schema.json',import.meta.url),'utf8'));

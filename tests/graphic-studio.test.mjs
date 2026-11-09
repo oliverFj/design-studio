@@ -1,29 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {renderGraphicsView,createGraphicsState,chooseInitialGraphicFamily,filterGraphicMotifs,graphicPreviewTheme} from '../studio/graphics.mjs';
+import {renderGraphicsView,createGraphicsState,resolveGraphicFamily,filterGraphicMotifs,graphicPreviewTheme} from '../studio/graphics.mjs';
 import {resolveThemeMode} from '../core/theme-modes.mjs';
 import {GRAPHIC_FAMILIES,GRAPHIC_MOTIFS} from '../core/graphics.mjs';
 
 const theme=()=>resolveThemeMode(JSON.parse(readFileSync(new URL('../packages/studio-light.json',import.meta.url),'utf8')),'light');
 
-test('opening Studio chooses among all styles except the previous selection',()=>{
- const samples=[0,.34,.67,.999];
- assert.deepEqual(new Set(samples.map(value=>chooseInitialGraphicFamily(null,()=>value))),new Set(GRAPHIC_FAMILIES.map(item=>item.id)));
- for(const previous of GRAPHIC_FAMILIES){
-  const actual=new Set(samples.map(value=>chooseInitialGraphicFamily(previous.id,()=>value)));
-  assert.deepEqual(actual,new Set(GRAPHIC_FAMILIES.filter(item=>item.id!==previous.id).map(item=>item.id)));
- }
- assert.ok(GRAPHIC_FAMILIES.some(item=>item.id===chooseInitialGraphicFamily('obsolete',()=>.5)));
+test('Studio follows the authored family unless the user explicitly chooses another style',()=>{
+ const pack={...theme(),graphics:{family:'lightroom'}};
+ assert.equal(resolveGraphicFamily(pack),'lightroom');
+ assert.equal(resolveGraphicFamily(pack,''),'lightroom');
+ assert.equal(resolveGraphicFamily(pack,'obsolete'),'lightroom');
+ assert.equal(resolveGraphicFamily(pack,'passage'),'passage');
+ assert.equal(resolveGraphicFamily({...pack,graphics:{family:'anatomy'}},'passage'),'passage');
+ assert.equal(resolveGraphicFamily({...pack,graphics:undefined}),'anatomy');
 });
 
 test('a family selection survives theme changes without changing editable or saved theme data',()=>{
- const first=theme(),second={...theme(),id:'another-theme'},saved=JSON.stringify(first),state=createGraphicsState();
+ const first=theme(),second={...theme(),id:'another-theme'},saved=JSON.stringify(first),state=createGraphicsState(),originalFamily=first.graphics;
  state.family='passage';
  assert.equal(graphicPreviewTheme(first,state.family).graphics.family,'passage');
  assert.equal(graphicPreviewTheme(second,state.family).graphics.family,'passage');
  assert.equal(JSON.stringify(first),saved);
- assert.equal(first.graphics,undefined);assert.equal(second.graphics,undefined);
+ assert.deepEqual(first.graphics,originalFamily);assert.deepEqual(second.graphics,originalFamily);
 });
 
 test('the graphic workspace exposes each family, every motif and a uniquely named accessible stage',()=>{

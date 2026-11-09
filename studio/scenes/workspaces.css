@@ -1,0 +1,17 @@
+.case-editor,.case-overview{min-width:0;color:var(--ds-color-text-primary);background:var(--ds-color-background-canvas);font-family:var(--ds-typography-font-body);padding:clamp(16px,2.4vw,32px)}
+.case-editor__header,.case-overview__header{display:flex;justify-content:space-between;align-items:start;gap:var(--ds-space-scale-6);margin-bottom:var(--ds-space-scale-8)}
+.case-editor__header>div,.case-overview__header>div{display:grid;gap:var(--ds-space-scale-2);min-width:0}
+.case-editor__document{justify-items:end;text-align:right;max-width:18rem}
+.case-editor .composition-object-studio{max-width:none}
+.case-overview__metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--ds-space-scale-4);margin-bottom:var(--ds-space-scale-8)}
+.case-overview__workspace{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(250px,1fr);gap:var(--ds-space-scale-6);align-items:start;margin-bottom:var(--ds-space-scale-6)}
+.case-overview__list,.case-overview__detail,.case-overview__table{min-width:0}
+.case-overview__filters{display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,.55fr);gap:var(--ds-space-scale-4);margin-bottom:var(--ds-space-scale-4)}
+.case-overview__table{margin-top:var(--ds-space-scale-3)}
+.case-overview__project-identity{display:grid;justify-items:start;gap:var(--ds-space-scale-2)}
+.case-overview__owner{display:flex;align-items:center;gap:var(--ds-space-scale-3)}
+.case-overview__initials{width:36px;height:36px;display:grid;place-items:center;flex:none;border-radius:var(--ds-radius-control);background:var(--ds-color-background-subtle);color:var(--ds-color-text-primary);font:600 .75rem var(--ds-typography-font-body)}
+@container(max-width:1000px){.case-editor .composition-object-editor{grid-template-columns:minmax(0,1fr)}.case-overview__workspace{grid-template-columns:minmax(0,1fr)}.case-overview__detail{max-width:none}}
+@container(max-width:600px){.case-editor,.case-overview{padding:16px}.case-editor__header,.case-overview__header{flex-direction:column;gap:var(--ds-space-scale-4)}.case-editor__document{justify-items:start;text-align:left}.case-overview__metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ds-space-scale-3)}.case-overview__filters{grid-template-columns:minmax(0,1fr)}}
+
+@container(max-width:400px){.case-overview__metrics{grid-template-columns:minmax(0,1fr)}}

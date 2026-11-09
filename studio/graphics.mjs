@@ -4,9 +4,8 @@ import {resolveTokens} from '../core/engine.mjs';
 
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const createGraphicsState=()=>({family:DEFAULT_GRAPHIC_FAMILY,motif:'poster',part:'',progress:1,direction:1,loop:false,reduced:false,query:''});
-export function chooseInitialGraphicFamily(previousFamily,random=Math.random){
- const choices=GRAPHIC_FAMILIES.filter(item=>item.id!==previousFamily);
- return choices[Math.floor(random()*choices.length)].id;
+export function resolveGraphicFamily(pack,preference){
+ return GRAPHIC_FAMILIES.some(item=>item.id===preference)?preference:getGraphicFamily(pack);
 }
 export const graphicPreviewTheme=(pack,family)=>({...pack,graphics:{family}});
 export function filterGraphicMotifs(query=''){
@@ -22,7 +21,7 @@ export function renderGraphicsView(pack,state,{showcase=false}={}){
  const editorial=GRAPHIC_MOTIFS.slice(0,4),components=GRAPHIC_MOTIFS.slice(4).toSorted((a,b)=>a.name.localeCompare(b.name,'da'));
  let tokens={};try{tokens=resolveTokens(pack);}catch{}
  return `<div class="graphics-studio"><div class="canvas-toolbar"><h2>Grafik <span class="count">${GRAPHIC_FAMILIES.length} illustrationsstile · ${GRAPHIC_FAMILIES.length*GRAPHIC_MOTIFS.length} motiver</span></h2></div>
- <p class="help">Illustrationsstilen er en visningsindstilling i Stade. Temaet leverer farver og materialer; du kan frit skifte formsprog uden at ændre temaet.</p>
+ <p class="help">Temaet anbefaler en illustrationsstil og leverer farver og materialer. Du kan frit vælge et andet formsprog eller følge temaets anbefaling i menuen.</p>
  <div class="graphic-families" role="group" aria-label="Vælg illustrationsstil">${GRAPHIC_FAMILIES.map(item=>`<button type="button" class="graphic-family" id="graphic-family-${item.id}" data-graphic-family="${item.id}" aria-pressed="${item.id===familyId}"><span class="graphic-art">${graphics.render('poster',{family:item.id,idPrefix:'studio-family-'+item.id,decorative:true})}</span><strong>${escape(item.name)}</strong><span>${escape(item.qualities.join(' · '))}</span></button>`).join('')}</div>
  <div class="graphic-heading"><div><p class="eyebrow">${escape(family.qualities.join(' · '))}</p><h2>${escape(family.name)}</h2><p>${escape(family.description)}</p></div><label class="studio-field" for="graphic-motif">Motiv<select class="studio-input" id="graphic-motif">${[['Principillustrationer',editorial],['Komponenter',components]].map(([name,items])=>`<optgroup label="${name}">${items.map(item=>`<option value="${item.id}"${item.id===motif.id?' selected':''}>${escape(item.name)}</option>`).join('')}</optgroup>`).join('')}</select></label></div>
  <div class="graphic-workbench"><figure class="graphic-figure"><div class="graphic-stage graphic-art" id="graphic-stage">${graphics.render(motif.id,{idPrefix:'studio-graphic-'+familyId+'-'+motif.id})}</div><figcaption><strong>${escape(motif.name)}</strong><span>${escape(motif.meaning)}</span></figcaption></figure>

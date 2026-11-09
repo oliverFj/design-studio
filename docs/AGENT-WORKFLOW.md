@@ -31,7 +31,7 @@ Find `design-studio.project.json`. Brug dens faktiske filstier, scope, tema og r
 node tools/cli.mjs init PROJECT_DIR --theme studio-light
 ```
 
-Erstat `PROJECT_DIR` med produktets faktiske sti. Vælg tema efter produktets karakter; Studio Light er et udgangspunkt, ikke et æstetisk krav. Init leverer redigerbare `src`-filer, byggeopsætning, designfiler, agentanvisning og en færdig `index.html`. Eksisterende output overskrives ikke.
+Erstat `PROJECT_DIR` med produktets faktiske sti. Vælg tema efter produktets karakter; Studio (`studio-light`) er et udgangspunkt, ikke et æstetisk krav. Init leverer redigerbare `src`-filer, byggeopsætning, designfiler, agentanvisning og en færdig `index.html`. Eksisterende output overskrives ikke.
 
 Kør derefter i produktmappen:
 

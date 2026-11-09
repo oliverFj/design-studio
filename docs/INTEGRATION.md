@@ -141,6 +141,27 @@ Talfeltet bruger centrerede cifre med fast cifferbredde og symmetrisk indvendig 
 
 Parameterpaneler bruger normalt `range-field` med `with-input` og den fælles `mountRangeField`. Gyldige ændringer opdaterer prøven live; produktet bevarer seneste gyldige visning under ugyldige kladder og adskiller forhåndsvisning fra lagring. Talfeltet har centrerede cifre, symmetrisk luft og stabil bredde efter interval og trin. Se [skyderkontrakten](INTEGRATION.md#skyder-med-præcis-talindtastning).
 
+## Materialer på eksisterende komponenter
+
+Materialernes CSS følger automatisk format 2-runtime og `init`/`sync`. Brug eksisterende varianter frem for lokale kopier af komponentopskrifter:
+
+```js
+const card = createComponent(theme, 'card', {
+  variant: 'frosted', idPrefix: 'material-example',
+  slots: {
+    header: {tag: 'h2', text: 'Et roligt fokus'},
+    body: {tag: 'p', text: 'Indholdet ligger på en opak læseflade.'},
+  },
+});
+const title = createComponent(theme, 'heading', {
+  variant: 'gradient', slots: {root: {tag: 'h1', text: 'Lys og retning'}},
+});
+```
+
+`card.rimmed` giver en gradientkant med opakt indre; `card.frosted` giver frostet ramme med opake indholdsdele. `heading.gradient` bruger `gradient.ink`, som valideres mod de tre fælles tekstflader. Bevar semantisk overskriftsniveau og kontrollér ekstra produktbaggrunde særskilt.
+
+Dekorative noder kan bruge `data-material="atmosphere"` eller `data-material="frost"` sammen med `aria-hidden="true"` inden i `.ds-scope`. Produktet ejer deres størrelse, lag og placering. Læg tekst og kontroller på separate, opake flader; ingen af behandlingerne indfører bevægelse eller en ny komponentrolle. Tokens og fallbackregler står i [materialekontrakten](PACKAGE-FORMAT.md#materialer-frost-og-gradienttekst).
+
 ## Valgfrie sammensætningseksempler
 
 Før referencekode udledes af eller indføres i et eksisterende produkt, læses de relevante dele af [produktbaserede mønstre og skånsom opdatering](PRODUCT-PATTERNS.md). Vejledningen beskriver referenceforløb fra de fire aktuelle produkter, herunder FormLabs Materialegenerator og Detaljeværksted, og grænserne for en gradvis overgang.
@@ -151,7 +172,7 @@ Offline-editorens Designmønstre og web-showcasen viser samme tolv eksempler: pa
 
 Tilføj `collapsible:true` for at lade trækket fortsætte fra minimumsbredden til en lukkezone; lukning udføres ved slip. `collapseThreshold` er som standard den mindste af 64 px og halvdelen af minimumsbredden og skal ligge mellem nul og minimumsbredden. Toggleknappen fungerer også som kantgreb til genåbning. Escape og pointerannullering genskaber den tidligere bredde; separatorens piletaster, Home/End og Enter giver tastaturalternativer. Smalle eller lave flader bruger stablet indhold og almindelig knapbetjening. Produktet ejer indhold og kladder; controlleren bevarer panelnoden og håndterer fokus og reduceret bevægelse. Komponenter og mønstre uden illustration deler placeholderen fra `core/catalog-placeholder.mjs`; mønstre angiver `illustration:false` i kataloget.
 
-`mountCompositionGallery` viser en vandret kortbjælke med native knapper og et fælles `scroll-area`. Pilene ruller bjælken; valg opdaterer eksemplet nedenunder og bevarer kladder, fokus på udløseren og scrollpositionen ved kortskift. `createPatternIllustrator` i `patterns/illustrations.mjs` bygger dekorative, statiske SVG'er fra fire lokale familiemoduler. De deler kun native SVG-primitiver; hver familie ejer sin geometri og materialebehandling. Illustrationsstilen vælges gennem `theme.graphics.family`, mens det opløste tema leverer grafikfarver og materialeværdier. Hele sæt af illustrationsmoduler følger med `examples`-eksporten. Se [grafikstandarden](GRAPHICS-AUTHORING.md).
+`mountCompositionGallery` viser en kortvælger med native knapper og et aktivt eksempel. Valg bevarer de enkelte kladder; relaterede mønstre flytter fokus til den nye titel og bringer det tilhørende kort frem i vælgeren. `createPatternIllustrator` i `patterns/illustrations.mjs` bygger dekorative, statiske SVG'er fra fire lokale familiemoduler. De deler kun native SVG-primitiver; hver familie ejer sin geometri og materialebehandling. Illustrationsstilen vælges gennem `theme.graphics.family`, mens det opløste tema leverer grafikfarver og materialeværdier. Hele sæt af illustrationsmoduler følger med `examples`-eksporten. Se [grafikstandarden](GRAPHICS-AUTHORING.md).
 
 Katalogets layoutprofil vælger en af bibliotekets fælles breddeprofiler. Profilerne vælges efter indholdets rolle og kan tilpasses i produktet. Objektkort og handlinger strækkes ikke med en bredere arbejdsflade. Se [retningslinjerne for indholdsbredde](DESIGN-FOUNDATIONS.md#indholdsbredde-og-fuld-bredde).
 
@@ -217,7 +238,7 @@ Det er referencekode, ikke et pluginsystem eller et krav til produktets struktur
 
 ## Lyse og mørke farvetilstande
 
-Temaer kan også tilbyde navngivne farvevariationer uden et lys/mørk-par. Byg da pickerens valg med `themeModeOptions(source)` fra komponentruntime eller `theme-modes.mjs`, og send det valgte id til `resolveThemeMode`. `hasNamedThemeModes(source)` skelner navngivne variationer fra det traditionelle lys/mørk-valg. Produktet ejer og bevarer det valgte id; `createColorModePreference` gælder fortsat OS-valget mellem lys og mørk. Brug tilstandens `colorScheme` til native kontroller. Bauhaus demonstrerer tre lyse variationer, som aldrig automatisk bliver mørke. Se [temaformatet](PACKAGE-FORMAT.md#farvetilstande-og-navngivne-farvevariationer).
+Temaer kan også tilbyde navngivne farvevariationer. Byg pickerens valg med `themeModeOptions(source)` fra komponentruntime eller `theme-modes.mjs`, og send det valgte id til `resolveThemeMode`. `hasNamedThemeModes(source)` skelner navngivne variationer fra det traditionelle lys/mørk-valg. Produktet ejer og bevarer det valgte id; `createColorModePreference` gælder fortsat OS-valget mellem lys og mørk. Brug tilstandens `colorScheme` til native kontroller. Bauhaus har tre lyse variationer og den mørke Værkstedsnat. Formatet kræver ikke begge lysheder; den offentlige samling tilbyder dem i hvert tema. Se [temaformatet](PACKAGE-FORMAT.md#farvetilstande-og-navngivne-farvevariationer).
 
 Parrede temaer bruger det valgfrie format 2-felt `modes` med light/dark-tokenoverrides og `defaultMode`. Gem hele kilden. Opret en valgt læsemodel med `resolveThemeMode`, og brug den samme model til både CSS og komponenter:
 

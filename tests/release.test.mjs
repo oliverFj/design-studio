@@ -21,6 +21,7 @@ async function fixture(t) {
   const put = async (relative, value) => { await mkdir(path.dirname(path.join(directory, relative)), { recursive: true }); await writeFile(path.join(directory, relative), value); };
   for (const filename of ['AGENTS.md', 'README.md', '.gitignore', '.gitattributes', 'package.json', 'package-lock.json']) await put(filename, filename.endsWith('.json') ? '{}' : 'Source');
   await put('index.html', '<!doctype html><html><head><title>Offline</title></head><body><button>Open</button><script>/* no external resources */</script></body></html>');
+  for(const id of ['aureol','obsidian'])await put('examples/scenes/'+id+'.html','<!doctype html><title>'+id+'</title>');
   await put('core/runtime.mjs', 'export const example = true;');
   await put('showcase/index.html', '<!doctype html><title>Showcase</title>');
   await put('showcase/showcase.mjs', 'export const showcase = true;');
@@ -63,7 +64,7 @@ test('release archives preserve bytes, readable licenses, checksums and determin
     for (const file of item.files) { assert.equal(files.get(file.name).length, file.bytes); assert.equal(hash(files.get(file.name)), file.sha256); }
     assert.deepEqual(zip, createZip([...files].map(([name, data]) => ({ name, data }))));
     if (item.name.includes('offline')) {
-      assert.deepEqual([...files.keys()], ['index.html', 'licenses/example/OFL.txt', 'licenses/tabler-icons-MIT.txt']);
+      assert.deepEqual([...files.keys()], ['examples/scenes/aureol.html','examples/scenes/obsidian.html','index.html', 'licenses/example/OFL.txt', 'licenses/tabler-icons-MIT.txt']);
       assert.deepEqual(files.get('index.html'), await readFile(path.join(directory, 'index.html')));
     } else {
       assert.ok(files.has('core/runtime.mjs')); assert.ok(files.has('templates/offline/.gitignore')); assert.ok(files.has('assets/fonts/test.woff2')); assert.ok(files.has('.gitattributes'));
@@ -72,6 +73,7 @@ test('release archives preserve bytes, readable licenses, checksums and determin
       for(const name of ['guides','search','graphics'])assert.ok(files.has(`collaboration/${name}.mjs`),'MCP source includes '+name);
       assert.equal([...files.keys()].some(name=>name.startsWith('collaboration/tickets/')),false);
       assert.equal(files.has('index.html'), false);
+      for(const id of ['aureol','obsidian'])assert.equal(files.has('examples/scenes/'+id+'.html'),false,'generated scenes stay out of the source archive');
     }
   }
   const known = createZip([{ name: 'checksum.txt', data: '123456789' }]);

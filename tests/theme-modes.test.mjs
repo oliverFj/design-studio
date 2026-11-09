@@ -27,7 +27,11 @@ test('all authored appearances resolve to independent valid snapshots and preser
 });
 
 test('named colorways use their own labels and native schemes without inventing a dark appearance',()=>{
- const pack=theme('bauhaus'),before=structuredClone(pack);
+ const pack=theme('bauhaus');
+ // A deliberately light-only authoring fixture remains supported even when
+ // the shipped collection also supplies a dark color.
+ pack.modes=Object.fromEntries(['solgul','kalk','signalroed'].map(id=>[id,pack.modes[id]]));
+ const before=structuredClone(pack);
  assert.deepEqual(themeModeOptions(pack),[{value:'solgul',label:'Solgul'},{value:'kalk',label:'Kalk'},{value:'signalroed',label:'Signalrød'}]);
  assert.equal(pack.modes.dark,undefined);
  assert.equal(resolveThemeModeId(pack,'system','dark'),'solgul');
@@ -52,6 +56,12 @@ test('single-mode and legacy themes are not silently converted by color preferen
 });
 
 test('paired theme validation rejects missing modes, unknown schema fields and quality failures in either mode',()=>{
+ const pairedTheme=()=>{
+  const pack=theme('studio-light');
+  pack.modes=Object.fromEntries(['light','dark'].map(id=>[id,{tokens:pack.modes[id].tokens}]));
+  pack.defaultMode='light';
+  return pack;
+ };
  const mutations=[
   pack=>{delete pack.modes.light;},
   pack=>{delete pack.modes.dark;},
@@ -63,7 +73,7 @@ test('paired theme validation rejects missing modes, unknown schema fields and q
   pack=>{pack.modes.dark.tokens['color.text.primary']=color('{color.background.canvas}');},
   pack=>{pack.modes.light.tokens['color.border.field']=color('{color.background.canvas}');},
  ];
- for(const mutate of mutations){const pack=theme('studio-light');mutate(pack);const checked=validatePackage(pack);assert.equal(checked.valid,false);assert.ok(checked.errors.some(error=>/modes|defaultMode/.test(error)),checked.errors.join('\n'));}
+ for(const mutate of mutations){const pack=pairedTheme();mutate(pack);const checked=validatePackage(pack);assert.equal(checked.valid,false);assert.ok(checked.errors.some(error=>/modes|defaultMode/.test(error)),checked.errors.join('\n'));}
  const unpaired=theme('studio-light');delete unpaired.modes;
  assert.match(validatePackage(unpaired).errors.join('\n'),/defaultMode requires/);
  const bad=theme('studio-light');bad.modes.dark.tokens['color.text.primary']=color('{color.background.canvas}');

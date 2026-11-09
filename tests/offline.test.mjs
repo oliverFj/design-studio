@@ -6,14 +6,14 @@ import { createThemeStorage } from '../studio/theme-storage.mjs';
 const theme = JSON.parse(await readFile(new URL('../packages/studio-light.json', import.meta.url), 'utf8'));
 const bundled = [{ key: 'studio-light', package: theme }];
 
-test('graphic family is a Studio-only preference and is omitted when reopening or saving older themes',async()=>{
+test('authored graphic family survives opening and saving independently of Studio view preferences',async()=>{
  const oldTheme={...structuredClone(theme),graphics:{family:'passage'}},before=structuredClone(oldTheme),downloads=[];
  const store=createThemeStorage([{key:'old',package:oldTheme}],{download:(...args)=>downloads.push(args)});
- assert.equal((await store.read('old')).package.graphics,undefined);
+ assert.deepEqual((await store.read('old')).package.graphics,{family:'passage'});
  const opened=await store.open(oldTheme,'old.json');
- assert.equal((await store.read(opened.key)).package.graphics,undefined);
+ assert.deepEqual((await store.read(opened.key)).package.graphics,{family:'passage'});
  await store.save(opened.key,oldTheme);
- assert.equal(JSON.parse(downloads[0][1]).graphics,undefined);
+ assert.deepEqual(JSON.parse(downloads[0][1]).graphics,{family:'passage'});
  assert.deepEqual(oldTheme,before);
 });
 

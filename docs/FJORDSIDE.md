@@ -10,13 +10,13 @@ Fjordside-pakken er omsat fra Design System-mappen, især brandguiden v1.2.1, to
 
 Varmt papir og kalk fylder fladen. Tryksværte bærer teksten. Terracotta bruges sparsomt, til én særlig handling eller markering pr. blik. Kildens 90/8/2-regel er en kompositionsregel; tokenværdier kan ikke alene håndhæve den.
 
-Platypi bærer overskrifter, display og redaktionelle citater. Den lokale Inter-webfont bruges til funktioner, webbrødtekst, labels og tal og overtager den oprindelige Helvetica-staks tilbageholdende rolle. I trykte dokumenter bruges Platypi også som brødtekst. Afstande følger kildens 8px-rytme med små halvtrin.
+Platypi bærer overskrifter, display og redaktionelle citater. Den lokale Inter-webfont bruges til funktioner, webbrødtekst, labels og tal og overtager den oprindelige Helvetica-staks tilbageholdende rolle. I trykte dokumenter bruges Platypi også som brødtekst. Det offentlige tema arver bibliotekets fælles størrelser og 4px-baserede afstandsskala, som også rummer kildens 8px-rytme.
 
 Kontroller og kort er firkantede. Almindelige kort er flade og har fine kanter; kun løsrevne lag bruger skygge. Hover og tryk ændrer farve og kant, ikke størrelse eller placering. Fokus følger bibliotekets synlige markering på mindst 3 deklarerede pixels uden for kontrollen.
 
 ## Indhold
 
-Pakken ligger i packages/fjordside.json. Temaet har sine visuelle tokens, appearance-overrides og brandguide. Det fælles bibliotek giver alle temaer de samme 30 roller, herunder kategorilabel, tag, radio, switch og valgliste.
+Pakken ligger i packages/fjordside.json. Temaet har sine visuelle tokens, appearance-overrides og brandguide. Det fælles bibliotek giver alle temaer samme katalog; den aktuelle version og roller findes i core/library.mjs. Fjordside tilbyder fire farvevariationer, herunder Havpapir og Skumring, med både lyse og mørke valg. Platypi, sværte, terracotta og de godkendte originalmærker fastholder brandet på tværs af farverne.
 
 Grundroller og startsættets tokennavne er bevaret. I format 2 har alle temaer samme komponentstruktur. Produktets ekstra tokens kan fortsat kræve tilsvarende værdier ved temaskift.
 
@@ -30,7 +30,7 @@ Logoet har mindst 20px størrelse og en frizone på mindst halvdelen af mærkets
 
 Stemmeguiden beskriver korte sætninger, konkrete verber, første person som personlig afsender og almindeligt dansk. Den afviser buzzwords, superlativer og udråbstegn. Brandets afsender og personlige indhold overføres ikke automatisk til andre produkter.
 
-Brandguiden kan ses og redigeres på interfacets Brandguide-side. sources-feltet peger på de oprindelige lokale kilder, hvis en agent har brug for mere sammenhæng. Selve reglerne og de indlejrede ressourcer er tilgængelige i pakken uden adgang til originalmappen.
+Brandguiden kan ses og redigeres på **Temaet**; originalmærker og kilder ligger under **Brand, originaler og kilder**. sources-feltet peger på de oprindelige lokale kilder, hvis en agent har brug for mere sammenhæng. Selve reglerne og de indlejrede ressourcer er tilgængelige i pakken uden adgang til originalmappen.
 
 ## Bevidste tilpasninger
 

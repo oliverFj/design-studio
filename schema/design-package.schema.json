@@ -5549,6 +5549,201 @@
                     }
                   },
                   "additionalProperties": false
+                },
+                "material": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "header": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "body": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "footer": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "text": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "action": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "rimmed": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "header": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "body": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "footer": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "text": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "action": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "frosted": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "header": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "body": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "footer": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "text": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "action": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "embossed": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "header": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "body": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "footer": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "text": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "action": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "asymmetric": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "header": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "body": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "footer": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "text": {
+                          "$ref": "#/$defs/appearancePart"
+                        },
+                        "action": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
                 }
               },
               "additionalProperties": false
@@ -6157,6 +6352,30 @@
                   "additionalProperties": false
                 },
                 "narrative-large": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 10000,
+                      "pattern": "\\S"
+                    },
+                    "styles": {
+                      "$ref": "#/$defs/appearanceStyles"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "root": {
+                          "$ref": "#/$defs/appearancePart"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "gradient": {
                   "type": "object",
                   "properties": {
                     "description": {

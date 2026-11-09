@@ -81,7 +81,7 @@ Er accentens rolle stadig tydelig, hvis vi fjerner logoet? Er status og valg for
 
 ## 05. Lys og mørke er samme identitet
 
-Et tema kan være lyst, mørkt eller have begge farvetilstande. Vælg efter temaets idé og produktets behov; en modsat variation er ikke et leverancekrav. Når begge findes, skal de opleves som gennemarbejdede udgaver af samme produkt. Bevar typografisk karakter, geometri, betydning og placering. Afstem flader, farvestyrke, kanter og skygger særskilt.
+Et tema har en sammenhængende typografisk, geometrisk og materiel identitet med én eller flere farvevariationer. Den offentlige samling tilbyder både lyse og mørke valg i hvert tema; formatet tillader fortsat enkeltstående fremtoninger til konkrete produkter. Farvevariationerne skal opleves som gennemarbejdede udgaver af samme produkt. Bevar typografisk karakter, geometri, betydning og placering. Afstem flader, farvestyrke, gradienter, kanter og skygger særskilt.
 
 > Faglig praksis · Carbon bruger forskellige lagmodeller i lyse og mørke temaer. Fluent justerer farvers lyshed og mætning i mørk tilstand. Ingen af delene gør automatisk inversion til en tilstrækkelig designmetode. [S07](#s07) · [S08](#s08)
 

@@ -2,13 +2,8 @@
   "schemaVersion": 2,
   "id": "bauhaus",
   "name": "Bauhaus",
-  "description": "Klare primærfarver, kulsorte feltkanter og røde skillelinjer. Tunge grotesker og asymmetriske hjørner samler udtrykket i tre lyse farvevariationer: Solgul, Kalk og Signalrød.",
+  "description": "Klare primærfarver, tunge grotesker og asymmetriske hjørner. Solgul, Kalk og Signalrød suppleres af Værkstedsnat med kulsorte flader og gule handlinger.",
   "tokens": {
-    "typography.size.captionText": {
-      "$type": "dimension",
-      "$value": "14px",
-      "description": "Normal billedtekst med et underordnet typografisk niveau."
-    },
     "color.background.canvas": {
       "$type": "color",
       "$value": "{palette.canvas}",
@@ -104,31 +99,6 @@
       "$value": "Inter, system-ui, sans-serif",
       "description": "Temaets lokalt medfølgende display- og overskriftsskrift."
     },
-    "typography.size.body": {
-      "$type": "dimension",
-      "$value": "1rem",
-      "description": "Normal læsetekst."
-    },
-    "typography.size.heading": {
-      "$type": "dimension",
-      "$value": "2rem",
-      "description": "Primær overskrift i designeksemplerne."
-    },
-    "typography.size.label": {
-      "$type": "dimension",
-      "$value": "0.875rem",
-      "description": "Labels og betjeningskontroller."
-    },
-    "typography.size.small": {
-      "$type": "dimension",
-      "$value": "0.8125rem",
-      "description": "Hjælpetekst og kompakte badges."
-    },
-    "typography.size.title": {
-      "$type": "dimension",
-      "$value": "1.125rem",
-      "description": "Titler i kort og dialoger."
-    },
     "typography.weight.body": {
       "$type": "fontWeight",
       "$value": 400,
@@ -143,66 +113,6 @@
       "$type": "fontWeight",
       "$value": 600,
       "description": "Labels og handlingsknappers tekstvægt."
-    },
-    "typography.lineHeight.body": {
-      "$type": "number",
-      "$value": 1.6,
-      "description": "Linjehøjde uden enhed for brødtekst."
-    },
-    "typography.lineHeight.heading": {
-      "$type": "number",
-      "$value": 1.15,
-      "description": "Linjehøjde uden enhed for overskrifter."
-    },
-    "typography.lineHeight.control": {
-      "$type": "number",
-      "$value": 1.35,
-      "description": "Linjehøjde uden enhed for knapper og badges."
-    },
-    "space.scale.1": {
-      "$type": "dimension",
-      "$value": "0.25rem",
-      "description": "Små indvendige mellemrum."
-    },
-    "space.scale.2": {
-      "$type": "dimension",
-      "$value": "0.5rem",
-      "description": "Tæt afstand mellem beslægtede elementer."
-    },
-    "space.scale.3": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Kompakt indvendig afstand."
-    },
-    "space.scale.4": {
-      "$type": "dimension",
-      "$value": "1rem",
-      "description": "Standardafstand og vandret kontrolpadding."
-    },
-    "space.scale.6": {
-      "$type": "dimension",
-      "$value": "1.5rem",
-      "description": "Indvendig afstand i større overflader."
-    },
-    "space.scale.8": {
-      "$type": "dimension",
-      "$value": "2rem",
-      "description": "Afstand mellem visuelle grupper."
-    },
-    "size.control.height": {
-      "$type": "dimension",
-      "$value": "2.75rem",
-      "description": "Minimumshøjde for knapper, input og select."
-    },
-    "size.checkbox": {
-      "$type": "dimension",
-      "$value": "1.125rem",
-      "description": "Checkboxens visuelle størrelse."
-    },
-    "size.dialog.maxWidth": {
-      "$type": "dimension",
-      "$value": "36rem",
-      "description": "Dialogfladens maksimale bredde."
     },
     "border.width.default": {
       "$type": "dimension",
@@ -304,26 +214,6 @@
       "$value": "{palette.neutral.0}",
       "description": "Semantisk farverolle: color.caption.labelText."
     },
-    "typography.size.control": {
-      "$type": "dimension",
-      "$value": "{typography.size.label}",
-      "description": "Temaets fælles visuelle værdi for typography.size.control."
-    },
-    "typography.size.panel": {
-      "$type": "dimension",
-      "$value": "{typography.size.title}",
-      "description": "Temaets fælles visuelle værdi for typography.size.panel."
-    },
-    "typography.size.tiny": {
-      "$type": "dimension",
-      "$value": "{typography.size.small}",
-      "description": "Temaets fælles visuelle værdi for typography.size.tiny."
-    },
-    "typography.size.shortcut": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Temaets fælles visuelle værdi for typography.size.shortcut."
-    },
     "typography.weight.strong": {
       "$type": "fontWeight",
       "$value": "{typography.weight.label}",
@@ -374,55 +264,10 @@
       "$value": "999px",
       "description": "Temaets fælles visuelle værdi for radius.pill."
     },
-    "size.switch.width": {
-      "$type": "dimension",
-      "$value": "2.75rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.width."
-    },
-    "size.switch.height": {
-      "$type": "dimension",
-      "$value": "1.5rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.height."
-    },
-    "size.switch.thumb": {
-      "$type": "dimension",
-      "$value": "1.125rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.thumb."
-    },
-    "size.switch.inset": {
-      "$type": "dimension",
-      "$value": "0.1875rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.inset."
-    },
     "opacity.shortcut": {
       "$type": "number",
       "$value": 1,
       "description": "Temaets fælles visuelle værdi for opacity.shortcut."
-    },
-    "space.component.padding": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Temaets fælles visuelle værdi for space.component.padding."
-    },
-    "space.component.paddingLarge": {
-      "$type": "dimension",
-      "$value": "1rem",
-      "description": "Temaets fælles visuelle værdi for space.component.paddingLarge."
-    },
-    "space.component.paddingCompact": {
-      "$type": "dimension",
-      "$value": "0.375rem",
-      "description": "Temaets fælles visuelle værdi for space.component.paddingCompact."
-    },
-    "space.component.gap": {
-      "$type": "dimension",
-      "$value": "0.375rem",
-      "description": "Temaets fælles visuelle værdi for space.component.gap."
-    },
-    "space.component.gapLarge": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Temaets fælles visuelle værdi for space.component.gapLarge."
     },
     "color.border.field": {
       "$type": "color",
@@ -458,11 +303,6 @@
       "$type": "color",
       "$value": "{palette.warning.700}",
       "description": "Tilstandens semantiske farvepar."
-    },
-    "typography.size.display": {
-      "$type": "dimension",
-      "$value": "3.5rem",
-      "description": "Temaets fælles visuelle værdi for typography.size.display."
     },
     "shadow.floating": {
       "$type": "shadow",
@@ -1147,6 +987,10 @@
     {
       "date": "2026-11-06",
       "note": "Dedikeret illustrationsregister med kuraterede billedfarver og materialer i alle temaets farvevariationer. Passage er valgt som grafisk udgangspunkt; alle fire billedfamilier kan fortsat vælges. Illustrationsforløb bruger en særskilt varighed på 3200 ms."
+    },
+    {
+      "date": "2026-11-09",
+      "note": "Samlet temakuratering: tydelig hensigt, navngivne farver, fælles størrelser og afstande samt en anbefalet, frit valgbar illustrationsstil."
     }
   ],
   "appearance": {
@@ -1236,7 +1080,7 @@
   },
   "brand": {
     "name": "Bauhaus",
-    "summary": "Klare primærfarver, kulsorte feltkanter og røde skillelinjer. Tunge grotesker og asymmetriske hjørner samler udtrykket i tre lyse farvevariationer: Solgul, Kalk og Signalrød.",
+    "summary": "Klare primærfarver, tunge grotesker og asymmetriske hjørner. Solgul, Kalk og Signalrød suppleres af Værkstedsnat med kulsorte flader og gule handlinger.",
     "principles": [
       {
         "id": "primary-colors",
@@ -1253,7 +1097,7 @@
       {
         "id": "color-and-form",
         "title": "Primærfarver og præcise kanter",
-        "description": "Vælg Solgul for det markante udtryk, Kalk for en roligere flade eller Signalrød for røde handlinger og blå detaljer. Alle tre har lyse kontrolflader.",
+        "description": "Solgul, Kalk og Signalrød bevarer det etablerede lyse udtryk. Værkstedsnat bruger kulsorte flader, lyse feltkanter og gule handlinger; den tunge grotesk og de grafiske hjørner er fælles.",
         "tokens": [
           "color.background.canvas",
           "color.action.primary.rest.surface",
@@ -1270,12 +1114,37 @@
         ],
         "dos": [
           "Brug de røde skillelinjer til at give indholdet rytme.",
-          "Bevar kulsorte feltkanter og klare, plane kontrolflader.",
+          "Bevar tydelige feltkanter: kulsorte i lyse farver og lyse i Værkstedsnat.",
           "Brug asymmetric til enkelte kort med grafisk karakter."
         ],
         "donts": [
-          "Tilføj ikke en mørk variant som automatisk modstykke.",
           "Brug ikke den dekorative røde accent som eneste tegn på en fejl."
+        ]
+      },
+      {
+        "id": "shared-measures",
+        "title": "Fælles målestok",
+        "description": "Skriftstørrelser, linjehøjder, kontrolmål og afstande følger bibliotekets fælles skala. Temaets egen karakter ligger i skriftvalg, vægt, geometri, materialer og bevægelse. Navigation kan være i samme farvefamilie som arbejdsfladen eller bruge en afstemt kontrast.",
+        "tokens": [
+          "typography.size.body",
+          "typography.size.heading",
+          "typography.size.panel",
+          "space.scale.1",
+          "space.scale.2",
+          "space.scale.3",
+          "space.scale.4",
+          "space.scale.6",
+          "space.scale.8",
+          "size.control.height"
+        ],
+        "components": [],
+        "dos": [
+          "Vælg kompakt eller desktop gennem komponentens funktionelle varianter.",
+          "Lad sidemenuens farve understøtte den konkrete skærm."
+        ],
+        "donts": [
+          "Skab ikke tæthed ved at ændre temaets målestok.",
+          "Gør ikke kontrastfarvet sidemenu til et krav."
         ]
       }
     ],
@@ -1373,73 +1242,7 @@
     "solgul": {
       "name": "Solgul",
       "colorScheme": "light",
-      "tokens": {
-        "palette.canvas": {
-          "$type": "color",
-          "$value": "#f3cc39",
-          "description": "Solgul arbejdsflade med røde skillelinjer og blå handlinger."
-        },
-        "color.illustration.ground": {
-          "$type": "color",
-          "$value": "#f2d462",
-          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
-        },
-        "color.illustration.plane": {
-          "$type": "color",
-          "$value": "#f8e599",
-          "description": "Et selvstændigt materialeplan i illustrationen."
-        },
-        "color.illustration.ink": {
-          "$type": "color",
-          "$value": "#25272a",
-          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
-        },
-        "color.illustration.subject": {
-          "$type": "color",
-          "$value": "#3155b0",
-          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
-        },
-        "color.illustration.counterpoint": {
-          "$type": "color",
-          "$value": "#b94433",
-          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
-        },
-        "color.illustration.context": {
-          "$type": "color",
-          "$value": "#c9b972",
-          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
-        },
-        "color.illustration.edge": {
-          "$type": "color",
-          "$value": "#7d7142",
-          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
-        },
-        "color.illustration.light": {
-          "$type": "color",
-          "$value": "#fff8da",
-          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
-        },
-        "color.illustration.depth": {
-          "$type": "color",
-          "$value": "#b9a452",
-          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
-        },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 2.2,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
-        },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.1,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
-        },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
-        }
-      }
+      "tokens": {}
     },
     "kalk": {
       "name": "Kalk",
@@ -1459,16 +1262,6 @@
           "$type": "color",
           "$value": "#faf6e5",
           "description": "Et selvstændigt materialeplan i illustrationen."
-        },
-        "color.illustration.ink": {
-          "$type": "color",
-          "$value": "#25272a",
-          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
-        },
-        "color.illustration.subject": {
-          "$type": "color",
-          "$value": "#3155b0",
-          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
         },
         "color.illustration.counterpoint": {
           "$type": "color",
@@ -1494,21 +1287,6 @@
           "$type": "color",
           "$value": "#bbb8ab",
           "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
-        },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 2.2,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
-        },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.1,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
-        },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
         }
       }
     },
@@ -1516,11 +1294,6 @@
       "name": "Signalrød",
       "colorScheme": "light",
       "tokens": {
-        "palette.canvas": {
-          "$type": "color",
-          "$value": "#f3e9dd",
-          "description": "Varm, lys arbejdsflade til signalrøde handlinger og blå detaljer."
-        },
         "palette.brand.50": {
           "$type": "color",
           "$value": "#faefde",
@@ -1636,6 +1409,11 @@
           "$value": "inset 4px 0 0 #2446b3",
           "description": "Blå indvendig kant i den røde farvevariation."
         },
+        "palette.canvas": {
+          "$type": "color",
+          "$value": "#f3e9dd",
+          "description": "Varm, lys arbejdsflade til signalrøde handlinger og blå detaljer."
+        },
         "color.illustration.ground": {
           "$type": "color",
           "$value": "#f1e5d5",
@@ -1680,23 +1458,567 @@
           "$type": "color",
           "$value": "#bab0a4",
           "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+        }
+      }
+    },
+    "vaerkstedsnat": {
+      "name": "Værkstedsnat",
+      "colorScheme": "dark",
+      "tokens": {
+        "color.background.canvas": {
+          "$type": "color",
+          "$value": "#151515",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
         },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 2.2,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
+        "color.background.surface": {
+          "$type": "color",
+          "$value": "#242424",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
         },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.1,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
+        "color.background.subtle": {
+          "$type": "color",
+          "$value": "#353535",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
         },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
+        "color.background.control": {
+          "$type": "color",
+          "$value": "#303030",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.background.detail": {
+          "$type": "color",
+          "$value": "#242424",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.background.inverse": {
+          "$type": "color",
+          "$value": "#fffbea",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.text.primary": {
+          "$type": "color",
+          "$value": "#fffbea",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.text.secondary": {
+          "$type": "color",
+          "$value": "#ded9c8",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.text.muted": {
+          "$type": "color",
+          "$value": "#ded9c8",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.text.label": {
+          "$type": "color",
+          "$value": "#ded9c8",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.text.inverse": {
+          "$type": "color",
+          "$value": "#242424",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.border.default": {
+          "$type": "color",
+          "$value": "#e76a55",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.border.strong": {
+          "$type": "color",
+          "$value": "#fffbea",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.primary.rest.surface": {
+          "$type": "color",
+          "$value": "#f3cc39",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.primary.rest.text": {
+          "$type": "color",
+          "$value": "#242424",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.selected.rest.surface": {
+          "$type": "color",
+          "$value": "#f3cc39",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.selected.rest.text": {
+          "$type": "color",
+          "$value": "#242424",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.brand.accent": {
+          "$type": "color",
+          "$value": "#f49a87",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.focus": {
+          "$type": "color",
+          "$value": "#f3cc39",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.status.danger": {
+          "$type": "color",
+          "$value": "{palette.danger.200}",
+          "description": "Semantisk farverolle: color.status.danger."
+        },
+        "color.status.dangerSurface": {
+          "$type": "color",
+          "$value": "{palette.danger.950}",
+          "description": "Semantisk farverolle: color.status.dangerSurface."
+        },
+        "color.status.dangerText": {
+          "$type": "color",
+          "$value": "{palette.danger.100}",
+          "description": "Semantisk farverolle: color.status.dangerText."
+        },
+        "color.status.dangerContrast": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.status.dangerContrast."
+        },
+        "color.disabled.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.disabled.surface."
+        },
+        "color.disabled.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.400}",
+          "description": "Semantisk farverolle: color.disabled.text."
+        },
+        "color.caption.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.caption.surface."
+        },
+        "color.caption.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.caption.text."
+        },
+        "color.caption.labelSurface": {
+          "$type": "color",
+          "$value": "{palette.brand.200}",
+          "description": "Semantisk farverolle: color.caption.labelSurface."
+        },
+        "color.caption.labelText": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.caption.labelText."
+        },
+        "shadow.card": {
+          "$type": "shadow",
+          "$value": "{elevation.level2}",
+          "description": "Semantisk hævning: shadow.card."
+        },
+        "color.border.field": {
+          "$type": "color",
+          "$value": "#d9d4c3",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.status.success": {
+          "$type": "color",
+          "$value": "{palette.success.200}",
+          "description": "Semantisk farverolle: color.status.success."
+        },
+        "color.status.info": {
+          "$type": "color",
+          "$value": "{palette.info.200}",
+          "description": "Semantisk farverolle: color.status.info."
+        },
+        "color.status.warning": {
+          "$type": "color",
+          "$value": "{palette.warning.200}",
+          "description": "Semantisk farverolle: color.status.warning."
+        },
+        "color.action.neutral.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.800}",
+          "description": "Semantisk farverolle: color.action.neutralHover."
+        },
+        "color.action.neutral.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.neutralHoverText."
+        },
+        "color.action.neutral.active.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.700}",
+          "description": "Semantisk farverolle: color.action.neutralActive."
+        },
+        "color.action.neutral.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.50}",
+          "description": "Semantisk farverolle: color.action.neutralActiveText."
+        },
+        "color.action.primary.hover.surface": {
+          "$type": "color",
+          "$value": "#ffe071",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.primary.hover.text": {
+          "$type": "color",
+          "$value": "#242424",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.primary.active.surface": {
+          "$type": "color",
+          "$value": "#fff0b1",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.primary.active.text": {
+          "$type": "color",
+          "$value": "#242424",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.selected.hover.surface": {
+          "$type": "color",
+          "$value": "#ffe071",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.selected.hover.text": {
+          "$type": "color",
+          "$value": "#242424",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.selected.active.surface": {
+          "$type": "color",
+          "$value": "#fff0b1",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.selected.active.text": {
+          "$type": "color",
+          "$value": "#242424",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "color.action.danger.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.danger.100}",
+          "description": "Semantisk farverolle: color.action.dangerHover."
+        },
+        "color.action.danger.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.dangerHoverText."
+        },
+        "color.action.danger.active.surface": {
+          "$type": "color",
+          "$value": "{palette.danger.50}",
+          "description": "Semantisk farverolle: color.action.dangerActive."
+        },
+        "color.action.danger.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.dangerActiveText."
+        },
+        "color.action.accent.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.accent.100}",
+          "description": "Semantisk farverolle: color.action.accentHover."
+        },
+        "color.action.accent.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.accentHoverText."
+        },
+        "color.action.accent.active.surface": {
+          "$type": "color",
+          "$value": "{palette.accent.50}",
+          "description": "Semantisk farverolle: color.action.accentActive."
+        },
+        "color.action.accent.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.950}",
+          "description": "Semantisk farverolle: color.action.accentActiveText."
+        },
+        "color.action.secondary.hover.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.200}",
+          "description": "Semantisk farverolle: color.action.secondaryHover."
+        },
+        "color.action.secondary.hover.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.action.secondaryHoverText."
+        },
+        "color.action.secondary.active.surface": {
+          "$type": "color",
+          "$value": "{palette.neutral.300}",
+          "description": "Semantisk farverolle: color.action.secondaryActive."
+        },
+        "color.action.secondary.active.text": {
+          "$type": "color",
+          "$value": "{palette.neutral.900}",
+          "description": "Semantisk farverolle: color.action.secondaryActiveText."
+        },
+        "palette.neutral.0": {
+          "$type": "color",
+          "$value": "#ffffff",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.50": {
+          "$type": "color",
+          "$value": "#f6f6f7",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.100": {
+          "$type": "color",
+          "$value": "#eceeef",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.200": {
+          "$type": "color",
+          "$value": "#dadcdf",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.300": {
+          "$type": "color",
+          "$value": "#b9bec2",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.400": {
+          "$type": "color",
+          "$value": "#9ea4aa",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.500": {
+          "$type": "color",
+          "$value": "#7f8890",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.550": {
+          "$type": "color",
+          "$value": "#747d86",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.600": {
+          "$type": "color",
+          "$value": "#616b76",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.700": {
+          "$type": "color",
+          "$value": "#4a5661",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.800": {
+          "$type": "color",
+          "$value": "#374451",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.850": {
+          "$type": "color",
+          "$value": "#23313f",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.900": {
+          "$type": "color",
+          "$value": "#162432",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.950": {
+          "$type": "color",
+          "$value": "#0f1922",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.neutral.1000": {
+          "$type": "color",
+          "$value": "#000000",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.50": {
+          "$type": "color",
+          "$value": "#f1f4fc",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.100": {
+          "$type": "color",
+          "$value": "#dfe6f9",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.200": {
+          "$type": "color",
+          "$value": "#becdf2",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.300": {
+          "$type": "color",
+          "$value": "#97afea",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.400": {
+          "$type": "color",
+          "$value": "#688ce1",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.500": {
+          "$type": "color",
+          "$value": "#3a69d8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.600": {
+          "$type": "color",
+          "$value": "#174ed1",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.700": {
+          "$type": "color",
+          "$value": "#1442b2",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.800": {
+          "$type": "color",
+          "$value": "#103792",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.900": {
+          "$type": "color",
+          "$value": "#0d2b73",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.brand.950": {
+          "$type": "color",
+          "$value": "#091f54",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "color.brand.accentDeep": {
+          "$type": "color",
+          "$value": "#ffb9a9",
+          "description": "Bauhaus i kulsort, solgul og signalrød."
+        },
+        "palette.accent.50": {
+          "$type": "color",
+          "$value": "#f1f4fc",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.100": {
+          "$type": "color",
+          "$value": "#dfe6f9",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.200": {
+          "$type": "color",
+          "$value": "#becdf2",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.300": {
+          "$type": "color",
+          "$value": "#97afea",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.400": {
+          "$type": "color",
+          "$value": "#688ce1",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.500": {
+          "$type": "color",
+          "$value": "#3a69d8",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.600": {
+          "$type": "color",
+          "$value": "#174ed1",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.700": {
+          "$type": "color",
+          "$value": "#1442b2",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.800": {
+          "$type": "color",
+          "$value": "#103792",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.900": {
+          "$type": "color",
+          "$value": "#0d2b73",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "palette.accent.950": {
+          "$type": "color",
+          "$value": "#091f54",
+          "description": "Primitiv paletteværdi; komponenter anvender semantiske farver."
+        },
+        "elevation.level1": {
+          "$type": "shadow",
+          "$value": "0 1px 3px rgba(23, 36, 51, 0.12)",
+          "description": "Temaværdi for elevation.level1."
+        },
+        "elevation.level2": {
+          "$type": "shadow",
+          "$value": "0 1px 2px rgba(23, 36, 51, 0.035)",
+          "description": "Temaværdi for elevation.level2."
+        },
+        "elevation.level3": {
+          "$type": "shadow",
+          "$value": "0 12px 32px rgba(23, 36, 51, 0.13)",
+          "description": "Temaværdi for elevation.level3."
+        },
+        "color.illustration.ground": {
+          "$type": "color",
+          "$value": "#142337",
+          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
+        },
+        "color.illustration.plane": {
+          "$type": "color",
+          "$value": "#2e3b4d",
+          "description": "Et selvstændigt materialeplan i illustrationen."
+        },
+        "color.illustration.ink": {
+          "$type": "color",
+          "$value": "#e7edf9",
+          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
+        },
+        "color.illustration.subject": {
+          "$type": "color",
+          "$value": "#8da8e0",
+          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
+        },
+        "color.illustration.counterpoint": {
+          "$type": "color",
+          "$value": "#c69c55",
+          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
+        },
+        "color.illustration.context": {
+          "$type": "color",
+          "$value": "#334663",
+          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
+        },
+        "color.illustration.edge": {
+          "$type": "color",
+          "$value": "#8c96a6",
+          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
+        },
+        "color.illustration.light": {
+          "$type": "color",
+          "$value": "#fcfdff",
+          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
+        },
+        "color.illustration.depth": {
+          "$type": "color",
+          "$value": "#091019",
+          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
+        },
+        "gradient.material": {
+          "$type": "gradient",
+          "$value": "linear-gradient(135deg, #242424 0%, #242424 100%)",
+          "description": "Plan mørk materialeflade."
+        },
+        "shadow.embossed": {
+          "$type": "shadow",
+          "$value": "inset 4px 0 0 #e76a55",
+          "description": "Bauhaus røde skillelinje."
         }
       }
     }
+  },
+  "graphics": {
+    "family": "anatomy"
   }
 }

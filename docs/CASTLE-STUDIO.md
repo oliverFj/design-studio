@@ -28,6 +28,6 @@ Efter ændringer: validér temaet, synkronisér runtime/CSS og kontrollér relev
 
 ## Kompakt tæthed og fælles layout
 
-Castle-temaet bruger 14 px brødtekst, 13 px kontroltekst og mindst 44 px klikflader. Semantiske paddingtokens er 12/16/8 px, og gap/gapLarge er 8/12 px. Hele ord sætter valgknappers naturlige minimumsbredde; wrap-varianten flytter valg til næste række. Produktet giver panelet plads frem for at bryde almindelige ord.
+Det offentlige Castle-tema arver bibliotekets fælles tekststørrelser, kontrolmål og semantiske afstande. Nunito, Alegreya, farver og form bevarer identiteten. Kompakte produktpaneler bruger eksisterende varianter og semantiske tokens. Hele ord sætter valgknappers naturlige minimumsbredde; wrap-varianten flytter valg til næste række. Produktet giver panelet plads frem for at bryde almindelige ord. Et allerede tilknyttet Castle-produkt bevarer sin egen temakopi indtil en bevidst opdatering.
 
 Brug stack til ydre afstand mellem felter, noter og handlinger. Indlejret scrollindhold bruger scroll-areaens surface-part eller body-variant, så der kun er én synlig panelramme. Hover og tryk bruger synlige flade-/tekstpar for neutral, primary, selected, danger og accent; alle temaer følger samme mekanik. De praktiske regler står i INTEGRATION.md.

@@ -1,5 +1,7 @@
 import { validatePackage, resolveTokens, brandAssetDataURL } from '../core/engine.mjs';
 
+import {renderComponent} from '../core/components.mjs';
+
 import { DEFAULT_TOKENS, COMPONENT_LIBRARY } from '../core/library.mjs';
 
 const imageTypes = new Set(['image/svg+xml','image/png','image/jpeg','image/webp']);
@@ -14,10 +16,10 @@ const slug = value => {const id=value.toLowerCase().normalize('NFKD').replace(/[
 const uniqueId = (items, base) => {let id=base,index=2;while(items.some(item=>item.id===id))id=base+'-'+index++;return id;};
 
 /** The guide edits the same package as tokens and recipes, without executable markup. */
-export function createBrandStudio(state, {escape:e, field, edited, render, notice, allowNavigation, download, showcase=false}) {
+export function createBrandStudio(state, {escape:e, field, edited, render, notice, allowNavigation, download, showcase=false, getTheme=()=>state.pack}) {
   let selected={kind:'overview',id:null}, key=null, uploadTarget=null;
   const guide = () => state.pack.brand;
-  const tokens = () => state.pack.schemaVersion === 2 ? { ...DEFAULT_TOKENS, ...state.pack.tokens } : state.pack.tokens;
+  const tokens = () => {const pack=getTheme();return pack.schemaVersion === 2 ? { ...DEFAULT_TOKENS, ...pack.tokens } : pack.tokens;};
   const components = () => state.pack.schemaVersion === 2 ? COMPONENT_LIBRARY : state.pack.components;
   function normalizeSelection() {
     if(key!==state.key){selected={kind:'overview',id:null};key=state.key;}
@@ -41,38 +43,41 @@ export function createBrandStudio(state, {escape:e, field, edited, render, notic
     const token=tokens()[id];if(!token)return '';
     const value=resolved[id];
     let sample='<span class="brand-value">'+e(value)+'</span>';
-    if(token.$type==='color')sample='<span class="brand-color" style="background:'+e(value)+'"></span>';
+    if(['color','gradient'].includes(token.$type))sample='<span class="brand-color" style="background:'+e(value)+'"></span>';
     else if(token.$type==='fontFamily')sample='<span class="brand-font" style="font-family:'+e(value)+'">Aa Bb · Æøå 0123</span>';
     else if(token.$type==='dimension'&&id.startsWith('typography.size.'))sample='<span class="brand-font" style="font-family:var(--ds-typography-font-heading);font-size:clamp(11px,'+e(value)+',64px)">Aa</span>';
     else if(token.$type==='dimension'&&id.startsWith('space.'))sample='<span class="brand-space" style="width:max(0px,min('+e(value)+',220px))"></span>';
     else if(token.$type==='shadow')sample='<span class="brand-shadow" style="box-shadow:'+e(value)+'"></span>';
     else if(token.$type==='dimension'&&id.startsWith('radius.'))sample='<span class="brand-shape" style="border-radius:'+e(value)+'"></span>';
-    return '<button type="button" class="brand-token" data-brand-token="'+e(id)+'">'+sample+'<span class="brand-token-id">'+e(id)+'</span><span class="brand-token-value">'+e(value)+'</span></button>';
+    return '<button type="button" class="brand-token" data-brand-token="'+e(id)+'">'+sample+'<span class="brand-token-id">'+e(id)+'</span><code class="brand-token-value">'+e(value)+'</code></button>';
+  }
+  function themeSpecimen(){
+    let material='';
+    try{material=renderComponent(getTheme(),'card',{idPrefix:'theme-form-study',slots:{header:{tag:'h3',text:'Giv idéen plads'},body:{tag:'p',text:'En god begyndelse med plads til det næste.'},footer:{tag:'span',text:'Form, kanter og dybde'}}});}catch{/* Invalid drafts retain the last valid CSS preview. */}
+    return '<section class="theme-specimen" aria-label="Temaets typografi, form og farver"><div class="theme-type-study"><span class="theme-study-label">Typografi</span><p class="theme-display-study">Form med karakter.</p><p>Et sted til idéer, overblik og godt arbejde.</p><span class="theme-mono-study">Aa Æøå · 0123456789</span></div><div class="theme-form-study"><span class="theme-study-label">Form og materiale</span><div class="theme-card-study">'+material+'</div></div><div class="theme-color-study"><span class="theme-study-label">Den valgte farve</span><div class="theme-color-samples">'+[['color.background.canvas','Grund'],['color.background.surface','Flade'],['color.action.primary.rest.surface','Handling'],['color.text.primary','Skrift']].map(([id,label])=>'<button type="button" data-brand-token="'+id+'" class="theme-color-sample"><span style="background:var(--ds-'+id.replaceAll('.','-')+')" aria-hidden="true"></span><span>'+label+'</span></button>').join('')+'</div></div></section>';
   }
   function content() {
     normalizeSelection();
     const brand=guide();
-    const toolbar='<div class="canvas-toolbar"><h2>Brandguide</h2>'+(brand?'<button type="button" class="studio-button" data-brand-upload>Tilføj logo</button>':'')+'</div>';
-    if(!brand)return toolbar+'<section class="empty"><h3>Et sted til designets hensigt</h3><p>Tilføj principper, anvendelsesregler og originale logoer til denne pakke.</p><button type="button" class="studio-button primary" data-brand-create>Opret brandguide</button></section>';
+    const toolbar='<div class="canvas-toolbar"><h2>Temaets hensigt</h2></div>';
+    if(!brand)return toolbar+'<section class="empty"><h3>Et sted til designets hensigt</h3><p>Beskriv temaets typografi, form, materialer og bevægelse. Brandinformation og originale logoer kan følge med.</p><button type="button" class="studio-button primary" data-brand-create>Beskriv temaets hensigt</button></section>';
     const valid=validatePackage(state.pack).valid;
-    let resolved={};if(valid)resolved=resolveTokens(state.pack);
+    let resolved={};if(valid)resolved=resolveTokens(getTheme());
     const assets=new Map(brand.assets.map(asset=>[asset.id,asset]));
-    const primary=brand.logos[0],primaryAsset=primary&&assets.get(primary.asset);
-    const heroLogo=valid&&primaryAsset?'<div class="brand-hero-mark" style="background:'+e(resolved[primary.background] || resolved['color.background.canvas'])+'"><img class="brand-hero-logo" src="'+e(dataURL(primaryAsset,resolved[primary.foreground] || resolved['color.text.primary']))+'" alt="'+e(primary.name)+'"></div>':'';
     const logos=brand.logos.map(logo=>{
       const asset=assets.get(logo.asset),background=resolved[logo.background] || resolved['color.background.canvas'],color=resolved[logo.foreground] || resolved['color.text.primary'];
       return '<article class="brand-logo-card'+active('logos',logo.id)+'"><div class="brand-logo-surface" style="background:'+e(background || 'transparent')+';color:'+e(color || 'inherit')+'">'+(valid&&asset?'<img src="'+e(dataURL(asset,color))+'" alt="'+e(logo.name)+'">':'<span>Logo</span>')+'</div><div class="brand-logo-caption">'+pick('logos',logo.id,logo.name)+'<p>'+e(logo.usage)+'</p>'+(asset&&!showcase?'<button class="brand-link" type="button" data-brand-download="'+e(asset.id)+'">Hent original · '+e(asset.fileName)+'</button>':'')+'</div></article>';
     }).join('');
-    return toolbar+'<div class="brand-document ds-scope"><header class="brand-hero">'+heroLogo+'<div>'+pick('overview',null,'Identitet')+'<h2>'+e(brand.name)+'</h2><p>'+e(brand.summary)+'</p></div></header>'+
+    return toolbar+'<div class="brand-document ds-scope"><header class="theme-intent">'+pick('overview',null,'Hensigt og karakter')+(brand.summary.trim()!==state.pack.description.trim()?'<p>'+e(brand.summary)+'</p>':'')+'</header>'+themeSpecimen()+
       (brand.principles.length?'<section class="brand-principles" aria-label="Designprincipper">'+brand.principles.map(item=>'<article class="'+active('principles',item.id)+'">'+pick('principles',item.id,item.title)+'<p>'+e(item.description)+'</p></article>').join('')+'</section>':'')+
       '<div class="brand-add-row"><button type="button" class="brand-link" data-brand-add="principles">Tilføj princip</button><button type="button" class="brand-link" data-brand-add="sections">Tilføj afsnit</button></div>'+
-      (logos?'<section class="brand-logo-section"><h3>Logoer og mærker</h3><div class="brand-logo-grid">'+logos+'</div></section>':'')+
+
       brand.sections.map((section,index)=>'<section class="brand-section'+active('sections',section.id)+'"><div class="brand-section-label"><span>'+String(index+1).padStart(2,'0')+'</span>'+pick('sections',section.id,section.title)+'</div><p class="brand-section-description">'+e(section.description)+'</p>'+
         (section.tokens.length?'<div class="brand-token-grid">'+section.tokens.map(id=>tokenSample(id,resolved)).join('')+'</div>':'')+
         (section.components.length?'<div class="brand-component-links">'+section.components.map(id=>'<button type="button" class="brand-link" data-brand-component="'+e(id)+'">Se '+e(components()[id]?.name || id)+'</button>').join('')+'</div>':'')+
         '<div class="brand-rule-columns">'+ruleList(section.dos,'Gør')+ruleList(section.donts,'Undgå')+'</div></section>').join('')+
-      '<section class="brand-section brand-resources"><h3>Originaler og ressourcer</h3><p>Disse filer følger med i designpakken.'+(showcase?'':' Download giver den originale fil.')+'</p><div class="brand-resource-list">'+brand.assets.map(asset=>'<div class="brand-resource-row">'+pick('assets',asset.id,asset.name)+'<span>'+e(asset.fileName)+' · '+Math.round(asset.data.length*3/4/1024)+' KB</span>'+(showcase?'':'<button type="button" class="brand-link" data-brand-download="'+e(asset.id)+'">Hent fil</button>')+'</div>').join('')+'</div></section>'+
-      (brand.sources.length?'<section class="brand-section brand-sources"><h3>Grundlag og kilder</h3>'+brand.sources.map(source=>'<p><strong>'+e(source.title)+'</strong><span>'+e(source.location)+'</span></p>').join('')+'</section>':'')+'</div>';
+      '<details class="brand-section brand-resources"'+(['logos','assets'].includes(selected.kind)?' open':'')+'><summary>Brand, originaler og kilder</summary><button type="button" class="studio-button" data-brand-upload>Tilføj logo</button><p class="theme-brand-name">Brand: '+e(brand.name)+'</p>'+(logos?'<section class="brand-logo-section"><h3>Logoer og mærker</h3><div class="brand-logo-grid">'+logos+'</div></section>':'')+'<h3>Originaler og ressourcer</h3><p>Disse filer følger med i designpakken.'+(showcase?'':' Download giver den originale fil.')+'</p><div class="brand-resource-list">'+brand.assets.map(asset=>'<div class="brand-resource-row">'+pick('assets',asset.id,asset.name)+'<span>'+e(asset.fileName)+' · '+Math.round(asset.data.length*3/4/1024)+' KB</span>'+(showcase?'':'<button type="button" class="brand-link" data-brand-download="'+e(asset.id)+'">Hent fil</button>')+'</div>').join('')+'</div>'+
+      (brand.sources.length?'<section class="brand-section brand-sources"><h3>Grundlag og kilder</h3>'+brand.sources.map(source=>'<p><strong>'+e(source.title)+'</strong><span>'+e(source.location)+'</span></p>').join('')+'</section>':'')+'</details></div>';
   }
   function editField(property,label,value,{textarea=false}={}) {
     return field('brand-edit-'+property,label,value,{textarea}).replace(/<(input|textarea) /,'<$1 data-brand-edit="'+property+'" ');
@@ -82,10 +87,10 @@ export function createBrandStudio(state, {escape:e, field, edited, render, notic
   }
   function inspector() {
     normalizeSelection();const brand=guide(),item=current();
-    let body='<div class="inspector-heading">Brandguide</div>';
+    let body='<div class="inspector-heading">Temaets hensigt</div>';
     if(!brand)return body+'<h2>Fælles format. Egen identitet.</h2><p>Guiden samler begrundelser og anvendelsesregler med de visuelle værdier.</p>';
-    body+='<h2>'+e(selected.kind==='overview'?'Identitet':item?.title || item?.name)+'</h2>';
-    if(selected.kind==='overview')body+=editField('name','Brandnavn',brand.name)+editField('summary','Hensigt og karakter',brand.summary,{textarea:true})+'<p>Vælg et princip, afsnit, logo eller en ressource i guiden for at redigere det.</p>';
+    body+='<h2>'+e(selected.kind==='overview'?'Hensigt og brand':item?.title || item?.name)+'</h2>';
+    if(selected.kind==='overview')body+=editField('name','Brandnavn',brand.name)+editField('summary','Hensigt og karakter',brand.summary,{textarea:true})+'<p>Vælg et princip, afsnit, logo eller en ressource i temaet for at redigere det.</p>';
     else if(selected.kind==='principles')body+=editField('title','Princip',item.title)+editField('description','Betydning i designet',item.description,{textarea:true});
     else if(selected.kind==='sections')body+=editField('title','Afsnit',item.title)+editField('description','Anvendelse',item.description,{textarea:true})+editField('dos','Gør · én regel pr. linje',item.dos.join('\n'),{textarea:true})+editField('donts','Undgå · én regel pr. linje',item.donts.join('\n'),{textarea:true})+
       selectField('tokens','Viste designværdier',Object.keys(tokens()).map(id=>[id,id]),item.tokens,true)+selectField('components','Tilknyttede komponenter',Object.entries(components()).map(([id,c])=>[id,c.name]),item.components,true);
@@ -100,7 +105,7 @@ export function createBrandStudio(state, {escape:e, field, edited, render, notic
       '<button type="button" class="studio-button" data-brand-replace="'+e(item.id)+'">Udskift fil</button>';
     return body+'<div class="inspector-section"><p>Teksten og filerne gemmes sammen med resten af pakken.</p>'+(selected.kind!=='overview'?'<button type="button" class="studio-button" data-brand-remove>Fjern '+(selected.kind==='assets'?'ressource':selected.kind==='logos'?'logovariant':selected.kind==='principles'?'princip':'afsnit')+'</button>':'')+'</div><div id="validation-errors" class="error-box" hidden></div><input type="file" id="brand-upload-file" hidden>';
   }
-  function refreshCanvas() {const canvas=document.querySelector('.canvas');if(canvas)canvas.innerHTML=content();}
+  function refreshCanvas() {const canvas=document.querySelector('[data-theme-guide]')||document.querySelector('.canvas');if(!canvas)return;const resourcesOpen=canvas.querySelector('.brand-resources')?.open;canvas.innerHTML=content();if(resourcesOpen)canvas.querySelector('.brand-resources')?.setAttribute('open','');}
   function pickItem(kind,id) {if(!allowNavigation())return;selected={kind,id:id || null};render();}
   async function upload(file,targetId) {
     if(!file)return;
@@ -153,7 +158,7 @@ export function createBrandStudio(state, {escape:e, field, edited, render, notic
     }
   }
   function bind() {
-    if(state.view!=='brand')return;
+    if(!['brand','package'].includes(state.view))return;
     document.querySelector('.canvas').addEventListener('click',handleAction);
     document.querySelector('.inspector').addEventListener('click',handleAction);
     document.querySelectorAll('[data-brand-edit]').forEach(el=>el.addEventListener('input',()=>{

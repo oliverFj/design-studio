@@ -27,7 +27,9 @@ Start i **[AGENTS.md](AGENTS.md)** og vælg opgavens læsevej. Der er ikke krav 
 
 ## Ét bibliotek, flere temaer
 
-Editoren viser komponenter, interaktive designmønstre, tokens og brandguide i de medfølgende temaer. Temaer kan være lyse, mørke eller have flere farvetilstande. Struktur og genbrugelig adfærd udvikles centralt. Aktuelt katalog, biblioteksversion og controllerdækning findes i `core/library.mjs`; editorens versionsnummer er særskilt. Se [temaformatet](docs/PACKAGE-FORMAT.md).
+Bibliotek 3.11.0 har 62 komponentroller. Den offentlige samling har 13 temaer og 49 farvevariationer, med både lyse og mørke valg i hvert tema. Temaet ejer typografi, geometri, materialer og bevægelse; farven afstemmer palet, gradienter og skygger. Størrelser og afstande følger fælles målestok. Temaets anbefalede illustrationsstil kan tilsidesættes i menuen. Se [temaformatet og samlingen](docs/PACKAGE-FORMAT.md).
+
+**Temaet** samler visuel hensigt, prøver og brandspecifikke originaler. **Scener** viser Blog, Webshop, Editor og Overblik med fungerende lokale handlinger og alle temaer. Aureol og Obsidian har desuden selvstændige materialestudier med mere frost, lys og rumlighed. [Produktion](docs/PRODUCTION.md#scener-og-materialestudier) beskriver indhold og levering. Struktur og genbrugelig adfærd udvikles centralt; katalog og controllerdækning findes i `core/library.mjs`.
 
 ## Grafik og animation
 
@@ -53,11 +55,11 @@ Genbrug eksisterende roller før udvidelse. Følg [udvidelsesreglerne](docs/DESI
 
 ## Web-showcase
 
-Den offentlige udgave viser editoren uden filåbning, gemning og eksport. Besøgendes ændringer påvirker ingen produkter. Et lokalt build opdaterer ikke hjemmesiden; følg [hjemmesideguiden](docs/WEBSITE-SHOWCASE.md). [Produktmedier](docs/PRODUCT-MEDIA.md) beskriver screenshots og produktkort; [signaturen](docs/SIGNATURE.md) beskriver Fjordside-kreditering.
+Den offentlige Studio-udgave bruger samme interface med filåbning, gemning og eksport i besøgendes egen browser. Ændringer påvirker ingen produkter; private tickets følger ikke med. Et lokalt build opdaterer ikke hjemmesiden; følg [hjemmesideguiden](docs/WEBSITE-SHOWCASE.md). [Produktmedier](docs/PRODUCT-MEDIA.md) beskriver screenshots og produktkort; [signaturen](docs/SIGNATURE.md) beskriver Fjordside-kreditering.
 
 ## Portabilitet og kontrolgrænser
 
-Den færdige editor er én fil; udviklingsopsætning og MCP kræver særskilt installation. Lokale skrifter og ressourcer følger leverancen med licenser. Se [produktion](docs/PRODUCTION.md) og den daterede [verifikationsstatus](docs/PRODUCTION.md#verifikationsstatus) for faktisk kontrol og resterende begrænsninger.
+Den færdige editor med brugsscener er én fil. De to ekstra materialestudier ligger i `examples/scenes/`; brug offline-ZIP'en for at bevare links mellem siderne. Udviklingsopsætning og MCP kræver særskilt installation. Lokale skrifter og ressourcer følger leverancen med licenser. Se [produktion](docs/PRODUCTION.md) og den daterede [verifikationsstatus](docs/PRODUCTION.md#verifikationsstatus) for faktisk kontrol og resterende begrænsninger.
 
 ## Indhold
 

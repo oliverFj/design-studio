@@ -12,6 +12,7 @@ Format 2 er ét tema i en JSON-fil. Komponentdefinitioner ligger i det fælles c
 | tokens | Flade token-id'er med $type, $value og description. Kan være sparsomme; centrale defaults suppleres. |
 | appearance | Valgfrie overrides af godkendte visuelle egenskaber på eksisterende dele, varianter og tilstande. |
 | brand | Valgfri brandguide og originalressourcer; se BRANDGUIDE.md. |
+| graphics | Valgfri anbefalet illustrationsstil, fx `{"family":"lightroom"}`. Familier: `anatomy`, `lightroom`, `passage`, `fieldlines`. |
 | history | Dato og beskrivelse af temabeslutninger. |
 | modes | Valgfrie farvetilstande: et `light`/`dark`-par eller navngivne farvevariationer med `name`, `colorScheme` og `tokens`. |
 | defaultMode | Id på temaets standardtilstand, påkrævet sammen med `modes`. |
@@ -31,6 +32,45 @@ core/contract.mjs beskriver grundvokabularet. core/library.mjs indeholder DEFAUL
 De offentlige temaer bruger primitive farver under `palette.*` og semantiske aliases under `color.*`. `core/scales.mjs` leverer `space.scale.*`, `elevation.level0…3`, `layer.*` og `size.icon.small/medium/large`. Ældre semantiske navne kan fortsat overskrives af temaer. `BREAKPOINTS` er fælles talværdier til genereret CSS; de er ikke CSS-variable, der kan anvendes som betingelse i en media query.
 
 space.component.padding, paddingLarge, paddingCompact, gap og gapLarge skal efter aliasopløsning have positive absolutte eller skriftrelative længder. Nul, negative værdier og procentafstande afvises. Bibliotekets padding og mellemrum kan dermed ikke forsvinde gennem et tema.
+
+## Temahensigt og offentlig samling
+
+Temaet ejer skriftfamilier og vægte, geometri, materialebehandling og bevægelse. Farvevariationerne ejer paletter, semantiske farver samt farveafstemte gradienter og skygger. De kuraterede temaer arver bibliotekets fælles tekststørrelser, linjehøjder, kontrolmål og afstande; deres særpræg ligger i formen og materialerne. Farveoverrides er sparsomme og gentager ikke grundtemaets uændrede værdier. Format 2 accepterer fortsat ældre, bredere modeoverrides af hensyn til eksisterende produkter.
+
+| Tema | Farver | Karakter |
+| --- | ---: | --- |
+| Studio (`studio-light`) | 6 | Fælles arbejdsflade; Indigo, Mineral og Blomme i lys/mørk. |
+| Værk | 4 | Redaktionelt håndværk og varm typografi. |
+| Fjordside | 4 | Platypi, tryksværte, terracotta og godkendte originalmærker. |
+| Castle Studio | 2 | Nunito, Alegreya, papir og dyb grøn. |
+| Signal | 2 | Tydelige handlinger og grafisk præcision. |
+| Prisme | 4 | Farvede lyskanter og klare flader. |
+| Nordlys | 4 | Præcise former, lysfelter og kølige gradienter. |
+| Riso | 5 | Trykfarver, papir og forskudte pigmentlag. |
+| Bauhaus | 4 | Geometrisk komposition, primærfarver og Værkstedsnat. |
+| Porcelæn | 5 | Glaserede flader, fine relieffer og roligt lys. |
+| Terminal | 5 | Teknisk typografi og fosforfarver. |
+| Aureol | 2 | Afrundede opalflader, frost og koral/lavendel. |
+| Obsidian | 2 | Facetterede mineraler, rumlig dybde og cyan/violet. |
+
+Alle 13 offentlige temaer har mindst én lys og én mørk variation; tilsammen 49. `tools/public-themes.mjs` finder samlingen og udelader de historiske id'er `atelier`, `castle-studio-v2`, `kyst`, `midnight-editorial` og `nocturne`. Deres filer bevares til eksisterende produkter. Kyst/Nocturnes farveidéer indgår i Studio, Atelier/Midnight Editorials i Værk.
+
+`graphics.family` gemmes sammen med temaet. Studios **Illustrationsstil → Følg temaet** bruger anbefalingen; et manuelt familievalg har forrang og ændrer ikke temaets anbefaling. Illustrationerne er fælles på tværs af temaer. Brandspecifikke regler og originaler bliver i `brand` og vises under **Temaet → Brand, originaler og kilder**. En kontrastfarvet sidemenu er et kompositionsvalg, ikke et fælles temaprincip.
+
+## Materialer, frost og gradienttekst
+
+[core/materials.mjs](../core/materials.mjs) leverer fælles, valgfrie behandlinger på eksisterende komponenter: `card.rimmed`, `card.frosted` og `heading.gradient`. `card.material`, `card.embossed` og `card.asymmetric` giver yderligere overflade- og formvariationer. Produktet vælger anvendelsen; temaet leverer værdierne.
+
+| Token | Opgave |
+| --- | --- |
+| `gradient.rim` | Dekorativ kant omkring en opak indholdsflade. |
+| `gradient.atmosphere` | Dekorativt lysfelt uden tekst eller betjening. |
+| `gradient.ink` | Gradient i stor overskrift; mindst 4,5:1 mod canvas, surface og subtle gennem hele overgangen. |
+| `material.rim.width` | Kantens tykkelse; ændrer ikke tastaturfokus. |
+| `material.frost.blur` | Frostlagets sløring, standard 16px. |
+| `material.frost.opacity` | Andel af temafladen, tal fra 0 til 1, standard .72. |
+
+Frostede kort har en transparent ramme og opake header/body/footer som læseøer. Et kort med tekst direkte i roden forbliver opakt. Dekorative atmosfære- og frostlag kræver `aria-hidden="true"`. Fælles CSS har solide fallbackflader og tilpasninger til reduceret transparens, øget kontrast og forced colors. Materialerne tilføjer ingen automatisk bevægelse. Se [anvendelsen i runtime](INTEGRATION.md#materialer-på-eksisterende-komponenter).
 
 ## Læsbarhed og kompatible navne
 

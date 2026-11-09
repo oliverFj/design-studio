@@ -11,6 +11,7 @@
     "build": "node tools/build-offline.mjs",
     "start": "node tools/open-offline.mjs",
     "example:build": "node tools/build-workspace.mjs",
+    "scenes:build": "node tools/build-scenes.mjs",
     "test": "node tools/run-tests.mjs",
     "check": "node tools/check-themes.mjs",
     "check:docs": "node tools/check-documentation.mjs",

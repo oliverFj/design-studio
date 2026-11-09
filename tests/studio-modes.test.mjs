@@ -16,7 +16,8 @@ async function editor({showcase=false,themeId='studio-light'}={}){
  brandStudio.bind=()=>{};qualityStudio.bind=()=>{};
  download=(...args)=>globalThis.downloads.push(args);
  export const editorTest={state,model,tokenInspector,changeToken,bind,download,packageInspector,brandContent:()=>brandStudio.content(),
-   chooseMode:value=>colorPreference.set(value),
+   chooseMode:value=>{if(hasNamedThemeModes(state.pack)){namedModeChoices.set(state.pack.id,value);readModel=null;qualityStudio.invalidate();cssPreview();}else colorPreference.set(value);},
+   chooseGraphic:changeGraphicFamily,syncGraphics:syncGraphicFamily,graphicFamily:()=>graphicsState.family,
    resetModel:()=>{readModel=null;},
    activeTheme,principlesContent:()=>renderPrinciples(activeTheme())};`;
  const result=await build({stdin:{contents:exposed,resolveDir:fileURLToPath(new URL('../studio/',import.meta.url)),sourcefile:'app.mjs'},bundle:true,write:false,format:'cjs',platform:'browser',loader:{'.md':'text'},define:{__STUDIO_SHOWCASE__:JSON.stringify(showcase)}});
@@ -84,7 +85,7 @@ test('public studio offers the same theme experiments and exports as the local e
 test('editor offers named Bauhaus colors, edits only the selected appearance and exports the full theme',async()=>{
  const {api,document,downloads}=await editor({themeId:'bauhaus'}),pack=api.state.pack;
  const picker=document.querySelector('#color-mode');
- assert.deepEqual(Array.from(picker.children,option=>option.textContent),['Solgul','Kalk','Signalrød']);
+ assert.deepEqual(Array.from(picker.children,option=>option.textContent),Object.values(pack.modes).map(mode=>mode.name));
  const original=JSON.stringify(pack.modes.solgul),base=pack.tokens['color.background.canvas'].$value;
  picker.value='kalk';fire(picker,'change');
  assert.equal(resolveTokens(JSON.parse(JSON.stringify(api.activeTheme())))['color.background.canvas'],'#fffbea');
@@ -92,5 +93,37 @@ test('editor offers named Bauhaus colors, edits only the selected appearance and
  assert.equal(pack.modes.kalk.tokens['color.background.canvas'].$value,'#fff8e5');
  assert.equal(JSON.stringify(pack.modes.solgul),original);assert.equal(pack.tokens['color.background.canvas'].$value,base);
  fire(document.querySelector('#download-css'),'click');assert.match(downloads[0][1],/--ds-color-background-canvas:\s*#fff8e5/);
- assert.equal(pack.modes.dark,undefined);
+ assert.ok(Object.values(pack.modes).some(mode=>mode.colorScheme==='dark'));
+ assert.ok(Object.values(pack.modes).some(mode=>mode.colorScheme==='light'));
+});
+
+
+test('editing form and motion updates the shared theme while colour edits remain local',async()=>{
+ const {api}=await editor({themeId:'bauhaus'}),pack=api.state.pack;
+ const colors=Object.keys(pack.modes);
+ for(const [id,value] of [['radius.control','7px'],['typography.font.heading','Inter, system-ui, sans-serif'],['duration.fast','140ms']]){
+  api.state.token=id;api.changeToken(value);
+  assert.equal(pack.tokens[id].$value,value);
+  for(const mode of colors){
+   api.chooseMode(mode);
+   assert.equal(pack.modes[mode].tokens[id],undefined);
+   assert.equal(resolveTokens(JSON.parse(JSON.stringify(api.activeTheme())))[id],value);
+  }
+ }
+ api.state.token='color.background.canvas';api.chooseMode('kalk');
+ const other=JSON.stringify(pack.modes.solgul);api.changeToken('#fff8e5');
+ assert.equal(pack.modes.kalk.tokens['color.background.canvas'].$value,'#fff8e5');
+ assert.equal(JSON.stringify(pack.modes.solgul),other);
+});
+
+test('explicit illustration choice survives theme changes and following restores the authored default',async()=>{
+ const {api}=await editor();
+ api.state.pack.graphics={family:'lightroom'};api.syncGraphics();
+ assert.equal(api.graphicFamily(),'lightroom');
+ api.chooseGraphic('passage');
+ api.state.pack.graphics={family:'fieldlines'};api.syncGraphics();
+ assert.equal(api.graphicFamily(),'passage');
+ api.chooseGraphic('');assert.equal(api.graphicFamily(),'fieldlines');
+ assert.deepEqual(JSON.parse(JSON.stringify(api.state.pack.graphics)),{family:'fieldlines'});
+ const content=api.brandContent();assert.match(content,/Temaets hensigt/);assert.match(content,/Brand, originaler og kilder/);assert.match(content,/theme-specimen/);
 });

@@ -4,11 +4,6 @@
   "name": "Porcelæn",
   "description": "Bløde hjørner, kursiv typografi og satinagtige flader. Fem glasurfarver spænder fra Lavendel og Natglasur til Celadon, Rosenkvarts og Måneblå.",
   "tokens": {
-    "typography.size.captionText": {
-      "$type": "dimension",
-      "$value": "14px",
-      "description": "Normal billedtekst med et underordnet typografisk niveau."
-    },
     "color.background.canvas": {
       "$type": "color",
       "$value": "{palette.neutral.50}",
@@ -104,31 +99,6 @@
       "$value": "Platypi, Georgia, serif",
       "description": "Temaets lokalt medfølgende display- og overskriftsskrift."
     },
-    "typography.size.body": {
-      "$type": "dimension",
-      "$value": "1rem",
-      "description": "Normal læsetekst."
-    },
-    "typography.size.heading": {
-      "$type": "dimension",
-      "$value": "2rem",
-      "description": "Primær overskrift i designeksemplerne."
-    },
-    "typography.size.label": {
-      "$type": "dimension",
-      "$value": "0.875rem",
-      "description": "Labels og betjeningskontroller."
-    },
-    "typography.size.small": {
-      "$type": "dimension",
-      "$value": "0.8125rem",
-      "description": "Hjælpetekst og kompakte badges."
-    },
-    "typography.size.title": {
-      "$type": "dimension",
-      "$value": "1.125rem",
-      "description": "Titler i kort og dialoger."
-    },
     "typography.weight.body": {
       "$type": "fontWeight",
       "$value": 400,
@@ -143,66 +113,6 @@
       "$type": "fontWeight",
       "$value": 600,
       "description": "Labels og handlingsknappers tekstvægt."
-    },
-    "typography.lineHeight.body": {
-      "$type": "number",
-      "$value": 1.6,
-      "description": "Linjehøjde uden enhed for brødtekst."
-    },
-    "typography.lineHeight.heading": {
-      "$type": "number",
-      "$value": 1.15,
-      "description": "Linjehøjde uden enhed for overskrifter."
-    },
-    "typography.lineHeight.control": {
-      "$type": "number",
-      "$value": 1.35,
-      "description": "Linjehøjde uden enhed for knapper og badges."
-    },
-    "space.scale.1": {
-      "$type": "dimension",
-      "$value": "0.25rem",
-      "description": "Små indvendige mellemrum."
-    },
-    "space.scale.2": {
-      "$type": "dimension",
-      "$value": "0.5rem",
-      "description": "Tæt afstand mellem beslægtede elementer."
-    },
-    "space.scale.3": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Kompakt indvendig afstand."
-    },
-    "space.scale.4": {
-      "$type": "dimension",
-      "$value": "1rem",
-      "description": "Standardafstand og vandret kontrolpadding."
-    },
-    "space.scale.6": {
-      "$type": "dimension",
-      "$value": "1.5rem",
-      "description": "Indvendig afstand i større overflader."
-    },
-    "space.scale.8": {
-      "$type": "dimension",
-      "$value": "2rem",
-      "description": "Afstand mellem visuelle grupper."
-    },
-    "size.control.height": {
-      "$type": "dimension",
-      "$value": "2.75rem",
-      "description": "Minimumshøjde for knapper, input og select."
-    },
-    "size.checkbox": {
-      "$type": "dimension",
-      "$value": "1.125rem",
-      "description": "Checkboxens visuelle størrelse."
-    },
-    "size.dialog.maxWidth": {
-      "$type": "dimension",
-      "$value": "36rem",
-      "description": "Dialogfladens maksimale bredde."
     },
     "border.width.default": {
       "$type": "dimension",
@@ -304,26 +214,6 @@
       "$value": "{palette.neutral.0}",
       "description": "Semantisk farverolle: color.caption.labelText."
     },
-    "typography.size.control": {
-      "$type": "dimension",
-      "$value": "{typography.size.label}",
-      "description": "Temaets fælles visuelle værdi for typography.size.control."
-    },
-    "typography.size.panel": {
-      "$type": "dimension",
-      "$value": "{typography.size.title}",
-      "description": "Temaets fælles visuelle værdi for typography.size.panel."
-    },
-    "typography.size.tiny": {
-      "$type": "dimension",
-      "$value": "{typography.size.small}",
-      "description": "Temaets fælles visuelle værdi for typography.size.tiny."
-    },
-    "typography.size.shortcut": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Temaets fælles visuelle værdi for typography.size.shortcut."
-    },
     "typography.weight.strong": {
       "$type": "fontWeight",
       "$value": "{typography.weight.label}",
@@ -374,55 +264,10 @@
       "$value": "999px",
       "description": "Temaets fælles visuelle værdi for radius.pill."
     },
-    "size.switch.width": {
-      "$type": "dimension",
-      "$value": "2.75rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.width."
-    },
-    "size.switch.height": {
-      "$type": "dimension",
-      "$value": "1.5rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.height."
-    },
-    "size.switch.thumb": {
-      "$type": "dimension",
-      "$value": "1.125rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.thumb."
-    },
-    "size.switch.inset": {
-      "$type": "dimension",
-      "$value": "0.1875rem",
-      "description": "Temaets fælles visuelle værdi for size.switch.inset."
-    },
     "opacity.shortcut": {
       "$type": "number",
       "$value": 1,
       "description": "Temaets fælles visuelle værdi for opacity.shortcut."
-    },
-    "space.component.padding": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Temaets fælles visuelle værdi for space.component.padding."
-    },
-    "space.component.paddingLarge": {
-      "$type": "dimension",
-      "$value": "1rem",
-      "description": "Temaets fælles visuelle værdi for space.component.paddingLarge."
-    },
-    "space.component.paddingCompact": {
-      "$type": "dimension",
-      "$value": "0.375rem",
-      "description": "Temaets fælles visuelle værdi for space.component.paddingCompact."
-    },
-    "space.component.gap": {
-      "$type": "dimension",
-      "$value": "0.375rem",
-      "description": "Temaets fælles visuelle værdi for space.component.gap."
-    },
-    "space.component.gapLarge": {
-      "$type": "dimension",
-      "$value": "0.75rem",
-      "description": "Temaets fælles visuelle værdi for space.component.gapLarge."
     },
     "color.border.field": {
       "$type": "color",
@@ -458,11 +303,6 @@
       "$type": "color",
       "$value": "{palette.warning.600}",
       "description": "Semantisk farverolle: color.status.warning."
-    },
-    "typography.size.display": {
-      "$type": "dimension",
-      "$value": "3.5rem",
-      "description": "Temaets fælles visuelle værdi for typography.size.display."
     },
     "shadow.floating": {
       "$type": "shadow",
@@ -932,6 +772,10 @@
     {
       "date": "2026-11-06",
       "note": "Dedikeret illustrationsregister med kuraterede billedfarver og materialer i alle temaets farvevariationer. Lysrum er valgt som grafisk udgangspunkt; alle fire billedfamilier kan fortsat vælges. Illustrationsforløb bruger en særskilt varighed på 3200 ms."
+    },
+    {
+      "date": "2026-11-09",
+      "note": "Samlet temakuratering: tydelig hensigt, navngivne farver, fælles størrelser og afstande samt en anbefalet, frit valgbar illustrationsstil."
     }
   ],
   "appearance": {
@@ -1052,6 +896,32 @@
           "Brug ikke dekorativ bevægelse automatisk eller på løbende læseindhold.",
           "Brug ikke teksturer bag felttekst eller som erstatning for tydelige grænser."
         ]
+      },
+      {
+        "id": "shared-measures",
+        "title": "Fælles målestok",
+        "description": "Skriftstørrelser, linjehøjder, kontrolmål og afstande følger bibliotekets fælles skala. Temaets egen karakter ligger i skriftvalg, vægt, geometri, materialer og bevægelse. Navigation kan være i samme farvefamilie som arbejdsfladen eller bruge en afstemt kontrast.",
+        "tokens": [
+          "typography.size.body",
+          "typography.size.heading",
+          "typography.size.panel",
+          "space.scale.1",
+          "space.scale.2",
+          "space.scale.3",
+          "space.scale.4",
+          "space.scale.6",
+          "space.scale.8",
+          "size.control.height"
+        ],
+        "components": [],
+        "dos": [
+          "Vælg kompakt eller desktop gennem komponentens funktionelle varianter.",
+          "Lad sidemenuens farve understøtte den konkrete skærm."
+        ],
+        "donts": [
+          "Skab ikke tæthed ved at ændre temaets målestok.",
+          "Gør ikke kontrastfarvet sidemenu til et krav."
+        ]
       }
     ],
     "logos": [],
@@ -1159,68 +1029,7 @@
   "defaultMode": "light",
   "modes": {
     "light": {
-      "tokens": {
-        "color.illustration.ground": {
-          "$type": "color",
-          "$value": "#e8e5f2",
-          "description": "Illustrationens eget billedfelt, afstemt uafhængigt af appens arbejdsflade."
-        },
-        "color.illustration.plane": {
-          "$type": "color",
-          "$value": "#f3eef1",
-          "description": "Et selvstændigt materialeplan i illustrationen."
-        },
-        "color.illustration.ink": {
-          "$type": "color",
-          "$value": "#44394e",
-          "description": "Illustrationens bærende kontur, symboler og grafiske tyngde."
-        },
-        "color.illustration.subject": {
-          "$type": "color",
-          "$value": "#9382b2",
-          "description": "Motivets første tyngdepunkt; en billedfarve uden handlings- eller statusbetydning."
-        },
-        "color.illustration.counterpoint": {
-          "$type": "color",
-          "$value": "#bc98b2",
-          "description": "En selvstændig grafisk modstemme med afstemt farvevægt."
-        },
-        "color.illustration.context": {
-          "$type": "color",
-          "$value": "#d6d0e5",
-          "description": "Tilbagetrukne dele og sekundær masse i illustrationen."
-        },
-        "color.illustration.edge": {
-          "$type": "color",
-          "$value": "#8b8395",
-          "description": "Illustrative samlinger, konturer og hjælpelinjer; ikke en interaktiv feltgrænse."
-        },
-        "color.illustration.light": {
-          "$type": "color",
-          "$value": "#fff9ef",
-          "description": "Illustrationens lyskant eller lyskilde, afstemt til billedmaterialet."
-        },
-        "color.illustration.depth": {
-          "$type": "color",
-          "$value": "#bab5c4",
-          "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
-        },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 1.6,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
-        },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.16,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
-        },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
-        }
-      },
+      "tokens": {},
       "name": "Lavendel",
       "colorScheme": "light"
     },
@@ -1565,21 +1374,6 @@
           "$type": "color",
           "$value": "#12101b",
           "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
-        },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 1.6,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
-        },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.18,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
-        },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
         }
       },
       "name": "Natglasur",
@@ -1733,21 +1527,6 @@
           "$type": "color",
           "$value": "#b1c0b8",
           "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
-        },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 1.6,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
-        },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.16,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
-        },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
         }
       }
     },
@@ -1899,21 +1678,6 @@
           "$type": "color",
           "$value": "#c5b3b4",
           "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
-        },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 1.6,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
-        },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.16,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
-        },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
         }
       }
     },
@@ -2350,23 +2114,11 @@
           "$type": "color",
           "$value": "#0c121d",
           "description": "Illustrative indsnit og afgrænset materialedybde; uafhængig af UI-elevation."
-        },
-        "illustration.material.lineWidth": {
-          "$type": "number",
-          "$value": 1.6,
-          "description": "Positiv stregvægt i illustrationens SVG-enheder."
-        },
-        "illustration.material.depthOpacity": {
-          "$type": "number",
-          "$value": 0.17,
-          "description": "Dybdefarvens styrke i illustrationen, fra 0 til 1."
-        },
-        "duration.illustration": {
-          "$type": "duration",
-          "$value": "3200ms",
-          "description": "Positiv varighed for illustrationens afgrænsede forløb; ændrer ikke UI-kontrollernes timing."
         }
       }
     }
+  },
+  "graphics": {
+    "family": "lightroom"
   }
 }

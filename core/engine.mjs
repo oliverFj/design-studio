@@ -7,6 +7,7 @@ import { generateLayoutCSS, generateScrollbarCSS } from './layout.mjs';
 import { BUTTON_COMPATIBILITY_VARIANTS, BUTTON_SIZES, BUTTON_DANGER_VARIANTS } from './library.mjs';
 import { generateIconCSS, ICON_NAMES } from './icons.mjs';
 import { generatePreferenceCSS } from './preferences.mjs';
+import { generateMaterialCSS } from './materials.mjs';
 import {SIGNATURE_FONT_CSS} from './signature-assets.mjs';
 import {GRAPHIC_FAMILY_IDS,DEFAULT_GRAPHIC_FAMILY} from './graphic-tokens.mjs';
 
@@ -710,7 +711,7 @@ export function generateCSS(pack, {scope = '.ds-scope'} = {}) {
   if(sourceVersion===2){
     const selectors=interactiveSelectors(pack.components).flatMap(expandLegacySelectors).map(selector=>`${scope} ${selector}:focus-visible`);
     if(selectors.length)rules.push('',selectors.join(', ')+' {','  outline: max(3px, var(--ds-border-width-focus)) solid var(--ds-color-focus) !important;','  outline-offset: max(2px, var(--ds-border-offset-focus)) !important;','  opacity: 1 !important;','}');
-    rules.push(generatePreferenceCSS(scope));
+    rules.push(generateMaterialCSS(scope),generatePreferenceCSS(scope));
   }
   return `${rules.join('\n')}\n`;
 }

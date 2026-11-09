@@ -1,7 +1,8 @@
 /** Project-agnostic component anatomy and semantic defaults. Visual themes own appearance. */
 import {DEFAULT_SCALE_TOKENS,TOKEN_NAME_ALIASES} from './scales.mjs';
 import {GRAPHIC_TOKEN_DEFAULTS} from './graphic-tokens.mjs';
-export const LIBRARY_VERSION='3.9.1';
+import {MATERIAL_TOKEN_DEFAULTS} from './materials.mjs';
+export const LIBRARY_VERSION='3.11.0';
 export { LAYOUT_PROFILES } from './layout.mjs';
 function freeze(value){if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;}
 // Keep one-line desktop controls at 32px without clipping larger type or wrapped labels.
@@ -190,6 +191,7 @@ const SCALE_ALIASES={'shadow.selected':'elevation.level1','shadow.card':'elevati
 function scaleDefaults(tokens){for(const [id,target]of Object.entries(SCALE_ALIASES))tokens[id].$value='{'+target+'}';for(const [oldId,id]of Object.entries(TOKEN_NAME_ALIASES))tokens[oldId]={$type:tokens[id].$type,$value:'{'+id+'}',description:'Compatibility alias for '+id+'. Use the canonical token in new integrations.'};return tokens;}
 export const DEFAULT_TOKENS=freeze(scaleDefaults({
   ...GRAPHIC_TOKEN_DEFAULTS,
+  ...MATERIAL_TOKEN_DEFAULTS,
   'gradient.material': {$type:'gradient',$value:'linear-gradient(135deg, {color.background.surface} 0%, {color.background.surface} 100%)',description:'Opak materialeflade på kortets material-variant. Tekstkontrast måles over hele gradienten.'},
   'radius.feature': {$type:'dimension',$value:'2rem',description:'Det fremhævede hjørne på asymmetriske kort; øvrige hjørner følger radius.card.'},
   'shadow.embossed': {$type:'shadow',$value:'inset 0 2px 0 #00000018, inset 0 -2px 0 #ffffff44',description:'Indvendigt relief uden ændret geometri, tekstgennemsigtighed eller fokus.'},
@@ -2417,6 +2419,19 @@ export const COMPONENT_LIBRARY=freeze({
         "description": "Opak, kontrastmålt materialeflade. Temaets gradient giver eksempelvis papir eller satin; ingen billeder, gennemsigtighed eller ændret layout.",
         "styles": {"background":"{gradient.material}"}
       },
+      "rimmed": {
+        "description": "Dekorativ gradientkant omkring et opakt, læsbart indre. Farven følger temaets kantmateriale; fokus og klikflader ændres ikke.",
+        "styles": {"backgroundColor":"{color.background.surface}","color":"{color.text.primary}"}
+      },
+      "frosted": {
+        "description": "Frostet, transparent ramme med opake læseøer til overskrift, indhold og handlinger. Brug over et dekorativt motiv; en solid fallback bevarer kortet uden sløring.",
+        "styles": {"backgroundColor":"{color.background.surface}","color":"{color.text.primary}","boxShadow":"{shadow.floating}"},
+        "parts": {
+          "header": {"styles":{"backgroundColor":"{color.background.surface}","color":"{color.text.primary}","padding":"{space.component.padding}","borderRadius":"{radius.control}"}},
+          "body": {"styles":{"backgroundColor":"{color.background.surface}","color":"{color.text.secondary}","padding":"{space.component.padding}","borderRadius":"{radius.control}"}},
+          "footer": {"styles":{"backgroundColor":"{color.background.surface}","color":"{color.text.primary}","padding":"{space.component.padding}","borderRadius":"{radius.control}"}}
+        }
+      },
       "embossed": {
         "description": "Indvendigt relief til en taktil indholdsflade. Bevarer læsbar grundfarve, native indhold og synligt fokus.",
         "styles": {"boxShadow":"{shadow.embossed}"}
@@ -2869,6 +2884,15 @@ export const COMPONENT_LIBRARY=freeze({
           "fontStyle": "normal",
           "fontWeight": "{typography.weight.expressive}",
           "lineHeight": 1.15
+        }
+      },
+      "gradient": {
+        "description": "Stor overskrift med kontrastmålt gradientpigment og solid tekstfarve som fallback. Brug på canvas eller en almindelig eller afdæmpet flade.",
+        "styles": {
+          "fontSize":"clamp(2rem, 5vw, {typography.size.display})",
+          "fontWeight":"{typography.weight.display}",
+          "lineHeight":"{typography.lineHeight.display}",
+          "color":"{color.text.primary}"
         }
       },
       "panel": {

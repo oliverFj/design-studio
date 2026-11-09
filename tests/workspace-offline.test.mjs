@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {themeModeOptions} from '../core/theme-modes.mjs';
 import { Script, createContext } from 'node:vm';
 import { buildWorkspaceHTML } from '../tools/build-workspace.mjs';
 import { offlineIssues } from '../tools/offline-checks.mjs';
@@ -48,26 +50,29 @@ test('the realistic workspace is one executable offline HTML file with all publi
   const themePicker=document.querySelector('#example-theme-control');themePicker.value='bauhaus';fire(themePicker,'change');
   const namedTitle=app.querySelector('#workspace-title-control'),namedPicker=document.querySelector('#example-color-mode-control');
   let namedCSS=document.querySelector('#theme-styles').textContent;
-  assert.deepEqual(Array.from(namedPicker.children,option=>option.textContent),['Solgul','Kalk','Signalrød']);
-  for(const mode of ['kalk','signalroed','solgul']){
+  const bauhaus=JSON.parse(readFileSync(new URL('../packages/bauhaus.json',import.meta.url),'utf8'));
+  assert.deepEqual(Array.from(namedPicker.children,option=>option.textContent),themeModeOptions(bauhaus).map(option=>option.label));
+  for(const mode of [...Object.keys(bauhaus.modes).filter(id=>id!==bauhaus.defaultMode),bauhaus.defaultMode]){
     namedPicker.focus();namedPicker.value=mode;fire(namedPicker,'change');
     assert.equal(app.querySelector('#workspace-title-control'),namedTitle);
     assert.equal(namedTitle.value,'Bevar min kladde');assert.equal(document.activeElement,namedPicker);
     const nextCSS=document.querySelector('#theme-styles').textContent;assert.notEqual(nextCSS,namedCSS);namedCSS=nextCSS;
-    assert.equal(document.documentElement.style.colorScheme,'light');
+    assert.equal(document.documentElement.style.colorScheme,bauhaus.modes[mode].colorScheme);
   }
   themePicker.value=PUBLIC_THEME_IDS.at(-1);fire(themePicker,'change');title=app.querySelector('#workspace-title-control');
   const originalTitle = title, modePicker = document.querySelector('#example-color-mode-control');
   const themeCSS = document.querySelector('#theme-styles');
-  for (const mode of ['light', 'dark', 'system']) {
-    const previousCSS = themeCSS.textContent;
+  const lastTheme=JSON.parse(readFileSync(new URL('../packages/'+PUBLIC_THEME_IDS.at(-1)+'.json',import.meta.url),'utf8'));
+  assert.deepEqual(Array.from(modePicker.children,option=>option.value),themeModeOptions(lastTheme).map(option=>option.value));
+  for (const mode of Object.keys(lastTheme.modes)) {
+    const previousCSS = themeCSS.textContent,previousMode=modePicker.value;
     modePicker.focus(); modePicker.value = mode; fire(modePicker, 'change');
     assert.equal(app.querySelector('#workspace-title-control'), originalTitle, mode + ': palette changes keep the native controls mounted');
     assert.equal(title.value, 'Bevar min kladde', mode + ': palette changes preserve the unfinished draft');
     assert.equal(document.activeElement, modePicker, mode + ': palette changes keep focus on the picker');
     assert.equal(app.querySelector('.ds-app-content').scrollTop, 180, mode + ': palette changes preserve content scroll');
     assert.equal(app.querySelector('.ds-form-fields').scrollTop, 140, mode + ': palette changes preserve form scroll');
-    if (mode !== 'light') assert.notEqual(themeCSS.textContent, previousCSS, mode + ': palette changes update the generated theme');
+    if (mode !== previousMode) assert.notEqual(themeCSS.textContent, previousCSS, mode + ': palette changes update the generated theme');
   }
   const beforeUnload = fire(window, 'beforeunload');
   assert.equal(beforeUnload.defaultPrevented, true, 'an unfinished project draft protects against accidental closing');
