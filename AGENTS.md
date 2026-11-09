@@ -4,6 +4,7 @@ Læs [README.md](README.md), [docs/AGENT-WORKFLOW.md](docs/AGENT-WORKFLOW.md) og
 
 - **Arbejdsgang:** AGENT-WORKFLOW er den fælles vej fra nyt projekt til færdig skærm, opdatering og kontrol.
 - **API og eksempler:** [docs/INTEGRATION.md](docs/INTEGRATION.md).
+- **Samarbejde og erfaringer:** [docs/COLLABORATION.md](docs/COLLABORATION.md) beskriver MCP-værktøjspakker, projektadgang og nye erfaringer. Søg efter relevante erfaringer før gentagen fejlsøgning; læs kilder, anvendelsesområde og faktisk kontrol, før en løsning genbruges.
 - **Grafik og animation:** [docs/GRAPHICS-AUTHORING.md](docs/GRAPHICS-AUTHORING.md) samler stilguider, begrebsopskrifter og grafikværkstedet. Læs den før nye illustrationer eller animationsplaner; genbrug den fælles afspiller.
 - **Eksisterende produkter:** [docs/PRODUCT-PATTERNS.md](docs/PRODUCT-PATTERNS.md) beskriver udtræk fra FormLab, Tonerum, Hjemmesiden og Watchman samt skånsom indføring af fælles mønstre. Læs de relevante dele før mønsterudtræk eller udskiftning af produktets eksisterende løsninger.
 - **Designprincipper:** [Designgrundloven](docs/DESIGN-PRINCIPLES.md) gælder temaer, komponenter, mønstre og produkter. DESIGN-FOUNDATIONS beskriver den tekniske anvendelse, og [docs/BRANDGUIDE.md](docs/BRANDGUIDE.md) beskriver branddelen.

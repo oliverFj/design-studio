@@ -74,10 +74,22 @@ test('release archives preserve bytes, readable licenses, checksums and determin
 test('source allowlist excludes installed binaries, local configuration, outputs and unrelated files', async t => {
   const { directory, put } = await fixture(t);
   await put('docs/graphics/style-contract.json', '{"contractVersion":1}');
+  await put('collaboration/service.mjs', 'export const service = true;');
+  await put('collaboration/experiences.json', '[]');
+  await put('collaboration/evidence/example.json', '{"verified":true}');
+  await put('skills/stade-collaboration/SKILL.md', 'Shared workflow');
+  await put('collaboration/proposals/local-draft.json', 'Local draft');
+  await put('collaboration/local-settings.json', 'Local settings');
   for (const file of ['node_modules/@esbuild/win32-x64/esbuild.exe', 'tools/node_modules/example/index.mjs', '.git/config', '.env', '.env.local', 'artifacts/private.json', 'docs/.env.md', 'studio/local.log', 'examples/workspace/index.html', 'private.json']) await put(file, 'Must not ship');
   const names = (await sourceEntries(directory)).map(entry => entry.name);
   assert.ok(names.includes('package-lock.json'));
   assert.ok(names.includes('docs/graphics/style-contract.json'), 'the machine-readable authoring contract travels with its guides');
+  assert.ok(names.includes('collaboration/service.mjs'));
+  assert.ok(names.includes('collaboration/experiences.json'));
+  assert.ok(names.includes('collaboration/evidence/example.json'));
+  assert.ok(names.includes('skills/stade-collaboration/SKILL.md'));
+  assert.equal(names.includes('collaboration/proposals/local-draft.json'), false);
+  assert.equal(names.includes('collaboration/local-settings.json'), false);
   assert.equal(names.some(name => /(?:node_modules|esbuild\.exe|\.env|artifacts|private\.json|\.git\/|local\.log|workspace\/index\.html)/.test(name)), false);
 });
 

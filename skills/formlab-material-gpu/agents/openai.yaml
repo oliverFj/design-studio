@@ -1,0 +1,10 @@
+interface:
+  display_name: "FormLab: materialer og GPU"
+  short_description: "Undersøg materialeflimmer med kontrollerede kilder"
+  default_prompt: "Brug $formlab-material-gpu til at undersøge materialeflimmer i tilmurede blændingsfelter og munkestenskantsten."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "stade"
+      description: "Stades lokale MCP-server med projektgrundlag, erfaringer og kildekontrol."

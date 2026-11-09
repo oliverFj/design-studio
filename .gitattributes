@@ -1,3 +1,6 @@
 # Keep reviewed font licenses byte-identical on every checkout.
 /assets/fonts/*-OFL.txt text eol=lf
 /assets/fjordside/fonts/OFL.txt text eol=lf
+
+# Evidence hashes refer to exact bytes, including original line endings.
+/collaboration/evidence/** -text whitespace=cr-at-eol

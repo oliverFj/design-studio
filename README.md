@@ -1,6 +1,6 @@
-# Design Studio
+# Stade · Design Studio
 
-Et fælles, framework-uafhængigt komponentbibliotek med udskiftelige temaer, agentprocedure, offline-editor i browseren og interaktiv web-showcase.
+Et fælles, framework-uafhængigt komponentbibliotek med udskiftelige temaer, offline-editor og web-showcase samt MCP-værktøjer, skills og kildeunderstøttede erfaringer til samarbejde med agenter.
 
 Kildekode: [oliverFj/design-studio på GitHub](https://github.com/oliverFj/design-studio).
 
@@ -32,6 +32,23 @@ npm run build
 Efter kode-, design- eller temaændringer køres `npm run build` igen. Brugeren skal derefter blot genindlæse browseren. Håndredigér ikke `index.html`. Rene dokumentationsændringer kræver ikke et nyt build. CLI-værktøjerne til produktintegration kræver Node.js 20 eller nyere.
 
 `npm run release` pakker det aktuelle build som en offline-ZIP med licenser og en separat kilde-ZIP med låsefil. Kildepakken indeholder ingen installerede afhængigheder; brug `npm ci` på den aktuelle platform. Se [produktion og levering](docs/PRODUCTION.md) for pakker, kontrol, opdatering og web-showcase.
+
+## Samarbejde med agenter
+
+Siden **Samarbejde og koordination** forklarer API, CLI og MCP og viser værktøjspakker og erfaringer. Den lokale MCP leverer otte værktøjer til bibliotek, projektgrundlag og erfaringsopslag. Erfaringernes kildefiler kontrolleres automatisk ved opslag; nye forslag gemmes som kladder, mens gennemgang, rettelser og udfasning har en særskilt kurateringsvej.
+
+Efter `npm ci` installeres forbindelsen og den fælles skill i Codex med:
+
+~~~sh
+npm run agents -- install
+npm run agents -- status --probe
+~~~
+
+Projekter tilknyttes udtrykkeligt med `--project ID=ABSOLUTE_PATH`, og produktspecifikke skills vælges med `--skill NAVN`, eksempelvis `formlab-material-gpu`. Gentagen installation opdaterer uændrede, administrerede filer; lokale ændringer og øvrige Codex-indstillinger bevares. Én central Stade-mappe beholder bibliotek og erfaringer på tværs af produkterne.
+
+[Samarbejdsguiden](docs/COLLABORATION.md) samler installation, statustjek, adgangsgrænser, kildekontrol, kuratering og udvidelse med nye værktøjer og skills. Serverprøven kontrollerer forbindelsen i en separat klient; den færdige offlineoversigt måler ikke den aktuelle chats indlæste værktøjer. MCP og skills kræver udviklingsopsætningen, mens den færdige `index.html` fortsat kan bruges selvstændigt.
+
+En mulig fælles materialemotor er beskrevet i [udviklingsforslaget](docs/MATERIAL-ENGINE.md). Der er endnu ikke udtrukket en motor eller integreret den i andre produkter.
 
 ## Ét bibliotek, flere temaer
 

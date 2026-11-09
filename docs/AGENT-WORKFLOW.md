@@ -8,6 +8,10 @@ Bibliotek 3.9.1 leverer de 62 roller i det aftalte katalog på tværs af de medf
 
 Læs systemets [README](../README.md), [AGENTS.md](../AGENTS.md) og [designgrundlag](DESIGN-FOUNDATIONS.md) samt produktets egne anvisninger før UI-arbejde.
 
+Ved gentagen fejlsøgning eller overdraget arbejde: søg i de [fælles erfaringer](COLLABORATION.md#agentens-arbejdsgang), og læs relevante poster med kilder og begrænsninger. Brug Stade-MCP, når forbindelsen er tilgængelig; ellers læses `collaboration/experiences.json` direkte. Efterprøv løsningen i den aktuelle produktversion, og foreslå kun nye erfaringer ved konkret genbrugelig viden.
+
+Ved bestilt projekttilknytning bruges den [fælles installation](COLLABORATION.md#samlet-installation-i-codex) af MCP og skills. Tilføj kun de navngivne projekter; bevar øvrige indstillinger og lokale skillrettelser. Brug `stade-collaboration` som fælles arbejdsvejledning og vælg produktspecifikke skills efter opgaven. En installeret skill eller bestået serverprøve er ikke i sig selv bevis for, at den aktuelle chat har indlæst forbindelsen.
+
 Ved tema- og designarbejde bruges [designgrundloven](DESIGN-PRINCIPLES.md) som fælles beslutningsgrundlag fra tokens til produkter. Genbrug allerede læste principper; gennemgå især de berørte afsnit ved ændringer.
 
 Find `design-studio.project.json`. Brug dens faktiske filstier, scope, tema og registrerede adaptere; standardstierne er `design/design.json`, `design/design.css` og `design/runtime/components.mjs`. Bevar produktets brand. Læs relevante brandprincipper, sektionsregler og logobrug; genbrug godkendte originaler og licenser.

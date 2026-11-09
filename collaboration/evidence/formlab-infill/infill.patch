@@ -1,0 +1,100 @@
+--- a/masonry-study-shader.js
++++ b/masonry-study-shader.js
+@@ -49,7 +49,8 @@
+   return physical;
+ }
+ vec2 masonryStudyPhysicalCoordinates(){
+-  if(masonryStudyDomain()>=4.0){vec2 cell,local,size;masonryFieldCell(vMasonryStudyUv.xy,cell,local,size);return local;}
++  // Field cells wrap at every brick; only the retained metre chart is continuous.
++  if(masonryStudyDomain()>=4.0)return vMasonryStudyUv.xy;
+   vec3 correction=masonryStudySweepCorrection();
+   return vMasonryStudyMetric.x>=0.0?vec2(vMasonryStudyUv.x+correction.x,vMasonryStudyMetric.y+correction.z):masonryStudyCoordinates();
+ }
+--- a/masonry-field.js
++++ b/masonry-field.js
+@@ -70,6 +70,25 @@
+     cell=vec2(column,row);local=vec2(point.x+shift-column*l,point.y-row*h);size=vec2(l,h);
+   }
+ }
++// Differentiate the selected cell analytically. Cell IDs and wrapped local
++// positions must never enter a screen derivative at a joint.
++mat2 masonryFieldBasis(vec2 physical){
++  float domain=masonryStudyDomain(),h=masonrySize.z,l=masonrySize.x;
++  if(domain==4.0){
++    float angle=vMasonryStudyLayout.x,c=cos(angle),s=sin(angle);
++    mat2 rotation=mat2(c,-s,s,c);vec2 point=rotation*physical;
++    float n=max(1.0,floor(l/h+.5)),at=mod(floor(point.x/h)+floor(point.y/h),2.0*n);
++    return at<n?rotation:mat2(0.0,-1.0,1.0,0.0)*rotation;
++  }
++  if(domain==5.0){
++    float radius=max(length(physical),.0001),middle=(floor(radius/l)+.5)*l;
++    vec2 radial=physical/radius,tangent=vec2(-radial.y,radial.x)*middle/radius;
++    return mat2(radial.x,tangent.x,radial.y,tangent.y);
++  }
++  return mat2(1.0);
++}
++vec2 masonryFieldFromPhysical(vec2 physical,vec2 delta){return masonryFieldBasis(physical)*delta;}
++vec2 masonryFieldToPhysical(vec2 physical,vec2 gradient){mat2 basis=masonryFieldBasis(physical);return vec2(dot(basis[0],gradient),dot(basis[1],gradient));}
+ vec4 masonryFieldChart(vec2 physical,out vec2 id,out float edge,out float gap){
+   vec2 cell,local,size;masonryFieldCell(physical,cell,local,size);
+   id=cell+floor(vMasonryStudyId+.5)+masonryStudyDomain()*vec2(197.0,389.0);
+--- a/baked-material.js
++++ b/baked-material.js
+@@ -67,6 +67,12 @@
+ uniform float sourceUnitEdgeDamage;
+ vec2 sourceBrickEdgeGradient(vec2 physical);
+ #endif
++#if BAKED_BRICK == 1
++bool masonryStudyEnabled();
++float masonryStudyDomain();
++vec2 masonryFieldFromPhysical(vec2 physical,vec2 delta);
++vec2 masonryFieldToPhysical(vec2 physical,vec2 gradient);
++#endif
+ uniform vec2 bakedRoofLaying;
+ uniform float bakedRoofPitch;
+ uniform float bakedRoofLength;
+@@ -273,8 +279,15 @@
+   if(bakedEdgeWear<=0.0)return bakedRawUnitNormal(sampled,edgeGradient,edge,bevel,height,face,edgeDetail);
+   vec2 phase=vec2(bakedHash(id+vec2(67,131)),bakedHash(id+vec2(211,43)))*7.0;
+   vec2 pixel=max(abs(dFdx(physical)),abs(dFdy(physical)));
++#if BAKED_BRICK == 1
++  bool fieldChart=masonryStudyEnabled()&&masonryStudyDomain()>=4.0;
++  if(fieldChart)pixel=max(abs(masonryFieldFromPhysical(physical,dFdx(physical))),abs(masonryFieldFromPhysical(physical,dFdy(physical))));
++#endif
+   vec3 broad=bakedWearNoise((local+phase)*vec2(11,15),pixel*15.0),broken=bakedWearNoise((local+phase)*vec2(43,47),pixel*47.0);
+   vec2 db=bakedLocalGradient(physical,local,broad.yz*vec2(11,15)),dc=bakedLocalGradient(physical,local,broken.yz*vec2(43,47));
++#if BAKED_BRICK == 1
++  if(fieldChart){db=masonryFieldToPhysical(physical,broad.yz*vec2(11,15));dc=masonryFieldToPhysical(physical,broken.yz*vec2(43,47));}
++#endif
+   float width=bevel*mix(1.0,mix(.45,2.1,broad.x),bakedEdgeWear);
+   vec2 dw=bevel*1.65*bakedEdgeWear*db;
+   float q=edge/max(width,.0001),t=clamp(q,0.0,1.0);
+@@ -414,6 +427,8 @@
+ const NO_MASONRY_STUDY=/* glsl */`
+ bool masonryStudyEnabled(){return false;}
+ float masonryStudyDomain(){return 0.0;}
++vec2 masonryFieldFromPhysical(vec2 physical,vec2 delta){return delta;}
++vec2 masonryFieldToPhysical(vec2 physical,vec2 gradient){return gradient;}
+ vec2 masonryStudyCoordinates(){return vBakedMasonryUv.xy;}
+ vec2 masonryStudyPhysicalCoordinates(){return vBakedMasonryUv.xy;}
+ float masonryStudyCoverage(){return 1.0;}
+@@ -450,6 +465,10 @@
+ brickAngle=(bakedHash(layoutId+vec2(307,991))*2.0-1.0)*radians(bakedShape.z)*(1.0-profile)*(1.0-study);
+ #endif
+ vec2 uvPerMetre=flip/faceSize/bakedUnits.xy,uvDx=bakedRotate(dFdx(physical),-brickAngle)*uvPerMetre,uvDy=bakedRotate(dFdy(physical),-brickAngle)*uvPerMetre;
++if(study>.5&&masonryStudyDomain()>=4.0){
++  uvDx=masonryFieldFromPhysical(physical,dFdx(physical))*uvPerMetre;
++  uvDy=masonryFieldFromPhysical(physical,dFdy(physical))*uvPerMetre;
++}
+ vec2 bakedUv=bakedAtlas((chart.xy-.5)*flip+.5,id,bakedUnits);
+ #if BAKED_SOURCE_UNITS == 1 && BAKED_V2 == 1
+ // The bevel and mortar profile share the same physical construction edge.
+@@ -474,6 +493,8 @@
+ mapNormal.xy=bakedRotate(mapNormal.xy,brickAngle)*bakedShape.y;
+ mapNormal=bakedPieceNormal(mapNormal,id,faceSize,normalDetail*(1.0-profile));
+ #endif
++// Atlas normals follow the cell axes; physical edge/mortar slopes do not.
++if(study>.5&&masonryStudyDomain()>=4.0)mapNormal.xy=masonryFieldToPhysical(physical,mapNormal.xy);
+ float jointDepth=1.0;
+ #if BAKED_V2 == 1
+ float jointField=characterNoise(physical*vec2(3.7,4.3));

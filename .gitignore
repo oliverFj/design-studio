@@ -9,6 +9,7 @@ desktop.ini
 /index.html
 /examples/workspace/index.html
 *.log
+!collaboration/evidence/**/*.log
 .env
 .env.*
 !.env.example

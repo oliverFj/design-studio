@@ -15,6 +15,8 @@ const sourceTypes = new Map([
   ['assets', ['.css', '.ttf', '.woff', '.woff2', '.svg', '.txt', '.json']],
   ['.github', ['.yml', '.yaml']], ['examples', ['.mjs', '.css', '.html']],
   ['templates', ['.mjs', '.css', '.html', '.json']],
+  ['skills', ['.md', '.mjs', '.yaml', '.json']],
+  ['collaboration/evidence', ['.json', '.patch', '.log']],
 ]);
 const excludedDirectory = name => name === 'node_modules' || name.startsWith('.') && name !== '.github';
 const sha256 = data => createHash('sha256').update(data).digest('hex');
@@ -72,6 +74,11 @@ export async function sourceEntries(directory = root) {
   for (const filename of rootFiles) await add(filename);
   for (const [relative, extensions] of sourceTypes) {
     try { await walk(relative, extensions); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+  }
+  // Ship the collaboration runtime and reviewed data, with a fixed boundary
+  // around the distributable files rather than all local collaboration data.
+  for (const file of ['catalog.mjs', 'schema.mjs', 'service.mjs', 'experiences.json']) {
+    try { await add('collaboration/' + file); } catch (error) { if (error.code !== 'ENOENT') throw error; }
   }
   // The hidden starter ignore-file is intentional source, not local settings.
   try { await add('templates/offline/.gitignore'); } catch (error) { if (error.code !== 'ENOENT') throw error; }

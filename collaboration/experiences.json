@@ -1,0 +1,429 @@
+[
+  {
+    "schemaVersion": 1,
+    "id": "formlab-texture-resize-ownership",
+    "title": "Skift teksturstørrelse uden at miste ejerskabet",
+    "summary": "FormLab har en fælles vej til at udskifte teksturbilleder og frigive den tidligere GPU-allokering, mens delte ejere bevares.",
+    "status": "reviewed",
+    "scope": "project",
+    "project": "formlab",
+    "tags": [
+      "gpu",
+      "webgl",
+      "threejs",
+      "texture",
+      "memory",
+      "ownership"
+    ],
+    "problem": "Et billede kan indlæses asynkront og erstatte en lille placeholder med et større kort. En lokal ny implementering kan overse den tidligere GPU-allokering, ændre et delt Texture-objekts identitet eller genaktivere en endeligt frigivet tekstur.",
+    "approach": "Brug FormLabs updateMaterialTexture og disposeMaterialTextures. Ved ændrede dimensioner frigiver updateMaterialTexture GPU-lageret før ny upload, men bevarer selve Texture-objektet. Cache og referenceoptælling tilhører fortsat de konkrete ejere. Endeligt frigivne teksturer afviser senere opdateringer.",
+    "verification": {
+      "kind": "source-inspection",
+      "summary": "Aktuel kode og den eksisterende regressionstest er gennemlæst. Testen beskriver ændrede dimensioner, bevaret objektidentitet, gentagen frigivelse og sent billedsvar. Ingen test er kørt i denne gennemgang; faktisk GPU-allokering og forbrug er ikke målt. Gennemlæst arbejdskopi den 2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263. Arbejdskopien kan indeholde lokale ændringer; kildehashene identificerer de gennemlæste filbytes."
+    },
+    "limits": [
+      "Dette er FormLabs konkrete Three.js-livscyklus, ikke en universel opskrift for alle grafikmotorer.",
+      "GPU-lagerets midlertidige frigivelse ved resize og sidste ejers endelige frigivelse er forskellige handlinger.",
+      "Ved overførsel til et andet produkt skal dets motorversion, uploadvej og ejerskabsregler verificeres først."
+    ],
+    "sources": [
+      {
+        "project": "formlab",
+        "file": "material-texture.js",
+        "line": 26,
+        "note": "Opdatering afviser endeligt frigivne teksturer og håndterer dimensionsskift uden nyt Texture-objekt.",
+        "sha256": "01f07f7897dc394de01ad6e6e1c11423a7528837a6256cc9239ccba055b46c23",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      },
+      {
+        "project": "formlab",
+        "file": "material-texture.test.mjs",
+        "line": 19,
+        "note": "Eksisterende regressionstest for resize, identitet og sent svar; gennemlæst, ikke kørt.",
+        "sha256": "3de8ad1df59f10805a30e830fb8f9cb2cb9c8ae941d2908fe265ad31d3fe3167",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      },
+      {
+        "project": "formlab",
+        "file": "docs/MATERIALEGENERATOR_V2.md",
+        "line": 87,
+        "note": "Produktets aktuelle kontrakt for teksturopsætning, ejerskab og frigivelse.",
+        "sha256": "8a11ea52fba7d1ffe910440de7caeb444ab132f99f3ee8f08ed87b157653850e",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      }
+    ],
+    "updatedAt": "2026-11-07"
+  },
+  {
+    "schemaVersion": 1,
+    "id": "formlab-preview-resource-cleanup",
+    "title": "Frigiv alle previewets GPU-ressourcer",
+    "summary": "Et lukket preview skal også frigive skyggekort, miljøkort og øvrige egne renderressourcer. Den gamle mangel i detaljeprøven er allerede håndteret i den nuværende kode.",
+    "status": "reviewed",
+    "scope": "project",
+    "project": "formlab",
+    "tags": [
+      "gpu",
+      "webgl",
+      "threejs",
+      "preview",
+      "memory",
+      "dispose",
+      "stale-findings"
+    ],
+    "problem": "Gentagen åbning og lukning af previews kan efterlade GPU-ressourcer, hvis oprydningen kun frigiver materialer eller renderer. Historiske fejlbeskrivelser kan samtidig få en ny agent til at gentage en rettelse, som allerede findes.",
+    "approach": "Læs den aktuelle dispose-vej før en historisk fejl genåbnes. detail-preview.js frigiver nu sun.shadow, environmentMap, antialiasing og renderer. Materialegeneratorens preview frigiver tilsvarende alle lysenes skyggekort og annullerer planlagt rendering. Bevar den eksplicitte ressourceoprydning og verificér gentagne åbne/lukke-forløb ved ændringer.",
+    "verification": {
+      "kind": "source-inspection",
+      "summary": "Begge aktuelle dispose-implementeringer er gennemlæst og sammenholdt med det historiske arkitekturfund. Ingen browser- eller GPU-test er kørt, og hukommelsesforbrug over gentagne åbninger er ikke målt. Gennemlæst arbejdskopi den 2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263. Arbejdskopien kan indeholde lokale ændringer; kildehashene identificerer de gennemlæste filbytes."
+    },
+    "limits": [
+      "At dispose-kaldet findes, beviser ikke alene at hele previewets ressourceforbrug er stabilt.",
+      "Arkitekturens afsnit med kodegennemgang fra 28. oktober er historik; den aktuelle detail-preview.js har allerede sun.shadow.dispose().",
+      "Et andet produkts ejede og delte ressourcer skal kortlægges særskilt, før princippet overføres."
+    ],
+    "sources": [
+      {
+        "project": "formlab",
+        "file": "detail-preview.js",
+        "line": 114,
+        "note": "Den aktuelle oprydning inkluderer sun.shadow.dispose(), miljø, antialiasing og renderer.",
+        "sha256": "b79b2e3d3d74f1ebd2270674556ba998fd5152e817d25934874bfa429d27bf93",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      },
+      {
+        "project": "formlab",
+        "file": "material-generator-studio.js",
+        "line": 374,
+        "note": "Previewets aktuelle oprydning annullerer renderFrame og frigiver alle lysenes skyggeressourcer.",
+        "sha256": "c9e73fe8b3a6aa95b6e784547cd91c1a6d23f44cc58eadae83c75165385c7340",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      },
+      {
+        "project": "formlab",
+        "file": "docs/ARKITEKTUR.md",
+        "line": 103,
+        "note": "Historisk fund om detaljeprøvens manglende skyggefrigivelse; må ikke læses som aktuel kodeadfærd.",
+        "sha256": "9b6d46ed9284f75284a6db6b95b3704013e5bc8d569dfe34038133ec55cfb7ca",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      }
+    ],
+    "updatedAt": "2026-11-07"
+  },
+  {
+    "schemaVersion": 1,
+    "id": "formlab-async-preview-revisions",
+    "title": "Lad kun det aktuelle beregningssvar overtage previewet",
+    "summary": "FormLab kontrollerer åbent værksted, jobstatus og revision før et asynkront resultat bliver til synlig geometri eller materiale.",
+    "status": "reviewed",
+    "scope": "project",
+    "project": "formlab",
+    "tags": [
+      "gpu",
+      "async",
+      "worker",
+      "preview",
+      "revision",
+      "cancellation",
+      "ownership"
+    ],
+    "problem": "En bruger kan ændre parametre, skifte familie eller lukke værkstedet, mens en beregning eller billedindlæsning stadig kører. Et sent svar kan ellers overskrive nyere arbejde eller oprette ressourcer til et lukket preview.",
+    "approach": "Bevar material-source-studios revisions- og livscykluskontrol: onResult afviser lukket dialog, disposed værksted, ikke-aktuelt job og forkert revision, før der oprettes ny BufferGeometry. Asynkron genindlæsning af gemte kort accepteres kun ved uændret revision. Lukning og suspendering annullerer arbejde og hæver revisionen; lukning frigiver geometri og preview.",
+    "verification": {
+      "kind": "source-inspection",
+      "summary": "Resultatadoption, genindlæsning af gemte kort samt suspend/close/dispose er gennemlæst i den aktuelle kode. Ingen timing-, browser- eller GPU-test er kørt i denne gennemgang. Gennemlæst arbejdskopi den 2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263. Arbejdskopien kan indeholde lokale ændringer; kildehashene identificerer de gennemlæste filbytes."
+    },
+    "limits": [
+      "Annullering alene er ikke et bevis på, at et allerede afsendt svar aldrig ankommer; kontrollen før adoption skal bevares.",
+      "Mønstret kan være relevant for andre asynkrone apps, men deres revisionsgrænser, ejere og fejlforløb skal verificeres særskilt.",
+      "Denne erfaring dokumenterer eksisterende beskyttelse; den fastslår ikke at alle asynkrone veje i FormLab er kontrolleret."
+    ],
+    "sources": [
+      {
+        "project": "formlab",
+        "file": "material-source-studio.js",
+        "line": 108,
+        "note": "Staleness og livscyklus kontrolleres før ny GPU-relateret geometri oprettes.",
+        "sha256": "36d2ed7ef34ca52120158dfb9b62e13d81364c92b20a714156fa195c92ddfe92",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      },
+      {
+        "project": "formlab",
+        "file": "material-source-studio.js",
+        "line": 164,
+        "note": "Gemte kort indlæses med en indfanget revision og overtager kun ved match.",
+        "sha256": "36d2ed7ef34ca52120158dfb9b62e13d81364c92b20a714156fa195c92ddfe92",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      },
+      {
+        "project": "formlab",
+        "file": "material-source-studio.js",
+        "line": 229,
+        "note": "Suspendering og lukning annullerer arbejde; close hæver revisionen og frigiver previewet.",
+        "sha256": "36d2ed7ef34ca52120158dfb9b62e13d81364c92b20a714156fa195c92ddfe92",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      }
+    ],
+    "updatedAt": "2026-11-07"
+  },
+  {
+    "schemaVersion": 1,
+    "id": "formlab-physical-normal-gradients",
+    "title": "Hold materialets relief uafhængigt af kameraets kantudglatning",
+    "summary": "FormLab adskiller fysisk overfladehældning fra skærmens udglatning, så kamerabevægelse ikke skal skabe et nyt relief i materialet.",
+    "status": "reviewed",
+    "scope": "project",
+    "project": "formlab",
+    "tags": [
+      "gpu",
+      "webgl",
+      "shader",
+      "normals",
+      "antialiasing",
+      "camera",
+      "material"
+    ],
+    "problem": "Hvis skærmafhængige kantmasker eller diskrete ejer-id'er bliver til en højde, som differentieres med dFdx/dFdy, kan materialets beregnede normal ændre sig ved små kamerabevægelser.",
+    "approach": "Følg material-surface-gradients kontrakt: beregn og filtrér dh/dx og dh/dy i fysiske materialekoordinater før kantdækning. Brug skærmafledte mål til kontinuerte positioner, koordinater og filterstørrelser. Bevar forskellen mellem fysisk relief og visuel kantudglatning. Shaderændringer skal efterfølgende afprøves i rigtig WebGL med upload, nær/fjern visning og små kameraflytninger.",
+    "verification": {
+      "kind": "source-inspection",
+      "summary": "Den centrale GLSL-hjælper og produktets aktuelle normal- og kontrolkontrakt er gennemlæst. Ingen shaderkompilering, billedsammenligning eller GPU-test er udført; tidsligt flimrende fuger er ikke målt. Gennemlæst arbejdskopi den 2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263. Arbejdskopien kan indeholde lokale ændringer; kildehashene identificerer de gennemlæste filbytes."
+    },
+    "limits": [
+      "Dette er FormLabs dokumenterede produktionsregel for materialeshadere, ikke en generel begrænsning af alle anvendelser af dFdx/dFdy.",
+      "En CPU-test kan ikke alene dokumentere korrekt WebGL-upload eller fravær af kameraafhængige billedfejl.",
+      "Andre shader- og koordinatsystemer kræver selvstændig faglig vurdering før genbrug."
+    ],
+    "sources": [
+      {
+        "project": "formlab",
+        "file": "material-surface-gradient.js",
+        "line": 1,
+        "note": "Central kontrakt og GLSL-omregning fra fysisk hældning til normal.",
+        "sha256": "32751d77a27f03a5957f09e8c7e558a0a7a3cc8b24f20edaaef8b1793b8986be",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      },
+      {
+        "project": "formlab",
+        "file": "docs/MATERIALEGENERATOR_V2.md",
+        "line": 91,
+        "note": "Normalreglen adskiller fysisk hældning fra AA, ejer-id'er og cellemasker.",
+        "sha256": "8a11ea52fba7d1ffe910440de7caeb444ab132f99f3ee8f08ed87b157653850e",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      },
+      {
+        "project": "formlab",
+        "file": "docs/MATERIALEGENERATOR_V2.md",
+        "line": 121,
+        "note": "Shaderændringer kræver faktisk WebGL-kontrol; CPU-kontrol dækker ikke GPU-allokering og tidsligt flimren.",
+        "sha256": "8a11ea52fba7d1ffe910440de7caeb444ab132f99f3ee8f08ed87b157653850e",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      }
+    ],
+    "updatedAt": "2026-11-07"
+  },
+  {
+    "schemaVersion": 1,
+    "id": "kontroller-aktuel-kilde-foer-historisk-rettelse",
+    "title": "Kontrollér den aktuelle kode før en historisk rettelse gentages",
+    "summary": "En tidligere fejlbeskrivelse kan være korrekt som historik, selv om problemet allerede er rettet. Sammenhold fundets versionsgrundlag med den aktuelle kode, før nyt arbejde startes.",
+    "status": "reviewed",
+    "scope": "shared",
+    "project": "formlab",
+    "tags": [
+      "coordination",
+      "handoff",
+      "source-freshness",
+      "debugging",
+      "history",
+      "regression"
+    ],
+    "problem": "En ny agent læser et gammelt fund uden at kontrollere den aktuelle implementering og bruger tid på at gentage en allerede udført rettelse. Historiske kildehenvisninger og linjenumre kan fortsat se troværdige ud.",
+    "approach": "Find fundets dato, kodeversion og kilder. Kontrollér den aktuelle kode og de relevante eksisterende kontroller. Registrér forskellen mellem historisk fejl, nuværende implementering og faktisk genafprøvet adfærd. I FormLab omtaler arkitekturens historiske kodegennemgang manglende frigivelse af sun.shadow, mens den aktuelle detail-preview.js allerede kalder sun.shadow.dispose(). Brug kildehash og version til at opdage senere kildeændringer; en ændret fil kræver ny vurdering.",
+    "verification": {
+      "kind": "source-inspection",
+      "summary": "Proceserfaringen er kurateret ud fra ét konkret, gennemlæst tilfælde i FormLab. Ingen GPU-test eller måling af procesgevinst på tværs af apps er udført. Gennemlæst arbejdskopi den 2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263. Arbejdskopien kan indeholde lokale ændringer; kildehashene identificerer de gennemlæste filbytes."
+    },
+    "limits": [
+      "Den fælles erfaring gælder genbrug og fejlsøgning som proces. FormLabs konkrete Three.js- og dispose-regler bliver ikke automatisk fælles regler.",
+      "Eksisterende oprydningskode beviser ikke alene at en rapporteret GPU-fejl er løst. Et fortsat reproducerbart problem skal undersøges i sin aktuelle sammenhæng.",
+      "Uændrede kildehashes viser filidentitet, ikke at alle afhængigheder, driverforhold eller brugerscenarier er uændrede."
+    ],
+    "sources": [
+      {
+        "project": "formlab",
+        "file": "detail-preview.js",
+        "line": 114,
+        "note": "Den aktuelle oprydning inkluderer sun.shadow.dispose(), miljø, antialiasing og renderer.",
+        "sha256": "b79b2e3d3d74f1ebd2270674556ba998fd5152e817d25934874bfa429d27bf93",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      },
+      {
+        "project": "formlab",
+        "file": "docs/ARKITEKTUR.md",
+        "line": 103,
+        "note": "Historisk fund om detaljeprøvens manglende skyggefrigivelse; må ikke læses som aktuel kodeadfærd.",
+        "sha256": "9b6d46ed9284f75284a6db6b95b3704013e5bc8d569dfe34038133ec55cfb7ca",
+        "revision": "working-tree@2026-11-07; HEAD dc950510fafbfa2534093fd4fd545ace90988263"
+      }
+    ],
+    "updatedAt": "2026-11-07"
+  },
+  {
+    "schemaVersion": 1,
+    "id": "formlab-infill-continuous-field-jacobian-2026-11-08",
+    "title": "Bevar kontinuerte koordinater og analytisk feltbasis i blændingens tilmuring",
+    "summary": "FormLabs source-brick infill flimmer i bond, herringbone og radial blev afgrænset til wrapped per-cell fysiske koordinater. Et kontinuerligt metre-chart og analytisk felt-Jacobian stabiliserer atlasfiltrering og normalretning i de isolerede produktionsprøver.",
+    "status": "reviewed",
+    "scope": "project",
+    "project": "formlab",
+    "tags": [
+      "gpu",
+      "webgl",
+      "flimmer",
+      "blind-panels",
+      "infill",
+      "masonry",
+      "herringbone",
+      "radial",
+      "jacobian",
+      "textureGrad"
+    ],
+    "problem": "masonryStudyPhysicalCoordinates returnerede cellens wrapped local-koordinater for masonryStudyDomain >= 4. De lokale koordinater springer ved hver sten/fuge; dFdx/dFdy over dem gav forkerte pixel-footprints og atlasgradienter under kamerabevægelse. En ny temporalprøve af det faktiske source-materiale på produktionsmesh for blind-panels reproducerede problemet. Korrigeret filtrering alene skal også bevare atlasnormalernes orientering i de roterede og radiale feltceller.",
+    "approach": "Brug det bevarede kontinuerte vMasonryStudyUv.xy metre-chart som fysisk koordinat for felt-domænerne. Beregn cellens lokale differential analytisk med masonryFieldBasis: rotation og retningsskift i herringbone, radial/tangent Jacobian i radial og identitet i bond. Transformér de kontinuerte skærmdifferentialer ind i feltets atlasbasis før textureGrad, og transformér atlas- og slidnormalgradienter tilbage til den fysiske basis med den transponerede differential. Hold diskrete celle-id og wrapped local-positioner ude af skærmafledninger. Bevar øvrige materialers stier gennem identitetsfallback. Erfaringen afklarer den rettede årsag bag den tidligere blændingsobservation; den gamle observation er historisk evidens.",
+    "verification": {
+      "kind": "tested",
+      "summary": "Afprøvet 2026-11-08 i headless Chrome/ANGLE SwiftShader (software-WebGL) på den faktisk anvendte arbejdskopi. Tre WebGL-tests bestod: source-brick temporal, ny field-infill temporal og stone/quoin. Field-prøven bruger det faktiske produktions-blind-panels mesh og source-materiale, isoleret fra scenen. 12 rettede temporaltilfælde: bond/herringbone/radial x 3 m/1,5 m x farve/normal; nul pixels med RGB-delta over 6, største enkeltpixeldelta 2 og ingen GL-/side-/consolefejl. Wrapped-koordinat negativ kontrol genindfører over 1000 ændrede farvepixels ved 3 m i alle tre mønstre. Seks shader-basisresultater (atlas-delta og normal-gradient for tre mønstre) matcher CPU finite-difference Jacobianreferencer med nul byteafvigelse. Prøven beviser hverken brugerens samlede scene, perspektiv/skygger/okklusion eller fysisk GPU-adfærd."
+    },
+    "limits": [
+      "Gælder FormLabs konkrete source-brick felt-domæner og metre-chart. Genbrug i andre motorer kræver ny kontrol af koordinatkonventioner, normalrum og Jacobian.",
+      "Tre grønne software-WebGL-prøver er ikke en hardware-GPU-godkendelse eller dokumentation for hele brugerens faktiske scene.",
+      "Prøven isolerer den aktuelle produktionsflade. Perspektiv, skygger, okklusion og en konkret brugerprojektfil er ikke reproduceret.",
+      "Der blev ikke fastslået eller leveret en særskilt ny hjørne-/kantstensrettelse; den eksisterende stone/quoin-prøve bestod som regressionskontrol.",
+      "Tjek aktuelle kildehash før erfaringen anvendes; testbelægget omfatter ikke en generel bestået CPU-suite."
+    ],
+    "sources": [
+      {
+        "project": "formlab",
+        "file": "masonry-study-shader.js",
+        "line": 51,
+        "note": "masonryStudyPhysicalCoordinates bevarer det kontinuerte metre-chart for felt-domæner >= 4.",
+        "sha256": "bb1aefaea5c915f4ff9b88cf216e8369078ee61a4232985c5bee84cc303c89ec",
+        "revision": "working-tree@2026-11-08; HEAD dc950510fafbfa2534093fd4fd545ace90988263; applied infill fix"
+      },
+      {
+        "project": "formlab",
+        "file": "masonry-field.js",
+        "line": 75,
+        "note": "masonryFieldBasis og FromPhysical/ToPhysical leverer analytisk Jacobian for herringbone og radial.",
+        "sha256": "49b4740d07d14df502e0ec6bc5a4830186b8ed4abdcac6b79abd122267cf58c0",
+        "revision": "working-tree@2026-11-08; HEAD dc950510fafbfa2534093fd4fd545ace90988263; applied infill fix"
+      },
+      {
+        "project": "formlab",
+        "file": "baked-material.js",
+        "line": 468,
+        "note": "Atlasgradienter, kantslid og normalgradienter bruger feltets analytiske basis sammen med textureGrad.",
+        "sha256": "1921380df82d90fe7edbb363faa5438f44d7600ad37490e6d082ee0e02b3d664",
+        "revision": "working-tree@2026-11-08; HEAD dc950510fafbfa2534093fd4fd545ace90988263; applied infill fix"
+      },
+      {
+        "project": "formlab",
+        "file": "material-source-field-shimmer-browser.test.mjs",
+        "line": 15,
+        "note": "Faktisk produktions-blind-panels source-materiale; temporal før/efter-kontrol og seks Jacobianreferencer.",
+        "sha256": "32ac486f2c3ece1d59c89f1a81d32685baf35d458924b6503d41b4a7a5706dbe",
+        "revision": "working-tree@2026-11-08; HEAD dc950510fafbfa2534093fd4fd545ace90988263; applied infill fix"
+      },
+      {
+        "project": "stade",
+        "file": "collaboration/evidence/formlab-infill/infill.patch",
+        "line": 1,
+        "note": "Den afgrænsede rettelse af tre produktionsfiler.",
+        "sha256": "07d6dd7f106e978665f9389d8c5dff8672911e4f078742967c0b4061dc2e50a0",
+        "revision": "working-tree@2026-11-08; captured infill regression evidence"
+      },
+      {
+        "project": "stade",
+        "file": "collaboration/evidence/formlab-infill/field-regression.json",
+        "line": 1,
+        "note": "12 rettede temporalresultater med nul pixels over delta 6; seks basisresultater med nul byteafvigelse.",
+        "sha256": "f6f52f97afb0f6d38c06388bd50af0537754c6704ec3431907aaa0cf95caa80f",
+        "revision": "working-tree@2026-11-08; captured infill regression evidence"
+      },
+      {
+        "project": "stade",
+        "file": "collaboration/evidence/formlab-infill/webgl.log",
+        "line": 1,
+        "note": "Tre beståede WebGL-tests: sourcebrick, infill field og stone/quoin.",
+        "sha256": "d0489bd66eb428d027d59574a77b622981b209b4acce59a49e1a716097f8d619",
+        "revision": "working-tree@2026-11-08; captured infill regression evidence"
+      }
+    ],
+    "updatedAt": "2026-11-08"
+  },
+  {
+    "schemaVersion": 1,
+    "id": "formlab-blind-panel-temporal-observation-2026-11-08",
+    "title": "Afprøv blændingens tilmuring i dens faktiske rendervej",
+    "summary": "Historisk WebGL-observation fra før rettelsen af blændingens feltkoordinater. Erstattet af formlab-infill-continuous-field-jacobian-2026-11-08, der afgrænser årsagen og den efterprøvede rettelse.",
+    "status": "retired",
+    "scope": "project",
+    "project": "formlab",
+    "tags": [
+      "gpu",
+      "webgl",
+      "flimmer",
+      "blænding",
+      "blind-panels",
+      "masonry",
+      "field",
+      "herringbone",
+      "radial"
+    ],
+    "problem": "Brugeren rapporterer flimmer i blændingens tilmurede vinduesområde. Den eksisterende brick-shimmer-prøve bruger masonryStudy:false, og detailprøvens bueprofil er en anden flade.",
+    "approach": "Identificér den faktiske v2 blind-panels-flade, bevar dens produktionsgeometri og materiale, og sammenlign farve og normaler ved en fysisk kameraflytning på præcis én pixel. Genbrug skillens observe-blind-panel-prøve til afgrænset observation før en hypotese om shaderårsagen ændres til en rettelse.",
+    "verification": {
+      "kind": "tested",
+      "summary": "Kørt 2026-11-08 mod FormLabs arbejdskopi med headless Chrome/ANGLE SwiftShader (software-WebGL). 12 observationer på faktiske source-munkesten/units og bond, herringbone, radial ved 3 m og 1,5 m. Ingen kontrollerede GL-/compile-/sidefejl. Ved 3 m var andelen af ændrede farvepixels over delta 6 ca. 3,22 %, 8,01 % og 8,71 %; største normalforskel 7, 188 og 176. temporalRegressionAsserted:false: der er ingen kalibreret flimmerbeståelsesgrænse. Almindelige murstens- og tekstur-uploadprøver samt en separat fine-ashlar-kantstensprøve bestod, men er andre dækningsområder."
+    },
+    "limits": [
+      "Udgået: Historisk observation erstattet af formlab-infill-continuous-field-jacobian-2026-11-08. Den nye erfaring afgrænser årsag, rettelse og testbelæg.",
+      "Den isolerede flade omfatter ikke brugerens konkrete model, overlappende geometri, skygger eller perspektivkamera.",
+      "Software-WebGL dokumenterer ikke alle forhold på brugerens fysiske GPU og driver.",
+      "Rå pixelforskelle er et undersøgelsesspor, ikke en fastslået årsag eller en bestået temporal regression.",
+      "Fine-ashlar-kantstensprøven dækker ikke automatisk munkestenenes kantsten; den berørte kantstensvisning skal afgrænses."
+    ],
+    "sources": [
+      {
+        "project": "stade",
+        "file": "skills/formlab-material-gpu/scripts/observe-blind-panel.mjs",
+        "note": "Genanvendelig diagnostisk prøve; råmåling uden temporal beståelsesgrænse.",
+        "sha256": "bcbe2a100edeb22eebf1bf1019cd14abe9aac9f633fbe9477b257df0f91065ce",
+        "revision": "working-tree@2026-11-08"
+      },
+      {
+        "project": "formlab",
+        "file": "masonry-field.js",
+        "note": "Feltmapping for den faktiske produktionsflade.",
+        "sha256": "9083d589719f46e6aa5c6114325427c41dd0db0d8f51e41d9bf1c01ab1a2d44d",
+        "revision": "working-tree@2026-11-08"
+      },
+      {
+        "project": "formlab",
+        "file": "masonry-study-shader.js",
+        "note": "Shaderens domæner og feltkoordinater.",
+        "sha256": "d8afd021e9cf6508ef6fad8d1d7f535bca6b9f874fa459a82cd7e0929c9365ef",
+        "revision": "working-tree@2026-11-08"
+      },
+      {
+        "project": "formlab",
+        "file": "material-source-brick-shimmer-browser.test.mjs",
+        "note": "Eksisterende prøve af almindelige source-munkesten; dækker ikke field-mesh automatisk.",
+        "sha256": "2a424f9f5602b057b68a901208ee4949ef3b4dc89b80116ae963797b0479b3b4",
+        "revision": "working-tree@2026-11-08"
+      }
+    ],
+    "updatedAt": "2026-11-08"
+  }
+]
