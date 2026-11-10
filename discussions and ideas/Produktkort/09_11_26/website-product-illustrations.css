@@ -1,0 +1,29 @@
+
+/* Product artwork inherits live theme tokens, including after light/dark changes. */
+#fjordside-site .journal-product-illustration{
+ --g-ground:var(--ds-color-background-canvas);--g-plane:var(--ds-color-illustration-plane);
+ --g-ink:var(--ds-color-illustration-ink);--g-subject:var(--ds-color-illustration-subject);
+ --g-counter:var(--ds-color-illustration-counterpoint);--g-context:var(--ds-color-illustration-context);
+ --g-edge:var(--ds-color-illustration-edge);--g-light:var(--ds-color-illustration-light);
+ --g-depth:var(--ds-color-illustration-depth);--g-line-width:var(--ds-illustration-material-lineWidth,1.8);
+ --g-depth-opacity:var(--ds-illustration-material-depthOpacity,.12);
+ display:flex;flex-direction:column;width:100%;height:100%;background:transparent;color:var(--g-ink);
+ padding:56px 0 3%;container-type:inline-size;
+}
+#fjordside-site .journal-product-art{display:block;width:100%;height:auto;min-height:0;flex:1;overflow:visible}
+#fjordside-site .product-cover-brand{display:flex;align-items:center;justify-content:center;gap:2.5%;padding:0 7%;min-height:18%;flex-shrink:0;font-family:Inter,system-ui,sans-serif;line-height:1.1}
+#fjordside-site .product-cover-wordmark{font-size:clamp(22px,10.5cqi,46px);font-weight:700;letter-spacing:-.035em;white-space:nowrap}
+#fjordside-site .product-cover-brand[data-product=formationsstudio] .product-cover-wordmark{font-size:clamp(18px,7.8cqi,34px)}
+#fjordside-site .product-cover-logo{display:block;width:18%;height:auto;flex-shrink:0}
+#fjordside-site .product-cover-logo--dark{display:none}
+#fjordside-site[data-color-scheme=dark] .product-cover-logo--light{display:none}
+#fjordside-site[data-color-scheme=dark] .product-cover-logo--dark{display:block}
+#fjordside-site .product-cover-brand[data-product=tonerum] .product-cover-wordmark{font-weight:800;letter-spacing:-.045em}
+#fjordside-site .product-cover-dot{color:#e7b959}
+#fjordside-site .product-cover-brand[data-product=ringsmith] .product-cover-wordmark{font-family:'Source Serif 4',Georgia,serif;letter-spacing:-.03em}
+#fjordside-site .product-cover-ring-mark{font:clamp(39px,16.5cqi,72px)/1 Georgia,serif;color:#896c36;flex-shrink:0}
+#fjordside-site .product-cover-formation-mark{display:grid;place-items:center;width:18%;aspect-ratio:1;flex-shrink:0;font:clamp(25px,10.5cqi,46px)/1 Georgia,serif}
+#fjordside-site .product-cover-formation-mark{background:var(--g-ink);color:var(--g-ground);border-radius:3px}
+#fjordside-site[data-color-scheme=dark] .product-cover-logo--formlab{background:#f5f3ec;border-radius:3px}
+@container (max-width:320px){#fjordside-site .product-cover-brand[data-product=formationsstudio] .product-cover-wordmark{font-size:7cqi}}
+#fjordside-site .journal-gallery-slide:first-child:has([data-cover-active-style]:not([data-cover-active-style=original])){background:transparent}
