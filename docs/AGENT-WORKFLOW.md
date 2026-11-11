@@ -82,7 +82,7 @@ Brug `createProjectFile` med produktets format-id, version og datavalidering. Op
 
 Tilpas kontrollen til ændringen. Små, reversible rettelser kræver højst én hurtig relevant kontrol; kør ikke automatisk alle tests og builds i rækkefølge. En ny skærm eller væsentlig ændring i layout eller adfærd skal også inspiceres i browseren.
 
-Ved en ny skærm: afprøv normaltilstand og relevante lange tekster, feltfejl eller tomme resultater. Kontrollér tastatur, fokus og smal visning omkring 320 CSS-px. Ved temaændringer kontrolleres også relevante lyse, mørke og ekspressive temaer. Ved fælles biblioteksændringer kontrolleres alle medfølgende temaer. Kontrollér zoom, reduceret bevægelse, højkontrast og hjælpemidler, når de er relevante; angiv præcist, hvad der faktisk er afprøvet.
+Ved en ny skærm: afprøv normaltilstand og relevante lange tekster, feltfejl eller tomme resultater. Kontrollér tastatur, fokus og smal visning omkring 320 CSS-px. Ved temaændringer kontrolleres også relevante lyse, mørke og ekspressive temaer. Ved ændringer i fælles stilregler kontrolleres de temaer, der bruger reglerne. Kontrollér zoom, reduceret bevægelse, højkontrast og hjælpemidler, når de er relevante; angiv præcist, hvad der faktisk er afprøvet.
 
 Agentens standardkontrol kombinerer to forskellige prøver:
 
@@ -103,6 +103,16 @@ Se [verifikationsstatus](PRODUCTION.md#verifikationsstatus) for uafprøvede plat
 
 Fælles roller skal have `name`, `description`, `usage`, `composes`, `parts`, `variants`, `states` og deklarativt `preview` i `core/library.mjs`. Genbrug semantiske tokens og dokumenterede centrale defaults. Hold kontrakt, runtime, kvalitet, skema, temaer og interface konsistente.
 
-Systemkravene i dette afsnit har forrang for den generelle regel om én lille kontrol: Kør `npm test` og `npm run check` efter ændringer i format, runtime eller værktøjer. Kør `npm run build` efter kode-, design- eller temaændringer. Ved biblioteksændringer opdateres hjemmesidens showcase med `npm run sync:design-studio` og dens normale build; synkronisér produkter, der skal have ændringen. Hæv `STARTER_VERSION` i `tools/starter.mjs`, når startskabelonerne ændres. Temaændringer noteres i temaets `history`.
+Vælg prøver ud fra, hvad ændringen kan påvirke.
+
+| Ændring | Kontrol |
+| --- | --- |
+| Fælles mønster | Kør `npm run test:patterns` for mønstergruppen, eller afgræns til den berørte prøve med `npm run test:patterns -- --test-name-pattern="..."`. Afprøv ændret betjening i et relevant produkt. |
+| Komponent eller controller | Kør de berørte testfiler og prøv relevante samspil. Fx `node --test tests/overlays.test.mjs` for en ændring af popoverens fokus eller placering. |
+| Tema eller fælles stilregler | Kør den relevante temakontrol. `npm run check` kontrollerer det offentlige temakatalogs pakker, CSS, geometri og kontrast. Mønsterprøverne ligger i testpakken. |
+| Eksport, synkronisering eller build | Kør prøverne for den berørte kommando og afprøv den ændrede leveringsvej med et midlertidigt projekt. |
+| Udgivelse eller bred ændring | Kør hele pakken med `npm test`. Brede ændringer omfatter fælles format, rendering eller andre kontrakter med virkning på tværs af komponenter og produkter. Kør temakontrollen, når temaernes CSS eller kontrakt er berørt, og følg [udgivelseskontrollen](PRODUCTION.md#byg-og-lever-offline-editoren) ved udgivelse. |
+
+Genbyg det berørte output efter kode-, design- eller temaændringer. Ved biblioteksændringer opdateres hjemmesidens showcase med `npm run sync:design-studio` og dens normale build. Synkronisér produkter, der skal have ændringen. Hæv `STARTER_VERSION` i `tools/starter.mjs`, når startskabelonerne ændres. Temaændringer noteres i temaets `history`.
 
 Format 1 virker fortsat. Migration er eksplicit med `migrate FILE --out NEW_FILE`; bevar originalen og gennemgå gamle indre afstande før tilkobling. Se [format og migration](PACKAGE-FORMAT.md).

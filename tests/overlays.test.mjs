@@ -20,6 +20,26 @@ test('floating panels flip at viewport edges, clamp both axes and respect visual
  assert.throws(()=>floatingPlacement(anchor,panel,{width:320,height:220},{placement:'invalid'}),/placement/);
 });
 
+test('floating panels align trigger edges, follow RTL, flip and stay inside the viewport',()=>{
+ const anchor={left:200,right:240,top:80,bottom:100,width:40,height:20},panel={width:100,height:60},viewport={width:400,height:300};
+ assert.equal(floatingPlacement(anchor,panel,viewport).left,170);
+ assert.equal(floatingPlacement(anchor,panel,viewport,{align:'start'}).left,200);
+ assert.equal(floatingPlacement(anchor,panel,viewport,{align:'end'}).left,140);
+ assert.equal(floatingPlacement(anchor,panel,viewport,{align:'start',direction:'rtl'}).left,140);
+ assert.equal(floatingPlacement(anchor,panel,viewport,{align:'end',direction:'rtl'}).left,200);
+ assert.deepEqual(floatingPlacement({...anchor,top:250,bottom:270},panel,viewport,{align:'end'}),{left:140,top:182,placement:'top'});
+ assert.equal(floatingPlacement({...anchor,left:10,right:50},panel,viewport,{align:'end'}).left,8);
+ assert.throws(()=>floatingPlacement(anchor,panel,viewport,{align:'invalid'}),/alignment/);
+});
+
+test('popover forwards edge alignment to its shared positioner',()=>{
+ const {trigger,panel}=fixture();
+ trigger.getBoundingClientRect=()=>({left:200,right:240,top:80,bottom:100,width:40,height:20});
+ panel.getBoundingClientRect=()=>({width:100,height:60});
+ const popover=mountPopover(trigger,panel,{align:'end'});
+ popover.open();assert.equal(panel.style.left,'140px');popover.destroy();
+});
+
 test('tooltip retains external descriptions, focus, hover persistence and Escape dismissal',async()=>{
  const {document,trigger,panel}=fixture();trigger.setAttribute('aria-describedby','existing');
  const tooltip=mountTooltip(trigger,panel,{delay:0,closeDelay:0});

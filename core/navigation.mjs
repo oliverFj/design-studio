@@ -56,7 +56,7 @@ export function mountTabs(host,options={}){
  if(!host?.querySelectorAll)throw new Error('mountTabs requires a DOM host.');
  const document=host.ownerDocument,list=[host,...host.querySelectorAll('[role]')].find(node=>node.getAttribute('role')==='tablist');
  if(!list)throw new Error('Tabs require a tablist.');
- let config={},pairs=[],selected=null,destroyed=false;
+ let config={},pairs=[],selected=null,destroyed=false,horizontalVariant='default';
  const listeners=[];
  const listen=(type,fn)=>{list.addEventListener(type,fn);listeners.push([type,fn]);};
  const disabled=tab=>tab.disabled||tab.getAttribute('disabled')!==null||tab.getAttribute('aria-disabled')==='true';
@@ -79,7 +79,14 @@ export function mountTabs(host,options={}){
   const orientation=config.orientation??list.getAttribute('aria-orientation')??'horizontal',activation=config.activation??'automatic';
   if(!['horizontal','vertical'].includes(orientation)||!['automatic','manual'].includes(activation))throw new Error('Unknown tab orientation or activation.');
   list.setAttribute('aria-orientation',orientation);config.orientation=orientation;config.activation=activation;
-  for(let node=list.parentNode;node;node=node.parentNode){if(node.getAttribute?.('data-tabs')!=null){node.setAttribute('data-variant',orientation==='vertical'?'vertical':'default');break;}if(node===host)break;}
+  for(let node=list.parentNode;node;node=node.parentNode){
+   if(node.getAttribute?.('data-tabs')!=null){
+    if(node.getAttribute('data-variant')==='wrap')horizontalVariant='wrap';
+    node.setAttribute('data-variant',orientation==='vertical'?'vertical':horizontalVariant);
+    break;
+   }
+   if(node===host)break;
+  }
   const roles=[...host.querySelectorAll('[role]')],tabs=[...list.querySelectorAll('[role]')].filter(tab=>{
    if(tab.getAttribute('role')!=='tab')return false;
    for(let parent=tab.parentNode;parent&&parent!==list;parent=parent.parentNode)if(parent.getAttribute?.('role')==='tablist')return false;

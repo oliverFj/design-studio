@@ -1396,7 +1396,13 @@ export const COMPONENT_LIBRARY=freeze({
       tab:{selector:'.ds-tabs__tab',styles:{display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:'44px',minWidth:'44px',maxWidth:'100%',boxSizing:'border-box',padding:'{space.component.paddingCompact} {space.component.padding}',border:'{border.width.default} solid transparent',borderRadius:'{radius.control}',fontFamily:'{typography.font.body}',fontSize:'{typography.size.control}',fontWeight:'{typography.weight.label}',lineHeight:'{typography.lineHeight.control}',whiteSpace:'normal',wordBreak:'normal',overflowWrap:'anywhere',backgroundColor:'{color.background.subtle}',color:'{color.text.primary}',cursor:'pointer'}},
       panel:{selector:'.ds-tabs__panel',styles:{minWidth:'0',padding:'{space.component.padding}',border:'{border.width.default} solid {color.border.default}',borderRadius:'{radius.control}',backgroundColor:'{color.background.surface}',color:'{color.text.primary}',fontFamily:'{typography.font.body}',fontSize:'{typography.size.body}',lineHeight:'{typography.lineHeight.body}',overflowWrap:'anywhere'}},
     },
-    variants:{default:{description:'Vandrette faner, der kan bryde til flere rækker.',styles:{}},vertical:{description:'Lodret faneliste ved siden af indholdet; produktet vælger tilstrækkelig plads.',styles:{flexDirection:'row',flexWrap:'wrap'},parts:{list:{styles:{flexDirection:'column',alignItems:'stretch',flex:'1 1 12rem'}},panel:{styles:{flex:'3 1 16rem'}}}}},
+    variants:{
+      default:{description:'Fanerne deler bredden på én vandret række, der kan rulle ved pladsmangel.',styles:{},parts:{
+        list:{styles:{flexWrap:'nowrap',overflowX:'auto',scrollbarWidth:'thin',padding:'max({space.component.paddingCompact}, calc(max(3px, {border.width.focus}) + max(2px, {border.offset.focus})))'}},
+        tab:{styles:{flex:'1 0 0',minWidth:'max-content',whiteSpace:'nowrap'}},
+      }},
+      wrap:{description:'Fanerne følger deres indhold og kan bryde til flere rækker.',styles:{}},
+      vertical:{description:'Lodret faneliste ved siden af indholdet; produktet vælger tilstrækkelig plads.',styles:{flexDirection:'row',flexWrap:'wrap'},parts:{list:{styles:{flexDirection:'column',alignItems:'stretch',flex:'1 1 12rem'}},panel:{styles:{flex:'3 1 16rem'}}}}},
     states:{
       selected:{description:'Den aktive fane, som ejer det synlige panel.',parts:{tab:{styles:{backgroundColor:'{color.action.primary.rest.surface}',color:'{color.action.primary.rest.text}',borderColor:'{color.action.primary.rest.surface}',textDecoration:'underline'}}}},
       hover:{description:'En tilgængelig fane under pegemarkøren.',parts:{tab:{styles:{backgroundColor:'{color.action.neutral.hover.surface}',color:'{color.action.neutral.hover.text}'}}}},

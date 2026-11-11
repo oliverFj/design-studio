@@ -4,6 +4,17 @@ export const COMPOSITION_KINDS = Object.freeze({
 });
 
 export const COMPOSITIONS = Object.freeze({
+  'theme-picker': Object.freeze({
+    name: 'Stade tema', version: '1.0.0', layout: 'workspace', kind: 'workflow',
+    illustration: false,
+    useWhen: 'Brugeren skal kunne vælge tema og farve fra en knap i programmets eller sidens top.',
+    related: Object.freeze(['site-header']),
+    description: 'En knap med Stades mærke åbner et lille panel med valg af tema og farve.',
+    usage: 'Brug mountThemePicker fra patterns/theme-picker.mjs. Produktet leverer katalog, aktuelle valg og funktionen, der anvender og gemmer dem. Placér knappen ved arbejdsfladens øverste højre kant.',
+    components: ['button', 'popover', 'field', 'select'],
+    interactions: ['Tema og farve vælges med native felter', 'Temaet skifter med det samme, mens panelet bliver åbent', 'Klik udenfor eller Escape lukker panelet', 'Escape returnerer fokus til knappen'],
+    qualityScenarios: Object.freeze(['initial', 'appearance']),
+  }),
   'resizable-panel': Object.freeze({
     name: 'Panel med træk og sammenklapning', version: '1.0.0', layout: 'workspace', kind: 'workflow',
     illustration: false,
@@ -135,4 +146,4 @@ export const COMPOSITIONS = Object.freeze({
   }),
 });
 
-export const PATTERN_FILES = Object.freeze(['resizable-panel.mjs', 'catalog.mjs', 'compositions.mjs', 'web.mjs', 'form.mjs', 'list-detail.mjs', 'object-workbench.mjs', 'parameter-workbench.mjs', 'recipe-editor.mjs', 'resource-library.mjs', 'history.mjs', 'history-editor.mjs', 'gallery.mjs', 'illustrations.mjs', 'illustrations-primitives.mjs', 'illustrations-anatomy.mjs', 'illustrations-lightroom.mjs', 'illustrations-passage.mjs', 'illustrations-fieldlines.mjs', 'quality.mjs', 'styles.css']);
+export const PATTERN_FILES = Object.freeze(['theme-picker.mjs', 'resizable-panel.mjs', 'catalog.mjs', 'compositions.mjs', 'web.mjs', 'form.mjs', 'list-detail.mjs', 'object-workbench.mjs', 'parameter-workbench.mjs', 'recipe-editor.mjs', 'resource-library.mjs', 'history.mjs', 'history-editor.mjs', 'gallery.mjs', 'illustrations.mjs', 'illustrations-primitives.mjs', 'illustrations-anatomy.mjs', 'illustrations-lightroom.mjs', 'illustrations-passage.mjs', 'illustrations-fieldlines.mjs', 'quality.mjs', 'styles.css']);

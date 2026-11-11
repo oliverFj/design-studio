@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 2,
+  "id": "stabil-3d-arbejdsflade-bag-paneler",
+  "title": "Læg justerbare paneler oven på en stabil 3D-arbejdsflade",
+  "summary": "Når et sidepanel trækkes i en 3D-editor, kan scenen ligge bag panelet med fast størrelse og projektion. Placér sceneværktøjerne ud fra deres egne ankre.",
+  "status": "draft",
+  "scope": "shared",
+  "tags": [
+    "3d",
+    "webgl",
+    "editor",
+    "paneler",
+    "layout"
+  ],
+  "context": "En interaktiv 3D-editor har sidepaneler, der trækkes bredere eller foldes sammen, mens brugeren arbejder på modellen. I FormLab ændrede panelbredden tidligere også størrelsen på WebGL-fladen.",
+  "heuristic": "Lad 3D-fladen dække arbejdsområdet bag sidepanelerne, når der er plads. Hold scenens projektion og koordinater stabile ved paneltræk. Lad kantbundne værktøjer følge det synlige område, og hold elementer, der hører til skærmens midte, fast centreret.",
+  "rationale": "Ændring af WebGL-fladens størrelse rydder dens tegningsbuffer. Opdatering og gentegning i samme billede fjerner den tomme mellemliggende flade. En fast scene undgår desuden gentagne bufferændringer og gør, at modellen bliver stående, når panelet flyttes.",
+  "verification": {
+    "kind": "tested",
+    "summary": "I FormLabs byggede editor blev højrepanelet trukket, lukket og genåbnet uden ændringer i 3D-fladens dimensioner eller kameraets projektion. Målingen kontrollerede også, at værktøjerne var tilgængelige, og at panelet blev stablet på en smal skærm."
+  },
+  "limits": [
+    "På smalle skærme kan et stablet layout give plads til både scene og panel. Håndtér reelle størrelsesskift og gentegning i samme billede.",
+    "Et panel oven på scenen dækker en del af modellen. Hold kantbundne værktøjer tilgængelige, og fjern dækkede 3D-greb fra tastaturfokus, mens de er skjult."
+  ],
+  "sources": [
+    {
+      "project": "formlab",
+      "file": "ui.css",
+      "line": 18,
+      "note": "3D-fladen fylder arbejdsområdet uafhængigt af panelkolonnerne.",
+      "sha256": "076a3dab9ab79ac491af9c7969d250ceb976ccc5a34987c3dcf6072f757e8622"
+    },
+    {
+      "project": "formlab",
+      "file": "app.js",
+      "line": 4936,
+      "note": "Størrelsesskift behandles sammen med næste tegning.",
+      "sha256": "e8ccc7984f415bfa2d7f0b887886ec0fb940f5d1af03c3f737688529775726db"
+    }
+  ],
+  "updatedAt": "2026-11-11"
+}

@@ -78,3 +78,38 @@ export function canonicalizeTokenSet(tokens){
  for(const value of Object.values(result))if(value&&typeof value==='object')value.$value=canonicalTokenReferences(value.$value);
  return result;
 }
+
+/** An optional product density layer, loaded after the selected theme's CSS. */
+export function generateDensityCSS(density = 'standard', scope = '.ds-scope'){
+ if(density==='standard')return '';
+ if(density!=='compact')throw new Error('Unknown density profile.');
+ if(typeof scope!=='string'||!/^[.#][a-zA-Z_][a-zA-Z0-9_-]*$/.test(scope))throw new Error('CSS scope must be a single class or ID selector.');
+ return `
+${scope} {
+  --ds-space-component-padding: .5rem;
+  --ds-space-component-paddingLarge: .5rem;
+  --ds-space-component-paddingCompact: .25rem;
+  --ds-space-component-gap: .25rem;
+  --ds-space-component-gapLarge: .5rem;
+}
+${scope} .ds-menu:not(:has(.ds-menu-item__symbol:not(:empty))) .ds-menu-item__symbol,
+${scope} .ds-menu-item :is(.ds-menu-item__shortcut, .ds-menu-item__indicator):empty {
+  display: none;
+}
+@media (pointer: fine) {
+  ${scope} .ds-tabs > .ds-tabs__list > .ds-tabs__tab {
+    min-width: 32px;
+    min-height: 32px;
+    padding: .125rem .375rem;
+  }
+  ${scope} .ds-menu {
+    gap: .125rem;
+    min-width: min(12rem, 100%);
+  }
+  ${scope} .ds-menu .ds-menu-item {
+    min-height: 28px;
+    padding: .125rem var(--ds-space-component-padding);
+  }
+}
+`;
+}

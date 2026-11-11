@@ -13,6 +13,7 @@
     "example:build": "node tools/build-workspace.mjs",
     "scenes:build": "node tools/build-scenes.mjs",
     "test": "node tools/run-tests.mjs",
+    "test:patterns": "node tools/run-tests.mjs --patterns",
     "check": "node tools/check-themes.mjs",
     "check:docs": "node tools/check-documentation.mjs",
     "showcase:build": "node tools/build-showcase.mjs",

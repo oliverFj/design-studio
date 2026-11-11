@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {stat} from 'node:fs/promises';
+import {createCollaborationService} from '../collaboration/service.mjs';
 import {COMPOSITIONS,PATTERN_FILES} from '../patterns/catalog.mjs';
 import {mountComposition} from '../patterns/compositions.mjs';
 import {compositionQualityReport,compositionStructureReport} from '../patterns/quality.mjs';
@@ -8,6 +10,21 @@ import {PUBLIC_THEME_IDS} from '../tools/public-themes.mjs';
 import {dom,fire} from './support/dom.mjs';
 
 const theme=id=>JSON.parse(readFileSync(new URL('../packages/'+id+'.json',import.meta.url),'utf8'));
+
+test('every pattern has existing reference paths and correct direct controller imports', async () => {
+  const service = await createCollaborationService();
+  for (const id of Object.keys(COMPOSITIONS)) {
+    const pattern = await service.getPattern({ id });
+    assert.equal(pattern.pattern.name, COMPOSITIONS[id].name);
+    for (const file of pattern.exampleFiles) assert.ok((await stat(new URL('../' + file, import.meta.url))).isFile());
+    for (const basis of pattern.controllerBasis) {
+      const module = await import(new URL('../' + basis.file, import.meta.url));
+      for (const symbol of basis.symbols) assert.equal(typeof module[symbol], 'function');
+    }
+  }
+  const panel = await service.getPattern({ id: 'resizable-panel' });
+  assert.ok(panel.controllerBasis.some(item => item.symbols.includes('mountPanelControls')));
+});
 
 test('catalog patterns are representative quality samples in every theme',async()=>{
  assert.ok(PATTERN_FILES.includes('quality.mjs'),'project exports carry the same composition checks');

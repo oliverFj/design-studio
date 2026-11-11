@@ -89,6 +89,27 @@ test('pointer resizing preserves focus, ignores other pointers and cancels or co
   controls.destroy();
 });
 
+test('a left-hand panel mirrors keyboard resizing, drag to close and drag to reopen', () => {
+  const { container, events, handle, toggle, panel, controls } = fixture({ side: 'left', collapsible: true });
+  assert.equal(container.getAttribute('data-panel-side'), 'left');
+  fire(handle, 'keydown', { key: 'ArrowRight' });
+  assert.equal(handle.getAttribute('aria-valuenow'), '336');
+  fire(handle, 'pointerdown', { pointerId: 1, clientX: 336, button: 0 });
+  fire(events, 'pointermove', { pointerId: 1, clientX: 380 });
+  assert.equal(handle.getAttribute('aria-valuenow'), '380');
+  fire(events, 'pointermove', { pointerId: 1, clientX: 50 });
+  assert.equal(container.getAttribute('data-panel-drag'), 'close');
+  fire(events, 'pointerup', { pointerId: 1 });
+  assert.equal(panel.hidden, true);
+  fire(toggle, 'pointerdown', { pointerId: 2, clientX: 15, button: 0 });
+  fire(events, 'pointermove', { pointerId: 2, clientX: 100 });
+  assert.equal(container.getAttribute('data-panel-drag'), 'open');
+  fire(events, 'pointerup', { pointerId: 2 });
+  assert.equal(panel.hidden, false);
+  assert.equal(handle.getAttribute('aria-valuenow'), '336');
+  controls.destroy();
+});
+
 test('panel limits reserve main content and switch to one scroller for narrow or low work areas', () => {
   const { container, handle, controls, resize, disconnected, changes } = fixture({ width: 500 });
   resize({ width: 620 });
@@ -216,6 +237,8 @@ test('shared panel and form layouts isolate scroll without changing card or stac
   assert.ok(compactChildren.length);
   for (const [, , declarations] of compactChildren) assert.doesNotMatch(declarations, /display:/, 'shared cards and stacks retain their anatomy');
   const mobile = css.slice(css.indexOf('@media (max-width: 800px), (max-height: 480px)'));
+  assert.match(css.slice(0, css.length - mobile.length), /\[data-panel-open="true"\]:not\(\[data-panel-compact="true"\]\) > \[data-panel-grip\]:not\(:focus-visible\)[^{]*\{ opacity: 0; pointer-events: none; \}/);
+  assert.doesNotMatch(mobile, /\[data-panel-grip\]:not\(:focus-visible\)/);
   assert.match(mobile, /\.ds-panel-layout[^{}]*\{ display: block; block-size: auto; overflow: visible/);
   assert.match(mobile, /\.ds-panel-resize[^{}]*\{ display: none/);
   assert.doesNotMatch(css, /position:\s*(?:sticky|fixed)/, 'form actions occupy a separate layout row rather than covering fields');

@@ -1,4 +1,5 @@
 import { COMPOSITIONS } from './catalog.mjs';
+import {mountThemePicker} from './theme-picker.mjs';
 import {createResizablePanelState,mountResizablePanel} from './resizable-panel.mjs';
 import { createObjectWorkbenchState, mountObjectWorkbench } from './object-workbench.mjs';
 import { createResourceLibraryState, mountResourceLibrary } from './resource-library.mjs';
@@ -10,6 +11,7 @@ import { createRecipeEditorState, mountRecipeEditor } from './recipe-editor.mjs'
 import { WEB_PATTERNS, createWebState, mountWebPattern } from './web.mjs';
 
 export function createCompositionState(id) {
+  if(id==='theme-picker')return {id:'studio',mode:'light'};
   if(id==='resizable-panel')return createResizablePanelState();
   if (WEB_PATTERNS.includes(id)) return createWebState(id);
   if (id === 'editor') return createObjectWorkbenchState();
@@ -28,6 +30,16 @@ export function mountComposition(theme, id, {
   announce = () => {}, onChange = () => {}, onUse = () => {}, idPrefix = 'composition-' + id,
 } = {}) {
   if (!COMPOSITIONS[id]) throw new Error('Ukendt sammensætning: ' + id);
+  if(id==='theme-picker'){
+    const preferences={
+      themeOptions:[['studio','Studio'],['castle','Castle Studio']],
+      get id(){return state.id;},
+      get mode(){return state.mode;},
+      modes:()=>state.id==='studio'?[['light','Indigo'],['dark','Indigonat']]:[['light','Elfenben'],['dark','Mørk grøn']],
+      set(id,mode='light'){Object.assign(state,{id,mode});onChange(state);},
+    };
+    return {...mountThemePicker(theme,{document,preferences,idPrefix}),state};
+  }
   if(id==='resizable-panel')return mountResizablePanel(theme,{document,state,announce,onChange,idPrefix});
   if (WEB_PATTERNS.includes(id)) return mountWebPattern(theme, id, { document, state, onChange, idPrefix });
   if (id === 'editor') return mountObjectWorkbench(theme, { document, state, announce, onChange, idPrefix });

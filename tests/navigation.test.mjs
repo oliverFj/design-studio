@@ -27,6 +27,21 @@ test('navigation families validate and render using every public light/dark pale
  }
 });
 
+test('tabs fill one row by default and preserve the wrapping variant through controller updates',()=>{
+ const theme=source(),parts=materializePackage(theme).components.tabs;
+ assert.equal(parts.variants.default.parts.list.styles.flexWrap,'nowrap');
+ assert.equal(parts.variants.default.parts.tab.styles.flex,'1 0 0');
+ assert.equal(parts.parts.list.styles.flexWrap,'wrap');
+ assert.deepEqual(parts.variants.wrap.styles,{});
+ const {root}=fixture({variant:'wrap',orientation:'horizontal'}),controller=mountTabs(root);
+ assert.equal(root.getAttribute('data-variant'),'wrap');
+ controller.update({orientation:'vertical'});
+ assert.equal(root.getAttribute('data-variant'),'vertical');
+ controller.update({orientation:'horizontal'});
+ assert.equal(root.getAttribute('data-variant'),'wrap');
+ controller.destroy();
+});
+
 test('tabs expose reciprocal unique relations and automatic keyboard navigation skips disabled items',()=>{
  const {document,root,tabs,panels}=fixture(),changes=[];
  const controller=mountTabs(root,{onChange:(id,detail)=>changes.push([id,detail.previousId])});

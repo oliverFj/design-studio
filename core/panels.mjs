@@ -2,13 +2,15 @@ import { animateStandard } from './motion.mjs';
 
 let panelSequence = 0;
 
-/** Right-hand panel disclosure/resizing. Opt-in collapse commits on release;
+/** Side panel disclosure/resizing. Opt-in collapse commits on release;
  * the toggle also acts as a draggable edge grip. Hosts retain the same content. */
-export function mountPanelControls({ container, panel, handle, toggle, minimum = 240, maximum = 560, width = 320, open = true, collapsible = false, collapseThreshold = Math.min(64, minimum / 2), onChange = () => {}, document = container?.ownerDocument ?? globalThis.document } = {}) {
+export function mountPanelControls({ container, panel, handle, toggle, minimum = 240, maximum = 560, width = 320, open = true, side = 'right', collapsible = false, collapseThreshold = Math.min(64, minimum / 2), onChange = () => {}, document = container?.ownerDocument ?? globalThis.document } = {}) {
   if (![container, panel, toggle].every(node => node?.setAttribute && node?.addEventListener)
     || (handle && (!handle.setAttribute || !handle.addEventListener))) throw new Error('Panel controls require a container, panel and toggle.');
-  if (![minimum, maximum, width, collapseThreshold].every(Number.isFinite) || minimum <= 0 || maximum < minimum || collapseThreshold <= 0 || collapseThreshold >= minimum || typeof collapsible !== 'boolean' || typeof open !== 'boolean' || typeof onChange !== 'function') throw new Error('Invalid panel limits or initial state.');
+  if (![minimum, maximum, width, collapseThreshold].every(Number.isFinite) || minimum <= 0 || maximum < minimum || collapseThreshold <= 0 || collapseThreshold >= minimum || !['left', 'right'].includes(side) || typeof collapsible !== 'boolean' || typeof open !== 'boolean' || typeof onChange !== 'function') throw new Error('Invalid panel limits or initial state.');
   let currentWidth = width, isOpen = open, destroyed = false, drag = null, keyboardStart = null, transition = null, suppressClick = false;
+  const grow = side === 'left' ? 1 : -1;
+  container.setAttribute('data-panel-side', side);
   const originalInert = Boolean(panel.inert);
   const listeners = [], pointerTarget = document?.addEventListener ? document : handle;
   const listen = (node, type, handler) => { if (node?.addEventListener) { node.addEventListener(type, handler); listeners.push([node, type, handler]); } };
@@ -116,7 +118,7 @@ export function mountPanelControls({ container, panel, handle, toggle, minimum =
     if (drag) return;
     if (collapsible && event.key === 'Enter') { event.preventDefault(); setOpen(false); return; }
     const step = event.shiftKey ? 32 : 16, range = limits();
-    const next = event.key === 'ArrowLeft' ? currentWidth + step : event.key === 'ArrowRight' ? currentWidth - step : event.key === 'Home' ? range.minimum : event.key === 'End' ? range.maximum : null;
+    const next = event.key === 'ArrowLeft' ? currentWidth - grow * step : event.key === 'ArrowRight' ? currentWidth + grow * step : event.key === 'Home' ? range.minimum : event.key === 'End' ? range.maximum : null;
     if (next === null) return;
     keyboardStart ??= currentWidth; event.preventDefault(); applyWidth(next);
   });
@@ -137,7 +139,7 @@ export function mountPanelControls({ container, panel, handle, toggle, minimum =
   listen(pointerTarget, 'pointermove', event => {
     if (!drag || event.pointerId !== drag.id || !Number.isFinite(event.clientX)) return;
     event.preventDefault();
-    drag.raw = (drag.wasOpen ? drag.width : 0) + drag.x - event.clientX;
+    drag.raw = (drag.wasOpen ? drag.width : 0) + grow * (event.clientX - drag.x);
     drag.moved ||= Math.abs(drag.x - event.clientX) >= 4;
     if (!drag.moved) return;
     if (!collapsible) { applyWidth(drag.raw); return; }

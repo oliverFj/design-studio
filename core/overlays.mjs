@@ -28,20 +28,26 @@ function focusFirst(panel,initialFocus){
  (candidates[0]??panel).focus();
 }
 
-/** Placement is viewport-relative. Flip on the main axis and clamp both axes. */
-export function floatingPlacement(anchor,panel,viewport,{placement='bottom',gap=8,padding=8}={}){
+/** Viewport-relative placement; start/end follow text direction on the horizontal axis.
+ * Flip on the main axis and clamp both axes, including aligned panels. */
+export function floatingPlacement(anchor,panel,viewport,{placement='bottom',align='center',direction='ltr',gap=8,padding=8}={}){
  if(!['top','bottom','left','right'].includes(placement))throw new Error('Unknown overlay placement.');
+ if(!['start','center','end'].includes(align))throw new Error('Unknown overlay alignment.');
  const width=viewport.width,height=viewport.height,left=viewport.left??0,top=viewport.top??0;
  const fits={top:anchor.top-top-padding>=panel.height+gap,bottom:top+height-padding-anchor.bottom>=panel.height+gap,left:anchor.left-left-padding>=panel.width+gap,right:left+width-padding-anchor.right>=panel.width+gap};
  const opposite={top:'bottom',bottom:'top',left:'right',right:'left'};
  let side=placement;if(!fits[side]&&fits[opposite[side]])side=opposite[side];
  let x=anchor.left+(anchor.width-panel.width)/2,y=anchor.top+(anchor.height-panel.height)/2;
+ if(align!=='center'){
+  if(side==='top'||side==='bottom')x=(align==='start')!==(direction==='rtl')?anchor.left:anchor.right-panel.width;
+  else y=align==='start'?anchor.top:anchor.bottom-panel.height;
+ }
  if(side==='top')y=anchor.top-panel.height-gap;if(side==='bottom')y=anchor.bottom+gap;
  if(side==='left')x=anchor.left-panel.width-gap;if(side==='right')x=anchor.right+gap;
  return {left:Math.max(left+padding,Math.min(x,left+width-padding-panel.width)),top:Math.max(top+padding,Math.min(y,top+height-padding-panel.height)),placement:side};
 }
 
-export function positionFloating(trigger,panel,placement='bottom'){
+export function positionFloating(trigger,panel,placement='bottom',{align='center'}={}){
  const view=trigger.ownerDocument?.defaultView??globalThis,listeners=[];
  const names=['position','inset','margin','left','top','--ds-overlay-available-width','--ds-overlay-available-height'];
  const original=names.map(name=>[name,panel.style.getPropertyValue?.(name)??panel.style[name]??'']);
@@ -49,7 +55,8 @@ export function positionFloating(trigger,panel,placement='bottom'){
  const update=()=>{
   const visual=view.visualViewport,viewport={width:visual?.width??view.innerWidth??1024,height:visual?.height??view.innerHeight??768,left:visual?.offsetLeft??0,top:visual?.offsetTop??0};
   set('--ds-overlay-available-width',Math.max(1,viewport.width-16)+'px');set('--ds-overlay-available-height',Math.max(1,viewport.height-16)+'px');
-  const result=floatingPlacement(trigger.getBoundingClientRect(),panel.getBoundingClientRect(),viewport,{placement});
+  const direction=view.getComputedStyle?.(trigger)?.direction??'ltr';
+  const result=floatingPlacement(trigger.getBoundingClientRect(),panel.getBoundingClientRect(),viewport,{placement,align,direction});
   set('position','fixed');set('inset','auto');set('margin','0');set('left',Math.round(result.left)+'px');set('top',Math.round(result.top)+'px');
   panel.setAttribute('data-placement',result.placement);
  };
@@ -98,7 +105,7 @@ export function mountTooltip(trigger,tooltip,{placement='top',delay=300,closeDel
 
 /** Non-modal interactive panel. Tab follows document order; focus leaving the
  * panel dismisses it. Escape and explicit close restore the trigger. */
-export function mountPopover(trigger,panel,{placement='bottom',initialFocus,onOpenChange}={}){
+export function mountPopover(trigger,panel,{placement='bottom',align='center',initialFocus,onOpenChange}={}){
  if(!trigger?.ownerDocument||!panel?.style)throw new Error('mountPopover requires a trigger and panel.');
  const document=trigger.ownerDocument,eventHost=document.addEventListener?document:document.body,listeners=[],active=[];
  const restoreTrigger=snapshotAttrs(trigger,['aria-controls','aria-expanded','aria-haspopup']),restorePanel=snapshotAttrs(panel,['id','role','tabindex','popover','hidden']);
@@ -113,7 +120,7 @@ export function mountPopover(trigger,panel,{placement='bottom',initialFocus,onOp
  }
  function open(){
   if(destroyed||opened||disabled(trigger))return false;
-  reveal(panel);opened=true;stack.push(entry);attr(trigger,'aria-expanded','true');stopPosition=positionFloating(trigger,panel,placement);focusFirst(panel,initialFocus);
+  reveal(panel);opened=true;stack.push(entry);attr(trigger,'aria-expanded','true');stopPosition=positionFloating(trigger,panel,placement,{align});focusFirst(panel,initialFocus);
   listen(active,eventHost,'pointerdown',event=>{if(!ownsLayerTarget(stack,panel,event.target)&&!trigger.contains(event.target))close({restoreFocus:false});});
   listen(active,eventHost,'focusin',event=>{if(!ownsLayerTarget(stack,panel,event.target)&&!trigger.contains(event.target))close({restoreFocus:false});});
   listen(active,eventHost,'keydown',event=>{if(!event.defaultPrevented&&event.key==='Escape'&&opened&&stack.at(-1)===entry){event.preventDefault();event.stopPropagation();close();}});

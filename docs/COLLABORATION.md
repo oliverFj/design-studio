@@ -238,6 +238,6 @@ En pakke skal understøtte et konkret arbejdsbehov. Genbrug en eksisterende hand
 3. Implementér den faktiske operation i `collaboration/service.mjs`. Håndhæv tilladte projekter, filgrænser og skriveadgang dér. Værktøjsbeskrivelser og MCP-annotations er ikke adgangskontrol.
 4. Registrér handleren eksplicit i `tools/mcp-server.mjs`. Angiv korrekte `readOnlyHint`, `destructiveHint`, `idempotentHint` og `openWorldHint`. Ingen mappe må blive en automatisk eksekveringskilde for indsendt kode.
 5. Tilføj meningsfulde prøver af både forventet resultat og relevante afvisninger. Kontrollér opdagelse og kald gennem en rigtig MCP-klient; en knap eller en katalogpost er ikke en fungerende integration.
-6. Kør `npm test`, `npm run check` og `npm run build` ved værktøjsændringer. Opdatér denne vejledning, hvis det offentlige format eller opsætningen ændres.
+6. Kør de berørte værktøjs- og MCP-prøver efter [kontrolreglerne](AGENT-WORKFLOW.md#når-selve-systemet-ændres). Opdatér denne vejledning, hvis det offentlige format eller opsætningen ændres.
 
 Et nyt værktøj bør have én forståelig opgave. Adskil opslag fra ændringer, og returnér tydeligt, hvad der faktisk blev udført. Se [OpenAI's vejledning til MCP-værktøjer](https://developers.openai.com/plugins/build/mcp-server) for metadata, schemaer og kontrollerede handlinger.

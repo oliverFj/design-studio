@@ -168,7 +168,7 @@ Før referencekode udledes af eller indføres i et eksisterende produkt, læses 
 
 Offline-editorens Designmønstre og web-showcasen viser samme tolv eksempler: panel med træk og sammenklapning, objekteditor med kontekstpanel, parametrisk værksted, opskriftseditor med lag, formular med validering, liste med detaljevisning, ressourcebibliotek, fortryd/gentag, header/navigation, hero, footer og billedgalleri. De bruger bibliotekets eksisterende roller og det valgte tema. Kilde, version, formål, komponenter og interaktioner findes i patterns/catalog.mjs; implementering og layout findes i patterns/compositions.mjs, de enkelte mønstermoduler og patterns/styles.css. PATTERN_FILES i kataloget er den fælles liste til referenceeksport og showcase.
 
-`mountResizablePanel` fra `patterns/resizable-panel.mjs` er referenceeksemplet til `mountPanelControls`, som eksporteres fra runtime. Controlleren forbindes med `{container, panel, handle, toggle, width, minimum, maximum, open, onChange}`. Værten bruger `ds-panel-layout` med børnene `ds-panel-content`, `ds-panel-resize`, `ds-panel-side` og en native toggleknap. `onChange({width,open})` giver produktet mulighed for at bevare tilstanden. `setOpen(boolean)`, `setWidth(number)` og `destroy()` styrer livscyklussen.
+`mountResizablePanel` fra `patterns/resizable-panel.mjs` er referenceeksemplet til `mountPanelControls`, som eksporteres fra runtime. Controlleren forbindes med `{container, panel, handle, toggle, width, minimum, maximum, open, side, onChange}`. Værten bruger `ds-panel-layout` med børnene `ds-panel-content`, `ds-panel-resize`, `ds-panel-side` og en native toggleknap. `side` er `right` som standard og kan sættes til `left` for at spejle placering, trækretning og piletaster. `onChange({width,open})` giver produktet mulighed for at bevare tilstanden. `setOpen(boolean)`, `setWidth(number)` og `destroy()` styrer livscyklussen.
 
 Tilføj `collapsible:true` for at lade trækket fortsætte fra minimumsbredden til en lukkezone; lukning udføres ved slip. `collapseThreshold` er som standard den mindste af 64 px og halvdelen af minimumsbredden og skal ligge mellem nul og minimumsbredden. Toggleknappen fungerer også som kantgreb til genåbning. Escape og pointerannullering genskaber den tidligere bredde; separatorens piletaster, Home/End og Enter giver tastaturalternativer. Smalle eller lave flader bruger stablet indhold og almindelig knapbetjening. Produktet ejer indhold og kladder; controlleren bevarer panelnoden og håndterer fokus og reduceret bevægelse. Komponenter og mønstre uden illustration deler placeholderen fra `core/catalog-placeholder.mjs`; mønstre angiver `illustration:false` i kataloget.
 
@@ -267,6 +267,12 @@ picker.addEventListener('change', event => preference.set(event.target.value));
 
 En gammel enkeltstående pakke beholder sin egen fremtoning. `resolveThemeMode` tilføjer ikke modes eller ændrer kilden. Ved parrede temaer redigeres en semantisk modeoverride i den aktive modes `tokens`; en ændring alene i grundtokens erstatter ikke en eksisterende override. Primitive paletteændringer kan deles mellem tilstandene gennem deres semantiske aliases.
 
+### Fælles temavælger
+
+Brug mønstret **Stade tema** (`theme-picker`) til et temavalg øverst til højre. Det samler Stades mærke, en knap, en popover og native felter til **Tema** og **Farve**. Montér `mountThemePicker(theme, {preferences, idPrefix})` fra `patterns/theme-picker.mjs`. I projekter med de eksporterede mønstre ligger filen i `design/patterns/`.
+
+`preferences` leverer `themeOptions` som par af id og navn, de aktuelle `id` og `mode`, `modes()` for det aktuelle temas farver samt `set(id, mode)`. Produktet anvender temaet og gemmer valget. Indsæt mønstrets `element` i det aktive designscope. Brug `open()` til genveje og `destroy()` ved afmontering. Bevar samme instans, når temaets CSS udskiftes, så fokus og det åbne panel bevares.
+
 ## Fælles ikoner
 
 Tabler Icons 3.50.0 leveres som et fast lokalt SVG-udvalg fra `core/icons.mjs`. `createIcon`, `renderIcon`, `ICON_NAMES` og `TABLER_VERSION` eksporteres gennem komponentruntime. Et ikonnavn skal findes i registret; vilkårlig SVG eller HTML indlæses ikke som ikondefinition.
@@ -358,7 +364,7 @@ Link, navigation og image er selvstændige biblioteksroller; header, hero, foote
 
 ## Faner og native navigation
 
-`tabs` leverer forbundne tab-/panel-id'er, én valgt fane og ét synligt panel. Angiv `items` med entydige, stabile `id`, en ikke-tom `label`, valgfri `disabled` og `content`. Indhold følger slotkontrakten: tekst, deklarative noder eller fælles komponenter. `selectedId` vælger den første aktive fane; uden bruges første tilgængelige fane. Et ukendt `selectedId` afvises ved komponentoprettelse. `orientation: 'vertical'` vælger både lodret opbygning og tastaturretning; standarden er vandret. Brug `idPrefix`, når produktet har brug for genkendelige relationer.
+`tabs` leverer forbundne tab-/panel-id'er, én valgt fane og ét synligt panel. Angiv `items` med entydige, stabile `id`, en ikke-tom `label`, valgfri `disabled` og `content`. Indhold følger slotkontrakten: tekst, deklarative noder eller fælles komponenter. `selectedId` vælger den første aktive fane; uden bruges første tilgængelige fane. Et ukendt `selectedId` afvises ved komponentoprettelse. `orientation: 'vertical'` vælger både lodret opbygning og tastaturretning; standarden er én vandret række, hvor fanerne deler bredden og kan rulles ved pladsmangel. Vælg `variant: 'wrap'` for faner med indholdsbestemt bredde og ombrydning til flere rækker. Brug `idPrefix`, når produktet har brug for genkendelige relationer.
 
 ```js
 import {createComponent,mountTabs} from './design/runtime/components.mjs';
@@ -656,6 +662,10 @@ En native details bevarer summary og browserens åbne/lukkede adfærd. Details-r
 Handlingsfamilierne neutral, primary, selected, danger og accent har hver fire tokens under color.action: eksempelvis neutralHover, neutralHoverText, neutralActive og neutralActiveText. Biblioteket binder disse flade-/tekstpar til de relevante roller og varianter; synlig hover må ikke bero på en lille tekstfarveændring alene. Vedvarende valg og aria-pressed bevares under hover og tryk, og disabled er undtaget.
 
 Temaer justerer tæthed med positive space.component.padding, paddingLarge, paddingCompact, gap og gapLarge samt typografitokens. Bevar bibliotekets minimumsklikflader. De interne --ds-interaction-variabler er komponentlokale implementeringsdetaljer og må ikke sættes som globale tema-overrides.
+
+### Kompakt tæthedsprofil
+
+Brug `generateDensityCSS('compact')` fra `core/scales.mjs` eller den synkroniserede `design/runtime/scales.mjs`. Indlæs CSS-laget efter temaets CSS, og behold det, når tema eller farve skifter. Profilen sætter de fælles positive afstande og gør faner og kommandomenuer tættere ved præcis pegeindgang. Produktet vælger profil og kan fortsat bruge de semantiske afstande til egne paneler. `generateDensityCSS('standard')` leverer et tomt lag. En anden designklasse eller et id kan angives som andet argument og skal svare til temaets CSS-scope.
 
 ### Rytme og klikflader
 

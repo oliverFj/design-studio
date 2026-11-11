@@ -6,6 +6,7 @@ import {renderComponent,createComponent} from '../core/components.mjs';
 import {contrastRatio} from '../core/quality.mjs';
 import {PUBLIC_THEME_IDS} from '../tools/public-themes.mjs';
 import {dom} from './support/dom.mjs';
+import {generateDensityCSS} from '../core/scales.mjs';
 const themes=PUBLIC_THEME_IDS.map(id=>JSON.parse(readFileSync(new URL('../packages/'+id+'.json',import.meta.url),'utf8')));
 
 test('compact composite controls preserve density, labels and errors independently in every theme',()=>{
@@ -56,4 +57,16 @@ test('lean themes retain readable captions, separate decorative and interactive 
   assert.equal(c.divider.parts.root.styles.margin,'0','stack owns the separation around an ordinary divider');
   assert.ok(c.divider.variants.standalone.styles.margin,'standalone use can request spacing explicitly');
  }
+});
+
+test('product density is opt-in and scopes smaller tab and menu hit areas to fine pointers',()=>{
+ const css=generateDensityCSS('compact','#editor');
+ assert.equal(generateDensityCSS('standard'),'');
+ assert.match(css,/#editor \{\s*--ds-space-component-padding: \.5rem;/);
+ const fine=css.indexOf('@media (pointer: fine)');
+ assert.ok(fine>=0);
+ assert.doesNotMatch(css.slice(0,fine),/min-height:/);
+ assert.match(css.slice(fine),/#editor \.ds-tabs > \.ds-tabs__list > \.ds-tabs__tab \{[^}]*min-height: 32px;/);
+ assert.match(css.slice(fine),/#editor \.ds-menu \.ds-menu-item \{[^}]*min-height: 28px;/);
+ assert.throws(()=>generateDensityCSS('unknown'),/Unknown density/);
 });

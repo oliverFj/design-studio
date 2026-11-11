@@ -5,8 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { parseGuide, guidePage, loadGuides, searchMatch, GUIDE_CONTENT_LIMIT } from '../collaboration/guides.mjs';
-import { createCollaborationService, STUDIO_ROOT } from '../collaboration/service.mjs';
-import { COMPOSITIONS } from '../patterns/catalog.mjs';
+import { createCollaborationService } from '../collaboration/service.mjs';
 
 async function fixture(t) {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'stade-guides-'));
@@ -93,21 +92,6 @@ test('project context always returns entire AGENTS and makes README opt-in with 
   assert.ok(expanded.instructions[1].continuation.includes('16000'));
   await fs.writeFile(path.join(directory, 'AGENTS.md'), 'x'.repeat(256 * 1024 + 1));
   await assert.rejects(service.getProjectContext({ projectId: 'stade' }), /for stor/);
-});
-
-test('every pattern has existing reference paths and correct direct controller imports', async () => {
-  const service = await createCollaborationService();
-  for (const id of Object.keys(COMPOSITIONS)) {
-    const pattern = await service.getPattern({ id });
-    assert.equal(pattern.pattern.name, COMPOSITIONS[id].name);
-    for (const file of pattern.exampleFiles) assert.ok((await fs.stat(path.join(STUDIO_ROOT, file))).isFile());
-    for (const basis of pattern.controllerBasis) {
-      const module = await import(new URL('../' + basis.file, import.meta.url));
-      for (const symbol of basis.symbols) assert.equal(typeof module[symbol], 'function');
-    }
-  }
-  const panel = await service.getPattern({ id: 'resizable-panel' });
-  assert.ok(panel.controllerBasis.some(item => item.symbols.includes('mountPanelControls')));
 });
 
 test('matching weights exact titles over tags, summaries and incidental body text', () => {

@@ -4,6 +4,11 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
+const patternTests = [
+  'compositions', 'form-pattern', 'history', 'object-workbench', 'parameter-workbench',
+  'pattern-gallery', 'pattern-keyboard', 'pattern-quality', 'recipe-editor',
+  'resizable-panel-pattern', 'web-patterns',
+];
 
 export async function testFiles(directory = root) {
   return (await readdir(path.join(directory, 'tests'))).filter(name => name.endsWith('.test.mjs')).sort()
@@ -12,7 +17,11 @@ export async function testFiles(directory = root) {
 
 /** Enumerate files in Node rather than relying on shell glob expansion. */
 export async function runTests(args = [], directory = root) {
-  const files = await testFiles(directory);
+  const patternsOnly = args[0] === '--patterns';
+  const files = patternsOnly
+    ? patternTests.map(name => path.join(directory, 'tests', name + '.test.mjs'))
+    : await testFiles(directory);
+  const testArgs = patternsOnly ? args.slice(1) : args;
   const parent = path.join(directory, 'artifacts', 'test-runs');
   await mkdir(parent, { recursive: true });
   const resolvedParent = await realpath(parent);
@@ -22,7 +31,7 @@ export async function runTests(args = [], directory = root) {
     // A runner invoked by its own regression test must start a real child run.
     delete environment.NODE_TEST_CONTEXT;
     return await new Promise((resolve, reject) => {
-      const child = spawn(process.execPath, ['--test', ...args, ...files], {
+      const child = spawn(process.execPath, ['--test', ...testArgs, ...files], {
         cwd: directory, stdio: 'inherit', windowsHide: true,
         // Child-only settings: esbuild and fixtures share an accessible location.
         env: environment,

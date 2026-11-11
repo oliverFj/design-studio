@@ -409,7 +409,13 @@ function model(pack,id,options,components,depth=0){
   else identify(preview);
  }
  // Shared navigation preview normalization.
- if(navigationComponent){preview=normalizeNavigationPreview(id,preview,options,identifier);if(id==='tabs'&&options.orientation!==undefined)variant=options.orientation==='vertical'?'vertical':'default';}
+ if(navigationComponent){
+  preview=normalizeNavigationPreview(id,preview,options,identifier);
+  if(id==='tabs'&&options.orientation!==undefined){
+   if(options.orientation==='vertical')variant='vertical';
+   else if(variant==='vertical')variant='default';
+  }
+ }
  // Shared overlay preview normalization.
  const tree=visit(preview,true);
  if(standardDataTable)delete tree.attrs['aria-selected'];

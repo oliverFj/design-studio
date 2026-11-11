@@ -107,7 +107,13 @@ export async function compositionQualityReport(theme, { document = globalThis.do
         });
         continue;
       }
-      if (composition === 'resizable-panel') {
+      if (composition === 'theme-picker') {
+        const [themeSelect,colorSelect]=root.querySelectorAll('select');
+        themeSelect.value='castle';send(themeSelect,'change');
+        colorSelect.value='dark';send(colorSelect,'change');
+        add('appearance','selection','Valg af tema og farve opdaterer produktets præference',
+          state.id==='castle'&&state.mode==='dark'&&root.querySelectorAll('select')[1]===colorSelect);
+      } else if (composition === 'resizable-panel') {
         const input=root.querySelector('#'+prefix+'-name-control');
         input.value='Bevar min panelkladde';send(input,'input');input.focus();
         const toggle=root.querySelector('[data-panel-demo-toggle]');
