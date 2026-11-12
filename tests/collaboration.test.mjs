@@ -402,7 +402,7 @@ test('proposal capacity does not block curation and canonical symlinks cannot re
   assert.equal(await fs.readFile(target, 'utf8'), '[]');
 });
 
-test('SDK stdio client discovers, validates and calls the actual fifteen-tool server', async t => {
+test('SDK stdio client discovers, validates and calls the collaboration server', async t => {
   const { knowledge, project } = await fixture(t);
   const serverURL = new URL('../tools/mcp-server.mjs', import.meta.url).href;
   const transportURL = new URL('../node_modules/@modelcontextprotocol/sdk/dist/esm/server/stdio.js', import.meta.url).href;
@@ -413,7 +413,7 @@ test('SDK stdio client discovers, validates and calls the actual fifteen-tool se
   await client.connect(transport);
   const { tools } = await client.listTools();
   assert.deepEqual(tools.map(tool => tool.name).sort(), TOOL_PACKAGES.flatMap(pack => pack.tools.map(tool => tool.name)).sort());
-  assert.equal(tools.length, 15);
+  assert.equal(tools.find(tool => tool.name === 'list_experience_categories').annotations.readOnlyHint, true);
   assert.equal(tools.find(tool => tool.name === 'propose_experience').annotations.readOnlyHint, false);
   assert.ok(tools.every(tool => tool.inputSchema && tool.outputSchema));
   const graphic = await client.callTool({ name: 'get_graphic_profile', arguments: { family: 'anatomy' } });
@@ -448,6 +448,41 @@ test('SDK stdio client discovers, validates and calls the actual fifteen-tool se
   assert.deepEqual(sourceCheck.structuredContent.sourceChecks, experience.structuredContent.sourceChecks);
   assert.equal((await client.callTool({ name: 'check_experience_sources', arguments: { id: 'unknown-experience' } })).isError, true);
   assert.equal((await client.callTool({ name: 'search_experiences', arguments: { query: 'gpu' } })).structuredContent.total, 1);
+  const actual = JSON.parse(await fs.readFile(path.join(STUDIO_ROOT, 'collaboration/experiences.json'), 'utf8'));
+  const decoy = { ...sample('tag-only'), scope: 'shared', status: 'reviewed', tags: ['interaktiv 3D-modellering'] };
+  await fs.writeFile(path.join(knowledge, 'experiences.json'), JSON.stringify([...actual, decoy]));
+  const overview = await client.callTool({ name: 'list_experience_categories', arguments: {} });
+  assert.equal(overview.isError, undefined);
+  const category = overview.structuredContent.categories.find(item => item.title === 'Interaktiv 3D-modellering');
+  assert.ok(category?.description);
+  for (const query of ['3D-redigering', 'direct manipulation']) {
+    const topicSearch = await client.callTool({ name: 'list_experience_categories', arguments: { query } });
+    assert.equal(topicSearch.structuredContent.categories[0].id, category.id);
+  }
+  const filters = { category: category.id, scope: 'shared', status: 'reviewed' };
+  const categorized = await client.callTool({ name: 'search_experiences', arguments: filters });
+  assert.equal(categorized.isError, undefined);
+  assert.deepEqual(categorized.structuredContent.results.map(entry => entry.id).sort(), [
+    '3d-genberegn-efter-faktiske-geometriafhaengigheder',
+    '3d-genbrug-konstruktion-normaler-og-materialefinish',
+    '3d-glat-normaler-efter-fladens-intention',
+    '3d-greb-viser-modellens-traekresultat',
+    '3d-maal-redigering-til-faerdigt-billede',
+  ]);
+  assert.ok(categorized.structuredContent.results.every(entry => entry.categories.includes(category.id)));
+  const optimizationTopics = await client.callTool({ name: 'list_experience_categories', arguments: { query: 'optimering' } });
+  const optimization = optimizationTopics.structuredContent.categories.find(topic => topic.title === 'Optimering');
+  assert.ok(optimization);
+  const optimized = await client.callTool({ name: 'search_experiences', arguments: { ...filters, category: optimization.id } });
+  assert.equal(optimized.isError, undefined);
+  assert.deepEqual(optimized.structuredContent.results.map(entry => entry.id), categorized.structuredContent.results.map(entry => entry.id));
+  const narrowed = await client.callTool({ name: 'search_experiences', arguments: { ...filters, query: 'materialefinish' } });
+  assert.ok(narrowed.structuredContent.total > 0 && narrowed.structuredContent.total < 5);
+  const finish = narrowed.structuredContent.results.find(entry => entry.id === '3d-genbrug-konstruktion-normaler-og-materialefinish');
+  assert.deepEqual(finish?.categories, [category.id, optimization.id, 'rendering-and-materials']);
+  const details = await client.callTool({ name: 'get_experience', arguments: { id: finish.id } });
+  assert.deepEqual(details.structuredContent.categories, finish.categories);
+  assert.equal((await client.callTool({ name: 'search_experiences', arguments: { category: 'unknown-topic' } })).isError, true);
   assert.equal((await client.callTool({ name: 'get_project_context', arguments: { projectId: 'unknown' } })).isError, true);
   assert.equal((await client.callTool({ name: 'search_library', arguments: { query: 'button', limit: 1000 } })).isError, true);
   assert.equal((await client.callTool({ name: 'propose_experience', arguments: { experience: { ...sample('second'), status: 'reviewed' } } })).isError, true);

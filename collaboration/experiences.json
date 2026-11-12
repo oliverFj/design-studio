@@ -432,5 +432,230 @@
       }
     ],
     "updatedAt": "2026-11-09"
+  },
+  {
+    "schemaVersion": 2,
+    "id": "3d-greb-viser-modellens-traekresultat",
+    "title": "Lad 3D-greb vise modellens accepterede træk",
+    "summary": "Brug det senest kendte svar, når et greb vises. Lad selve modelhandlingen validere bevægelsen og levere feedback om stop og tilbagetrækning.",
+    "status": "reviewed",
+    "scope": "shared",
+    "tags": [
+      "interaktiv 3D-modellering",
+      "direkte manipulation",
+      "greb",
+      "gizmos",
+      "drag handles",
+      "snapping",
+      "ydelse"
+    ],
+    "context": "En 3D-editor viser retningspile på et greb, hvis mulige bevægelse afhænger af lokale geometriske stop, snap eller redigeringstilstand. Beregning af mulige retninger ved hvert valg kan starte mange af de samme geometriske prøver som et rigtigt træk.",
+    "heuristic": "Lad den autoritative modelhandling validere trækket. Vis den sidst accepterede retningsfeedback for det logiske greb og den relevante redigeringstilstand. Opdatér feedback fra det faktiske træk, når det rammer et stop, og når en bevægelse væk fra stoppet accepteres. Gem feedback ved accept, og gendan den foregående visning ved annullering.",
+    "rationale": "Den synlige pil bliver en billig læsning af en kendt tilstand. Ét aktuelt regelsæt håndhæver bevægelsen, og det kan give præcis feedback, når brugeren har behov for den.",
+    "verification": {
+      "kind": "source-inspection",
+      "summary": "Gennemgået i FormLabs arbejdskopi 12. november 2026. Markering læser sessionsdata, den aktive modelhandling giver feedback om accepteret eller afvist bevægelse, og slip gemmer retningerne. Kontrollen omfatter kodevejen for visning og træk."
+    },
+    "limits": [
+      "Sidste feedback kan være forældet efter andre modelændringer. Selve trækket skal validere mod den aktuelle model, og et ukendt greb skal have en neutral eller optimistisk standardvisning.",
+      "Hvis en markering i sig selv skal vise garanteret tilgængelighed, skal visningen have et aktuelt, billigt svar fra modellen."
+    ],
+    "sources": [
+      {
+        "project": "formlab",
+        "file": "grip-direction-memory.js",
+        "line": 21,
+        "note": "Sessionsfeedback med særskilte redigeringstilstande og accept ved slip.",
+        "sha256": "16bbc22b30c7e0d99e35d4b11ec96b302d281f2d0ccf7830b1b02123f972b638",
+        "revision": "Arbejdskopi 2026-11-12"
+      },
+      {
+        "project": "formlab",
+        "file": "app.js",
+        "line": 1763,
+        "note": "Tegningen læser feedback fra det aktive træk eller den gemte tilstand.",
+        "sha256": "080e1dee97edaec0eeb43279d9f9d1ac6327c9716e770d38dd9f3df1e14e8b76",
+        "revision": "Arbejdskopi 2026-11-12"
+      }
+    ],
+    "updatedAt": "2026-11-12"
+  },
+  {
+    "schemaVersion": 2,
+    "id": "3d-genberegn-efter-faktiske-geometriafhaengigheder",
+    "title": "Afgræns genberegning til ændrede geometriske afhængigheder",
+    "summary": "Find de flader, kanter og fælles resultater, som den konkrete redigering påvirker. Medtag både tidligere og nye kontakter.",
+    "status": "reviewed",
+    "scope": "shared",
+    "tags": [
+      "interaktiv 3D-modellering",
+      "geometri",
+      "samlinger",
+      "overlap",
+      "boolean",
+      "dependencies",
+      "incremental recomputation",
+      "ydelse"
+    ],
+    "context": "En lokal ændring i en 3D-model berører en kontakt, en udskæring eller en del af en sammensat overflade. Grupper og sammenhængende konstruktioner kan samtidig indeholde fjerne dele med egne afhængigheder.",
+    "heuristic": "Afgræns arbejdet for hvert resultat ud fra de kilder og den del af geometrien, det faktisk læser. Medtag både gamle og nye kontaktområder. Genbrug et resultat, når dets afhængigheder er uændrede. Beregn en fælles overflade eller en sammenhængende operation, når dens samlede grundlag ændres.",
+    "rationale": "Kontakter kan opstå og forsvinde, og virkningen kan variere for vægge, åbninger, sammensatte flader og kantdetaljer. Lokale afhængigheder giver en præcis grænse for både korrekthed og omkostning.",
+    "verification": {
+      "kind": "tested",
+      "summary": "I FormLabs Harlech Castle flyttede tårntrækket én form med to direkte murkontakter. I den lokale prøve blev 122 af 142 scenekomponenter genbrugt, mens det fælles gulv blev erstattet. Gennemgangen brugte scenetællere og sammenlignede passagerne efter trækket. FormLab, arbejdskopi 12. november 2026."
+    },
+    "limits": [
+      "Udvid beregningsområdet ved en faktisk afhængighed, f.eks. en sammenhængende udskæring eller en hel flade med fælles triangulering.",
+      "Et nærhedstjek giver kandidater. Kontakt eller et andet relevant geometrisk forhold skal afgøre, om de bidrager til resultatet."
+    ],
+    "sources": [
+      {
+        "project": "formlab",
+        "file": "storey-scene-cache.js",
+        "line": 382,
+        "note": "Vægstykker vurderer afhængigheder af kontakt og naboer pr. kant.",
+        "sha256": "619e4e3791e9250c67563ac99589739d9ced5a4cace8611ddf0eea170b7f4d86",
+        "revision": "Arbejdskopi 2026-11-12"
+      },
+      {
+        "project": "formlab",
+        "file": "storey-scene-cache.js",
+        "line": 474,
+        "note": "Genbrug af lokale afledninger for brystværn og deres forløb.",
+        "sha256": "619e4e3791e9250c67563ac99589739d9ced5a4cace8611ddf0eea170b7f4d86",
+        "revision": "Arbejdskopi 2026-11-12"
+      }
+    ],
+    "updatedAt": "2026-11-12"
+  },
+  {
+    "schemaVersion": 2,
+    "id": "3d-genbrug-konstruktion-normaler-og-materialefinish",
+    "title": "Genbrug 3D-geometri og materialefinish efter deres egne afhængigheder",
+    "summary": "Afgør separat, om en redigering ændrer konstruktion, normaler, materialekoordinater eller udseende. Brug samme lokale afgrænsning ved beregning og indsættelse i scenen.",
+    "status": "reviewed",
+    "scope": "shared",
+    "tags": [
+      "interaktiv 3D-modellering",
+      "materialer",
+      "materialefinish",
+      "teksturkoordinater",
+      "uv mapping",
+      "shading",
+      "worker",
+      "sceneopdatering",
+      "ydelse"
+    ],
+    "context": "En 3D-editor kan ændre form, overfladens koordinater eller materialets udseende. Den kan beregne finish asynkront og bagefter sætte resultatet ind i den synlige scene.",
+    "heuristic": "Knyt hver afledning til dens faktiske input. Genbrug geometrien ved rene ændringer i udseendet. Opdatér materialekoordinater, når mappingen ændres, og genbrug normaler, så længe fladerne og deres glatte naboskab er ækvivalente. Brug den samme afgrænsning ved planlægning, beregning og indsættelse i scenen. Kontrollér resultatets kompatibilitet med den aktuelle scene, før et sent svar anvendes.",
+    "rationale": "En lokal baggrundsberegning kan stadig efterfølges af en dyr gennemgang på hovedtråden. Bevarede delresultater reducerer beregning, kopiering og udskiftning af renderdata.",
+    "verification": {
+      "kind": "tested",
+      "summary": "Ved sidegrebet på det nordre våbenhus i FormLabs Sct. Mortens-model fandt profileringen bredt scenearbejde efter den allerede afgrænsede baggrundsberegning. Efter lokal indsættelse viste tre målte slip 686, 691 og 939 ms til færdig visning, med 105, 97 og 160 ms til at indsætte finishen. Chromium 157, arbejdskopi 12. november 2026."
+    },
+    "limits": [
+      "Fysisk relief, der ændrer silhuet, snit eller overfladens geometri, skal have geometriske afhængigheder.",
+      "Materialelag, der deles mellem flader, kan have fælles mapping eller ressourcer. Udvid omfanget, når deres faktiske input ændres."
+    ],
+    "sources": [
+      {
+        "project": "formlab",
+        "file": "material-surface-keys.js",
+        "line": 13,
+        "note": "Nøgler for materialets geometriafhængigheder.",
+        "sha256": "946992b76234d117155e5c75d8c683e7676d3b0fef0c083150c3d536fd824753",
+        "revision": "Arbejdskopi 2026-11-12"
+      },
+      {
+        "project": "formlab",
+        "file": "material-finish-async.js",
+        "line": 102,
+        "note": "Indsættelse af et beregnet resultat i den aktuelle scene.",
+        "sha256": "d48528f26f22e8dac0c82bf7dce9d53e16f5d31d49759080a7e9d56ea8f93a33",
+        "revision": "Arbejdskopi 2026-11-12"
+      }
+    ],
+    "updatedAt": "2026-11-12"
+  },
+  {
+    "schemaVersion": 2,
+    "id": "3d-glat-normaler-efter-fladens-intention",
+    "title": "Begræns normalglatning til tilsigtet glatte flader og samlinger",
+    "summary": "Brug kendte kurver, glattegrupper eller markerede kanter til at afgrænse normalglatningen. Mål både tid og størrelsen på geometribufferne.",
+    "status": "reviewed",
+    "scope": "shared",
+    "tags": [
+      "interaktiv 3D-modellering",
+      "geometri",
+      "normaler",
+      "normalglatning",
+      "smooth normals",
+      "smoothing groups",
+      "mesh",
+      "geometribuffere",
+      "ydelse"
+    ],
+    "context": "En 3D-editor glatter normaler efter redigering eller udskæring, selv om meget af geometrien har kendte fladenormaler og tilsigtet skarpe kanter.",
+    "heuristic": "Bevar fladens kendte normaler, hvor de beskriver den tilsigtede overflade. Lad fladens producent eller modellens topologiske metadata angive glatte områder og skarpe grænser. Genberegn kun ændrede flader og glatte naboforbindelser, der kan ændre deres normaler. Kontrollér silhuetter og samlinger visuelt, og mål bufferstørrelse sammen med redigeringstid.",
+    "rationale": "Global normalglatning kan koste både geometrisøgning og bufferarbejde. Skarpe grænser kan kræve flere bufferpunkter med samme position og forskellige normaler, så trekanttal alene beskriver ikke omkostningen.",
+    "verification": {
+      "kind": "tested",
+      "summary": "På det nordre våbenhus i FormLabs Sct. Mortens-model faldt medianen over tre slip fra 635 til 529 ms, da glatningen blev afgrænset til cirkler og rundede hjørner. Geometribufferne voksede fra ca. 16 til 21 MB. Nærbilleder af samlingerne viste ingen nye synlige sprækker i det kontrollerede udsnit. Chromium 157, arbejdskopi 12. november 2026."
+    },
+    "limits": [
+      "Fri flademodellering og importeret geometri kan kræve eksplicitte glattegrupper, kantdata eller en anden måde at fastslå fladens hensigt.",
+      "Tids- og bufferresultaterne gælder den målte model og renderer."
+    ],
+    "sources": [
+      {
+        "project": "formlab",
+        "file": "auto-smooth-normals.js",
+        "line": 362,
+        "note": "Afgrænsning af normalglatning og genbrug af normale kontaktdata.",
+        "sha256": "b867f58b826182fe94ffaf1800d19407a3ffc2d0986a54b4e0eddb47b3955e78",
+        "revision": "Arbejdskopi 2026-11-12"
+      }
+    ],
+    "updatedAt": "2026-11-12"
+  },
+  {
+    "schemaVersion": 2,
+    "id": "3d-maal-redigering-til-faerdigt-billede",
+    "title": "Mål en 3D-redigering frem til det færdige billede",
+    "summary": "Gentag en realistisk interaktion før og efter. Mål fra input til det første billede med de endelige resultater, og registrér hvilket arbejde der blev udført.",
+    "status": "reviewed",
+    "scope": "shared",
+    "tags": [
+      "interaktiv 3D-modellering",
+      "ydelse",
+      "profilering",
+      "latency",
+      "input-to-frame",
+      "benchmark",
+      "sceneopdatering",
+      "materialefinish"
+    ],
+    "context": "En 3D-editor viser løbende feedback under et træk og bygger derefter geometri, materialefinish eller andre renderdata. En enkelt algoritmes tid eller gennemsnitlig billedfrekvens kan skjule ventetid efter slip.",
+    "heuristic": "Gentag samme redigering på en repræsentativ stor model før og efter en ændring. Mål både feedback under trækket og slip frem til første billede med færdig geometri og finish. Registrér ventetid, beregning, overførsel, indsættelse og tegning. Skeln i tællere eller visuel fejlsøgning mellem læsninger, genbrug og ombygning. Kontrollér også slutresultatet ved det berørte område.",
+    "rationale": "Arbejdet kan flytte sig mellem baggrundsberegning og synlig sceneopdatering. En ende-til-ende-måling og et afgrænset arbejdsregnskab viser, om brugerens ventetid faktisk blev kortere.",
+    "verification": {
+      "kind": "tested",
+      "summary": "I FormLab blev det samme sidegreb på det nordre våbenhus målt fra slip til færdig visning på en stor kirkemodel. Tre gentagelser i den tidlige serie gav medianen 1.462 ms. Efter de målte lokale forbedringer gav tre gentagelser 509, 529 og 539 ms. Sporingen registrerede særskilt sceneopdatering, normaler, materialeberegning og indsættelse. Chromium 157, arbejdskopier 12. november 2026."
+    },
+    "limits": [
+      "Rapportér kolde og gentagne kørsler særskilt, når opvarmning, caching eller GPU-upload påvirker forløbet.",
+      "Indlejrede tider overlapper. Adskil ventetid på den kritiske vej fra inkluderede delmålinger, og brug et observerbart kriterium for færdig visning."
+    ],
+    "sources": [
+      {
+        "project": "formlab",
+        "file": "tools/benchmark-building-interaction.mjs",
+        "line": 316,
+        "note": "Måler færdigt billede, input, sluttilstand og ændringer i rendergeometrien.",
+        "sha256": "cab2db0eb1ce90ed922f5b87b47b1b1a023ed1cf12db65db29ab714865d1650c",
+        "revision": "Arbejdskopi 2026-11-12"
+      }
+    ],
+    "updatedAt": "2026-11-12"
   }
 ]

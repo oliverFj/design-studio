@@ -1,13 +1,13 @@
 import { renderComponent } from '../core/components.mjs';
 import { downloadFile } from '../core/files.mjs';
-import { TOOL_PACKAGES, EXPERIENCE_STATUSES, searchExperiences } from '../collaboration/catalog.mjs';
+import { TOOL_PACKAGES, EXPERIENCE_CATEGORIES, EXPERIENCE_STATUSES, experienceCategories, searchExperiences } from '../collaboration/catalog.mjs';
 import experiences from '../collaboration/experiences.json' with { type: 'json' };
 import {renderTicketInbox,bindTicketInbox} from './tickets.mjs';
 
-const draft = { query: '', scope: '', status: '', open: new Set(), packages: new Set() };
+const draft = { query: '', category: '', scope: '', status: '', open: new Set(), packages: new Set() };
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const evidenceLabels = { 'source-inspection': 'Kildegennemgang', tested: 'Afprøvet', 'user-report': 'Brugerberetning' };
-const selection = () => searchExperiences(experiences, { query: draft.query, scope: draft.scope || undefined, status: draft.status || undefined });
+const selection = () => searchExperiences(experiences, { query: draft.query, category: draft.category || undefined, scope: draft.scope || undefined, status: draft.status || undefined });
 const paragraph = text => ({ tag: 'p', text });
 
 function experienceMarkup(theme, entry) {
@@ -36,6 +36,7 @@ function experienceMarkup(theme, entry) {
         { component: 'badge', options: { text: EXPERIENCE_STATUSES[entry.status], variant: entry.status === 'reviewed' ? 'accent' : 'neutral' } },
         { tag: 'span', text: entry.scope === 'shared' ? 'Fælles heuristik' : 'Produktlokal · ' + entry.project },
         { tag: 'span', text: evidenceLabels[entry.verification.kind] },
+        ...experienceCategories(entry.id).map(({ title }) => ({ tag: 'span', text: title })),
       ],
     },
   });
@@ -57,6 +58,7 @@ export function renderCollaborationLibrary(theme) {
       <p class="connections-copy">Når agenten henter en erfaring gennem MCP, sammenlignes kildernes aktuelle filer automatisk med de gemte kontrolsummer. Svaret skelner mellem uændret, ændret, utilgængelig og uden sammenligningsgrundlag. En ændret kilde kræver en ny gennemgang; erfaringen bliver ikke automatisk forkert eller omskrevet.</p>
       <form class="experience-filters" role="search" aria-label="Søg i erfaringer">
         <label class="studio-field" for="experience-query">Søg i erfaringer<input id="experience-query" class="studio-input" type="search" placeholder="Fx GPU, materialer eller hukommelse" value="${escape(draft.query)}"></label>
+        <label class="studio-field" for="experience-category">Emne<select id="experience-category" class="studio-input"><option value="">Alle emner</option>${EXPERIENCE_CATEGORIES.map(({ id, title }) => `<option value="${escape(id)}"${id === draft.category ? ' selected' : ''}>${escape(title)}</option>`).join('')}</select></label>
         <label class="studio-field" for="experience-scope">Omfang<select id="experience-scope" class="studio-input">${[['', 'Alle områder'], ['shared', 'Fælles'], ['project', 'Produktlokale']].map(([value, label]) => `<option value="${value}"${value === draft.scope ? ' selected' : ''}>${label}</option>`).join('')}</select></label>
         <label class="studio-field" for="experience-status">Status<select id="experience-status" class="studio-input">${[['', 'Aktuelle'], ['reviewed', 'Gennemgået'], ['draft', 'Kladde'], ['retired', 'Udgået']].map(([value, label]) => `<option value="${value}"${value === draft.status ? ' selected' : ''}>${label}</option>`).join('')}</select></label>
       </form>
@@ -120,7 +122,7 @@ export function bindCollaborationLibrary(root, theme, options={}) {
     host.querySelector('#experience-count').textContent = `${selection().length} af ${experiences.length} erfaringer`;
   };
   host.querySelector('.experience-filters').addEventListener('submit', event => event.preventDefault());
-  for (const [id, field, type] of [['experience-query', 'query', 'input'], ['experience-scope', 'scope', 'change'], ['experience-status', 'status', 'change']]) {
+  for (const [id, field, type] of [['experience-query', 'query', 'input'], ['experience-category', 'category', 'change'], ['experience-scope', 'scope', 'change'], ['experience-status', 'status', 'change']]) {
     host.querySelector('#' + id).addEventListener(type, event => { draft[field] = event.target.value; update(); });
   }
   host.addEventListener('toggle', event => {

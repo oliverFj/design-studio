@@ -14,7 +14,8 @@ export const TOOL_PACKAGES = Object.freeze([
     { name: 'check_project', title: 'Kontrollér projekt', description: 'Kør Stades eksisterende læsende projekttjek uden at udføre projektets scripts.', readOnly: true },
   ] },
   { id: 'experience', name: 'Heuristik og gode praksisser', description: 'Find tommelfingerregler fra korrigerede tilgange. Konkrete ændringsønsker til Stade hører til tickets.', tools: [
-    { name: 'search_experiences', title: 'Find erfaringer', description: 'Søg i erfaringer med tydelig kilde, status og anvendelsesområde.', readOnly: true },
+    { name: 'list_experience_categories', title: 'Find emner i erfaringsbiblioteket', description: 'Se de faglige emner, eller find et emne med danske eller engelske søgeord. Brug emnets id som category i search_experiences.', readOnly: true },
+    { name: 'search_experiences', title: 'Find erfaringer', description: 'Søg i erfaringer efter fritekst, emne, status og anvendelsesområde. Find emne-id’er med list_experience_categories.', readOnly: true },
     { name: 'get_experience', title: 'Læs en erfaring', description: 'Læs problemet, fremgangsmåden, belægget og begrænsningerne med automatisk kontrol af de aktuelle kildefiler.', readOnly: true },
     { name: 'check_experience_sources', title: 'Kontrollér erfaringens kilder', description: 'Sammenlign registrerede kildehash med aktuelle filbytes i tilladte projekter uden at ændre erfaringen.', readOnly: true },
     { name: 'propose_experience', title: 'Foreslå heuristik', description: 'Foreslå en genbrugelig tommelfingerregel i format 2: situation, heuristik, begrundelse, belæg og begrænsninger. Ikke konkrete tickets. Kan ikke godkende eller erstatte eksisterende erfaringer.', readOnly: false },
@@ -33,9 +34,79 @@ export const TICKET_PRIORITIES={low:'Lav',normal:'Normal',high:'Høj'};
 
 export const EXPERIENCE_STATUSES = Object.freeze({ draft: 'Kladde', reviewed: 'Gennemgået', retired: 'Udgået' });
 
+export const EXPERIENCE_CATEGORIES = [
+  {
+    id: 'interactive-3d-modeling',
+    title: 'Interaktiv 3D-modellering',
+    description: 'Direkte redigering af 3D-modeller, geometriske afhængigheder og feedback fra træk til færdig visning.',
+    keywords: ['3D-redigering', 'greb', 'geometri', 'interactive 3D modeling', 'interactive 3D modelling', 'direct manipulation', 'drag handles', 'mesh editing'],
+    experienceIds: [
+      '3d-greb-viser-modellens-traekresultat',
+      '3d-genberegn-efter-faktiske-geometriafhaengigheder',
+      '3d-genbrug-konstruktion-normaler-og-materialefinish',
+      '3d-glat-normaler-efter-fladens-intention',
+      '3d-maal-redigering-til-faerdigt-billede',
+    ],
+  },
+  {
+    id: 'optimization',
+    title: 'Optimering',
+    description: 'Reducer ventetid og beregningsarbejde med lokal opdatering, genbrug og måling af den færdige visning.',
+    keywords: ['optimering', 'ydeevne', 'svartid', 'performance', 'optimization', 'optimisation', 'latency'],
+    experienceIds: [
+      '3d-greb-viser-modellens-traekresultat',
+      '3d-genberegn-efter-faktiske-geometriafhaengigheder',
+      '3d-genbrug-konstruktion-normaler-og-materialefinish',
+      '3d-glat-normaler-efter-fladens-intention',
+      '3d-maal-redigering-til-faerdigt-billede',
+    ],
+  },
+  {
+    id: 'rendering-and-materials',
+    title: 'Rendering og materialer',
+    description: 'Materialefinish, overfladekoordinater, normaler, forhåndsvisning og GPU-ressourcer.',
+    keywords: ['materialefinish', 'teksturer', 'normaler', 'GPU', 'shading', 'textures', 'material finish', 'render resources', 'preview'],
+    experienceIds: [
+      'formlab-texture-resize-ownership',
+      'formlab-preview-resource-cleanup',
+      'formlab-async-preview-revisions',
+      'formlab-physical-normal-gradients',
+      'formlab-infill-continuous-field-jacobian-2026-11-08',
+      'formlab-blind-panel-temporal-observation-2026-11-08',
+      '3d-genbrug-konstruktion-normaler-og-materialefinish',
+      '3d-glat-normaler-efter-fladens-intention',
+    ],
+  },
+  {
+    id: 'verification',
+    title: 'Kontrol og måling',
+    description: 'Kontrollér kilder og observeret adfærd, og mål resultater under repræsentative forhold.',
+    keywords: ['validering', 'kildekontrol', 'ydelse', 'benchmark', 'performance', 'verification', 'source checks'],
+    experienceIds: [
+      'kontroller-aktuel-kilde-foer-historisk-rettelse',
+      'formlab-blind-panel-temporal-observation-2026-11-08',
+      '3d-maal-redigering-til-faerdigt-billede',
+    ],
+  },
+];
+
+export function findExperienceCategories(query = '') {
+  return EXPERIENCE_CATEGORIES.map(({ id, title, description, keywords }) => ({
+    category: { id, title, description, keywords },
+    match: searchMatch(query, { id, title, tags: keywords, summary: description }),
+  })).filter(({ match }) => match).sort((a, b) => b.match.score - a.match.score).map(({ category }) => category);
+}
+
+export function experienceCategories(id) {
+  return EXPERIENCE_CATEGORIES.filter(category => category.experienceIds.includes(id));
+}
+
 /** All query concepts must occur; a missing status excludes retired knowledge. */
-export function searchExperiences(entries, { query = '', scope, status, project } = {}) {
-  return entries.filter(entry => (!scope || entry.scope === scope)
+export function searchExperiences(entries, { query = '', category, scope, status, project } = {}) {
+  const selected = EXPERIENCE_CATEGORIES.find(item => item.id === category);
+  if (category !== undefined && !selected) throw new Error('Ukendt erfaringskategori. Find gyldige id’er med list_experience_categories.');
+  return entries.filter(entry => (!selected || selected.experienceIds.includes(entry.id))
+    && (!scope || entry.scope === scope)
     && (!project || entry.project === project)
     && (status ? entry.status === status : entry.status !== 'retired'))
     .map((entry, index) => ({ entry, index, match: searchMatch(query, { id: entry.id, title: entry.title, tags: entry.tags, summary: entry.summary, body: JSON.stringify(entry) }) }))
