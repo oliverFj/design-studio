@@ -9,7 +9,7 @@ import { materializePackage } from '../core/engine.mjs';
 import { buildHTML } from '../templates/offline/tools/build.mjs';
 import { Script, createContext } from 'node:vm';
 import { dom, fire } from './support/dom.mjs';
-import { doctor } from '../tools/doctor.mjs';
+import { doctor, PROJECT_RUNTIME } from '../tools/doctor.mjs';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 const silent = () => {};
@@ -155,6 +155,31 @@ test('doctor detects stale sources, CSS and runtime, and build/sync resolve them
   await runCLI(['sync', project], { log: silent });
   await fs.writeFile(path.join(project, 'index.html'), await buildHTML(project));
   assert.equal((await doctor(project)).valid, true);
+});
+
+test('doctor accepts checkout line endings and resolves the shared source from the project', async t => {
+  const project = await projectFixture(t);
+  const configFile = path.join(project, 'design-studio.project.json');
+  const config = JSON.parse(await fs.readFile(configFile, 'utf8'));
+  const sharedRoot = config.studioRoot;
+  config.studioRoot = path.relative(project, sharedRoot);
+  await fs.writeFile(configFile, JSON.stringify(config));
+  for (const relative of ['design/design.css', ...PROJECT_RUNTIME.map(([, relative]) => 'design/' + relative)]) {
+    const file = path.join(project, relative);
+    const content = await fs.readFile(file, 'utf8');
+    await fs.writeFile(file, content.replace(/\r?\n/g, '\r\n'));
+  }
+  await fs.writeFile(path.join(project, 'index.html'), await buildHTML(project));
+  const report = await doctor(project);
+  assert.equal(report.valid, true, JSON.stringify(report.checks));
+  assert.equal(report.checks.some(check => check.status === 'warning'), false);
+  config.studioRoot = './missing-shared-checkout';
+  await fs.writeFile(configFile, JSON.stringify(config));
+  await fs.writeFile(path.join(project, 'index.html'), await buildHTML(project));
+  const { stdout } = await promisify(execFile)(process.execPath, ['design/tools/doctor.mjs'], {
+    cwd: project, env: { ...process.env, STADE_ROOT: sharedRoot }, windowsHide: true,
+  });
+  assert.doesNotMatch(stdout, /FEJL|ADVARSEL/);
 });
 
 test('doctor validates adapter exports without executing product code and reports offline blockers', async t => {

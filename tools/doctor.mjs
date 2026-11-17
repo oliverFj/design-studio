@@ -20,6 +20,9 @@ export const PROJECT_RUNTIME = [
 export const runtimeContent = (source, content) => source === 'tools/doctor.mjs'
   ? content.replace("'../core/engine.mjs'", "'../runtime/engine.mjs'") : content;
 
+// Git may convert text files to CRLF on checkout without changing their content.
+const normalizedText = content => content.replace(/\r\n/g, '\n');
+
 /** Read-only diagnostics. Does not execute project scripts or repair files. */
 export async function doctor(projectArgument, { studioRoot } = {}) {
   const root = await fs.realpath(projectArgument);
@@ -46,12 +49,13 @@ export async function doctor(projectArgument, { studioRoot } = {}) {
     if (!result.valid) { theme = null; throw new Error(result.errors.join('\n')); }
   });
   if (theme) await check('Genereret CSS', async () => {
-    if (await read(config.css) !== generateCSS(theme, { scope: config.scope || '.ds-scope' })) throw new Error('CSS er forældet. Kør sync og derefter npm run build.');
+    if (normalizedText(await read(config.css)) !== normalizedText(generateCSS(theme, { scope: config.scope || '.ds-scope' }))) throw new Error('CSS er forældet. Kør sync og derefter npm run build.');
   });
   await check('Biblioteksversion', async () => {
     if (config.libraryVersion !== LIBRARY_VERSION) throw new Error('Registreret udgave: ' + config.libraryVersion + '; tilgængelig udgave: ' + LIBRARY_VERSION + '. Kør sync.');
   });
-  const baseline = studioRoot || config.studioRoot;
+  const baselinePath = studioRoot || process.env.STADE_ROOT || config.studioRoot;
+  const baseline = baselinePath && path.resolve(root, baselinePath);
   let baselineAvailable = false;
   if (baseline) {
     try { baselineAvailable = (await fs.stat(path.join(baseline, 'core/engine.mjs'))).isFile(); } catch {}
@@ -59,7 +63,7 @@ export async function doctor(projectArgument, { studioRoot } = {}) {
   if (!baselineAvailable) add('warning', 'Design Studios mappe er ikke tilgængelig. Kan ikke sammenligne runtime med den centrale kilde.');
   for (const [source, relative] of PROJECT_RUNTIME) await check('Fælles fil: design/' + relative, async () => {
     const content = await read('design/' + relative);
-    if (baselineAvailable && content !== runtimeContent(source, await fs.readFile(path.join(baseline, source), 'utf8'))) throw new Error('Filen afviger fra Design Studio. Kør sync.');
+    if (baselineAvailable && normalizedText(content) !== normalizedText(runtimeContent(source, await fs.readFile(path.join(baseline, source), 'utf8')))) throw new Error('Filen afviger fra Design Studio. Kør sync.');
   });
   await check('Biblioteksindgang', async () => { await read(config.library); });
   if (!config.components || typeof config.components !== 'object' || Array.isArray(config.components)) add('error', 'components skal være et objekt med fil og export for hver adapter.');
