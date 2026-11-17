@@ -22,6 +22,10 @@ Agenten udfører synkronisering, build og udgivelse; brugeren genindlæser blot 
 
 Rodens `index.html` i Design Studio er den fulde lokale editor. Webudgaven er et særskilt offentligt build af samme interface og bibliotek. En eksport eller et lokalt hjemmesidebuild er ikke dokumentation for, at den aktuelle kode er udgivet online.
 
+## Stade Scene
+
+Synkroniseringen kopierer Scene-editoren og dens demoer fra Stade-eksporten til public/stade-scene/, som udgives på https://oliver.fjordside.dk/stade-scene/. Den indlejrede kopi under Stade bevares til Scener-galleriet. Begge bygges fra samme Scene-kilder. Logoet i editoren linker tilbage til Stade. Scenes kildekode og overdragelse ligger i https://github.com/oliverFj/stade-scene.
+
 ## Andre projekter på hjemmesiden
 
 Når brugeren beder om at lægge et produkt på hjemmesiden, læses hjemmesidens `AGENTS.md` og `docs/ADD-PROJECT.md`. Den fælles projektliste er `content/projects.json`; almindelige tilføjelser kræver ingen ny layoutkode. Hjemmesiden bruger Design Studios kopierede runtime og det valgte udvalg af temaer med lys/mørk visning. Temasamlingen udvides løbende, blandt andet når nye produkter får deres eget tema; antallet er ikke fast. Fælles ændringer hentes med `npm run sync:design-studio`, hvorefter siden genbygges.

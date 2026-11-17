@@ -19,7 +19,9 @@ npm run build
 
 Agenten kontrollerer den byggede fil over lokal HTTP og bruger relevante statiske offlineprøver efter [agentarbejdsgangen](AGENT-WORKFLOW.md#kontrollér-den-berørte-funktion). Kontrollér det berørte brugerforløb, og ved ændringer i filhåndtering også åbning og download af et tema. Ved en samlet offlineleverance indgår desuden en særskilt direkte filkontrol; hvis browserværktøjet kun tillader HTTP/HTTPS, aftales den manuelle kontrol med brugeren. Forsøg ikke den kendt ikke-understøttede protokol, og omgå ikke en URL-afvisning. HTTP- og statisk kontrol må ikke kaldes direkte filkontrol. Rene dokumentationsændringer kræver hverken nyt build eller gentagelse af kodekontroller.
 
-Kopiér den færdige `index.html` til modtageren. Skal links til materialestudierne også fungere, medtages `examples/scenes/aureol.html` og `examples/scenes/obsidian.html` med samme mappestruktur, eller brug offline-ZIP'en. Notér det anvendte Git-commit sammen med leverancen, så kildegrundlaget kan findes igen.
+Kopiér den færdige `index.html` til modtageren. Scener indlæser materialestudierne direkte i galleriet. Medtag `examples/scenes/aureol.html` og `examples/scenes/obsidian.html` med samme mappestruktur, eller brug offline-ZIP'en. Notér det anvendte Git-commit sammen med leverancen, så kildegrundlaget kan findes igen.
+
+Når Stade Scene ligger i `../Second Gen/Stade Scene`, bygger Stade Scene-editoren og demoerne Overblik, Blog, Webshop og Editor til `examples/stade-scene/` i offlineudgaven og den fulde web-showcase. Brug `STADE_SCENE_ROOT` til at angive en anden kildeplacering. Bevar mappestrukturen ved kopiering, eller brug offline-ZIP'en. Et build uden Stade Scene-kilder viser de indbyggede brugsscener. [Fund fra demoerne](SCENE-DEMOER.md) samler det, iterationen viste om Scene og de fælles mønstre.
 
 ## Leveringspakker og portabel opsætning
 

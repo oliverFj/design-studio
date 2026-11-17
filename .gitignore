@@ -10,6 +10,7 @@ desktop.ini
 /examples/workspace/index.html
 /examples/scenes/aureol.html
 /examples/scenes/obsidian.html
+/examples/stade-scene/
 /collaboration/tickets/
 *.log
 !collaboration/evidence/**/*.log

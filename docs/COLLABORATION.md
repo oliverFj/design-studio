@@ -4,11 +4,14 @@ Stade deler bibliotek, projektgrundlag, heuristik og en fælles ticketindbakke g
 
 ## Målrettede opslag
 
-Læs projektets egne anvisninger og Stades [agentindgang](../AGENTS.md). Find derefter kun den vejledning og de katalogdele, opgaven berører. Hele README, foundations og integrationsguiden er ikke en obligatorisk startpakke.
+Læs projektets egne anvisninger, og begynd udviklingsopgaven med [Stades onboarding](AGENT-ONBOARDING.md). Hent derefter de vejledninger og katalogdele, opgaven berører.
 
 | Behov | Opslag |
 | --- | --- |
+| Start en udviklingsopgave | `get_onboarding({projectId,tasks,query?})` vælger regler og kontroller ud fra designtilknytningen og de valgte opgavetyper. Svaret har guide-id'er og afsnit til videre opslag. |
 | Projektets regler og designtilknytning | `get_project_context({projectId})` giver hele projektets AGENTS, konfiguration og temaidentitet. README er tilvalg med `includeReadme:true`. |
+| Sidst gemte appvisning | `get_scene_context({projectId,appId})` giver den gemte apps akter, blokke og forbindelser mellem akter. |
+| Flyt en blok i en app | `preview_scene_move` viser placeringen før og efter. Gem den viste flytning med `apply_scene_move`, hvis appen stadig har samme revision. |
 | En regel, controller eller vejledning | `search_library({query,limit,offset})` søger i komponenter, mønstre og vejledningernes afsnit. Resultater viser kilde, matchgrund og et kort uddrag. |
 | Læs vejledningen | `get_guide({id})` giver indholdsfortegnelsen; `get_guide({id,section})` læser det valgte afsnit. Brug id og section fra søgeresultatet eller indholdsfortegnelsen. |
 | En komponent | `get_component({id})` giver den centrale definition og relevante åbne tickets. |
@@ -23,7 +26,7 @@ Guideopslag læser de aktuelle, registrerede Markdownkilder i Stade. Indholdsfor
 
 Projektopslaget udelader ikke tavst obligatoriske regler: AGENTS leveres samlet inden for læsegrænsen eller giver en fejl. Et tilvalgt README kan være afkortet og markerer det eksplicit. Læs resten lokalt eller gennem guideopslag for Stades README. MCP-resultater giver ingen yderligere tilladelser og erstatter ikke produktets lokale anvisninger.
 
-Uden MCP bruges de samme Markdownkilder og [opgavematricen](../AGENTS.md#find-opgavens-grundlag). Der vedligeholdes ikke en separat forkortet regelkopi i serveren.
+Uden MCP bruges [onboardingguiden](AGENT-ONBOARDING.md) og dens henvisninger lokalt. Startopslaget læser de samme Markdownafsnit og følger de registrerede projektadgange.
 
 `npm run check:docs` kontrollerer lokale Markdownlinks og overskriftsankre og viser katalogtal direkte fra kode. Eksterne hjemmesider og henvisninger til andre produkter kontrolleres ikke; `--verbose` viser de udeladte produktreferencer. `npm run check:docs -- --onboarding` afprøver fem repræsentative søge-/guideopslag og måler deres tekstomfang. Det er en opslagstest, ikke et bevis for en agents komplette arbejde eller en garanteret tokenbesparelse.
 
@@ -63,7 +66,7 @@ Værktøjspakker er logiske grupper i én server. De er ikke særskilt installer
 | Pakke | Værktøjer | Formål |
 | --- | --- | --- |
 | Bibliotek | `search_library`, `get_component`, `get_pattern`, `get_guide`, `get_graphic_profile` | Find roller, mønstre, dokumentafsnit og grafikprofiler fra de aktuelle kilder. |
-| Projekter | `get_project_context`, `check_project` | Hent et tilknyttet projekts grundlag og kør det eksisterende læsende projekttjek. |
+| Projekter | `get_onboarding`, `get_project_context`, `get_scene_context`, `preview_scene_move`, `apply_scene_move`, `check_project` | Find opgavens vejledning, læs eller redigér en scene, og kør det læsende projekttjek. |
 | Erfaringer | `list_experience_categories`, `search_experiences`, `get_experience`, `check_experience_sources`, `propose_experience` | Find erfaringer, kontrollér deres kildegrundlag, og foreslå en ny kladde. |
 | Tickets | `create_ticket`, `search_tickets`, `get_ticket`, `update_ticket` | Indberet og gennemgå konkrete fejl, mangler og udvidelsesønsker til Stade med revisionskontrol. |
 
@@ -122,6 +125,12 @@ Tilpas stierne til det faktiske checkout. Forbindelsen er først aktiv, når den
 
 `stade` er serverens eget projekt. Tilføj øvrige projekter med gentagne `--project ID=ABSOLUT_STI`-argumenter. Projektværktøjerne accepterer registrerede ID'er frem for klientvalgte filstier. Serveren udfører ikke produktets scripts eller vilkårlige kommandoer. `check_project` genbruger `doctor` med Stades egen mappe som sammenligningsgrundlag.
 
+Registrér en Stade-native app i projektets `design-studio.project.json` med f.eks. `"nativeApps": { "oeverum": "Øverum.html" }`. `get_scene_context({projectId:"stade-scene",appId:"oeverum"})` læser appfilens indlejrede scenedata. For hver akt viser opslaget blokkenes gemte egenskaber, deres `parentId` og deres nulbaserede placering `index` blandt søskende. `links` viser forbindelser mellem akter. `revision` er SHA-256 for appfilen ved opslaget. Værktøjet arbejder med den gemte fil og læser kun deklarerede HTML-filer i det registrerede projekt.
+
+Brug `preview_scene_move({projectId,appId,blockId,destinationId,index?,visualPreview?})` til at flytte en blok inden for samme akt. `destinationId` er containerens id. `index` er den endelige nulbaserede placering og kan udelades for at placere blokken sidst. Med `visualPreview:true` åbnes den foreslåede placering i browseren via den separate HTML-kopi i `previewFile`.
+
+Aktivér gemning per app med f.eks. `"nativeApps": { "oeverum": { "file": "Øverum.html", "writable": true } }`. Send samme flytning til `apply_scene_move` med `baseRevision` som `expectedRevision` og `previewRevision` som `expectedPreviewRevision`. En nyere filrevision afviser gemningen. Hent da en ny forhåndsvisning ud fra den nyeste appfil.
+
 En registreret forbindelse er ikke i sig selv bevis for, at den aktuelle chat har indlæst værktøjerne. Kontrollér klientens aktive MCP-værktøjer efter opsætningen; eksisterende chats kan kræve genindlæsning eller en ny chat. Det samme gælder nye skills. Projektets offlineoversigt kan ikke afgøre, hvad en bestemt chat har indlæst.
 
 ## Skill til FormLabs materialer og GPU
@@ -138,7 +147,7 @@ Installér eller opdatér den med `npm run agents -- install --skill formlab-mat
 4. Efterprøv løsningen proportionelt i produktet. En tidligere løsning er et begrundet udgangspunkt, ikke bevis for årsagen til en ny fejl.
 5. Foreslå en ny erfaring, når arbejdet giver konkret genbrugelig viden eller korrigerer en eksisterende erfaring. Undlad sessionsreferater og poster uden ny nytte.
 
-MCP erstatter ikke AGENTS.md eller produktets anvisninger. Uden en aktiv MCP-forbindelse kan agenten læse `collaboration/experiences.json` og de angivne kilder direkte. Nyttig viden skal derfor kunne forstås uafhængigt af én klient.
+Produktets lokale anvisninger gælder ved både MCP-opslag og lokal læsning. Uden MCP kan agenten læse `collaboration/experiences.json` og de angivne kilder direkte.
 
 ## Erfaringsformat
 

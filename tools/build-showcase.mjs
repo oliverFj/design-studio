@@ -11,6 +11,7 @@ import { PUBLIC_THEME_IDS } from './public-themes.mjs';
 import { COMPOSITIONS, PATTERN_FILES } from '../patterns/catalog.mjs';
 import {buildStudio} from './build-studio.mjs';
 import {buildScenes} from './build-scenes.mjs';
+import {buildSceneIntegration,sceneDemoCatalog} from './build-scene-integration.mjs';
 import {PROJECT_RUNTIME} from './doctor.mjs';
 
 const studio = fileURLToPath(new URL('../', import.meta.url));
@@ -33,7 +34,8 @@ for (const id of PUBLIC_THEME_IDS) {
 await buildScenes({outputDirectory:join(output,'examples/scenes')});
 if(process.argv.includes('--studio')) {
   await mkdir(output,{recursive:true});
-  await buildStudio({output:join(output,'index.html'),showcase:true,themes:themes.map(theme=>({key:theme.id,package:theme}))});
+  const scenePages=await buildSceneIntegration(output);
+  await buildStudio({output:join(output,'index.html'),showcase:true,sceneDemos:sceneDemoCatalog(scenePages),themes:themes.map(theme=>({key:theme.id,package:theme}))});
 } else {
 const browserImports = source => source.replace(/\.mjs(['"])/g, '.js$1');
 const compactJS = async source => (await transform(source,{loader:'js',minify:true,target:'es2022',legalComments:'none'})).code;

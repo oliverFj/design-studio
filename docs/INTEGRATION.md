@@ -141,6 +141,26 @@ Talfeltet bruger centrerede cifre med fast cifferbredde og symmetrisk indvendig 
 
 Parameterpaneler bruger normalt `range-field` med `with-input` og den fælles `mountRangeField`. Gyldige ændringer opdaterer prøven live; produktet bevarer seneste gyldige visning under ugyldige kladder og adskiller forhåndsvisning fra lagring. Talfeltet har centrerede cifre, symmetrisk luft og stabil bredde efter interval og trin. Se [skyderkontrakten](INTEGRATION.md#skyder-med-præcis-talindtastning).
 
+## Redigerbare felter i scener
+
+`scene.fields` er en valgfri del af komponent- eller mønsterdefinitionen. Hvert felt har et stabilt id, en label, en type og en standardværdi. `text` angiver `maxLength` og kan knyttes til en eksisterende indholdsplads med `slot`. `enum` bruger `options` med værdier og visningsnavne, `number` angiver `min`, `max` og `step`, og `checkbox` er en boolesk værdi. `scene.parts` knytter valgfrit tekst-, tal- og synlighedsfelter til navngivne dele. Brug komponentens eksisterende indholdspladser, varianter og controller.
+
+Agenter finder kontrakten i `get_component({id:"card"})` og `get_pattern({id:"resizable-panel"})`. `validateSceneValues(definition.scene, props)` fra `design/runtime/scene-fields.mjs` returnerer en fejltekst eller en tom streng. `resolveSceneFields` tilføjer standardværdier og afviser ugyldige værdier. Scenefilen gemmer værdier for den konkrete blok. Et udeladt felt arver standarden, og en visuel justering behøver ikke gemme programmets midlertidige tilstand.
+
+### Appmønstre i Stade Scene
+
+Scene samler mønstre som Blog, Webshop og Editor med `defineScenePattern`. En registrering har et stabilt mønster-id og bloktyper med navn, `fields` og `parts`. De samme definitioner bruges af Blokbiblioteket, Egenskaber og scenefilens validering. Mønstrets controller udstiller de levende dele på tværs af akter. En bloktype markeret med `repeatable`, som Bloggens artikelliste, kan indsættes flere gange med felter for hver blok.
+
+Scene føjer det versionerede register til den byggede eller eksporterede HTML. For registrerede apps viser `get_scene_context` det som `registry`, så agenter kan finde bloktyper og redigerbare felter sammen med gemte blokke og værdier. Appfiler fra før registeret kan stadig læses.
+
+Under **Egenskaber → Handlinger** kan en bruger vælge en blok eller en akt som mål. Scenefilen gemmer eksplicitte mål som `block.actions[handlings-id]` med `{kind, id}`. Et udeladt mål arver mønstrets eventuelle standardmål, og `null` fravælger målet. Blokmål bruger blokkens id, så Scene finder dens aktuelle akt ved aktivering. `get_scene_context` viser målet under `links` med `targetActId` og eventuelt `targetBlockId`. Ældre appfiler kan eksporteres på ny for at få et runtime, der kan følge nye handlinger.
+
+Under **Indhold** viser Scene de registrerede samlinger, som projektet bruger. Blog gemmer artikler i `data.collections.articles`, og Webshop gemmer varer i `data.collections.products`. Begge refererer til billeder i `data.media` med `imageId`. En udeladt samling kan bruge skabelonens eksempler, mens en gemt tom liste vises som tom.
+
+Et handlingsfelt med `recordCollection` sender den valgte posts id til en blok med den tilsvarende `acceptsCollection`. Scene filtrerer mulige mål og kontrollerer, at de kan modtage posten. I Magasinbutik bruger artiklens varelink samme post som kataloget, varedetaljerne og kurven.
+
+Bloggens artikelliste kan have ét kortlayout under `children`. Layoutet består af en container med komponentblokke og gemmes én gang. Scene gentager det for artiklerne i listens udsnit. `bindings` knytter en komponents felt til artiklens felt, fx `{text: "title"}` på en overskrift. Ældre lister uden kortlayout beholder deres oprindelige visning og kan få et kortlayout via Egenskaber.
+
 ## Materialer på eksisterende komponenter
 
 Materialernes CSS følger automatisk format 2-runtime og `init`/`sync`. Brug eksisterende varianter frem for lokale kopier af komponentopskrifter:

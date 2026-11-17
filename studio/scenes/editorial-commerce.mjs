@@ -1,19 +1,19 @@
 import {createComponentFactory} from '../../core/components.mjs';
 import {resolveTokens} from '../../core/engine.mjs';
 
-const ARTICLES=Object.freeze([
+export const BLOG_ARTICLES=Object.freeze([
   {id:'rum',category:'Rum',title:'Når et rum giver plads',summary:'Om de små valg, der gør et sted rart at vende tilbage til.',date:'9. november 2026',reading:'6 min.',art:'room',paragraphs:['Et rum begynder sjældent med en ting. Det begynder med en fornemmelse af, hvad der skal være plads til: en samtale, en pause eller en idé, der endnu ikke har fået form.','Lys, materialer og proportioner fortæller os, hvordan vi kan være til stede. En lav bænk ved vinduet kan invitere mere end et helt katalog af møbler. Det afgørende er sammenhængen mellem tingene.','Vi kan begynde med at fjerne noget. Lade en flade være fri, flytte stolen en smule og se, hvordan lyset ændrer stedet gennem dagen. Nogle gange er det den mindste beslutning, der giver mest plads.']},
   {id:'papir',category:'Materialer',title:'Papiret husker hånden',summary:'En notesbog, en blød blyant og glæden ved det ufærdige.',date:'6. november 2026',reading:'4 min.',art:'paper',paragraphs:['Papiret giver modstand. Det tager imod en streg med sin egen rytme og gør en lille forskel synlig, hver gang vi begynder forfra.','I notesbogen behøver en tanke ikke være færdig. Her kan en skitse møde en indkøbsliste og et ord, der måske først giver mening i morgen. Det er en anden måde at tænke med hænderne på.','Et godt materiale hjælper os ikke ved at gøre alt ens. Det hjælper os ved at give plads til det personlige aftryk.']},
   {id:'lys',category:'Rum',title:'Det bløde lys klokken fire',summary:'En lampe kan skabe et lille rum inde i det store.',date:'3. november 2026',reading:'3 min.',art:'lamp',paragraphs:['Når dagen bliver kortere, flytter vi lyset tættere på. En bordlampe gør ikke hele rummet lyst. Den giver det et sted at samles.','Afstanden mellem lyskilde, bord og væg bestemmer, om lyset føles åbent eller nært. Det er værd at prøve en ny placering, før man finder en ny lampe.','Lad det praktiske og det stemningsfulde mødes. Der skal være lys nok til arbejdet og ro nok til at blive siddende lidt længere.']},
   {id:'pause',category:'Arbejdsliv',title:'En pause med udsigt',summary:'Hverdagsritualer, der giver tankerne en anden retning.',date:'30. oktober 2026',reading:'5 min.',art:'vase',paragraphs:['En pause behøver ikke være en opgave mere. Den kan være det øjeblik, hvor vi flytter blikket fra det nære arbejde til noget, der ikke skal løses.','Et glas vand, en gren i en vase eller udsigten fra et andet vindue kan markere overgangen. Det enkle ritual hjælper os med at opdage, at vi faktisk har skiftet tempo.','Når vi kommer tilbage, er opgaven ofte den samme. Men vi ser den fra en lidt anden vinkel.']},
-]);
-const PRODUCTS=Object.freeze([
+].map(({paragraphs,...article})=>Object.freeze({...article,body:paragraphs.join('\n\n')})));
+export const SHOP_PRODUCTS=Object.freeze([
   {id:'lamp',category:'Lys',title:'Orbit bordlampe',description:'Et varmt lyspunkt til skrivebordet. Drejet skærm og en rolig, rund fod.',price:895,material:'Lakeret metal · Ø 24 cm',art:'lamp'},
   {id:'notebook',category:'Papir',title:'Fold notesbog',description:'Plads til skitser, løse tanker og de første gode idéer.',price:145,material:'Genbrugspapir · 160 sider',art:'paper'},
   {id:'vase',category:'Objekter',title:'Kant vase',description:'En enkel silhuet med en lille forskydning i formen.',price:325,material:'Glaseret keramik · 18 cm',art:'vase'},
   {id:'print',category:'Papir',title:'Rum / 01',description:'Et grafisk studie i lys, flader og mødet mellem former.',price:295,material:'Kunsttryk · 30 × 40 cm',art:'print'},
 ]);
-const currency=value=>new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK',maximumFractionDigits:0}).format(value);
+const currency=value=>new Intl.NumberFormat('da-DK',{style:'currency',currency:'DKK',minimumFractionDigits:Number.isInteger(value)?0:2,maximumFractionDigits:2}).format(value);
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /** Original product/editorial studies: local geometry, coloured by the theme. */
@@ -30,122 +30,315 @@ function artwork(tokens,motif){
 }
 
 function sceneHelpers(theme,document){
-  const component=createComponentFactory(theme,{document}),listeners=[],imageTokens=resolveTokens(theme);
+  const component=createComponentFactory(theme,{document}),listeners=[],images=new Map();
+  let imageTokens=resolveTokens(theme);
   const el=(tag,className,text)=>{const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node;};
   const listen=(node,type,handler)=>{node.addEventListener(type,handler);listeners.push(()=>node.removeEventListener(type,handler));return node;};
-  const clear=()=>{for(const cleanup of listeners.splice(0))cleanup();};
+  const clear=()=>{for(const cleanup of listeners.splice(0))cleanup();images.clear();};
   const heading=(text,variant='panel',tag='h3')=>component('heading',{variant,slots:{root:{tag,text}}});
-  const image=(motif,alt)=>component('image',{src:artwork(imageTokens,motif),alt,caption:''});
+  const image=(motif,alt)=>{
+    const figure=component('image',{src:artwork(imageTokens,motif),alt,caption:''});
+    images.set(figure.querySelector('img'),motif);
+    return figure;
+  };
+  const setTheme=next=>{
+    imageTokens=resolveTokens(next);
+    for(const [img,motif]of images)img.setAttribute('src',artwork(imageTokens,motif));
+  };
   const card=(className,parts)=>{
     const node=component('card',{slots:{header:[],body:[],footer:[]}});node.className+=' '+className;
     for(const part of ['header','body','footer']){const target=node.querySelector('.ds-card__'+part),children=parts[part];if(children?.length)target.replaceChildren(...children);else target.setAttribute('hidden','');}
     return node;
   };
-  return {component,el,listen,clear,heading,image,card};
+  return {component,el,listen,clear,heading,image,card,setTheme};
 }
 
-export function mountBlogScene(theme,{document=globalThis.document,state={},idPrefix='case-blog',announce=()=>{}}={}){
-  const {component:c,el,listen,clear,heading,image}=sceneHelpers(theme,document);
+export function mountBlogScene(theme,{
+  document=globalThis.document,state={},renderParts,getArticles=()=>BLOG_ARTICLES,
+  renderArticleImage,onOpenArticle,onCloseArticle,onOpenProduct,announce=()=>{},
+}={}){
+  const {component:c,el,listen,clear,heading,image,setTheme}=sceneHelpers(theme,document);
   const root=el('section','case-blog');root.setAttribute('aria-label','Mellemrum · redaktionelt magasin');
-  if(!['Alle','Rum','Materialer','Arbejdsliv'].includes(state.category))state.category='Alle';
-  if(!ARTICLES.some(article=>article.id===state.article))state.article=null;
-  const articleButton=(article,location)=>{
-    const button=c('button',{text:location==='feature'?'Læs historien':'Læs artikel',variant:location==='feature'?'primary':'ghost',size:location==='feature'?'medium':'small',attrs:{'data-blog-open':article.id}});
-    return listen(button,'click',()=>{state.article=article.id;render('[data-blog-back]');});
-  };
+  const lists=new Set();
+  let presentation={},origin,articles,matching;
+  function articleImage(article,alternate){
+    const alt=alternate??article.imageAlt??article.summary??'';
+    return renderArticleImage?.(alternate===undefined?article:{...article,imageAlt:alternate})??image(article.art,alt);
+  }
+  function closeArticle(){
+    const previous=origin;
+    origin=undefined;
+    state.article=null;
+    render();
+    if(previous?.navigate&&onCloseArticle?.())return;
+    const host=previous?.host??root;
+    const button=host.querySelector(previous?.selector??'[data-blog-open]')
+      ??host.querySelector('[data-blog-open]');
+    button?.focus();
+  }
+  function articleButton(article,{feature=false,separate=false}={}){
+    const button=c('button',{text:feature?'Læs historien':'Læs artikel',variant:feature?'primary':'ghost',size:feature?'medium':'small'});
+    return connectArticleButton(button,article,separate);
+  }
+  function connectArticleButton(button,article,separate,sourceId,buttonId){
+    button.setAttribute('data-blog-open',article.id);
+    if(separate){
+      button.setAttribute('data-scene-action','read');
+      button.setAttribute('data-scene-action-item',article.id);
+    }
+    if(sourceId)button.setAttribute('data-scene-action-source',sourceId);
+    if(buttonId)button.setAttribute('data-blog-template-button',buttonId);
+    return listen(button,'click',()=>{
+      const host=button.closest?.(sourceId?'[data-scene-block="'+sourceId+'"]':'[data-scene-block]')??root;
+      const hostPanel=host.closest?.('[data-scene-act-panel]')??null;
+      const selector='[data-blog-open="'+article.id+'"]'+(buttonId?'[data-blog-template-button="'+buttonId+'"]':'');
+      origin={host,separate,selector};
+      state.article=article.id;
+      render();
+      if(separate){
+        const live=host.querySelector(selector);
+        if(live&&onOpenArticle?.(live)){
+          origin.navigate=!live.isConnected||Boolean((document.querySelector('[data-scene-act-panel]')??null)!==hostPanel);
+        }else announce('Vælg en artikellæser som mål for læseknappen.');
+      }else host.querySelector('[data-blog-back]')?.focus();
+    });
+  }
+  function appendText(host,className,text){
+    if(text)host.append(el('p',className,text));
+  }
+  function renderFeature(featured,settings={},separate=false){
+    if(!featured)return el('p','case-blog__empty','Der er ingen artikler at fremhæve.');
+    const feature=el('article','case-blog__feature'),copy=el('div','case-blog__feature-copy');
+    appendText(copy,'case-blog__eyebrow',[settings.label??'Ugens historie',featured.category].filter(Boolean).join(' / '));
+    copy.append(heading(featured.title,'display','h2'));
+    if(settings.showSummary!==false)appendText(copy,'case-blog__lead',featured.summary);
+    appendText(copy,'case-blog__meta',[featured.date,featured.reading].filter(Boolean).join(' · '));
+    if(settings.showLink!==false)copy.append(articleButton(featured,{feature:true,separate}));
+    if(settings.showImage!==false)feature.append(articleImage(featured));
+    else feature.className+=' case-blog__feature--text';
+    feature.append(copy);
+    return feature;
+  }
+  function renderList(items,settings={},separate=false,template){
+    const latest=el('section','case-blog__latest');
+    if(settings.showHeading!==false)latest.append(heading(settings.title??'Flere historier','panel','h2'));
+    const grid=el('div',settings.layout==='list'?'case-blog__grid case-blog__grid--list':'case-blog__grid');
+    for(const article of items){
+      const item=el('article','case-blog__story');
+      if(template){
+        item.append(template(article,{
+          image: alt=>articleImage(article,alt),
+          connectButton: (button,sourceId,buttonId)=>connectArticleButton(button,article,true,sourceId,buttonId),
+        }));
+        grid.append(item);
+        continue;
+      }
+      if(settings.showImage!==false)item.append(articleImage(article));
+      appendText(item,'case-blog__eyebrow',[article.category,article.reading].filter(Boolean).join(' / '));
+      item.append(heading(article.title));
+      if(settings.showSummary!==false)appendText(item,'case-blog__summary',article.summary);
+      if(settings.showLink!==false)item.append(articleButton(article,{separate}));
+      grid.append(item);
+    }
+    latest.append(items.length?grid:el('p','case-blog__empty','Ingen artikler i dette udsnit.'));
+    return latest;
+  }
+  function renderReader(current,settings={}){
+    if(!current)return el('p','case-blog__empty','Vælg en artikel for at læse den her.');
+    const article=el('article','case-blog__reader');
+    const back=listen(c('button',{text:'Tilbage til magasinet',variant:'ghost',size:'small',iconName:'arrow-left',attrs:{'data-blog-back':''}}),'click',closeArticle);
+    back.setAttribute('data-scene-target-focus','');
+    const copy=el('div','case-blog__reader-copy');
+    appendText(copy,'case-blog__eyebrow',[current.category,current.reading].filter(Boolean).join(' / '));
+    copy.append(heading(current.title,'title','h2'));
+    if(settings.showSummary!==false)appendText(copy,'case-blog__lead',current.summary);
+    if(settings.showDate!==false)appendText(copy,'case-blog__meta',current.date);
+    for(const paragraph of (current.body??'').split(/\r?\n\s*\r?\n/))appendText(copy,'case-blog__paragraph',paragraph.trim());
+    if(current.productId&&onOpenProduct){
+      const product=c('button',{text:'Se varen',variant:'secondary',attrs:{'data-scene-action':'product','data-scene-action-item':current.productId}});
+      copy.append(listen(product,'click',()=>{
+        if(!onOpenProduct(current.productId,product))announce('Vælg en blok med varedetaljer som mål.');
+      }));
+    }
+    article.append(back);
+    if(settings.showImage!==false)article.append(articleImage(current));
+    article.append(copy);
+    return article;
+  }
+  function paintList(list){
+    const {settings,element,renderCard,card}=list;
+    const start=(settings.startAt??1)-1;
+    const source=settings.source==='all'?articles:matching;
+    element.replaceChildren(renderList(source.slice(start,start+(settings.count??3)),settings,true,
+      card&&((article,controls)=>renderCard(card,article,controls))));
+  }
   function render(focus){
-    clear();root.replaceChildren();
+    clear();
+    articles=getArticles();
+    const categories=[...new Set(['Alle',...articles.map(article=>article.category).filter(Boolean)])];
+    if(!categories.includes(state.category))state.category='Alle';
+    const current=articles.find(article=>article.id===state.article);
+    if(!current){state.article=null;origin=undefined;}
+    matching=articles.filter(article=>state.category==='Alle'||article.category===state.category);
     const header=el('header','case-blog__masthead');
     header.append(el('span','case-blog__wordmark','Mellemrum'),el('span','case-blog__edition','Et magasin om form og hverdag · Nr. 04'));
     const nav=el('nav','case-blog__categories');nav.setAttribute('aria-label','Artikelemner');
-    for(const category of ['Alle','Rum','Materialer','Arbejdsliv']){
+    for(const category of categories){
       const button=c('button',{text:category,variant:'ghost',size:'small',attrs:{'aria-pressed':String(state.category===category),'data-blog-category':category}});
-      listen(button,'click',()=>{state.category=category;state.article=null;render('[data-blog-category="'+category+'"]');});nav.append(button);
+      listen(button,'click',()=>{state.category=category;state.article=null;render(category);});nav.append(button);
     }
-    root.append(header,nav);
-    const current=ARTICLES.find(article=>article.id===state.article);
-    if(current){
-      const article=el('article','case-blog__reader');
-      const back=listen(c('button',{text:'Tilbage til magasinet',variant:'ghost',size:'small',iconName:'arrow-left',attrs:{'data-blog-back':''}}),'click',()=>{state.article=null;render('[data-blog-open="'+current.id+'"]');});
-      const copy=el('div','case-blog__reader-copy');copy.append(el('p','case-blog__eyebrow',current.category+' / '+current.reading),heading(current.title,'title','h2'),el('p','case-blog__lead',current.summary),el('p','case-blog__meta','Redaktionen · '+current.date));
-      for(const paragraph of current.paragraphs)copy.append(el('p','case-blog__paragraph',paragraph));
-      const quote=el('blockquote','case-blog__quote','“Det er sammenhængen mellem tingene, der giver stedet karakter.”');
-      copy.append(quote);article.append(back,image(current.art,current.summary),copy);root.append(article);
-    }else{
-      const matching=ARTICLES.filter(article=>state.category==='Alle'||article.category===state.category),featured=matching[0];
-      const feature=el('article','case-blog__feature'),copy=el('div','case-blog__feature-copy');
-      copy.append(el('p','case-blog__eyebrow','Ugens historie / '+featured.category),heading(featured.title,'display','h2'),el('p','case-blog__lead',featured.summary),el('p','case-blog__meta',featured.date+' · '+featured.reading),articleButton(featured,'feature'));
-      feature.append(image(featured.art,featured.summary),copy);root.append(feature);
-      if(matching.length>1){
-        const latest=el('section','case-blog__latest');latest.append(heading('Flere historier','panel','h2'));
-        const grid=el('div','case-blog__grid');
-        for(const article of matching.slice(1)){
-          const item=el('article','case-blog__story');item.append(image(article.art,article.summary),el('p','case-blog__eyebrow',article.category+' / '+article.reading),heading(article.title),el('p','case-blog__summary',article.summary),articleButton(article,'grid'));grid.append(item);
-        }
-        latest.append(grid);root.append(latest);
-      }
+    const stories=current&&!origin?.separate?[renderReader(current)]:[renderFeature(matching[0])];
+    const extra=matching.slice(1,presentation.stories?.count??matching.length);
+    if((!current||origin?.separate)&&extra.length)stories.push(renderList(extra));
+    const footer=el('footer','case-blog__footer');footer.append(el('span','','Mellemrum'),el('span','','Nye perspektiver på det, vi omgiver os med.'));
+    if(renderParts){
+      const feature=presentation.feature??{};
+      const source=feature.source==='all'?articles:matching;
+      renderParts({
+        masthead:header,categories:nav,stories,footer,
+        feature:renderFeature(source[(feature.startAt??1)-1],feature,true),
+        reader:renderReader(current,presentation.reader),
+      });
     }
-    const footer=el('footer','case-blog__footer');footer.append(el('span','','Mellemrum'),el('span','','Nye perspektiver på det, vi omgiver os med.'));root.append(footer);
-    if(focus)root.querySelector(focus)?.focus();
+    else root.replaceChildren(header,nav,...stories,footer);
+    for(const list of lists)paintList(list);
+    if(focus)Array.from(nav.children).find(button=>button.getAttribute('data-blog-category')===focus)?.focus();
   }
   render();
-  return {element:root,destroy:clear};
+  return {
+    element:root,destroy:clear,setTheme,refresh:()=>render(),
+    configure(region,settings){
+      const previous=presentation[region]??{};
+      if(JSON.stringify(previous)===JSON.stringify(settings))return;
+      presentation={...presentation,[region]:settings};
+      render();
+    },
+    mountList(renderCard){
+      const list={element:el('div','case-blog__list'),settings:{},renderCard};
+      lists.add(list);
+      paintList(list);
+      return {
+        element:list.element,
+        update(settings={},card){
+          const revision=JSON.stringify([settings,card]);
+          if(list.revision===revision)return;
+          list.revision=revision;
+          list.settings=settings;
+          list.card=card;
+          render();
+        },
+        destroy(){lists.delete(list);},
+      };
+    },
+  };
 }
 
-export function mountShopScene(theme,{document=globalThis.document,state={},idPrefix='case-shop',announce=()=>{}}={}){
-  const {component:c,el,listen,clear,heading,image,card}=sceneHelpers(theme,document);
+export function mountShopScene(theme,{
+  document=globalThis.document,state={},idPrefix='case-shop',announce=()=>{},renderParts,onOpenCart,
+  getProducts=()=>SHOP_PRODUCTS,renderProductImage,
+}={}){
+  const {component:c,el,listen,clear,heading,image,card,setTheme}=sceneHelpers(theme,document);
   const root=el('section','case-shop');root.setAttribute('aria-label','Form Butik · designprodukter');
-  if(!PRODUCTS.some(product=>product.id===state.product))state.product='lamp';
-  if(!['Alle','Lys','Papir','Objekter'].includes(state.category))state.category='Alle';
   state.quantity??='1';state.cart??={};state.cartOpen??=false;
+  let products;
+  const productImage=product=>renderProductImage?.(product)??image(product.art,product.imageAlt??product.title);
   const count=()=>Object.values(state.cart).reduce((sum,quantity)=>sum+quantity,0);
   function add(product,focus){
     const amount=product.id===state.product?Number(state.quantity):1;
     state.cart[product.id]=(state.cart[product.id]??0)+amount;
     state.message=product.title+' er lagt i kurven.';announce(state.message);render(focus);
   }
-  function render(focus){
-    clear();root.replaceChildren();
+  function openCart(trigger){
+    const wasOpen=state.cartOpen;
+    if(onOpenCart){
+      if(!wasOpen){
+        state.cartOpen=true;
+        trigger=render('[data-shop-cart]');
+      }
+      if(onOpenCart(trigger)||!wasOpen)return;
+    }
+    state.cartOpen=!wasOpen;
+    render('[data-shop-cart]');
+  }
+  function render(focus,fallback,focusCategory){
+    clear();
+    products=getProducts();
+    const categoryNames=[...new Set(['Alle',...products.map(product=>product.category).filter(Boolean)])];
+    if(!categoryNames.includes(state.category))state.category='Alle';
+    const ids=new Set(products.map(product=>product.id));
+    if(!ids.has(state.product)){state.product=products[0]?.id;state.quantity='1';state.message='';}
+    for(const id of Object.keys(state.cart))if(!ids.has(id))delete state.cart[id];
     const header=el('header','case-shop__header'),identity=el('div','case-shop__identity');identity.append(el('span','case-shop__wordmark','FORM / BUTIK'),el('span','case-shop__byline','Gode ting til den nære hverdag.'));
-    const cartButton=c('button',{text:'Kurv · '+count(),variant:'secondary',size:'small',attrs:{'data-shop-cart':'','aria-expanded':String(state.cartOpen)}});
-    listen(cartButton,'click',()=>{state.cartOpen=!state.cartOpen;render('[data-shop-cart]');});header.append(identity,cartButton);root.append(header);
+    const cartButton=c('button',{text:'Kurv · '+count(),variant:'secondary',size:'small',attrs:{
+      'data-shop-cart':'',...(onOpenCart?{'data-scene-action':'cart'}:{'aria-expanded':String(state.cartOpen)}),
+    }});
+    listen(cartButton,'click',()=>openCart(cartButton));header.append(identity,cartButton);
+    let cart;
     if(state.cartOpen){
-      const cart=el('section','case-shop__cart');cart.setAttribute('aria-labelledby',idPrefix+'-cart-title');
-      const cartTitle=heading('Din kurv','panel','h2');cartTitle.setAttribute('id',idPrefix+'-cart-title');cart.append(cartTitle);
-      const entries=PRODUCTS.filter(product=>state.cart[product.id]>0);
+      cart=el('section','case-shop__cart');cart.setAttribute('aria-labelledby',idPrefix+'-cart-title');
+      const cartTitle=heading('Din kurv','panel','h2');cartTitle.setAttribute('id',idPrefix+'-cart-title');
+      cartTitle.setAttribute('tabindex','-1');
+      cartTitle.setAttribute('data-shop-cart-focus','');
+      cartTitle.setAttribute('data-scene-target-focus','');
+      cart.append(cartTitle);
+      const entries=products.filter(product=>state.cart[product.id]>0);
       if(!entries.length)cart.append(el('p','','Din kurv er tom. Find en ting, du har lyst til at se nærmere på.'));
       else{
         const list=el('ul','case-shop__cart-items');
         for(const product of entries){
           const row=el('li','case-shop__cart-item'),description=el('div','case-shop__cart-copy');description.append(el('strong','',product.title),el('span','',state.cart[product.id]+' stk. · '+currency(product.price)));
-          const remove=c('button',{text:'Fjern',variant:'ghost',size:'small',label:'Fjern '+product.title,attrs:{'aria-label':'Fjern '+product.title}});listen(remove,'click',()=>{delete state.cart[product.id];render('[data-shop-cart]');});row.append(description,el('strong','',currency(product.price*state.cart[product.id])),remove);list.append(row);
+          const remove=c('button',{text:'Fjern',variant:'ghost',size:'small',label:'Fjern '+product.title,attrs:{'aria-label':'Fjern '+product.title}});listen(remove,'click',()=>{
+            delete state.cart[product.id];
+            render(onOpenCart?'[data-shop-cart-focus]':'[data-shop-cart]');
+          });row.append(description,el('strong','',currency(product.price*state.cart[product.id])),remove);list.append(row);
         }
-        const total=entries.reduce((sum,product)=>sum+product.price*state.cart[product.id],0),summary=el('div','case-shop__total');summary.append(el('span','','I alt'),el('strong','',currency(total)));
+        const total=entries.reduce((sum,product)=>sum+Math.round(product.price*100)*state.cart[product.id],0),summary=el('div','case-shop__total');summary.append(el('span','','I alt'),el('strong','',currency(total/100)));
         cart.append(list,summary,el('p','case-shop__demo-note','Demokurv · Der gennemføres ingen bestilling eller betaling.'));
       }
-      root.append(cart);
     }
-    const current=PRODUCTS.find(product=>product.id===state.product),feature=el('section','case-shop__feature'),copy=el('div','case-shop__feature-copy');
-    copy.append(el('p','case-shop__eyebrow','Udvalgt / '+current.category),heading(current.title,'title','h2'),el('p','case-shop__description',current.description),el('p','case-shop__material',current.material),el('p','case-shop__price',currency(current.price)));
+    const current=products.find(product=>product.id===state.product);
+    const feature=current?renderProduct(current):el('p','case-shop__description','Der er ingen varer endnu.');
+    function renderProduct(current){
+    const detail=el('section','case-shop__feature'),copy=el('div','case-shop__feature-copy');
+    const title=heading(current.title,'title','h2');
+    title.setAttribute('data-scene-target-focus','');title.setAttribute('tabindex','-1');
+    copy.append(el('p','case-shop__eyebrow',['Udvalgt',current.category].filter(Boolean).join(' / ')),title,el('p','case-shop__description',current.description??''),el('p','case-shop__material',current.material??''),el('p','case-shop__price',currency(current.price)));
     const options=el('div','case-shop__purchase');
     const quantity=c('field',{idPrefix:idPrefix+'-quantity',label:'Antal',slots:{control:{tag:'select',children:[1,2,3,4,5].map(value=>({tag:'option',attrs:{value:String(value)},text:String(value)}))}},hint:''});
     const select=quantity.querySelector('select');select.value=state.quantity;listen(select,'change',()=>{state.quantity=select.value;});
     const addButton=c('button',{text:'Læg i kurv',variant:'primary',attrs:{'data-shop-add':'feature'}});listen(addButton,'click',()=>add(current,'[data-shop-add="feature"]'));options.append(quantity,addButton);copy.append(options);
-    const message=el('p','case-shop__message',state.message??'');message.setAttribute('role','status');copy.append(message);feature.append(image(current.art,current.title+' · '+current.material),copy);root.append(feature);
+    const message=el('p','case-shop__message',state.message??'');message.setAttribute('role','status');copy.append(message);detail.append(productImage(current),copy);
+    return detail;
+    }
     const collection=el('section','case-shop__collection'),bar=el('div','case-shop__collection-bar');bar.append(heading('Ting med omtanke','panel','h2'));
     const categories=el('div','case-shop__categories');categories.setAttribute('role','group');categories.setAttribute('aria-label','Produktkategorier');
-    for(const category of ['Alle','Lys','Papir','Objekter']){const button=c('button',{text:category,variant:'ghost',size:'small',attrs:{'aria-pressed':String(state.category===category),'data-shop-category':category}});listen(button,'click',()=>{state.category=category;render('[data-shop-category="'+category+'"]');});categories.append(button);}
+    for(const category of categoryNames){const button=c('button',{text:category,variant:'ghost',size:'small',attrs:{'aria-pressed':String(state.category===category),'data-shop-category':category}});listen(button,'click',()=>{state.category=category;render(undefined,undefined,category);});categories.append(button);}
     bar.append(categories);collection.append(bar);const grid=el('div','case-shop__products');
-    for(const product of PRODUCTS.filter(product=>state.category==='Alle'||product.category===state.category)){
+    for(const product of products.filter(product=>state.category==='Alle'||product.category===state.category)){
       const detail=c('button',{text:'Se produkt',variant:'ghost',size:'small',attrs:{'data-shop-product':product.id,'aria-pressed':String(state.product===product.id),'aria-label':'Se '+product.title}});
-      listen(detail,'click',()=>{state.product=product.id;state.quantity='1';state.message='';render('[data-shop-add="feature"]');});
+      listen(detail,'click',()=>{state.product=product.id;state.quantity='1';state.message='';render('[data-shop-add="feature"]','[data-shop-product="'+product.id+'"]');});
       const productCopy=el('div','case-shop__product-copy');productCopy.append(heading(product.title),el('p','case-shop__product-material',product.material));const productBuy=el('div','case-shop__product-buy');productBuy.append(el('strong','',currency(product.price)),detail);
-      const item=card('case-shop__product',{header:[image(product.art,product.title)],body:[productCopy],footer:[productBuy]});grid.append(item);
+      const item=card('case-shop__product',{header:[productImage(product)],body:[productCopy],footer:[productBuy]});grid.append(item);
     }
-    collection.append(grid);root.append(collection);
-    const footer=el('footer','case-shop__footer');footer.append(el('span','','FORM / BUTIK'),el('span','','Demobutik · produkter og priser er eksempler.'));root.append(footer);
-    if(focus)root.querySelector(focus)?.focus();
+    collection.append(grid);
+    const footer=el('footer','case-shop__footer');footer.append(el('span','','FORM / BUTIK'),el('span','','Demobutik · produkter og priser er eksempler.'));
+    const parts={header,cart,feature,collection,footer};
+    const visible=Object.values(parts).filter(Boolean);
+    if(renderParts)renderParts(parts);else root.replaceChildren(...visible);
+    if(focus){
+      const candidates=[focus,fallback].filter(Boolean).flatMap(selector=>visible.map(part=>part.querySelector(selector)));
+      (candidates.find(node=>node?.isConnected)??candidates.find(node=>node&&node.isConnected===undefined))?.focus();
+    }
+    if(focusCategory)Array.from(categories.children).find(button=>button.getAttribute('data-shop-category')===focusCategory)?.focus();
+    return cartButton;
   }
   render();
-  return {element:root,destroy:clear};
+  return {
+    element:root,destroy:clear,setTheme,refresh:()=>render(),
+    selectProduct(id){
+      if(!getProducts().some(product=>product.id===id))return false;
+      if(state.product!==id){state.product=id;state.quantity='1';state.message='';render();}
+      return true;
+    },
+  };
 }

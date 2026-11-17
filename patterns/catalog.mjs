@@ -11,7 +11,7 @@ export const COMPOSITIONS = Object.freeze({
     related: Object.freeze(['site-header']),
     description: 'En knap med Stades mærke åbner et lille panel med valg af tema og farve.',
     usage: 'Brug mountThemePicker fra patterns/theme-picker.mjs. Produktet leverer katalog, aktuelle valg og funktionen, der anvender og gemmer dem. Placér knappen ved arbejdsfladens øverste højre kant.',
-    components: ['button', 'popover', 'field', 'select'],
+    components: ['button', 'popover', 'choice-field'],
     interactions: ['Tema og farve vælges med native felter', 'Temaet skifter med det samme, mens panelet bliver åbent', 'Klik udenfor eller Escape lukker panelet', 'Escape returnerer fokus til knappen'],
     qualityScenarios: Object.freeze(['initial', 'appearance']),
   }),
@@ -21,7 +21,13 @@ export const COMPOSITIONS = Object.freeze({
     useWhen: 'Brugeren skal tilpasse pladsen mellem en arbejdsflade og et egenskabspanel og kunne lukke panelet uden at miste sin kladde.',
     related: Object.freeze(['editor', 'list-detail']),
     description: 'Skalér et sidepanel, træk det til lukkezonen og slip. Træk eller klik i kantgrebet for at åbne igen med bevaret indhold.',
-    usage: 'Brug den fælles panelcontroller mountPanelControls fra core/panels.mjs med collapsible:true. patterns/resizable-panel.mjs eksporterer mountResizablePanel som valgfri referencekode. Produktet ejer indhold og state; controlleren ejer træk, fokus, tastatur og bevægelse.',
+    usage: 'Brug den fælles panelcontroller mountPanelControls fra core/panels.mjs med collapsible:true. patterns/resizable-panel.mjs eksporterer mountResizablePanel som valgfri referencekode. Angiv side og startbredde via configuration, og opdatér dem med setConfiguration. Produktet ejer indhold og state, og controlleren ejer træk, fokus, tastatur og bevægelse.',
+    scene: Object.freeze({
+      fields: Object.freeze({
+        side: Object.freeze({ type: 'enum', label: 'Panelside', defaultValue: 'right', options: Object.freeze({ left: 'Venstre', right: 'Højre' }) }),
+        width: Object.freeze({ type: 'number', label: 'Startbredde i px', defaultValue: 310, min: 240, max: 440, step: 1 }),
+      }),
+    }),
     components: ['heading', 'text', 'field', 'button', 'instruction-note'],
     interactions: ['Skalering med træk eller separatorens piletaster', 'Lukkezone vises før panelet lukkes ved slip', 'Escape eller et træk tilbage annullerer lukningen', 'Kantgrebet åbner ved træk, klik eller tastatur', 'Kladde og panelbredde bevares ved lukning og temaskift', 'Smal visning bruger stablet indhold og en almindelig knap'],
     qualityScenarios: Object.freeze(['initial', 'disclosure']),
@@ -43,6 +49,13 @@ export const COMPOSITIONS = Object.freeze({
     related: Object.freeze(['image-gallery']),
     description: 'En introduktion med overskrift, beskrivelse, navigationshandlinger og et billede.',
     usage: 'Til sidens indledning. Tilpas overskriftsniveau til sidens hierarki og erstat indhold og destinationer. Teksten ligger på en sikker flade ved siden af billedet.',
+    scene: Object.freeze({
+      fields: Object.freeze({
+        eyebrow: Object.freeze({ type: 'text', label: 'Overlinje', defaultValue: 'Inspiration og nye perspektiver', maxLength: 80 }),
+        title: Object.freeze({ type: 'text', label: 'Overskrift', defaultValue: 'Giv idéerne plads til at vokse', maxLength: 120 }),
+        body: Object.freeze({ type: 'text', label: 'Introduktion', defaultValue: 'Et sted at opdage, undersøge og samle det, du vil arbejde videre med.', maxLength: 360 }),
+      }),
+    }),
     components: ['button', 'image', 'heading', 'text', 'stack'],
     interactions: ['Links fører til sektioner', 'To kolonner bliver til én i smalle rammer'], qualityScenarios: Object.freeze(['initial']),
   }),
@@ -118,6 +131,13 @@ export const COMPOSITIONS = Object.freeze({
     related: Object.freeze(['resource-library', 'editor']),
     description: 'Find en post med søgning, vælg den, og arbejd videre i detaljevisningen.',
     usage: 'Til biblioteker, forløb og samlinger. Produktet bestemmer indhold, handlinger og eventuel navigation.',
+    scene: Object.freeze({
+      fields: Object.freeze({
+        eyebrow: Object.freeze({ type: 'text', label: 'Overlinje', defaultValue: 'Indholdsoverblik', maxLength: 80 }),
+        title: Object.freeze({ type: 'text', label: 'Overskrift', defaultValue: 'Gennemgå samlingen', maxLength: 120 }),
+        collectionTitle: Object.freeze({ type: 'text', label: 'Listens overskrift', defaultValue: 'Samling', maxLength: 80 }),
+      }),
+    }),
     components: ['card', 'field', 'list-item', 'button', 'stack', 'badge', 'heading', 'text', 'label', 'divider', 'empty-state'],
     interactions: ['Søgning og statusfilter med nulstilling', 'Valg bevares gennem filtrering', 'Markering af gennemgåede poster', 'Tastaturvej mellem samling og detaljer', 'Tom samling og tomt søgeresultat'],
     qualityScenarios: Object.freeze(['initial', 'selection', 'empty']),

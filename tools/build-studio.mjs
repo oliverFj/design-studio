@@ -11,7 +11,7 @@ import {createTicketService} from '../collaboration/tickets.mjs';
 import {PUBLIC_THEME_IDS} from './public-themes.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-export async function buildStudio({output=path.join(root,'index.html'),showcase=false,includeTickets=!showcase,ticketRoot=path.join(root,'collaboration'),themes:providedThemes}={}) {
+export async function buildStudio({output=path.join(root,'index.html'),showcase=false,includeTickets=!showcase,ticketRoot=path.join(root,'collaboration'),themes:providedThemes,sceneDemos={}}={}) {
 const themes = providedThemes ?? [];
 if(!providedThemes)for (const id of PUBLIC_THEME_IDS) {
   const file=id+'.json';
@@ -24,7 +24,7 @@ const bundle = await build({
   entryPoints: [path.join(root, 'studio/app.mjs')], bundle: true, write: false,
   format: 'iife', target: 'es2022', minify: true, legalComments: 'none', charset: 'utf8',
   loader: { '.md': 'text' },
-  define:{__STUDIO_SHOWCASE__:JSON.stringify(showcase)},
+  define:{__STUDIO_SHOWCASE__:JSON.stringify(showcase),__STUDIO_SCENE_DEMOS__:JSON.stringify(sceneDemos)},
   plugins: [{
     name: 'offline-studio',
     setup(builder) {
@@ -34,6 +34,8 @@ const bundle = await build({
   }],
 });
 let html = await readFile(path.join(root, 'studio/index.html'), 'utf8');
+const demoFiles=Object.values(sceneDemos).map(demo=>demo.filename);
+if(demoFiles.length)html=html.replace('</head>','<meta name="stade-scene-demos" content="'+demoFiles.join(',')+'"></head>');
 for (const file of ['styles.css', 'project-overview.css', 'component-catalog.css', 'principles.css', 'graphics.css', 'scenes.css', 'scenes/editorial-commerce.css', 'scenes/workspaces.css']) {
   const css = (await transform(await readFile(path.join(root, 'studio', file), 'utf8'), {loader:'css',minify:true,legalComments:'none'})).code;
   html = html.replace('<link rel="stylesheet" href="./' + file + '">', () => '<style>' + css.replace(/<\/style/gi, '<\\/style') + '</style>');

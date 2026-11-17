@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { getComponents } from '../core/engine.mjs';
+import { validateSceneContract } from '../core/scene-fields.mjs';
 import { COMPOSITIONS, COMPOSITION_KINDS } from '../patterns/catalog.mjs';
 import { mountComposition, createCompositionState } from '../patterns/compositions.mjs';
 import { mountCompositionGallery, createGalleryState } from '../patterns/gallery.mjs';
@@ -20,6 +21,10 @@ test('all compositions mount with shared components and unique field IDs in ever
     for (const [id, metadata] of Object.entries(COMPOSITIONS)) {
       for (const component of metadata.components) assert.ok(catalog[component]);
       const mounted = mountComposition(pack, id, { document, idPrefix: file + id });
+      if (metadata.scene) {
+        assert.equal(validateSceneContract(metadata.scene), '', id);
+        assert.equal(typeof mounted.setConfiguration, 'function', id);
+      }
       const ids = mounted.element.querySelectorAll('[id]').map(node => node.id);
       assert.equal(new Set(ids).size, ids.length);
       for (const label of mounted.element.querySelectorAll('label')) {
@@ -222,6 +227,34 @@ test('list filters restore the preferred selection and keep count, review and em
   assert.equal(state.selected, 'practice');
   assert.match(element.querySelector('[data-list-count]').textContent, /4 af 4/);
   destroy();
+});
+
+test('list detail updates authored labels without replacing the focused filter or review state', () => {
+  const document = dom(), pack = theme('studio-light');
+  const first = mountComposition(pack, 'list-detail', { document, idPrefix: 'scene-one', configuration: { title: 'Ressourceoversigt' } });
+  const second = mountComposition(pack, 'list-detail', { document, idPrefix: 'scene-two' });
+  document.body.append(first.element, second.element);
+
+  const ids = document.body.querySelectorAll('[id]').map(node => node.id);
+  assert.equal(new Set(ids).size, ids.length);
+  const search = first.element.querySelector('#scene-one-search-control');
+  search.value = 'første udkast';
+  fire(search, 'input');
+  fire(first.element.querySelector('[data-action="review"]'), 'click');
+  search.focus();
+
+  const review = first.element.querySelector('[data-action="review"]');
+  first.setConfiguration({ collectionTitle: 'Ressourcer' });
+  assert.match(first.element.textContent, /Ressourceoversigt.*Ressourcer/);
+  assert.equal(document.activeElement, search);
+  assert.equal(search.value, 'første udkast');
+  assert.equal(first.state.selected, 'practice');
+  assert.equal(first.element.querySelector('[data-action="review"]'), review);
+  assert.equal(review.getAttribute('aria-pressed'), 'true');
+  assert.match(second.element.textContent, /Gennemgå samlingen/);
+  assert.equal(second.state.selected, 'introduction');
+  first.destroy();
+  second.destroy();
 });
 
 test('gallery leads with the example and presents guidance and attribution as readable content', () => {

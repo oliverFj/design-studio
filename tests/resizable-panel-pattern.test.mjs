@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {dom,fire} from './support/dom.mjs';
 import {mountComposition,createCompositionState} from '../patterns/compositions.mjs';
+import {mountResizablePanel} from '../patterns/resizable-panel.mjs';
 import {COMPOSITIONS,PATTERN_FILES} from '../patterns/catalog.mjs';
 import {createCatalogPlaceholder,renderCatalogPlaceholder} from '../core/catalog-placeholder.mjs';
 import {renderCatalogArtwork} from '../studio/catalog-artwork.mjs';
@@ -32,6 +33,40 @@ test('components and patterns share one decorative placeholder without an illust
  assert.ok(renderCatalogPlaceholder().includes(placeholder.textContent));
  assert.match(renderCatalogArtwork('missing-artwork',theme),/data-catalog-placeholder/);
  assert.equal(COMPOSITIONS['resizable-panel'].illustration,false);
+});
+
+test('the scene can edit the authored panel size and side without replacing its draft',()=>{
+ const document=dom(),state={name:'Åben kladde',panel:{width:360,open:false}};
+ const mounted=mountResizablePanel(theme,{document,state,configuration:{side:'left',width:320},idPrefix:'scene-panel'});
+ document.body.append(mounted.element);
+ try{
+  const {fields}=COMPOSITIONS['resizable-panel'].scene;
+  assert.equal(fields.width.defaultValue,310);
+  assert.deepEqual(Object.keys(fields.side.options),['left','right']);
+  const layout=mounted.element.querySelector('.ds-panel-layout');
+  const panel=mounted.element.querySelector('.ds-panel-side');
+  const handle=mounted.element.querySelector('.ds-panel-resize');
+  const input=mounted.element.querySelector('#scene-panel-name-control');
+  assert.equal(layout.getAttribute('data-panel-side'),'left');
+  assert.equal(handle.getAttribute('aria-valuenow'),'320');
+  assert.equal(panel.inert,true);
+  mounted.setConfiguration({side:'right'});
+  assert.equal(layout.getAttribute('data-panel-side'),'right');
+  assert.equal(panel.inert,true);
+  mounted.controls.setOpen(true);
+  assert.equal(panel.inert,false);
+  assert.equal(input.value,'Åben kladde');
+  assert.equal(mounted.element.querySelector('#scene-panel-name-control'),input);
+  mounted.setConfiguration({width:350});
+  fire(handle,'keydown',{key:'ArrowLeft'});
+  assert.equal(state.panel.width,366);
+  mounted.setConfiguration({side:'left',width:350});
+  assert.equal(state.panel.width,366);
+  fire(handle,'keydown',{key:'ArrowRight'});
+  assert.equal(state.panel.width,382);
+  assert.throws(()=>mounted.setConfiguration({width:441}));
+  assert.equal(state.panel.width,382);
+ }finally{mounted.destroy();}
 });
 
 test('agents can discover the panel controller through the shared library search',async()=>{

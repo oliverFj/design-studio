@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {createComponentFactory,createComponentRenderer,mountToast} from '../core/components.mjs';
+import {createComponentFactory,createComponentRenderer,mountToast,updateProgress} from '../core/components.mjs';
 import {materializePackage,generateCSS} from '../core/engine.mjs';
 import {resolveThemeMode} from '../core/theme-modes.mjs';
 import {PUBLIC_THEME_IDS} from '../tools/public-themes.mjs';
@@ -35,6 +35,31 @@ test('feedback roles render named native progress, quiet decorative placeholders
  assert.throws(()=>render('progress',{slots:{control:{tag:'div'}}}),/native progress/);
  assert.throws(()=>render('skeleton',{slots:{root:[{tag:'button',text:'Ikke dekorativ'}]}}),/decorative/);
  const css=generateCSS(theme());assert.match(css,/prefers-reduced-motion/);assert.match(css,/ds-feedback-spin/);assert.match(css,/ds-skeleton-pulse/);
+});
+
+test('mounted progress updates native and visible values together without replacing its anatomy',()=>{
+ const {document,create}=fixture(),button=document.createElement('button');
+ const root=create('progress',{idPrefix:'exercise',label:'Øvelsen',max:8,value:0});
+ const control=root.querySelector('progress'),label=root.querySelector('label'),display=root.querySelector('.ds-progress__value');
+ document.body.append(button,root);button.focus();
+ updateProgress(root,{value:2,valueText:'2 af 8 toner'});
+ assert.equal(control.getAttribute('max'),'8');assert.equal(control.getAttribute('value'),'2');
+ assert.equal(control.getAttribute('aria-valuetext'),'2 af 8 toner');assert.equal(display.textContent,'2 af 8 toner');
+ assert.equal(control.textContent,'2 af 8 toner');assert.equal(label.textContent,'Øvelsen');
+ assert.throws(()=>updateProgress(root,{max:3,value:4,label:'Anden øvelse'}),/Progress value/);
+ assert.throws(()=>updateProgress(root,{value:3,label:' '}),/non-empty label/);
+ assert.equal(control.getAttribute('max'),'8');assert.equal(control.getAttribute('value'),'2');
+ assert.equal(control.getAttribute('aria-valuetext'),'2 af 8 toner');assert.equal(display.textContent,'2 af 8 toner');
+ assert.equal(label.textContent,'Øvelsen');
+ updateProgress(root,{max:4,value:0,label:'Anden øvelse'});
+ assert.equal(control.getAttribute('max'),'4');assert.equal(control.getAttribute('value'),'0');
+ assert.equal(label.textContent,'Anden øvelse');assert.equal(display.textContent,'0 %');
+ assert.equal(control.getAttribute('aria-valuetext'),null);
+ updateProgress(root);
+ assert.equal(control.getAttribute('value'),null);assert.equal(display.textContent,'Arbejder…');
+ assert.equal(root.querySelector('progress'),control);assert.equal(label.getAttribute('for'),control.getAttribute('id'));
+ assert.equal(document.activeElement,button);assert.equal(display.getAttribute('aria-hidden'),'true');
+ assert.throws(()=>updateProgress(button,{value:0}),/shared native progress anatomy/);
 });
 
 test('toast announces once without its action labels, never moves focus and pauses its remaining lifetime',()=>{

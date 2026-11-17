@@ -1248,7 +1248,7 @@ export const COMPONENT_LIBRARY=freeze({
     preview:{tag:'span',part:'root',attrs:{role:'status','aria-live':'polite','aria-atomic':'true'},children:[{tag:'span',part:'indicator',attrs:{'aria-hidden':'true'}},{tag:'span',part:'label',text:'Indlæser indhold…'}]}
   },
   progress:{
-    name:'Fremdrift',description:'Navngivet native fremdrift med kendt eller ukendt slutværdi.',usage:'Angiv label og eventuelt value og max. Uden value er fremdriften ubestemt. Progress er ikke en live-region; annoncér meningsfulde milepæle i produktets status frem for hvert procenttrin.',composes:[],
+    name:'Fremdrift',description:'Navngivet native fremdrift med kendt eller ukendt slutværdi.',usage:'Angiv label og eventuelt value og max. Opdatér den monterede komponent med updateProgress. Uden value er fremdriften ubestemt. Progress er ikke en live-region; annoncér meningsfulde milepæle i produktets status frem for hvert procenttrin.',composes:[],
     parts:{root:{selector:'.ds-progress',styles:{display:'flex',flexDirection:'column',gap:'{space.component.gap}',minWidth:'0',maxWidth:'100%',fontFamily:'{typography.font.body}',fontSize:'{typography.size.label}',lineHeight:'{typography.lineHeight.body}',color:'{color.text.primary}'}},label:{selector:'.ds-progress__label',styles:{overflowWrap:'anywhere'}},control:{selector:'.ds-progress__control',styles:{display:'block',width:'100%',minWidth:'0',height:'1rem',accentColor:'{color.action.primary.rest.surface}'}},value:{selector:'.ds-progress__value',styles:{fontSize:'{typography.size.small}',color:'{color.text.secondary}'}}},
     variants:{default:{description:'Label, native fremdrift og synlig værdi.',styles:{}},compact:{description:'Kompakt fremdrift uden ekstra værdilinje.',styles:{},parts:{value:{styles:{display:'none'}}}}},states:{},
     preview:{tag:'div',part:'root',children:[{tag:'label',part:'label',text:'Forbereder indhold'},{tag:'progress',part:'control',attrs:{max:'100',value:'45'},text:'45 %'},{tag:'span',part:'value',attrs:{'aria-hidden':'true'},text:'45 %'}]}
@@ -1544,6 +1544,33 @@ export const COMPONENT_LIBRARY=freeze({
     "name": "Tekst",
     "description": "Læsetekst og supplerende information.",
     "usage": "Brug p eller span efter indholdets semantik. Produktet ejer indhold og læserækkefølge.",
+    "scene": {
+      "fields": {
+        "text": {
+          "type": "text",
+          "label": "Tekst",
+          "defaultValue": "En kort og tydelig beskrivelse.",
+          "maxLength": 600,
+          "slot": "root"
+        },
+        "variant": {
+          "type": "enum",
+          "label": "Variant",
+          "defaultValue": "default",
+          "options": {
+            "default": "Standard",
+            "secondary": "Sekundær",
+            "small": "Lille",
+            "editorial": "Redaktionel",
+            "caption": "Billedtekst",
+            "tiny": "Meget lille"
+          }
+        }
+      },
+      "parts": {
+        "root": { "label": "Tekst", "textKey": "text" }
+      }
+    },
     "composes": [],
     "parts": {
       "root": {
@@ -1560,6 +1587,10 @@ export const COMPONENT_LIBRARY=freeze({
       }
     },
     "variants": {
+      "default": {
+        "description": "Almindelig læsetekst.",
+        "styles": {}
+      },
       "secondary": {
         "description": "Supplerende handling.",
         "styles": {
@@ -2069,13 +2100,6 @@ export const COMPONENT_LIBRARY=freeze({
       "readOnly": {"description":"Native input/textarea bevarer fokus og kopiering.","styles":{},"parts":{"control":{"styles":{"backgroundColor":"{color.background.subtle}"}}}},
       "focus": {
         "styles": {},
-        "parts": {
-          "label": {
-            "styles": {
-              "color": "{color.action.selected.rest.text}"
-            }
-          }
-        },
         "description": "Synligt tastaturfokus."
       },
       "disabled": {
@@ -2341,6 +2365,40 @@ export const COMPONENT_LIBRARY=freeze({
     "name": "Kort",
     "description": "En indholdsflade med valgfri overskrift, indhold og handlinger.",
     "usage": "Sammensæt header, body og footer efter behov. Biblioteket ejer indre afstande og opbygning; temaet ejer udtrykket.",
+    "scene": {
+      "fields": {
+        "title": {
+          "type": "text",
+          "label": "Overskrift",
+          "defaultValue": "Overskrift",
+          "maxLength": 100,
+          "slot": "header"
+        },
+        "body": {
+          "type": "text",
+          "label": "Indhold",
+          "defaultValue": "Indhold og relaterede oplysninger.",
+          "maxLength": 400,
+          "slot": "body"
+        },
+        "variant": {
+          "type": "enum",
+          "label": "Variant",
+          "defaultValue": "default",
+          "options": {
+            "default": "Standard",
+            "elevated": "Hævet",
+            "outlined": "Med kant",
+            "subtle": "Diskret",
+            "inverse": "Invers"
+          }
+        }
+      },
+      "parts": {
+        "header": { "label": "Overskrift", "textKey": "title" },
+        "body": { "label": "Indhold", "textKey": "body" }
+      }
+    },
     "composes": [
       "text",
       "button"
@@ -2521,6 +2579,33 @@ export const COMPONENT_LIBRARY=freeze({
     "name": "Statusmærke",
     "description": "En kompakt tekstmarkering for status eller kategori.",
     "usage": "Skriv en forståelig tekst. Farve kan supplere betydningen, men må ikke være den eneste forklaring.",
+    "scene": {
+      "fields": {
+        "text": {
+          "type": "text",
+          "label": "Tekst",
+          "defaultValue": "Klar",
+          "maxLength": 60,
+          "slot": "root"
+        },
+        "variant": {
+          "type": "enum",
+          "label": "Variant",
+          "defaultValue": "default",
+          "options": {
+            "default": "Standard",
+            "neutral": "Neutral",
+            "accent": "Fremhævet",
+            "danger": "Fejl",
+            "inverse": "Invers",
+            "data": "Oplysning"
+          }
+        }
+      },
+      "parts": {
+        "root": { "label": "Tekst", "textKey": "text" }
+      }
+    },
     "composes": [],
     "parts": {
       "root": {
@@ -2640,6 +2725,38 @@ export const COMPONENT_LIBRARY=freeze({
     "name": "Besked",
     "description": "En orientering eller fejl med titel og forklaring.",
     "usage": "Produktet bestemmer timing og live-announcement. Biblioteket ejer indre afstande og læserækkefølge.",
+    "scene": {
+      "fields": {
+        "title": {
+          "type": "text",
+          "label": "Titel",
+          "defaultValue": "Ændringer gemt",
+          "maxLength": 100,
+          "slot": "title"
+        },
+        "body": {
+          "type": "text",
+          "label": "Besked",
+          "defaultValue": "Dine ændringer er nu klar til brug.",
+          "maxLength": 400,
+          "slot": "body"
+        },
+        "variant": {
+          "type": "enum",
+          "label": "Variant",
+          "defaultValue": "neutral",
+          "options": {
+            "neutral": "Neutral",
+            "accent": "Fremhævet",
+            "danger": "Fejl"
+          }
+        }
+      },
+      "parts": {
+        "title": { "label": "Titel", "textKey": "title" },
+        "body": { "label": "Besked", "textKey": "body" }
+      }
+    },
     "composes": [
       "text"
     ],
@@ -2823,6 +2940,35 @@ export const COMPONENT_LIBRARY=freeze({
     "name": "Overskrift",
     "description": "Et tydeligt niveau i indholdets hierarki.",
     "usage": "Brug h1-h6 efter dokumentets struktur. Visuelle varianter erstatter ikke et korrekt heading-niveau.",
+    "scene": {
+      "fields": {
+        "text": {
+          "type": "text",
+          "label": "Overskrift",
+          "defaultValue": "En tydelig overskrift",
+          "maxLength": 100,
+          "slot": "root"
+        },
+        "variant": {
+          "type": "enum",
+          "label": "Variant",
+          "defaultValue": "title",
+          "options": {
+            "title": "Titel",
+            "subtitle": "Undertitel",
+            "display": "Fremhævet",
+            "section": "Afsnitstitel",
+            "expressive": "Dekorativ",
+            "expressive-large": "Stor dekorativ",
+            "gradient": "Gradient",
+            "panel": "Paneltitel"
+          }
+        }
+      },
+      "parts": {
+        "root": { "label": "Overskrift", "textKey": "text" }
+      }
+    },
     "composes": [],
     "parts": {
       "root": {

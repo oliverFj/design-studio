@@ -10,7 +10,7 @@ import {normalizeDataGridPreview} from './data-grid.mjs';
 export {mountDataGrid,parseGridTSV,serializeGridTSV} from './data-grid.mjs';
 import {normalizeFeedbackPreview} from './feedback.mjs';
 import {normalizeFileUploadPreview} from './uploads.mjs';
-export {mountToast} from './feedback.mjs';
+export {mountToast,updateProgress} from './feedback.mjs';
 export {mountFileUpload,validateFileSelection} from './uploads.mjs';
 import {normalizeDataTablePreview} from './data-table.mjs';
 export {mountDataTable} from './data-table.mjs';

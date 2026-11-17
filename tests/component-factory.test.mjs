@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createComponent, createComponentFactory } from '../core/components.mjs';
-import { materializePackage } from '../core/engine.mjs';
+import { getComponents, materializePackage } from '../core/engine.mjs';
 import { DEFAULT_TOKENS } from '../core/library.mjs';
 import { PUBLIC_THEME_IDS } from '../tools/public-themes.mjs';
 import { dom } from './support/dom.mjs';
@@ -48,6 +48,63 @@ test('component factory preserves composed native anatomy and field state in eve
     assert.equal(actual.querySelector('[role="switch"]').getAttribute('checked'), '');
     assert.equal(actual.querySelector('button').getAttribute('disabled'), '');
     assert.equal(actual.querySelector('.ds-card__header').tagName, 'DIV', 'composed header keeps valid neutral anatomy');
+  }
+});
+
+test('card Scene fields map to native slots and supported variants in every public theme', () => {
+  for (const id of PUBLIC_THEME_IDS) {
+    const pack = theme(id);
+    const definition = getComponents(pack).card;
+    const { fields, parts } = definition.scene;
+    const create = createComponentFactory(pack, { document: dom() });
+    const edits = { title: 'Status <i>for projektet</i>', body: 'Tre opgaver er klar til gennemgang.' };
+    const slots = Object.fromEntries(Object.entries(edits).map(([key, value]) => [fields[key].slot, value]));
+    assert.equal(fields.variant.defaultValue, 'default', id);
+    for (const variant of Object.keys(fields.variant.options)) {
+      assert.ok(Object.hasOwn(definition.variants, variant), id + ' · ' + variant);
+    }
+    const card = create('card', { variant: 'outlined', slots });
+    assert.equal(card.getAttribute('data-variant'), 'outlined', id);
+    for (const [part, field] of Object.entries(parts)) {
+      const element = card.querySelector(definition.parts[part].selector);
+      assert.equal(element.textContent, edits[field.textKey], id + ' · ' + part);
+      assert.equal(element.children.length, 0, id + ' · ' + part + ' is rendered as text');
+    }
+  }
+});
+
+test('Scene library component fields render in their native parts in every public theme', () => {
+  const examples = [
+    ['heading', 'H2', 'display', { text: 'Nyt overblik' }],
+    ['text', 'P', 'caption', { text: 'Beskrivelse med <em>ordret tekst</em>' }],
+    ['badge', 'SPAN', 'accent', { text: 'Under arbejde' }],
+    ['alert', 'SECTION', 'danger', { title: 'Ret en fejl', body: 'En oplysning mangler.' }],
+  ];
+  for (const themeId of PUBLIC_THEME_IDS) {
+    const pack = theme(themeId);
+    const definitions = getComponents(pack);
+    const create = createComponentFactory(pack, { document: dom() });
+    for (const [componentId, tagName, variant, edits] of examples) {
+      const displayName = themeId + ' · ' + componentId;
+      const definition = definitions[componentId];
+      const { fields, parts } = definition.scene;
+      assert.deepEqual(Object.keys(fields.variant.options).sort(), Object.keys(definition.variants).sort(), displayName);
+      const slots = Object.fromEntries(Object.entries(edits).map(([key, value]) => [fields[key].slot, value]));
+      const defaults = Object.fromEntries(Object.keys(edits).map(key => [fields[key].slot, fields[key].defaultValue]));
+      const defaultElement = create(componentId, { variant: fields.variant.defaultValue, slots: defaults });
+      const element = create(componentId, { variant, slots });
+      assert.equal(element.tagName, tagName, displayName);
+      assert.equal(element.getAttribute('data-variant'), variant, displayName);
+      assert.deepEqual(Object.values(parts).map(part => part.textKey).sort(), Object.keys(edits).sort(), displayName);
+      for (const [partId, { textKey }] of Object.entries(parts)) {
+        const selector = definition.parts[partId].selector;
+        const defaultPart = defaultElement.matches(selector) ? defaultElement : defaultElement.querySelector(selector);
+        const part = element.matches(selector) ? element : element.querySelector(selector);
+        assert.equal(defaultPart.textContent, fields[textKey].defaultValue, displayName + ' · ' + partId);
+        assert.equal(part.textContent, edits[textKey], displayName + ' · ' + partId);
+        assert.equal(part.children.length, 0, displayName + ' · ' + partId + ' is rendered as text');
+      }
+    }
   }
 });
 

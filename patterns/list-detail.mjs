@@ -1,4 +1,6 @@
 import { createComponentFactory, createLayout } from '../core/components.mjs';
+import { resolveSceneFields } from '../core/scene-fields.mjs';
+import { COMPOSITIONS } from './catalog.mjs';
 
 export function createListDetailState() {
   return {
@@ -13,9 +15,11 @@ export function createListDetailState() {
 
 /** Optional reference composition. Selection and review belong to the host, not storage. */
 export function mountListDetail(theme, {
-  document = globalThis.document, state = createListDetailState(), announce = () => {},
+  document = globalThis.document, state = createListDetailState(), configuration = {}, announce = () => {},
   onChange = () => {}, idPrefix = 'composition-list-detail',
 } = {}) {
+  const scene = COMPOSITIONS['list-detail'].scene;
+  const initial = resolveSceneFields(scene, configuration);
   const prefix = String(idPrefix).replace(/[^a-zA-Z0-9_-]/g, '-');
   const c = createComponentFactory(theme, { document });
   const element = (tag, className = '') => { const node = document.createElement(tag); node.className = className; return node; };
@@ -34,7 +38,12 @@ export function mountListDetail(theme, {
   state.reviewFilter ??= 'all';
 
   const summary = c('text', { variant: 'secondary', text: '' });
-  const intro = stack([c('label', { text: 'Indholdsoverblik' }), heading('Gennemgå samlingen', 'title'), summary], 'compact');
+  const fields = {
+    eyebrow: c('label', { text: initial.eyebrow }),
+    title: heading(initial.title, 'title'),
+    collectionTitle: heading(initial.collectionTitle, 'panel'),
+  };
+  const intro = stack([fields.eyebrow, fields.title, summary], 'compact');
   const search = c('field', { idPrefix: prefix + '-search', label: 'Søg i samlingen', value: state.query, type: 'search', controlVariant: 'desktop', hint: '', placeholder: 'Navn, beskrivelse eller kategori' });
   const filter = c('field', {
     idPrefix: prefix + '-review-filter', label: 'Gennemgang', value: state.reviewFilter, hint: '', controlVariant: 'desktop',
@@ -46,7 +55,7 @@ export function mountListDetail(theme, {
   const resultBar = element('div', 'composition-list-result-bar'); resultBar.append(count, reset);
   const list = stack([], 'compact'); list.setAttribute('aria-label', 'Poster i samlingen');
   const collection = card();
-  collection.querySelector('.ds-card__header').append(heading('Samling', 'panel'));
+  collection.querySelector('.ds-card__header').append(fields.collectionTitle);
   collection.querySelector('.ds-card__body').append(stack([filters, resultBar, list]));
   collection.querySelector('.ds-card__footer').remove();
   const detail = card(); detail.className += ' composition-list-detail-card';
@@ -135,5 +144,9 @@ export function mountListDetail(theme, {
   listen(search.querySelector('input'), 'input', event => { state.query = event.target.value; state.message = ''; render(); status.textContent = ''; onChange(state); });
   listen(filter.querySelector('select'), 'change', event => { state.reviewFilter = event.target.value; state.message = ''; render(); status.textContent = ''; onChange(state); });
   render();
-  return { element: root, state, destroy() { listeners.forEach(dispose => dispose()); root.remove(); } };
+  function setConfiguration(patch = {}) {
+    const next = resolveSceneFields(scene, patch);
+    for (const key of Object.keys(patch)) fields[key].textContent = next[key];
+  }
+  return { element: root, state, setConfiguration, destroy() { listeners.forEach(dispose => dispose()); root.remove(); } };
 }

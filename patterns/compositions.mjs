@@ -26,7 +26,7 @@ export function createCompositionState(id) {
 
 /** Optional reference code. State belongs to the host; callbacks never imply disk persistence. */
 export function mountComposition(theme, id, {
-  document = globalThis.document, state = createCompositionState(id),
+  document = globalThis.document, state = createCompositionState(id), configuration,
   announce = () => {}, onChange = () => {}, onUse = () => {}, idPrefix = 'composition-' + id,
 } = {}) {
   if (!COMPOSITIONS[id]) throw new Error('Ukendt sammensætning: ' + id);
@@ -40,13 +40,13 @@ export function mountComposition(theme, id, {
     };
     return {...mountThemePicker(theme,{document,preferences,idPrefix}),state};
   }
-  if(id==='resizable-panel')return mountResizablePanel(theme,{document,state,announce,onChange,idPrefix});
-  if (WEB_PATTERNS.includes(id)) return mountWebPattern(theme, id, { document, state, onChange, idPrefix });
+  if(id==='resizable-panel')return mountResizablePanel(theme,{document,state,configuration,announce,onChange,idPrefix});
+  if (WEB_PATTERNS.includes(id)) return mountWebPattern(theme, id, { document, state, configuration, onChange, idPrefix });
   if (id === 'editor') return mountObjectWorkbench(theme, { document, state, announce, onChange, idPrefix });
   if (id === 'parameter-workbench') return mountParameterWorkbench(theme, { document, state, announce, onChange, onUse, idPrefix });
   if (id === 'recipe-editor') return mountRecipeEditor(theme, { document, state, announce, onChange, onUse, idPrefix });
   if (id === 'resource-library') return mountResourceLibrary(theme, { document, state, announce, onChange, onUse, idPrefix });
   if (id === 'history') return mountHistoryEditor(theme, { document, state, announce, onChange, idPrefix });
-  if (id === 'list-detail') return mountListDetail(theme, { document, state, announce, onChange, idPrefix });
+  if (id === 'list-detail') return mountListDetail(theme, { document, state, configuration, announce, onChange, idPrefix });
   if (id === 'form') return mountForm(theme, { document, state, announce, onChange, idPrefix });
 }

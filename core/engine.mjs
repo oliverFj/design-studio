@@ -10,6 +10,7 @@ import { generatePreferenceCSS } from './preferences.mjs';
 import { generateMaterialCSS } from './materials.mjs';
 import {SIGNATURE_FONT_CSS} from './signature-assets.mjs';
 import {GRAPHIC_FAMILY_IDS,DEFAULT_GRAPHIC_FAMILY} from './graphic-tokens.mjs';
+import {validateSceneContract} from './scene-fields.mjs';
 
 const own = (object, key) => Object.hasOwn(object, key);
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -471,7 +472,7 @@ function validateLegacyPackage(pack) {
     const path = `components.${id}`;
     if (!localIdPattern.test(id)) errors.push(`${path}: invalid component name.`);
     if (!record(component)) { errors.push(`${path}: must be an object.`); continue; }
-    allowedKeys(component, ['name', 'description', 'usage', 'composes', 'parts', 'variants', 'states', 'preview'], path, errors);
+    allowedKeys(component, ['name', 'description', 'usage', 'composes', 'parts', 'variants', 'states', 'preview', 'scene'], path, errors);
     for (const key of ['name', 'description', 'usage']) textField(component[key], `${path}.${key}`, errors);
     if (!Array.isArray(component.composes)) errors.push(`${path}.composes: must be an array of component IDs.`);
     else for (const composed of component.composes) {
@@ -492,6 +493,13 @@ function validateLegacyPackage(pack) {
       validateStyles(part.styles, `${partPath}.styles`, pack.tokens, resolved, errors);
     }
     if (own(component, 'preview')) validatePreview(component.preview, component, path + '.preview', errors, pack.components);
+    if (own(component, 'scene')) {
+      const issue = validateSceneContract(component.scene, {
+        parts: component.parts,
+        variants: record(component.variants) ? component.variants : {},
+      });
+      if (issue) errors.push(path + '.scene: ' + issue);
+    }
     const contract = COMPONENT_CONTRACTS[id];
     if (contract) for (const [partId, selector] of Object.entries(contract.parts)) {
       if (!own(component.parts, partId)) errors.push(`${path}.parts.${partId}: required component part is missing.`);

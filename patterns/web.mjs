@@ -1,4 +1,6 @@
 import { createComponentFactory, createLayout, createImageExamples } from '../core/components.mjs';
+import { resolveSceneFields } from '../core/scene-fields.mjs';
+import { COMPOSITIONS } from './catalog.mjs';
 
 export const WEB_PATTERNS = ['site-header', 'hero', 'site-footer', 'image-gallery'];
 
@@ -10,7 +12,10 @@ export function createWebState(id) {
 }
 
 /** Website reference compositions. Replace example content and destinations in the product. */
-export function mountWebPattern(theme, id, { document = globalThis.document, state = createWebState(id), idPrefix = 'web-' + id, onChange = () => {} } = {}) {
+export function mountWebPattern(theme, id, {
+  document = globalThis.document, state = createWebState(id), configuration = {},
+  idPrefix = 'web-' + id, onChange = () => {},
+} = {}) {
   const component = createComponentFactory(theme, { document });
   const images = createImageExamples(theme).slice(1);
   const prefix = String(idPrefix).replace(/[^a-zA-Z0-9_-]/g, '-');
@@ -22,6 +27,7 @@ export function mountWebPattern(theme, id, { document = globalThis.document, sta
   const link = (label, target, variant = 'navigation') => component('link', { text: label, href: '#' + prefix + '-' + target, variant });
   const image = (item, options = {}) => component('image', { src: item.src, alt: item.alt, caption: item.title, ...options });
   const cleanups = [];
+  let setConfiguration;
   const listen = (el, type, fn) => { el.addEventListener(type, fn); cleanups.push(() => el.removeEventListener(type, fn)); };
   const sections = [['overblik', 'Overblik'], ['samling', 'Samling'], ['kontakt', 'Kontakt']];
   function navigation(label, vertical = false) {
@@ -61,12 +67,22 @@ export function mountWebPattern(theme, id, { document = globalThis.document, sta
     });
   }
   if (id === 'hero') {
+    const scene = COMPOSITIONS.hero.scene;
+    const initial = resolveSceneFields(scene, configuration);
     const hero = node('section', 'composition-hero'); hero.setAttribute('aria-labelledby', prefix + '-title');
-    const title = component('heading', { text: 'Giv idéerne plads til at vokse', variant: 'display', attrs: { id: prefix + '-title' } });
+    const fields = {
+      eyebrow: text(initial.eyebrow),
+      title: component('heading', { text: initial.title, variant: 'display', attrs: { id: prefix + '-title' } }),
+      body: text(initial.body),
+    };
     const actions = node('div', 'composition-actions');
     actions.replaceChildren(component('button',{text:'Udforsk samlingen',href:'#'+prefix+'-samling',variant:'primary',size:'large',iconName:'arrow-right'}),component('button',{text:'Kontakt os',href:'#'+prefix+'-kontakt',variant:'tertiary',size:'large'}));
-    hero.append(stack(text('Inspiration og nye perspektiver'), title, text('Et sted at opdage, undersøge og samle det, du vil arbejde videre med.'), actions), image(images[0], { caption: '' }));
+    hero.append(stack(fields.eyebrow, fields.title, fields.body, actions), image(images[0], { caption: '' }));
     root.append(stack(hero, destinations()));
+    setConfiguration = (patch = {}) => {
+      const next = resolveSceneFields(scene, patch);
+      for (const key of Object.keys(patch)) fields[key].textContent = next[key];
+    };
   }
   if (id === 'site-footer') {
     const footer = node('footer', 'composition-site-footer');
@@ -93,5 +109,5 @@ export function mountWebPattern(theme, id, { document = globalThis.document, sta
     }
     root.append(stack(heading('Former og flader'), text('Tre indbyggede illustrationer. Åbn et billede for at se hele motivet.'), grid), dialog);
   }
-  return { element: root, state, destroy() { for (const cleanup of cleanups) cleanup(); root.remove(); } };
+  return { element: root, state, ...(setConfiguration ? { setConfiguration } : {}), destroy() { for (const cleanup of cleanups) cleanup(); root.remove(); } };
 }

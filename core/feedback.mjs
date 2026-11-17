@@ -2,6 +2,12 @@ const part=(node,name)=>node?.part===name?node:(node?.children??[]).map(child=>p
 const text=(node,value)=>{node.text=String(value);delete node.children;};
 const named=(value,label)=>{const result=String(value).trim();if(!result)throw new Error(label+' requires a non-empty label.');return result;};
 
+function progressDescription(value,maximum,valueText){
+ if(!Number.isFinite(maximum)||maximum<=0)throw new Error('Progress max must be a positive finite number.');
+ if(value!=null&&(!Number.isFinite(value)||value<0||value>maximum))throw new Error('Progress value must be between zero and max.');
+ return String(valueText??(value==null?'Arbejder…':Math.round(value/maximum*100)+' %'));
+}
+
 /** Normalize only the shared anatomy; callers preserve custom format-1 roles. */
 export function normalizeFeedbackPreview(id,source,options,identifier){
  const preview=structuredClone(source);preview.attrs??={};
@@ -11,14 +17,12 @@ export function normalizeFeedbackPreview(id,source,options,identifier){
  }
  if(id==='progress'){
   const maximum=options.max??100,value=options.value;
-  if(!Number.isFinite(maximum)||maximum<=0)throw new Error('Progress max must be a positive finite number.');
-  if(value!=null&&(!Number.isFinite(value)||value<0||value>maximum))throw new Error('Progress value must be between zero and max.');
+  const description=progressDescription(value,maximum,options.valueText);
   const label=part(preview,'label'),control=part(preview,'control'),display=part(preview,'value');
   text(label,named(options.label??'Forbereder indhold','Progress'));label.attrs={...label.attrs,for:identifier+'-progress'};
   control.attrs={...control.attrs,id:identifier+'-progress',max:String(maximum)};
   if(value==null)delete control.attrs.value;else control.attrs.value=String(value);
   if(options.valueText!==undefined)control.attrs['aria-valuetext']=String(options.valueText);
-  const description=options.valueText??(value==null?'Arbejder…':Math.round(value/maximum*100)+' %');
   text(control,description);text(display,description);
  }
  if(id==='skeleton'){
@@ -41,6 +45,23 @@ export function normalizeFeedbackPreview(id,source,options,identifier){
   }
  }
  return preview;
+}
+
+/** Update a mounted shared progress component. Omit value for indeterminate progress. */
+export function updateProgress(root,{value,max,valueText,label}={}){
+ const control=root?.querySelector?.('.ds-progress__control');
+ const labelNode=root?.querySelector?.('.ds-progress__label');
+ const display=root?.querySelector?.('.ds-progress__value');
+ if(control?.tagName!=='PROGRESS'||!labelNode||!display)throw new Error('updateProgress requires the shared native progress anatomy.');
+ const maximum=max??Number(control.getAttribute('max')??100);
+ const description=progressDescription(value,maximum,valueText);
+ const nextLabel=label===undefined?undefined:named(label,'Progress');
+ if(nextLabel!==undefined)labelNode.textContent=nextLabel;
+ control.setAttribute('max',String(maximum));
+ if(value==null)control.removeAttribute('value');else control.setAttribute('value',String(value));
+ if(valueText==null)control.removeAttribute('aria-valuetext');else control.setAttribute('aria-valuetext',description);
+ control.textContent=description;
+ display.textContent=description;
 }
 
 const setHidden=(node,value)=>{node.hidden=value;if(value)node.setAttribute('hidden','');else node.removeAttribute('hidden');};

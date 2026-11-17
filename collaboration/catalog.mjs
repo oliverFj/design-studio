@@ -4,13 +4,17 @@ import { searchMatch } from './search.mjs';
 export const TOOL_PACKAGES = Object.freeze([
   { id: 'library', name: 'Bibliotek og mønstre', description: 'Find fælles komponenter, designmønstre og deres kilder.', tools: [
     { name: 'search_library', title: 'Søg i biblioteket', description: 'Find eksisterende komponenter, mønstre og vejledninger før nyt arbejde. Komponenter og mønstre medtager op til fem relevante åbne tickets og totalantal.', readOnly: true },
-    { name: 'get_component', title: 'Forklar en komponent', description: 'Hent den centrale komponents anvendelse, dele, varianter og eksempel samt relevante åbne tickets.', readOnly: true },
-    { name: 'get_pattern', title: 'Hent et mønster', description: 'Hent hele mønsterdefinitionen, referencefiler, fælles controllergrundlag og relevante åbne tickets.', readOnly: true },
+    { name: 'get_component', title: 'Forklar en komponent', description: 'Hent komponentens anvendelse, dele, varianter, eksempel og relevante åbne tickets. component.scene angiver eventuelle redigerbare scenefelter.', readOnly: true },
+    { name: 'get_pattern', title: 'Hent et mønster', description: 'Hent mønsterdefinitionen, referencefiler, fælles controllergrundlag og relevante åbne tickets. pattern.scene angiver eventuelle redigerbare scenefelter.', readOnly: true },
     { name: 'get_guide', title: 'Læs en vejledning', description: 'Hent indholdsfortegnelse eller ét afsnit med kildehash. offset bladrer i afsnitslisten eller tekstens tegn; følg nextOffset.', readOnly: true },
     { name: 'get_graphic_profile', title: 'Hent en illustrationsprofil', description: 'Hent fælles grafikregler og en valgfri families stilprofil, referencepakke, guideafsnit og kildehash. Teknisk gyldighed er ikke stilgodkendelse.', readOnly: true },
   ] },
   { id: 'projects', name: 'Projektgrundlag', description: 'Hent projektets anvisninger og kontrollér dets designtilknytning.', tools: [
+    { name: 'get_onboarding', title: 'Start en opgave', description: 'Find regler, guideafsnit og kontroller for et registreret projekt og en eller flere opgavetyper. Brug stade for arbejde i Stade eller produktstart fra Stade. En valgfri kort søgning finder fx en bestemt komponent eller et API.', readOnly: true },
     { name: 'get_project_context', title: 'Hent projektgrundlag', description: 'Læs grundlaget for et projekt, som er tilladt ved serverstart.', readOnly: true },
+    { name: 'get_scene_context', title: 'Hent scenekontekst', description: 'Læs en registreret Stade-native apps gemte akter, blokplaceringer og handlingsmål. Nyere build viser også mønstrenes registrerede dele, redigerbare felter og handlinger.', readOnly: true },
+    { name: 'preview_scene_move', title: 'Forhåndsvis en blokflytning', description: 'Beregn en blokflytning i en registreret Stade-native app. Returnér den nuværende og foreslåede placering og revisionerne til en senere gemning. visualPreview opretter en separat HTML-kopi, som kan åbnes i browseren.', readOnly: false },
+    { name: 'apply_scene_move', title: 'Gem en forhåndsvist blokflytning', description: 'Gem den samme flytning i en skriveaktiveret Stade-native app, når både appfilens revision og den beregnede forhåndsvisningsrevision matcher. Hent en ny forhåndsvisning, hvis filen er ændret.', readOnly: false },
     { name: 'check_project', title: 'Kontrollér projekt', description: 'Kør Stades eksisterende læsende projekttjek uden at udføre projektets scripts.', readOnly: true },
   ] },
   { id: 'experience', name: 'Heuristik og gode praksisser', description: 'Find tommelfingerregler fra korrigerede tilgange. Konkrete ændringsønsker til Stade hører til tickets.', tools: [

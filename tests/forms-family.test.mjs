@@ -2,9 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createComponent,createComponentFactory,createComponentRenderer,renderComponent} from '../core/components.mjs';
-import {generateCSS,validatePackage,materializePackage} from '../core/engine.mjs';
+import {generateCSS,validatePackage,materializePackage,resolveTokens} from '../core/engine.mjs';
 import {resolveThemeMode} from '../core/theme-modes.mjs';
-import {PUBLIC_THEME_IDS} from '../tools/public-themes.mjs';
+import {contrastRatio} from '../core/quality.mjs';
+import {LEGACY_THEME_IDS,PUBLIC_THEME_IDS} from '../tools/public-themes.mjs';
 import {dom} from './support/dom.mjs';
 
 const theme=id=>JSON.parse(readFileSync(new URL('../packages/'+id+'.json',import.meta.url),'utf8'));
@@ -16,6 +17,26 @@ test('text controls use opaque semantic placeholders instead of low-contrast bro
   assert.ok(rule,selector+' has a placeholder rule');assert.match(rule,/color: var\(--ds-color-text-muted\)/);assert.match(rule,/opacity: 1/);
  }
 });
+test('field labels retain their text color and contrast on focus in every bundled appearance',()=>{
+ for(const id of [...PUBLIC_THEME_IDS,...LEGACY_THEME_IDS]){
+  const source=theme(id);
+  for(const mode of Object.keys(source.modes)){
+   const snapshot=resolveThemeMode(source,mode);
+   const {components}=materializePackage(snapshot);
+   const resolved=resolveTokens(snapshot);
+   const field=components.field;
+   const rest=field.parts.label.styles.color;
+   const focused=field.states.focus.parts?.label?.styles.color??rest;
+   const name=id+'/'+mode;
+   assert.equal(focused,rest,name+' keeps the label color');
+   const foreground=resolved[rest.slice(1,-1)];
+   for(const surface of ['color.background.canvas','color.background.surface','color.background.subtle']){
+    assert.ok(contrastRatio(foreground,resolved[surface])>=4.5,name+' label on '+surface);
+   }
+  }
+ }
+});
+
 const boolean=new Set(['disabled','checked','selected','required','readonly','hidden']);
 const escape=value=>String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 function htmlFromNative(node){

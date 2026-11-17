@@ -10483,6 +10483,77 @@
       },
       "additionalProperties": false
     },
+    "sceneField": {
+      "type": "object",
+      "required": ["type", "label", "defaultValue"],
+      "properties": {
+        "type": { "enum": ["text", "enum", "number", "checkbox"] },
+        "label": { "type": "string", "pattern": "\\S" },
+        "defaultValue": { "type": ["string", "number", "boolean"] },
+        "maxLength": { "type": "integer", "minimum": 1 },
+        "slot": { "type": "string", "pattern": "^[a-z][a-zA-Z0-9-]*$" },
+        "options": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "pattern": "^[a-z][a-zA-Z0-9-]*$" },
+          "additionalProperties": { "type": "string", "pattern": "\\S" }
+        },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "step": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "text" } } },
+          "then": { "required": ["maxLength"], "properties": { "defaultValue": { "type": "string", "pattern": "\\S" } } },
+          "else": { "properties": { "maxLength": false, "slot": false } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "enum" } } },
+          "then": { "required": ["options"], "properties": { "defaultValue": { "type": "string" } } },
+          "else": { "properties": { "options": false } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "number" } } },
+          "then": { "required": ["min", "max", "step"], "properties": { "defaultValue": { "type": "number" } } },
+          "else": { "properties": { "min": false, "max": false, "step": false } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "checkbox" } } },
+          "then": { "properties": { "defaultValue": { "type": "boolean" } } }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "sceneContract": {
+      "type": "object",
+      "required": ["fields"],
+      "properties": {
+        "fields": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "pattern": "^[a-z][a-zA-Z0-9-]*$" },
+          "additionalProperties": { "$ref": "#/$defs/sceneField" }
+        },
+        "parts": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[a-z][a-zA-Z0-9-]*$" },
+          "additionalProperties": {
+            "type": "object",
+            "required": ["label"],
+            "minProperties": 2,
+            "properties": {
+              "label": { "type": "string", "pattern": "\\S" },
+              "textKey": { "type": "string" },
+              "sizeKey": { "type": "string" },
+              "visibleKey": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
     "component": {
       "type": "object",
       "required": [
@@ -10550,6 +10621,9 @@
           "additionalProperties": {
             "$ref": "#/$defs/state"
           }
+        },
+        "scene": {
+          "$ref": "#/$defs/sceneContract"
         },
         "preview": {
           "allOf": [

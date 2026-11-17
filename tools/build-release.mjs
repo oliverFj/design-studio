@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
 import {buildStudio} from './build-studio.mjs';
 import {buildScenePages,SCENE_IDS} from './build-scenes.mjs';
+import {buildSceneIntegration,SCENE_INTEGRATION_DIRECTORY,readSceneFileNames,sceneDemoCatalog} from './build-scene-integration.mjs';
 import { deflateRawSync } from 'node:zlib';
 import { LIBRARY_VERSION } from '../core/library.mjs';
 import { offlineIssues } from './offline-checks.mjs';
@@ -67,7 +68,9 @@ export async function sourceEntries(directory = root) {
     for (const item of await readdir(location, { withFileTypes: true })) {
       if (excludedDirectory(item.name)) continue;
       const child = path.join(relative, item.name), normalized = child.split(path.sep).join('/');
-      if (item.isDirectory()) await walk(child, extensions);
+      if (item.isDirectory()) {
+        if (normalized !== SCENE_INTEGRATION_DIRECTORY) await walk(child, extensions);
+      }
       else if (item.isSymbolicLink()) throw new Error('Kildepakken følger ikke symbolske links: ' + child);
       else if (extensions.includes(path.extname(item.name)) && !['examples/workspace/index.html',...SCENE_IDS.map(id=>'examples/scenes/'+id+'.html')].includes(normalized)) await add(child);
       else if (normalized === 'templates/offline/.gitignore') await add(child);
@@ -79,7 +82,7 @@ export async function sourceEntries(directory = root) {
   }
   // Ship the collaboration runtime and reviewed data, with a fixed boundary
   // around the distributable files rather than all local collaboration data.
-  for (const file of ['catalog.mjs', 'schema.mjs', 'service.mjs', 'guides.mjs', 'search.mjs', 'graphics.mjs', 'ticket-schema.mjs', 'tickets.mjs', 'experiences.json']) {
+  for (const file of ['catalog.mjs', 'schema.mjs', 'service.mjs', 'guides.mjs', 'search.mjs', 'graphics.mjs', 'onboarding.mjs', 'scene-context.mjs', 'scene-move.mjs', 'ticket-schema.mjs', 'tickets.mjs', 'experiences.json']) {
     try { await add('collaboration/' + file); } catch (error) { if (error.code !== 'ENOENT') throw error; }
   }
   // The hidden starter ignore-file is intentional source, not local settings.
@@ -108,13 +111,25 @@ async function licenseEntries(directory) {
 }
 
 export async function buildRelease({ directory = root, output = path.join(directory, 'artifacts', 'release') } = {}) {
-  let html,scenes=[];
+  let html,scenes=[],scenePages=[];
   if(path.resolve(directory)===path.resolve(root)){
     await mkdir(output,{recursive:true});
     const temporary=path.join(output,'.offline-'+randomUUID()+'.html');
-    try{html=Buffer.from(await buildStudio({output:temporary,includeTickets:false}));}finally{await unlink(temporary).catch(error=>{if(error.code!=='ENOENT')throw error;});}
+    scenePages=await buildSceneIntegration();
+    try{html=Buffer.from(await buildStudio({output:temporary,includeTickets:false,sceneDemos:sceneDemoCatalog(scenePages)}));}finally{await unlink(temporary).catch(error=>{if(error.code!=='ENOENT')throw error;});}
     scenes=await buildScenePages(directory);
-  }else html=await readFile(path.join(directory,'index.html'));
+  }else{
+    html=await readFile(path.join(directory,'index.html'));
+    const sceneDirectory=await lstat(path.join(directory,SCENE_INTEGRATION_DIRECTORY)).catch(error=>{
+      if(error.code!=='ENOENT')throw error;
+    });
+    if(sceneDirectory){
+      scenePages=await Promise.all(readSceneFileNames(html.toString('utf8')).map(async file=>{
+        const name=SCENE_INTEGRATION_DIRECTORY+'/'+file;
+        return {name,data:await readFile(path.join(directory,name))};
+      }));
+    }
+  }
   if(path.resolve(directory)!==path.resolve(root))for(const id of SCENE_IDS){
     try{scenes.push({id,html:await readFile(path.join(directory,'examples/scenes',id+'.html'),'utf8')});}
     catch(error){if(error.code!=='ENOENT')throw error;}
@@ -122,7 +137,8 @@ export async function buildRelease({ directory = root, output = path.join(direct
   const issues = offlineIssues(html.toString('utf8'));
   if (issues.length) throw new Error('Offlinebuildet kan ikke leveres: ' + issues.join('\n'));
   for(const scene of scenes){const issues=offlineIssues(scene.html);if(issues.length)throw new Error(scene.id+': '+issues.join('\n'));}
-  const offline = [{ name: 'index.html', data: html }, ...scenes.map(({id,html})=>({name:'examples/scenes/'+id+'.html',data:Buffer.from(html)})), ...await licenseEntries(directory)];
+  for(const {name,data} of scenePages){const issues=offlineIssues(data.toString());if(issues.length)throw new Error(name+': '+issues.join('\n'));}
+  const offline = [{ name: 'index.html', data: html }, ...scenes.map(({id,html})=>({name:'examples/scenes/'+id+'.html',data:Buffer.from(html)})), ...scenePages, ...await licenseEntries(directory)];
   const source = await sourceEntries(directory);
   const artifacts = [
     { name: 'design-studio-offline.zip', entries: offline },

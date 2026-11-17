@@ -27,7 +27,7 @@ async function fixture(t) {
   await put('showcase/showcase.mjs', 'export const showcase = true;');
   await put('collaboration/tickets.mjs','export const ticketRuntime = true;');
   await put('collaboration/ticket-schema.mjs','export const ticketSchema = true;');
-  for(const name of ['guides','search','graphics'])await put(`collaboration/${name}.mjs`,'export const runtime = true;');
+  for(const name of ['guides','search','graphics','onboarding','scene-context','scene-move'])await put(`collaboration/${name}.mjs`,'export const runtime = true;');
   await put('collaboration/tickets/private-ticket/000001.json','{"private":"ticket content"}');
   await put('templates/offline/.gitignore', 'node_modules/\nindex.html\n');
   await put('assets/fonts/test.woff2', 'Public font fixture');
@@ -55,7 +55,11 @@ function unzip(buffer) {
 }
 
 test('release archives preserve bytes, readable licenses, checksums and deterministic output', async t => {
-  const { directory } = await fixture(t), output = path.join(directory, 'artifacts', 'release');
+  const { directory, put } = await fixture(t), output = path.join(directory, 'artifacts', 'release');
+  const demoFiles = ['blog.html','editor.html','overblik.html','webshop.html'];
+  const scenePages = [...demoFiles, 'index.html'].sort().map(file => 'examples/stade-scene/' + file);
+  await put('index.html','<!doctype html><meta name="stade-scene-demos" content="'+demoFiles.join(',')+'"><title>Offline</title>');
+  for(const file of scenePages)await put(file,'<!doctype html><title>Stade Scene</title>');
   const manifest = await buildRelease({ directory, output });
   for (const item of manifest.archives) {
     const zip = await readFile(path.join(output, item.name));
@@ -64,16 +68,17 @@ test('release archives preserve bytes, readable licenses, checksums and determin
     for (const file of item.files) { assert.equal(files.get(file.name).length, file.bytes); assert.equal(hash(files.get(file.name)), file.sha256); }
     assert.deepEqual(zip, createZip([...files].map(([name, data]) => ({ name, data }))));
     if (item.name.includes('offline')) {
-      assert.deepEqual([...files.keys()], ['examples/scenes/aureol.html','examples/scenes/obsidian.html','index.html', 'licenses/example/OFL.txt', 'licenses/tabler-icons-MIT.txt']);
+      assert.deepEqual([...files.keys()], ['examples/scenes/aureol.html','examples/scenes/obsidian.html',...scenePages,'index.html', 'licenses/example/OFL.txt', 'licenses/tabler-icons-MIT.txt']);
       assert.deepEqual(files.get('index.html'), await readFile(path.join(directory, 'index.html')));
     } else {
       assert.ok(files.has('core/runtime.mjs')); assert.ok(files.has('templates/offline/.gitignore')); assert.ok(files.has('assets/fonts/test.woff2')); assert.ok(files.has('.gitattributes'));
       assert.ok(files.has('showcase/index.html')); assert.ok(files.has('showcase/showcase.mjs'));
       assert.ok(files.has('collaboration/tickets.mjs'));assert.ok(files.has('collaboration/ticket-schema.mjs'));
-      for(const name of ['guides','search','graphics'])assert.ok(files.has(`collaboration/${name}.mjs`),'MCP source includes '+name);
+      for(const name of ['guides','search','graphics','onboarding','scene-context','scene-move'])assert.ok(files.has(`collaboration/${name}.mjs`),'MCP source includes '+name);
       assert.equal([...files.keys()].some(name=>name.startsWith('collaboration/tickets/')),false);
       assert.equal(files.has('index.html'), false);
       for(const id of ['aureol','obsidian'])assert.equal(files.has('examples/scenes/'+id+'.html'),false,'generated scenes stay out of the source archive');
+      for(const file of scenePages)assert.equal(files.has(file),false,'generated Scene pages stay out of the source archive');
     }
   }
   const known = createZip([{ name: 'checksum.txt', data: '123456789' }]);

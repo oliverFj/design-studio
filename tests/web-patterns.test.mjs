@@ -32,6 +32,31 @@ test('header navigation marks both responsive copies and moves focus to a real d
   mounted.destroy();
 });
 
+test('hero preserves its local actions and applies scoped authored text in place', () => {
+  const document = dom();
+  const first = mountComposition(theme, 'hero', { document, idPrefix: 'scene-one', configuration: { title: 'Vores værksted' } });
+  const second = mountComposition(theme, 'hero', { document, idPrefix: 'scene-two' });
+  document.body.append(first.element, second.element);
+
+  const ids = document.body.querySelectorAll('[id]').map(node => node.id);
+  assert.equal(new Set(ids).size, ids.length);
+  const action = first.element.querySelector('[href="#scene-one-samling"]');
+  const title = first.element.querySelector('#scene-one-title');
+  assert.ok(first.element.querySelector(action.getAttribute('href')));
+  action.focus();
+
+  first.setConfiguration({ body: 'Byg her <med os>' });
+  assert.equal(title.textContent, 'Vores værksted');
+  assert.match(first.element.textContent, /Byg her <med os>/);
+  assert.equal(document.activeElement, action);
+  assert.equal(first.element.querySelector('[href="#scene-one-samling"]'), action);
+  assert.equal(second.element.querySelector('#scene-two-title').textContent, 'Giv idéerne plads til at vokse');
+  assert.throws(() => first.setConfiguration({ body: ' ', title: 'Ny titel' }), /Ugyldig værdi/);
+  assert.equal(title.textContent, 'Vores værksted');
+  first.destroy();
+  second.destroy();
+});
+
 test('gallery dialog shows the full selected image and returns focus to its opener', () => {
   const document = dom(), mounted = mountComposition(theme, 'image-gallery', { document });
   document.body.append(mounted.element);

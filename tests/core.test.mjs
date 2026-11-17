@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {validatePackage, resolveTokens, generateCSS, validateCompatibility, brandAssetDataURL, getComponents, materializePackage, migratePackage} from '../core/engine.mjs';
 import {REQUIRED_TOKENS, COMPONENT_CONTRACTS} from '../core/contract.mjs';
 import {PUBLIC_THEME_IDS} from '../tools/public-themes.mjs';
+import { validateSceneContract, validateSceneValues, resolveSceneFields } from '../core/scene-fields.mjs';
 
 const themeFixture = id => JSON.parse(readFileSync(new URL(`../packages/${id}.json`, import.meta.url), 'utf8').replace(/^\uFEFF/, ''));
 const fixture = id => materializePackage(themeFixture(id));
@@ -23,6 +24,24 @@ test('schema and runtime share required tokens and component contract', () => {
   const schema=JSON.parse(readFileSync(new URL('../schema/design-package.schema.json', import.meta.url),'utf8'));
   assert.deepEqual(schema.allOf[0].then.properties.tokens.required, Object.keys(REQUIRED_TOKENS));
   assert.deepEqual(schema.properties.components.required, Object.keys(COMPONENT_CONTRACTS));
+});
+test('optional scene metadata stays available to editors and validates overrides', () => {
+  const theme = themeFixture('studio-light');
+  const card = getComponents(theme).card;
+  assert.equal(validateSceneContract(card.scene, card), '');
+  assert.deepEqual(resolveSceneFields(card.scene, { title: 'Projektstatus' }), {
+    title: 'Projektstatus',
+    body: card.scene.fields.body.defaultValue,
+    variant: 'default',
+  });
+  assert.match(validateSceneValues(card.scene, { variant: 'frosted' }), /Variant/);
+  assert.match(validateSceneValues(card.scene, { title: '<b>', unknown: true }), /Ukendt redigerbart felt/);
+  const legacy = base();
+  delete legacy.components.card.scene;
+  assert.equal(validatePackage(legacy).valid, true);
+  legacy.components.card.scene = structuredClone(card.scene);
+  legacy.components.card.scene.fields.variant.options.unknown = 'Ukendt';
+  assert.match(errorsFor(legacy), /components\.card\.scene/);
 });
 test('alias chains resolve without changing package data', () => {
   const pack=base();

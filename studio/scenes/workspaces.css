@@ -15,3 +15,4 @@
 @container(max-width:600px){.case-editor,.case-overview{padding:16px}.case-editor__header,.case-overview__header{flex-direction:column;gap:var(--ds-space-scale-4)}.case-editor__document{justify-items:start;text-align:left}.case-overview__metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ds-space-scale-3)}.case-overview__filters{grid-template-columns:minmax(0,1fr)}}
 
 @container(max-width:400px){.case-overview__metrics{grid-template-columns:minmax(0,1fr)}}
+.case-editor__header{overflow-wrap:anywhere}

@@ -6,7 +6,7 @@ Brug det aktuelle katalog og `COMPONENT_COVERAGE` i `core/library.mjs` til at sk
 
 ## Find grundlaget
 
-Læs produktets egne anvisninger og systemets [AGENTS.md](../AGENTS.md). Brug opgavematricen dér og læs kun de relevante afsnit; README er en introduktion, ikke obligatorisk agentkontekst. [Designgrundlaget](DESIGN-FOUNDATIONS.md) ejer generelle tekniske principper og kvalitetskrav; [integrationsguiden](INTEGRATION.md) ejer komponentkontrakter og API. Søg via MCP og hent det konkrete guideafsnit eller mønster, når forbindelsen er tilgængelig; ellers læses samme kildefiler lokalt.
+Læs projektets egne anvisninger, og følg [Stades onboarding](AGENT-ONBOARDING.md). Læs de afsnit, der gælder for opgaven. [Designgrundlaget](DESIGN-FOUNDATIONS.md) ejer generelle tekniske principper og kvalitetskrav. [Integrationsguiden](INTEGRATION.md) ejer komponentkontrakter og API.
 
 Ved gentagen fejlsøgning eller overdraget arbejde: søg i de [fælles erfaringer](COLLABORATION.md#agentens-arbejdsgang), og læs relevante poster med kilder og begrænsninger. Brug Stade-MCP, når forbindelsen er tilgængelig; ellers læses `collaboration/experiences.json` direkte. Efterprøv løsningen i den aktuelle produktversion, og foreslå kun nye erfaringer ved konkret genbrugelig viden.
 

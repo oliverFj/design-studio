@@ -3,6 +3,7 @@
 .composition-panel-layout>.ds-panel-content,.composition-panel-layout>.ds-panel-side{padding:1.25rem;min-width:0}
 .composition-panel-layout>.ds-panel-content{background:var(--ds-color-background-subtle)}
 .composition-panel-layout>.ds-panel-side{border-inline-start:1px solid var(--ds-color-border-default)}
+@media(min-width:801px) and (min-height:481px){.composition-panel-layout[data-panel-side="left"]:not([data-panel-compact="true"])>.ds-panel-side{border-inline-start:0;border-inline-end:1px solid var(--ds-color-border-default)}}
 .composition-panel-layout [data-panel-demo-toggle]{color:var(--ds-color-text-secondary)}
 .composition-panel-layout [data-panel-demo-toggle] .ds-button__icon{font-family:system-ui,sans-serif;font-size:10px}
 .composition-panel-layout[data-panel-drag]>[data-panel-demo-toggle]{visibility:hidden;pointer-events:none}

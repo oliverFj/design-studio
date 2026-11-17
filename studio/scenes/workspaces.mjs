@@ -27,7 +27,7 @@ export function mountEditorScene(theme,{document=globalThis.document,state={},id
  const intro=editor.element.firstChild;
  intro.replaceChildren(c('heading',{variant:'panel',text:'Din opstilling'}),c('text',{variant:'secondary',text:'Vælg et element i rummet, eller find det i lagene. Justér navn, bredde og placering i egenskaberne.'}));
  element.append(header,editor.element);
- return {element,state,destroy(){editor.destroy();}};
+ return {element,state,parts:{intro:header,workbench:editor.element},destroy(){editor.destroy();}};
 }
 
 const PROJECTS=Object.freeze([

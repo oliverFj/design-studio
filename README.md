@@ -6,6 +6,8 @@ Biblioteket bestemmer struktur, semantik og grundlayout. Temaet bestemmer det vi
 
 [Kildekode](https://github.com/oliverFj/design-studio) · [Offentlig showcase](https://oliver.fjordside.dk/design-studio/index.html)
 
+[Stade Scene](https://oliver.fjordside.dk/stade-scene/) er den tilknyttede visuelle appeditor. Dens [kildekode og produktoverdragelse](https://github.com/oliverFj/stade-scene) beskriver muligheder, begrænsninger og de åbne produktvalg.
+
 ## Åbn Design Studio
 
 Dobbeltklik på **[index.html](index.html)**. Den færdige editor fungerer offline uden installation eller server og har de medfølgende temaer indbygget. **Åbn tema** læser en valgt JSON-fil; **Gem tema** henter en ny fil og overskriver ikke originalen automatisk. Gem ændringer før genindlæsning eller lukning. Se [brug editoren](docs/PRODUCTION.md#brug-editoren) for funktioner og filhåndtering.
@@ -37,7 +39,7 @@ Bibliotek 3.11.0 har 62 komponentroller. Den offentlige samling har 13 temaer og
 
 ## Brug i et produkt
 
-Bed agenten om at bruge det tilknyttede Design Studio, læse produktets anvisninger og systemets AGENTS.md og vælge de relevante kontrakter gennem opgavematricen. Nye produkter oprettes fra systemmappen med:
+Bed agenten følge produktets anvisninger og [Stades onboarding](docs/AGENT-ONBOARDING.md). Nye produkter oprettes fra systemmappen med:
 
 ```sh
 node tools/cli.mjs init PROJECT_DIR --theme studio-light
@@ -65,7 +67,7 @@ Den færdige editor med brugsscener er én fil. De to ekstra materialestudier li
 
 | Behov | Autoritativ kilde |
 | --- | --- |
-| Opgavevalg og faste grænser | [AGENTS.md](AGENTS.md) |
+| Opgavevalg og faste grænser | [Stades onboarding](docs/AGENT-ONBOARDING.md) |
 | Arbejdsgang og kontrolkrav | [AGENT-WORKFLOW](docs/AGENT-WORKFLOW.md) |
 | Komponentkontrakter, API og eksempler | [INTEGRATION](docs/INTEGRATION.md) og `core/library.mjs` |
 | Temaformat og migration | [PACKAGE-FORMAT](docs/PACKAGE-FORMAT.md) |

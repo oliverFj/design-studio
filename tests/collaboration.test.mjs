@@ -10,6 +10,7 @@ import { createCollaborationService, experienceRevision, STUDIO_ROOT } from '../
 import { searchExperiences, TOOL_PACKAGES } from '../collaboration/catalog.mjs';
 import { experienceSchema } from '../collaboration/schema.mjs';
 import { parseProjectArguments } from '../tools/mcp-server.mjs';
+import { ONBOARDING_TASKS } from '../collaboration/onboarding.mjs';
 
 const sample = (id = 'gpu-sample') => ({
   schemaVersion: 1, id, title: 'GPU-ressourcer', summary: 'Bevar ejerskab ved teksturændringer.', status: 'draft', scope: 'project', project: 'formlab', tags: ['gpu', 'tekstur'],
@@ -413,6 +414,9 @@ test('SDK stdio client discovers, validates and calls the collaboration server',
   await client.connect(transport);
   const { tools } = await client.listTools();
   assert.deepEqual(tools.map(tool => tool.name).sort(), TOOL_PACKAGES.flatMap(pack => pack.tools.map(tool => tool.name)).sort());
+  assert.equal(tools.find(tool => tool.name === 'get_onboarding').annotations.readOnlyHint, true);
+  assert.equal(tools.find(tool => tool.name === 'get_scene_context').annotations.readOnlyHint, true);
+  assert.equal(tools.find(tool => tool.name === 'apply_scene_move').annotations.readOnlyHint, false);
   assert.equal(tools.find(tool => tool.name === 'list_experience_categories').annotations.readOnlyHint, true);
   assert.equal(tools.find(tool => tool.name === 'propose_experience').annotations.readOnlyHint, false);
   assert.ok(tools.every(tool => tool.inputSchema && tool.outputSchema));
@@ -436,6 +440,99 @@ test('SDK stdio client discovers, validates and calls the collaboration server',
   assert.ok(pattern.structuredContent.exampleFiles.includes('patterns/resizable-panel.mjs'));
   assert.equal((await client.callTool({ name: 'get_project_context', arguments: { projectId: 'test-project' } })).structuredContent.linked, false);
   assert.equal((await client.callTool({ name: 'check_project', arguments: { projectId: 'test-project' } })).structuredContent.valid, false);
+  const onboarding = args => client.callTool({ name: 'get_onboarding', arguments: args });
+  const fix = await onboarding({ projectId: 'test-project', tasks: ['small-fix'], query: 'modal dialog' });
+  assert.equal(fix.structuredContent.project.type, 'unlinked-product');
+  assert.deepEqual(fix.structuredContent.guidance.map(item => item.section), ['produkt-uden-designtilknytning', 'lille-produktrettelse']);
+  assert.match(fix.structuredContent.guidance[1].text, /én hurtig relevant kontrol/);
+  assert.equal(fix.structuredContent.matches[0].id, 'dialog');
+  const configFile = path.join(project, 'design-studio.project.json');
+  await fs.writeFile(configFile, JSON.stringify({ offline: true, nativeApps: { oeverum: 'Øverum.html', outside: '../outside/decoy.html' } }));
+  const layout = (id, children = []) => ({
+    id, name: id, type: 'container', width: 100, layout: { flow: 'stack', gap: 12, columns: 2, align: 'stretch' }, children,
+  });
+  const manifest = { format: 'stade-native-app', version: 1, id: 'oeverum', name: 'Øverum', scene: {
+    format: 'stade-scene', version: 2, data: { template: 'practice', acts: [
+      { id: 'exercise', name: 'Øvelse', mode: 'side', layout: layout('exercise-layout', [
+        { id: 'open-tools', type: 'act-trigger', props: { label: 'Lyd', targetAct: 'tools' } },
+        layout('instrument-area', [{ id: 'fretboard', type: 'practice-fretboard', actions: { inspect: { kind: 'block', id: 'tools-layout' } } }]),
+      ]) },
+      { id: 'tools', name: 'Lyd og værktøjer', mode: 'panel', layout: layout('tools-layout') },
+    ] },
+  } };
+  const registry = { version: 1, patterns: [{ id: 'practice', name: 'Øvelse', description: 'Et område med noder og instrument.', parts: [
+    { type: 'practice-fretboard', name: 'Gribebræt', fields: {
+      title: { type: 'text', label: 'Overskrift', defaultValue: 'Gribebræt', maxLength: 80 },
+    }, parts: { title: { label: 'Overskrift', textKey: 'title' } }, actions: { inspect: { label: 'Vis lydværktøjer' } } },
+  ] }] };
+  const appHtml = '<script type="application/json" id="stade-native-app">' + JSON.stringify(manifest) + '</script>'
+    + '<script type="application/json" id="stade-scene-registry">' + JSON.stringify(registry) + '</script>';
+  const appFile = path.join(project, 'Øverum.html');
+  await fs.writeFile(appFile, appHtml);
+  await fs.writeFile(path.resolve(project, '../outside/decoy.html'), appHtml);
+  const scene = args => client.callTool({ name: 'get_scene_context', arguments: args });
+  const context = await scene({ projectId: 'test-project', appId: 'oeverum' });
+  assert.equal(context.isError, undefined);
+  assert.equal(context.structuredContent.source, 'Øverum.html');
+  assert.equal(context.structuredContent.revision, createHash('sha256').update(appHtml).digest('hex'));
+  assert.deepEqual(context.structuredContent.registry, registry);
+  const instrument = context.structuredContent.acts[0].blocks.find(block => block.id === 'fretboard');
+  assert.equal(instrument.parentId, 'instrument-area');
+  assert.deepEqual(instrument.actions, { inspect: { kind: 'block', id: 'tools-layout' } });
+  assert.deepEqual(context.structuredContent.links, [
+    { actId: 'exercise', blockId: 'open-tools', targetActId: 'tools', label: 'Lyd' },
+    { actId: 'exercise', blockId: 'fretboard', actionId: 'inspect', targetActId: 'tools', targetBlockId: 'tools-layout', label: 'Vis lydværktøjer' },
+  ]);
+  assert.match((await scene({ projectId: 'test-project', appId: 'outside' })).content[0].text, /tilladte mappe/);
+  assert.equal((await scene({ projectId: 'test-project', appId: 'absent' })).isError, true);
+  assert.equal((await scene({ projectId: 'missing-project', appId: 'oeverum' })).isError, true);
+
+  const move = { projectId: 'test-project', appId: 'oeverum', blockId: 'fretboard', destinationId: 'exercise-layout' };
+  const preview = args => client.callTool({ name: 'preview_scene_move', arguments: args });
+  const apply = (reviewed, planned = move) => client.callTool({ name: 'apply_scene_move', arguments: {
+    ...planned, expectedRevision: reviewed.baseRevision, expectedPreviewRevision: reviewed.previewRevision,
+  } });
+  const reviewed = (await preview(move)).structuredContent;
+  assert.equal(reviewed.baseRevision, context.structuredContent.revision);
+  assert.equal(reviewed.before.parentId, 'instrument-area');
+  assert.deepEqual(reviewed.after, { actId: 'exercise', parentId: 'exercise-layout', parentName: 'exercise-layout', index: 2 });
+  assert.equal(await fs.readFile(appFile, 'utf8'), appHtml);
+  assert.match((await apply(reviewed)).content[0].text, /læseadgang/);
+
+  await fs.writeFile(configFile, JSON.stringify({ offline: true, nativeApps: { oeverum: { file: 'Øverum.html', writable: true } } }));
+  assert.match((await apply(reviewed, { ...move, index: 0 })).content[0].text, /forhåndsvisning/);
+  assert.equal(await fs.readFile(appFile, 'utf8'), appHtml);
+  const newerHtml = appHtml.replace('"label":"Lyd"', '"label":"Lydindstillinger"');
+  await fs.writeFile(appFile, newerHtml);
+  assert.match((await apply(reviewed)).content[0].text, /Appfilen er ændret siden forhåndsvisningen/);
+  assert.equal(await fs.readFile(appFile, 'utf8'), newerHtml);
+
+  const refreshed = (await preview(move)).structuredContent;
+  const applied = (await apply(refreshed)).structuredContent;
+  assert.equal(applied.applied, true);
+  assert.equal(applied.revision, refreshed.previewRevision);
+  const saved = (await scene({ projectId: move.projectId, appId: move.appId })).structuredContent;
+  assert.equal(saved.revision, applied.revision);
+  assert.equal(saved.acts[0].blocks.find(block => block.id === 'fretboard').parentId, 'exercise-layout');
+  assert.equal(saved.links[0].label, 'Lydindstillinger');
+  assert.deepEqual(saved.links[1], context.structuredContent.links[1]);
+  assert.deepEqual(saved.registry, registry);
+  assert.equal((await apply((await preview(move)).structuredContent)).structuredContent.applied, false);
+
+  const screen = (await onboarding({ projectId: 'test-project', tasks: ['new-screen', 'project-files', 'project-files'] })).structuredContent;
+  assert.equal(screen.project.type, 'offline-product');
+  assert.deepEqual(screen.guidance.map(item => item.section), ['offlineprodukt', 'ny-skærm', 'projektfiler']);
+  assert.match(screen.guidance[1].text, /tastatur, fokus og smal visning/);
+  assert.equal(screen.reading.filter(item => item.section === 'kontrollér-den-berørte-funktion').length, 1);
+  assert.ok(screen.reading.some(item => item.id === 'integration' && item.section === 'fælles-projektfiler'));
+  await fs.writeFile(configFile, JSON.stringify({ scope: '.ds-scope' }));
+  assert.equal((await onboarding({ projectId: 'test-project', tasks: [] })).structuredContent.project.type, 'existing-product');
+  const system = (await onboarding({ projectId: 'stade', tasks: ['shared-system'] })).structuredContent;
+  assert.deepEqual(system.guidance.map(item => item.section), ['stade', 'fælles-bibliotek-og-værktøjer']);
+  assert.match(system.guidance[1].text, /testfilerne for de berørte/);
+  assert.equal((await onboarding({ projectId: 'stade', tasks: ONBOARDING_TASKS })).structuredContent.guidance.length, ONBOARDING_TASKS.length + 1);
+  assert.equal((await onboarding({ projectId: 'missing-project', tasks: [] })).isError, true);
+  assert.equal((await onboarding({ projectId: 'stade', tasks: ['missing-task'] })).isError, true);
   const {problem,approach,...legacy}=sample();
   const heuristic={...legacy,schemaVersion:2,context:problem,heuristic:approach,rationale:'En korrigeret tilgang gør ejerskab eksplicit.'};
   const proposed = await client.callTool({ name: 'propose_experience', arguments: { experience: heuristic } });

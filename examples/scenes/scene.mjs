@@ -13,18 +13,19 @@ const el=(doc,tag,className,text)=>{const node=doc.createElement(tag);if(classNa
 /** A product composition of shared controls. Theme changes keep the live DOM,
  * range draft, observation and modal state intact. The sculpture is decorative.
  */
-export function mountScene({root,themes,sceneId='aureol',style,document:doc=root?.ownerDocument}){
+export function mountScene({root,themes,sceneId='aureol',style,embedded=false,document:doc=root?.ownerDocument}){
  if(!root||!doc||!themes?.length)throw new Error('A scene requires a root and authored themes.');
  const scene=SCENES[sceneId];if(!scene)throw new Error('Unknown scene.');
  const sources=themes.map(item=>item.package??item);
  const initial=sources.find(item=>item.id===sceneId)??sources[0];
- const state={theme:initial.id,color:initial.defaultMode,intensity:72,space:scene.spaces[0][0]};
- const active=()=>sources.find(item=>item.id===state.theme);
- let theme=resolveThemeMode(initial,state.color),animation=null;
- const c=createComponentFactory(theme,{document:doc});
+ const state={theme:embedded?'':initial.id,color:initial.defaultMode,intensity:72,space:scene.spaces[0][0]};
+ const active=()=>sources.find(item=>item.id===state.theme)??initial;
+ let inherited,animation=null;
+ const c=createComponentFactory(resolveThemeMode(initial,state.color),{document:doc});
  const cleanups=[];
  const listen=(node,type,handler)=>{node.addEventListener(type,handler);cleanups.push(()=>node.removeEventListener(type,handler));};
  root.className='scene ds-scope scene-'+sceneId;
+ if(embedded)root.setAttribute('data-embedded','');
  root.setAttribute('data-space',state.space);
  const skip=el(doc,'a','scene-skip','Gå til lyskontroller');skip.setAttribute('href','#light-controls');
  const header=el(doc,'header','scene-header');
@@ -34,6 +35,7 @@ export function mountScene({root,themes,sceneId='aureol',style,document:doc=root
  for(const [id,definition]of Object.entries(SCENES)){const link=el(doc,'a','scene-nav-link',definition.name);link.setAttribute('href',id+'.html');if(id===sceneId)link.setAttribute('aria-current','page');nav.append(link);}
  const edition=el(doc,'span','scene-edition',sceneId==='aureol'?'LYS / FORM / NÆRVÆR':'RUM / STOF / PERSPEKTIV');
  header.append(brand,nav,edition);
+ if(embedded)header.setAttribute('hidden','');
 
  const hero=el(doc,'section','scene-hero');hero.setAttribute('aria-labelledby','scene-title');
  const atmosphere=el(doc,'div','scene-atmosphere');atmosphere.setAttribute('aria-hidden','true');
@@ -67,7 +69,9 @@ export function mountScene({root,themes,sceneId='aureol',style,document:doc=root
  const rangeBinding=mountRangeField(range,{onInput:({value})=>{state.intensity=value;applyLight();}});cleanups.push(()=>rangeBinding.destroy());
  adjust.append(range);
  const palette=el(doc,'div','instrument-palette');
- const themeField=c('field',{idPrefix:'scene-theme',label:'Tema',hint:'',controlVariant:'desktop',slots:{control:{tag:'select',children:sources.map(source=>({tag:'option',attrs:{value:source.id},text:source.name}))}}});
+ const themeOptions=sources.map(source=>({tag:'option',attrs:{value:source.id},text:source.name}));
+ if(embedded)themeOptions.unshift({tag:'option',attrs:{value:''},text:'Følg Stade'});
+ const themeField=c('field',{idPrefix:'scene-theme',label:'Tema',hint:'',controlVariant:'desktop',slots:{control:{tag:'select',children:themeOptions}}});
  const colorField=c('field',{idPrefix:'scene-color',label:'Farve',hint:'',controlVariant:'desktop',slots:{control:{tag:'select'}}});
  const themeSelect=themeField.querySelector('select'),colorSelect=colorField.querySelector('select');themeSelect.value=state.theme;
  listen(themeSelect,'change',()=>{state.theme=themeSelect.value;state.color=active().defaultMode;applyTheme();});
@@ -94,14 +98,28 @@ export function mountScene({root,themes,sceneId='aureol',style,document:doc=root
   animation?.cancel();animation=animateThemed(stage,[{opacity:.45,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}]);
  }
  function applyTheme(rebuildColors=true){
-  theme=resolveThemeMode(active(),state.color);
+  const following=!state.theme;
+  const parentTheme=following?inherited:undefined;
   brand.setAttribute('href','../../index.html?view=scenes&package='+state.theme);
-  if(style)style.textContent=generateCSS(theme);
-  if(rebuildColors){colorSelect.replaceChildren(...themeModeOptions(active()).map(({value,label})=>{const option=el(doc,'option','',label);option.setAttribute('value',value);return option;}));colorSelect.value=state.color;}
-  root.setAttribute('data-color-scheme',active().modes?.[state.color]?.colorScheme??state.color);
-  const scheme=active().modes?.[state.color]?.colorScheme??state.color;
+  if(style){
+    style.textContent=parentTheme?.css??generateCSS(resolveThemeMode(active(),state.color));
+    style.setAttribute('data-theme',parentTheme?.id??active().id);
+    style.setAttribute('data-mode',parentTheme?.mode??state.color??'');
+  }
+  if(rebuildColors){
+    const colors=following?[{value:'',label:'Følger Stade'}]:themeModeOptions(active());
+    colorSelect.replaceChildren(...colors.map(({value,label})=>{const option=el(doc,'option','',label);option.setAttribute('value',value);return option;}));
+    colorSelect.value=following?'':state.color;
+    colorSelect.disabled=following;
+  }
+  const scheme=parentTheme?.mode??active().modes?.[state.color]?.colorScheme??state.color;
+  root.setAttribute('data-color-scheme',scheme??'');
   if(doc.documentElement)doc.documentElement.style.colorScheme=['light','dark'].includes(scheme)?scheme:'normal';
  }
+ function inheritTheme(theme,mode){
+   inherited={css:generateCSS(theme),id:theme.id,mode};
+   if(!state.theme)applyTheme(false);
+ }
  applyTheme();applyLight();
- return {state,setSpace,destroy(){animation?.cancel();for(const cleanup of cleanups)cleanup();root.replaceChildren();}};
+ return {state,setSpace,inheritTheme,destroy(){animation?.cancel();for(const cleanup of cleanups)cleanup();root.replaceChildren();}};
 }
